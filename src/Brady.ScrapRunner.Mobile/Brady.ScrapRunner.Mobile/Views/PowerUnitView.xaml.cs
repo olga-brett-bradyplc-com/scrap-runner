@@ -16,9 +16,11 @@ namespace Brady.ScrapRunner.Mobile.Views
         public PowerUnitView()
         {
             InitializeComponent();
+
+            // Hide the navigation title bar
             NavigationPage.SetHasNavigationBar(this, false);
 
-            // TODO: Refactor out once proper navigation system is developed
+            // @TODO: Remove once proper navigation system is developed
             SetPowerUnitIdButton.Clicked += async (sender, e) =>
             {
                 await Navigation.PushAsync(new RouteSummaryView(), false);
