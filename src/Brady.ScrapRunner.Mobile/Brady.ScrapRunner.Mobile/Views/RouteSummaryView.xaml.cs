@@ -14,7 +14,7 @@
 
             NavigationPage.SetHasBackButton(this, false);
 
-            // TODO: Refactor out once proper navigation system is developed
+            // @TODO: Remove once proper navigation system is developed
             RouteSummaryListView.ItemSelected += async (sender, e) =>
             {
                 await Navigation.PushAsync(new RouteDetailView(), false);
