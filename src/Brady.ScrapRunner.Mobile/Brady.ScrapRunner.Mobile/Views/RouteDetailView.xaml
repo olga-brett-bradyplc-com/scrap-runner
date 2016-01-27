@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- This is all static data, as I'll need to create to create custom renders for the collapsable listviews and navigation controls -->
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:Brady.ScrapRunner.Mobile.ViewModels;assembly=Brady.ScrapRunner.Mobile"
+             x:Class="Brady.ScrapRunner.Mobile.Views.RouteDetailView"
+             Title="{Binding Title}">
+  <ContentPage.BindingContext>
+    <viewModels:RouteDetailViewModel/>
+  </ContentPage.BindingContext>
+  <ContentPage.ToolbarItems>
+    <ToolbarItem Text="OptionsMenu" Clicked="OnClick" Order="Primary" Priority="2">
+      <ToolbarItem.Icon>
+        <OnPlatform x:TypeArguments="FileImageSource"
+             Android="drawericon2.png" />
+      </ToolbarItem.Icon>
+    </ToolbarItem>
+  </ContentPage.ToolbarItems>
+  <ContentPage.Content>
+    <StackLayout VerticalOptions="Start">
+      <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" BackgroundColor="#2f2f2f" Padding="15">
+        <Label 
+          Text="Kaman Aerospace"
+          HorizontalOptions="Start"
+          FontSize="18"
+          TextColor="#ffffff"
+          BackgroundColor="#2f2f2f"/>
+      </StackLayout>
+    
+      <StackLayout Orientation="Vertical" Spacing="0" VerticalOptions="StartAndExpand" BackgroundColor="#ffffff" Padding="15">
+        <Label 
+          Text="Kaman Aerospace"
+          HorizontalOptions="Start"
+          FontSize="18"
+          TextColor="#2f2f2f"/>
+         <Label 
+          Text="1701 Indianwood Circle"
+          HorizontalOptions="Start"
+          FontSize="18"
+          TextColor="#2f2f2f"/>
+         <Label 
+          Text="Maumee, OH 43537"
+          HorizontalOptions="Start"
+          FontSize="18"
+          TextColor="#2f2f2f"/>
+      </StackLayout>
+    
+      <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" Padding="8">
+        <StackLayout Padding="15" BackgroundColor="#ffffff" >
+          <Label Text="Notes"
+                 FontSize="18"
+          />
+          <Label Text="This is just a sample notes section" FontSize="13"/>
+        </StackLayout> 
+      </StackLayout>
+
+      <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" Padding="8">
+        <StackLayout Padding="15" BackgroundColor="#ffffff" >
+          <Label Text="Drop Empty (2)" FontSize="18" />
+          <Label Text="&lt;NO NUMBER&gt; LUGGER-10" FontSize="13"/>
+          <Label Text="DOCK DOOR 14" FontSize="13"/>
+          <Label Text="#15 SHEARING IRON" FontSize="13"/>
+        </StackLayout>
+      </StackLayout>
+
+      <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" Padding="8">
+        <StackLayout Padding="15" BackgroundColor="#ffffff" >
+          <Label Text="Pickup Full (1)" FontSize="18" />
+          <Label Text="&lt;NO NUMBER&gt; LUGGER-20" FontSize="13"/>
+          <Label Text="DOCK DOOR 20" FontSize="13"/>
+          <Label Text="#14 SHEARING IRON" FontSize="13"/>
+        </StackLayout>
+      </StackLayout>      
+      
+    </StackLayout>
+  </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Brady.ScrapRunner.Mobile.ViewModels;assembly=Brady.ScrapRunner.Mobile"
+             xmlns:custom="clr-namespace:Brady.ScrapRunner.Mobile.Renderers;assembly=Brady.ScrapRunner.Mobile"
+             xmlns:i18N="clr-namespace:Brady.ScrapRunner.Mobile.Resources;assembly=Brady.ScrapRunner.Mobile"
+             x:Class="Brady.ScrapRunner.Mobile.Views.SignInView"
+             Title="{Binding Title}"
+             BackgroundImage="loginsplash800x1280.jpg">
+  <ContentPage.BindingContext>
+    <vm:SignInViewModel/>
+  </ContentPage.BindingContext>
+  <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" Padding="10" x:Name="StackLayout">
+    <Image Source="scraprunnertemplogo.png" />
+
+    <!-- See comment in Brady.ScrapRunner.Mobile.Renderers.BradyEntry on why to use BgColor vs. BackgroundColor -->
+    <custom:ExtendedEntry
+        Text="{Binding UserName}"
+        StyleId="UserNameInputField"
+        Placeholder="{i18N:Translate UserName}"
+        CornerRadius="5"
+        StrokeColor="White"
+        StrokeThickness="17"
+        PlaceholderColor="#b4b4b4"
+        BgColor="White"
+        TextColor="#000000"
+        x:Name="UserNameInputField"
+      />
+
+    <custom:ExtendedEntry
+        Text="{Binding Password}"
+        StyleId="PasswordInputField"
+        Placeholder="{i18N:Translate Password}"
+        CornerRadius="5"
+        StrokeColor="White"
+        StrokeThickness="17"
+        PlaceholderColor="#b4b4b4"
+        BgColor="White"
+        TextColor="#000000"
+        x:Name="PasswordInput"
+      />    
+
+    <Button Text="{i18N:Translate SignIn}"
+            x:Name="SignInButton"
+            StyleId="SignInButton"
+            HorizontalOptions="Fill"
+            BackgroundColor="#eb8939"
+            BorderColor="#ffffff"
+            BorderWidth="2"
+            BorderRadius="10"
+            TextColor="#ffffff"
+            Command="{Binding SignInCommand}"/>
+  </StackLayout>
+</ContentPage>

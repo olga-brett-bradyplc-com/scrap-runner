@@ -1,0 +1,358 @@
+
+***
+*** Sample JSON requests and responses, using Curl in the bash shell 
+***
+*** Send a cookie named bwftoken to prove prior authentication.
+***
+*** If no bfwtoken you are 303'd to the authentication page.
+*** Change --silent to --verbose within curl see what's going on.
+*** 
+*** For me, do not add the dollar sign delimiters in the query strings, as suggested by apidoc:
+***           "https://localhost:7776/api/scraprunner/query/Preferences?filter=ParameterValue='Y'&top=3" 
+***       not "https://localhost:7776/api/scraprunner/query/Preferences?$filter=ParameterValue='Y'&$top=3" 
+***
+
+***
+*** Authentication
+***
+
+curl --silent --insecure --request POST \
+     --header "Content-Type: application/json" \
+     --data "{\"username\":\"admin\", \"password\":\"mem_2014\"}" \
+"https://localhost:7776/authentication/login"
+
+	{"error":null,"token":"05b2261c-bbb7-4e85-9a15-98ee60de8dd5"}
+
+***
+*** REST query
+***
+
+curl --silent --insecure --request GET \
+     --header "Content-Type: application/json" \
+     --header "cookie: bwftoken=05b2261c-bbb7-4e85-9a15-98ee60de8dd5" \
+"https://localhost:7776/api/scraprunner/Preference/DEFAutoPurgeOn;0000"
+
+	{
+	  "TerminalId": "0000",
+	  "Parameter": "DEFAutoPurgeOn",
+	  "ParameterValue": "Y",
+	  "Description": "Auto Purge On?",
+	  "Id": "DEFAutoPurgeOn;0000"
+	}
+
+***
+*** query API
+***
+
+curl --silent --insecure --request GET \
+     --header "Content-Type: application/json" \
+     --header "cookie: bwftoken=05b2261c-bbb7-4e85-9a15-98ee60de8dd5" \
+"https://localhost:7776/api/scraprunner/query/Preferences
+
+	{
+		"Records":[
+			{
+				"$type":"Brady.ScrapRunner.Domain.Models.Preference, Brady.ScrapRunner.Domain",
+				"TerminalId":"0000","Parameter":"DEFAutoPurgeOn","ParameterValue":"Y","Description":"Auto Purge On?","Id":"DEFAutoPurgeOn;0000"
+			},
+			{
+				"$type":"Brady.ScrapRunner.Domain.Models.Preference, Brady.ScrapRunner.Domain",
+				"TerminalId":"0000","Parameter":"DEFDateFormat","ParameterValue":"MM/DD/YYYY","Description":"MM/DD/YYYY","Id":"DEFDateFormat;0000"
+			},
+			{
+				all the remainder records ...
+			}
+		],
+		"Aggregates":{},
+		"TotalCount":1519,
+		"Query":"Preferences?"
+	}
+
+***
+*** query API
+***
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json"  \
+      --header "cookie: bwftoken=05b2261c-bbb7-4e85-9a15-98ee60de8dd5" \
+"https://localhost:7776/api/scraprunner/query/Preferences?filter=ParameterValue='Y'&top=3"
+
+	{
+		"Records":[
+			{"$type":"Brady.ScrapRunner.Domain.Models.Preference, Brady.ScrapRunner.Domain","TerminalId":"0000","Parameter":"DEFAutoPurgeOn","ParameterValue":"Y","Description":"Auto Purge On?","Id":"DEFAutoPurgeOn;0000"}
+			,{"$type":"Brady.ScrapRunner.Domain.Models.Preference, Brady.ScrapRunner.Domain","TerminalId":"0000","Parameter":"DEFFHCustomer","ParameterValue":"Y","Description":"Account Master (CU)","Id":"DEFFHCustomer;0000"}
+			,{"$type":"Brady.ScrapRunner.Domain.Models.Preference, Brady.ScrapRunner.Domain","TerminalId":"0000","Parameter":"DEFSysDelErrorLog","ParameterValue":"Y","Description":"Delete Error Log?","Id":"DEFSysDelErrorLog;0000"}
+		],
+		"Aggregates":{},
+		"TotalCount":342,
+		"Query":"Preferences?$filter=ParameterValue='Y'&$top=3"
+	}
+
+***
+*** REST query for Employee
+***
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=05b2261c-bbb7-4e85-9a15-98ee60de8dd5" \
+"https://localhost:7776/api/scraprunner/EmployeeMaster/001"
+
+	if not found:
+		
+		{"message":"The resource you requested was not found.","fullException":null}
+
+	else 
+
+		{
+		  "EmployeeId": "001",
+		  "TerminalId": "F1",
+		  "FirstName": "001",
+		  "LastName": "DRIVER",
+		  ...
+		}
+
+***
+*** query API finding an Employee
+***
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=05b2261c-bbb7-4e85-9a15-98ee60de8dd5" \
+"https://localhost:7776/api/scraprunner/query/EmployeeMasters?filter=EmployeeId='001'"
+
+	{
+		"Records":[
+			{"$type":"Brady.ScrapRunner.Domain.Models.EmployeeMaster, Brady.ScrapRunner.Domain","EmployeeId":"001","TerminalId":"F1","FirstName":"001","LastName":"DRIVER",
+				"Address":null,"City":null,"State":null,"Zip":null,"Phone1":null,"Phone2":null,"Password":null,"FileMaintAccess":null,"SecurityLevel":"DR",
+				"SupervisorId":null,"NickName":null,"EmployeeType":null,"CompanyCode":null,"EmployeeStatus":null,"LoginDateTime":null,"AccessDateTime":null,
+				"WorkArea":null,"BillerInitials":null,"NumTimesLogin":0,"MaxLogins":0,"RouterId":null,"AreaId":"F1","RegionId":"SDF","DefTerminalId":"F1",
+				"PrevEmployeeId":null,"AllowMessaging":"Y","DefLabelPrinter":null,"Country":null,"AllowMapsAccess":null,"DefReadyDateTomorrow":null,
+				"AudibleAlertNewMsg":null,"MapId":null,"ActionFlag":null,"DefReadyDateMonday":null,"DefStartAcctSearchBegName":null,"AllowChangeContNumber":null,
+				"AllowModDoneTrips":null,"AllowCancelDoneTrips":null,"opt":null,"SessionID":null,"Router":null,"DisplayReceiptNumber":null,
+				"DisplayScaleReferenceNumber":null,"LoginID":null,"LoginIDPrev":null,"InactiveDate":null,"Id":"001"
+			}
+		],
+		"Aggregates":{},
+		"TotalCount":1,
+		"Query":"EmployeeMasters?$filter=EmployeeId='001'"
+	}
+
+
+***
+*** Rest Lifecycle tests.   Still have a ways to go on single id....
+*** Trip
+***
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=c83a9c82-bc7a-45cb-b0da-c170d716c6e2" \
+"https://localhost:7776/api/scraprunner/Trip/STMSTM"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=c83a9c82-bc7a-45cb-b0da-c170d716c6e2" \
+     --data "{\"TripNumber\":\"STMSTM\", \"TripStatus\":\"A\", \"TripStatusDesc\":\"1st descrip\", \"TripAssignStatus\":\"X\", \"TripAssignStatusDesc\":\"1st X descrip\"}" \
+"https://localhost:7776/api/scraprunner/Trip/STMSTM"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=c83a9c82-bc7a-45cb-b0da-c170d716c6e2" \
+     --data "{\"TripNumber\":\"STMSTM\", \"TripStatus\":\"B\", \"TripStatusDesc\":\"2nd descrip\", \"TripAssignStatus\":\"Z\", \"TripAssignStatusDesc\":\"Updated descrip\"}" \
+"https://localhost:7776/api/scraprunner/Trip/STMSTM"
+
+curl --silent --insecure --request DELETE \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=c83a9c82-bc7a-45cb-b0da-c170d716c6e2" \
+"https://localhost:7776/api/scraprunner/Trip/STMSTM"
+
+***
+*** Rest Lifecycle tests.   Still have a ways to go on single id....
+*** TripSegment
+***
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=81444816-2648-46f1-adff-065868dccb26" \
+"https://localhost:7776/api/scraprunner/TripSegment/STMSTM;01"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=81444816-2648-46f1-adff-065868dccb26" \
+     --data "{\"TripNumber\":\"STMSTM\", \"TripSegNumber\":\"01\", \"TripSegStatus\":\"A\", \"TripSegStatusDesc\":\"1st descrip\"}" \
+"https://localhost:7776/api/scraprunner/TripSegment/STMSTM;01"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=81444816-2648-46f1-adff-065868dccb26" \
+     --data "{\"TripNumber\":\"STMSTM\", \"TripSegNumber\":\"01\", \"TripSegStatus\":\"B\", \"TripSegStatusDesc\":\"updated descrip\"}" \
+"https://localhost:7776/api/scraprunner/TripSegment/STMSTM;01"
+
+curl --silent --insecure --request DELETE \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=81444816-2648-46f1-adff-065868dccb26" \
+"https://localhost:7776/api/scraprunner/TripSegment/STMSTM;01"
+
+
+***
+*** Rest Lifecycle tests.   Still have a ways to go on single id....
+*** Driver Status
+***
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=c9ce2b72-9f9c-49c0-afba-641919edcd4e" \
+"https://localhost:7776/api/scraprunner/DriverStatus/001"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=c9ce2b72-9f9c-49c0-afba-641919edcd4e" \
+     --data "{\"employeeId\":\"001\", \"Status\":\"1\"}" \
+"https://localhost:7776/api/scraprunner/DriverStatus/001"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=c9ce2b72-9f9c-49c0-afba-641919edcd4e" \
+       --data "{ \"EmployeeId\": \"001\",  \"TripNumber\": \"3\",  \"TripSegNumber\": \"3\",  \"TripSegType\": \"3\",  \"TripAssignStatus\": \"3\",  \"TripStatus\": \"3\",  \"TripSegStatus\": \"3\",  \"Status\": \"3\",  \"Id\": \"001\" }" \
+"https://localhost:7776/api/scraprunner/DriverStatus/001"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=c9ce2b72-9f9c-49c0-afba-641919edcd4e" \
+       --data "{ \"EmployeeId\": \"001\",  \"TripNumber\": \"3\",  \"TripSegNumber\": \"3\",  \"TripSegType\": \"3\",  \"TripAssignStatus\": \"3\",  \"TripStatus\": \"3\",  \"TripSegStatus\": \"3\",  \"Status\": \"3\",  \"TerminalId\": \"3\",  \"RegionId\": \"3\",  \"PowerId\": null,  \"DriverArea\": \"6\",  \"MDTId\": \"6\",  \"LoginDateTime\": null,  \"ActionDateTime\": null,  \"DriverCumMinutes\": \"6\",  \"Odometer\": \"6\",  \"RFIDFlag\": null,  \"RouteTo\": null,  \"LoginProcessedDateTime\": null,  \"GPSAutoGeneratedFlag\": null,  \"ContainerMasterDateTime\": null,  \"DelayCode\": null,  \"PrevDriverStatus\": null,  \"MdtVersion\": null,  \"GPSXmitFlag\": null,  \"SendHHLogoffFlag\": null,  \"TerminalMasterDateTime\": null,  \"DriverLCID\": null,  \"Id\": \"001\" }" \
+"https://localhost:7776/api/scraprunner/DriverStatus/001"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=c9ce2b72-9f9c-49c0-afba-641919edcd4e" \
+       --data "@DriverStatusBody.txt" \
+"https://localhost:7776/api/scraprunner/DriverStatus/001"
+
+curl --silent --insecure --request DELETE \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=c4479780-fc6f-4091-af3a-3e44713d2c5d" \
+"https://localhost:7776/api/scraprunner/DriverStatus/001"
+
+***
+*** Rest Lifecycle tests.   Still have a ways to go on single id....
+*** PowerMaster
+***
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+"https://localhost:7776/api/scraprunner/PowerMaster/foo"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+     --data "{\"PowerId\":\"foo\", \"PowerType\":\"M\", \"PowerDesc\":\"pow desc\", \"PowerSize\":\"1\"}" \
+"https://localhost:7776/api/scraprunner/PowerMaster/foo"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+     --data "{\"PowerId\":\"foo\", \"PowerType\":\"M\", \"PowerDesc\":\"pow desc\", \"powerLength\":\"1\"}" \
+"https://localhost:7776/api/scraprunner/PowerMaster/foo"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+     --data "{\"PowerId\":\"foo\", \"PowerType\":\"M\", \"PowerDesc\":\"pow desc\", \"PowerSize\":\"1\",\"powerLength\":\"1\"}" \
+"https://localhost:7776/api/scraprunner/PowerMaster/foo"
+
+curl --silent --insecure --request DELETE \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+"https://localhost:7776/api/scraprunner/PowerMaster/foo"
+
+***
+*** Rest Lifecycle tests.   Still have a ways to go on single id....
+*** EmployeeMaster
+***
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+"https://localhost:7776/api/scraprunner/EmployeeMaster/foo"
+
+#
+# partial messages cause nulling of unspecified fields
+#
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+     --data "{\"employeeId\":\"foo\", \"firstName\":\"Steve\", \"LastName\":\"Maniak\", \"terminalID\":\"1\",\"city\":\"Maumee\"}" \
+"https://localhost:7776/api/scraprunner/EmployeeMaster/foo"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+     --data "{\"employeeId\":\"foo\", \"firstName\":\"Steve\", \"LastName\":\"Maniak\", \"terminalID\":\"1\",\"state\":\"OH\"}" \
+"https://localhost:7776/api/scraprunner/EmployeeMaster/foo"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+     --data "{\"employeeId\":\"foo\", \"firstName\":\"Steve\", \"LastName\":\"Maniak\", \"terminalID\":\"1\",\"city\":\"Maumee\",\"state\":\"OH\"}" \
+"https://localhost:7776/api/scraprunner/EmployeeMaster/foo"
+
+#
+# returns true on success 
+#
+curl --silent --insecure --request DELETE \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+"https://localhost:7776/api/scraprunner/EmployeeMaster/foo"
+
+***
+*** Preference tests. 
+*** EmployeeMaster
+***
+
+#
+# {"message":"Preference with Parameter=\u0027foo\u0027 and TerminalId=\u0027x\u0027 does not exist","fullException":null}
+#
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+"https://localhost:7776/api/scraprunner/Preference/foo;x"
+
+#
+# quietly fails  (405 method not allowed)
+#
+curl --silent --insecure --request POST \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"parameterValue\":\"Maniak\"}" \
+"https://localhost:7776/api/scraprunner/Preference/foo;x"
+
+#
+# PUT for insert and update.  partial messages cause nulling of unspecified fields on both insert and update.
+#
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"parameterValue\":\"Maniak\", \"description\":\"updated desc\"}" \
+"https://localhost:7776/api/scraprunner/Preference/foo;x"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"description\":\"updated desc\"}" \
+"https://localhost:7776/api/scraprunner/Preference/foo;x"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"parameterValue\":\"Maniak\", \"description\":\"updated desc\"}" \
+"https://localhost:7776/api/scraprunner/Preference/foo;x"
+
+#
+# returns true on success 
+#
+curl --silent --insecure --request DELETE \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+"https://localhost:7776/api/scraprunner/Preference/foo;x"
+
+
