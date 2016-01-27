@@ -18,6 +18,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new TripSegmentMetadata()
                   , new TripMetadata()
                   , new TerminalMasterMetadata()
+                  , new DriverDelayMetadata()
+                  , new DriverHistoryMetadata()
             )
         {
             

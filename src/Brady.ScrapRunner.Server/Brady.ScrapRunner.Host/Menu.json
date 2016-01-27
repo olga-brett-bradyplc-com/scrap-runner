@@ -32,6 +32,14 @@
             {
               "text": "TerminalMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TerminalMaster"
+            },
+            {
+              "text": "DriverDelay",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverDelay"
+            },
+            {
+              "text": "DriverHistory",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverHistory"
             }
           ]
         }

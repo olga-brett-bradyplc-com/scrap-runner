@@ -173,6 +173,8 @@
     <Compile Include="Concrete\SRDataService.cs" />
     <Compile Include="Concrete\SRRepository.cs" />
     <Compile Include="Interfaces\ISRRepository.cs" />
+    <Compile Include="Mappings\DriverHistoryMap.cs" />
+    <Compile Include="Mappings\DriverDelayMap.cs" />
     <Compile Include="Mappings\TerminalMasterMap.cs" />
     <Compile Include="Mappings\DriverStatusMap.cs" />
     <Compile Include="Mappings\EmployeeMasterMap.cs" />
@@ -181,12 +183,18 @@
     <Compile Include="Mappings\TripSegmentMap.cs" />
     <Compile Include="Mappings\PreferenceMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RecordTypes\DriverHistoryRecordType.cs" />
+    <Compile Include="RecordTypes\DriverDelayRecordType.cs" />
     <Compile Include="RecordTypes\TerminalMasterRecordType.cs" />
     <Compile Include="RecordTypes\DriverStatusRecordType.cs" />
     <Compile Include="RecordTypes\EmployeeMasterRecordType.cs" />
     <Compile Include="RecordTypes\PowerMasterRecordType.cs" />
     <Compile Include="RecordTypes\TripRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentRecordType.cs" />
+    <Compile Include="Validators\DriverHistoryValidator.cs" />
+    <Compile Include="Validators\DriverHistoryDeletionValidator.cs" />
+    <Compile Include="Validators\DriverDelayDeletionValidator.cs" />
+    <Compile Include="Validators\DriverDelayValidator.cs" />
     <Compile Include="Validators\TerminalMasterValidator.cs" />
     <Compile Include="Validators\TerminalMasterDeletionValidator.cs" />
     <Compile Include="Validators\DriverStatusDeletionValidator.cs" />

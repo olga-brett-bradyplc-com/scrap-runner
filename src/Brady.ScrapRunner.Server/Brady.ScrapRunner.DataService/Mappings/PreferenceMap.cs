@@ -13,8 +13,14 @@ namespace Brady.ScrapRunner.DataService.Mappings
     {
         public PreferenceMap()
         {
-
             Table("Preferences");
+
+            Property(x => x.Id, m =>
+            {
+                m.Formula("concat(Parameter, ';', TerminalId)");
+                m.Insert(false);
+                m.Update(false);
+            });
 
             ComposedId(map =>
             {
@@ -24,13 +30,6 @@ namespace Brady.ScrapRunner.DataService.Mappings
 
             Property(x => x.Description);
             Property(x => x.ParameterValue);
-
-            Property(x => x.Id, m =>
-            {
-                m.Formula("Parameter + ';' + TerminalId");
-                m.Insert(false);
-                m.Update(false);
-            });
         }
     }
 }
