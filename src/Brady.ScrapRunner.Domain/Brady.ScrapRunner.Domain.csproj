@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Metadata\TerminalMasterMetadata.cs" />
     <Compile Include="Metadata\DriverStatusMetadata.cs" />
     <Compile Include="Metadata\EmployeeMasterMetadata.cs" />
     <Compile Include="Metadata\PowerMasterMetadata.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="Metadata\SRMetadataBundle.cs" />
     <Compile Include="Metadata\TripMetadata.cs" />
     <Compile Include="Metadata\TripSegmentMetadata.cs" />
+    <Compile Include="Models\TerminalMaster.cs" />
     <Compile Include="Models\DriverStatus.cs" />
     <Compile Include="Models\EmployeeMaster.cs" />
     <Compile Include="Models\PowerMaster.cs" />

@@ -6,7 +6,7 @@
             "text": "Types",
           "items": [
             {
-              "text": "EmployeeMasters",
+              "text": "EmployeeMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
             },
             {
@@ -14,7 +14,7 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Preference"
             },
             {
-              "text": "PowerMasters",
+              "text": "PowerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerMaster"
             },
             {
@@ -28,6 +28,10 @@
             {
               "text": "TripSegment",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegment"
+            },
+            {
+              "text": "TerminalMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TerminalMaster"
             }
           ]
         }
