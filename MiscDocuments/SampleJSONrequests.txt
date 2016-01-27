@@ -140,6 +140,33 @@ curl --silent --insecure --request GET \
 
 ***
 *** Rest Lifecycle tests.   Still have a ways to go on single id....
+*** TerminalMaster
+***
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=e905b591-0e02-476e-bb2e-6b10d8fc1a2a" \
+"https://localhost:7776/api/scraprunner/TerminalMaster/STM"
+
+curl --silent --insecure --request PUT \
+     --header "Content-Type: application/json" \
+     --header "cookie: bwftoken=e905b591-0e02-476e-bb2e-6b10d8fc1a2a" \
+     --data "{ \"TerminalId\": \"STMSTM\",  \"Region\": \"OH\",  \"TerminalName\": \"STM Maumee\",  \"Address1\": \"1705 W. Indian Wood Cir\",  \"Address2\": null,  \"City\": \"MAUMEE\",  \"State\": \"OH\",  \"Zip\": \"43537\", \"Country\": \"USA\" } " \
+"https://localhost:7776/api/scraprunner/TerminalMaster/STMSTM"
+
+curl --silent --insecure --request PUT \
+     --header "Content-Type: application/json" \
+     --header "cookie: bwftoken=e905b591-0e02-476e-bb2e-6b10d8fc1a2a" \
+     --data "{ \"TerminalId\": \"STMSTM\",  \"Region\": \"OH\",  \"TerminalName\": \"STM Maumee\",  \"Address1\": \"1705 W. Indian Wood Cir\",  \"Address2\": null,  \"City\": \"MAUMEE\",  \"State\": \"OH\",  \"Zip\": \"43537\", \"Country\": \"USA\", \"Phone\":\"419.891.1100\" } " \
+"https://localhost:7776/api/scraprunner/TerminalMaster/STMSTM"
+
+curl --silent --insecure --request DELETE \
+     --header "Content-Type: application/json" \
+     --header "cookie: bwftoken=e905b591-0e02-476e-bb2e-6b10d8fc1a2a" \
+"https://localhost:7776/api/scraprunner/TerminalMaster/STMSTM"
+
+***
+*** Rest Lifecycle tests.   Still have a ways to go on single id....
 *** Trip
 ***
 
