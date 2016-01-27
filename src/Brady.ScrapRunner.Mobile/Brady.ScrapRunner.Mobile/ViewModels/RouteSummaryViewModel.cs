@@ -1,0 +1,83 @@
+﻿using Brady.ScrapRunner.Mobile.Models;
+
+namespace Brady.ScrapRunner.Mobile.ViewModels
+{
+    using System;
+    using System.Collections.ObjectModel;
+
+    public class RouteSummaryViewModel : BaseViewModel
+    {
+        public RouteSummaryViewModel()
+        {
+            Title = "Route Summary";
+            CreateDummyData();
+        }
+
+        private string _tripId;
+
+        public string TripId
+        {
+            get { return _tripId; }
+            set { SetProperty(ref _tripId, value); }
+        }
+
+        public ObservableCollection<Route> RouteSummaryList { get; private set; }
+
+        public void CreateDummyData()
+        {
+            RouteSummaryList = new ObservableCollection<Route>
+            {
+                new Route
+                {
+                    Notes = "Do something special with this note",
+                    CompanyName = "Kaman Aerospace",
+                    TripType = "Switch",
+                    Address1 = "1701 Indianwood Circle",
+                    City = "Maumee",
+                    State = "OH",
+                    Zipcode = "43537",
+                    CloseTime = "2000",
+                    OpenTime = "0900"
+                },
+                new Route
+                {
+                    Notes = "This should be an easy trip",
+                    CompanyName = "Jay's Scrap Metal",
+                    TripType = "Return To Yard",
+                    Address1 = "6560 Brixton Rd",
+                    City = "Maumee",
+                    State = "OH",
+                    Zipcode = "43537",
+                    CloseTime = "2000",
+                    OpenTime = "2000"
+                },
+                new Route
+                {
+                    Notes = "Just drop a few containers and party",
+                    CompanyName = "Jimbo's Recycling",
+                    TripType = "Drop Empty",
+                    Address1 = "Dingbing Rd",
+                    City = "Findlay",
+                    State = "OH",
+                    Zipcode = "43900",
+                    CloseTime = "0500",
+                    OpenTime = "0900"
+                },
+                new Route
+                {
+                    Notes =
+                        "WHHHHAAATTTTT? This is a test to see if the content will wrap correctly, otherwise back to the drawing board ...",
+                    TripType = "Switch",
+                    CompanyName = "SIMS Metal Management",
+                    Address1 = "1701 Indianwood Circle",
+                    City = "Maumee",
+                    State = "OH",
+                    Zipcode = "43537",
+                    CloseTime = "2000",
+                    OpenTime = "0900"
+                }
+            };
+
+        }
+    }
+}

@@ -1,0 +1,254 @@
+
+/*
+ *  Revised SQLlite scraprunner schema.
+ *  2016-01-20:  Consolidation of Container and TruckInv tables into Container table.
+ * 
+ */
+
+CREATE TABLE [CodeTable] (
+  [UniqueIdentifier] INTEGER  PRIMARY KEY NULL,
+  [CodeName] TEXT  NULL,
+  [CodeSeq] NUMERIC  NULL,
+  [CodeValue] TEXT  NULL,
+  [CodeDisp1] TEXT  NULL,
+  [CodeDisp2] TEXT  NULL,
+  [CodeDisp3] TEXT  NULL,
+  [CodeDisp4] TEXT  NULL,
+  [CodeDisp5] TEXT  NULL
+);
+
+CREATE TABLE Commodity (
+  Key TEXT PRIMARY KEY,
+  Code TEXT,
+  Desc TEXT,
+  HostCode TEXT
+);
+
+CREATE TABLE "ConfirmRTNC" (
+  "TripNumber" TEXT NOT NULL ,
+  "TripSegmentNumber" TEXT NOT NULL ,
+  "Confirmed" BOOL,
+  PRIMARY KEY ("TripNumber", "TripSegmentNumber")
+);
+
+/*
+ * Consolidated Container and TruckInv table.
+ * Assuming TripNumber, TripSegmentNumber, and ContainerSequenceNumber should all be non-null primary key fields.
+ * Assuming ContainerOnTruck is a critical discriminator column, so assuming  non-null Y/N value.
+ * Assuming all other fields are nullable.
+ * Excluding obsolete (compound value) TripNumSegSeq, there are only three additional columns: TripType, EmptyContNumFlag, and ContainerNumberEntered.
+ */
+CREATE TABLE Container (
+  [TripNumber]   			TEXT,
+  [TripSegmentNumber] 			TEXT,
+  [ContainerSequenceNumber] 		TEXT,
+  [ContainerOnTruck] 			TEXT,
+  [ContainerNumber] TEXT NULL,
+  [ContainerType] TEXT NULL,
+  [ContainerSize] TEXT NULL,
+  [ContainerCommodityCode] TEXT  NULL,
+  [ContainerCommodityDesc] TEXT  NULL,
+  [ContainerLocation] TEXT  NULL,
+  [ContainerWeightGross] NUMERIC  NULL,
+  [ContainerWeightTare] NUMERIC  NULL,
+  [ContainerActionDateTime] REAL  NULL,
+  [ReviewFlag] TEXT  NULL,
+  [ProcessedFlag] TEXT  NULL,
+  [Content] TEXT  NULL,
+  [Customer] TEXT  NULL,
+  [CustHostCode] TEXT  NULL,
+  [Done] TEXT  NULL,
+  [Gross1Flag] TEXT  NULL,
+  [Gross1DateTime] REAL  NULL,
+  [Gross2Flag] TEXT  NULL,
+  [Gross2DateTime] REAL  NULL,
+  [TareFlag] TEXT  NULL,
+  [TareDateTime] REAL  NULL,
+  [MaterialGradeFlag] TEXT  NULL,
+  [Comm1Code] TEXT  NULL,
+  [Comm1Pct] REAL  NULL,
+  [Comm2Code] TEXT  NULL,
+  [Comm2Pct] REAL  NULL,
+  [Comm3Code] TEXT  NULL,
+  [Comm3Pct] REAL  NULL,
+  [Comm4Code] TEXT  NULL,
+  [Comm4Pct] REAL  NULL,
+  [ContamCode] TEXT  NULL,
+  [CustArea] TEXT  NULL,
+  [ReviewReason] TEXT  NULL,
+  [EntryMethod] TEXT  NULL,
+  [ContamWeight] TEXT  NULL,
+  [Comm1Desc] TEXT  NULL,
+  [Comm2Desc] TEXT  NULL,
+  [Comm3Desc] TEXT  NULL,
+  [Comm4Desc] TEXT  NULL,
+  [ContainerWeightGross2] NUMERIC  NULL,
+  [ContainerLevel] TEXT  NULL,
+  [ContainerLatitude] TEXT  NULL,
+  [ContainerLongitude] TEXT  NULL,
+  [ContainerNumberEntered] TEXT NULL,
+  [TripType] TEXT NULL,
+  [EmptyContNumFlag] TEXT NULL,
+  [LeftInYard] TEXT  NULL,
+  PRIMARY KEY ([TripNumber], [TripSegmentNumber], [ContainerSequenceNumber])
+);
+
+CREATE TABLE ContainerMaster (
+  ContNumber TEXT PRIMARY KEY,
+  ContType TEXT,
+  ContSize TEXT,
+  TerminalId TEXT,
+  ContBarCodeNum TEXT
+);
+
+CREATE TABLE CustLoc (
+  Key TEXT PRIMARY KEY,
+  HostCode TEXT,
+  Location TEXT
+);
+
+CREATE TABLE MessageList (
+  EmployeeId TEXT PRIMARY KEY,
+  LastName TEXT
+);
+
+CREATE TABLE NewMsg (
+  Akey INTEGER PRIMARY KEY,
+  MsgId NUMERIC,
+  TerminalId TEXT,
+  xThread NUMERIC,
+  xCreateDateTime TEXT,
+  SenderId TEXT,
+  SenderName TEXT,
+  ReceiverId TEXT,
+  ReceiverName TEXT,
+  MsgTxt TEXT,
+  UrgentFlag TEXT
+);
+
+CREATE TABLE [ReceiptNumbers] (
+  [TripNumber] TEXT  NULL,
+  [Value] TEXT  NOT NULL,
+  PRIMARY KEY ([TripNumber],[Value])
+);
+
+CREATE TABLE [ScaleReferenceNumbers] (
+  [ContainerNumber] TEXT  NULL,
+  [ContainerTripNumber] TEXT  NULL,
+  [ContainerTripSegment] TEXT  NULL,
+  [ContainerSequence] NUMERIC  NULL,
+  [Value] TEXT  NULL,
+  PRIMARY KEY ([ContainerNumber],[Value])
+);
+
+CREATE TABLE [Segment] (
+  [DriverModified] TEXT  NULL,
+  [DriverGenerated] TEXT  NULL,
+  [DriverStatus] TEXT  NULL,
+  [TripNumSeg] TEXT  PRIMARY KEY NULL,
+  [TripNumber] TEXT  NULL,
+  [TripStatus] TEXT  NULL,
+  [TripType] TEXT  NULL,
+  [TripCustType] TEXT  NULL,
+  [TripCustHostCode] TEXT  NULL,
+  [TripCustCode4_4] TEXT  NULL,
+  [TripCustName] TEXT  NULL,
+  [TripCustAddress1] TEXT  NULL,
+  [TripCustAddress2] TEXT  NULL,
+  [TripCustCity] TEXT  NULL,
+  [TripCustState] TEXT  NULL,
+  [TripCustZip] TEXT  NULL,
+  [TripCustCountry] TEXT  NULL,
+  [TripCustPhone1] TEXT  NULL,
+  [TripContactName] TEXT  NULL,
+  [TripCustOpenTime] REAL  NULL,
+  [TripCustCloseTime] REAL  NULL,
+  [TripCustReadyDateTime] REAL  NULL,
+  [TripTerminalId] TEXT  NULL,
+  [TripRegionId] TEXT  NULL,
+  [TripExpediteFlag] TEXT  NULL,
+  [TripOdometer] NUMERIC  NULL,
+  [TripCustDirections] TEXT  NULL,
+  [TripCustLatitude] TEXT  NULL,
+  [TripCustLongitude] TEXT  NULL,
+  [TripCustRadius] NUMERIC  NULL,
+  [TripTotalSegments] NUMERIC  NULL,
+  [CurrentSegFlag] TEXT  NULL,
+  [SegDoneDateTime] REAL  NULL,
+  [NoContainers] TEXT  NULL,
+  [TripSequenceNumber] NUMERIC  NULL,
+  [ProcessedFlag] TEXT  NULL,
+  [OrigState] TEXT  NULL,
+  [ReceiptFlag] TEXT  NULL,
+  [TripComments] TEXT  NULL,
+  [DriverInstructions] TEXT  NULL,
+  [TripSegmentNumber] TEXT  NULL,
+  [SignatureRequired] TEXT  NULL
+);
+
+CREATE TABLE [SignatureData] (
+  [TripNumSeg] TEXT  PRIMARY KEY NULL,
+  [ImageData] BLOB  NOT NULL,
+  [PrintedName] TEXT  NULL,
+  [SignatureDateTime] REAL  NOT NULL
+);
+
+CREATE TABLE States (
+  Abbrv TEXT,
+  Name TEXT,
+  Number INTEGER PRIMARY KEY,
+  Country TEXT
+);
+
+CREATE TABLE Trip (
+  EmployeeId TEXT PRIMARY KEY,
+  TripTerminalId TEXT,
+  TripRegionId TEXT,
+  MDTId TEXT,
+  PowerId TEXT,
+  DriverStatus TEXT,
+  TripNumber TEXT,
+  TripSegmentNumber TEXT,
+  ContainerSequenceNumber TEXT,
+  TripSegContainerNumber TEXT,
+  TripSegmentType TEXT,
+  TripBeginActiveDateTime REAL,
+  TripActionDateTime REAL,
+  TripOdometer NUMERIC,
+  CurrentStopMinutes NUMERIC,
+  GPSOdometerFlag TEXT,
+  TripCustLatitude TEXT,
+  TripCustLongitude TEXT,
+  TripCustRadius NUMERIC,
+  TripCustHostCode TEXT,
+  TripCustName TEXT
+);
+
+CREATE TABLE UniversalCommodity (
+  Code TEXT PRIMARY KEY,
+  Desc TEXT
+);
+
+CREATE TABLE Yard (
+  DriverInstructions TEXT,
+  CustomerHostCode TEXT PRIMARY KEY,
+  ActionFlag TEXT,
+  CustomerCode4x4 TEXT,
+  CustomerName TEXT,
+  CustomerAddress1 TEXT,
+  CustomerAddress2 TEXT,
+  CustomerCity TEXT,
+  CustomerState TEXT,
+  CustomerZIP TEXT,
+  CustomerCountry TEXT,
+  CustomerPhone1 TEXT,
+  ContactName TEXT,
+  CustomerOpenTime REAL,
+  CustomerCloseTime REAL,
+  TerminalID TEXT,
+  RegionID TEXT,
+  CustomerLatitude TEXT,
+  CustomerLongitude TEXT,
+  CustomerRadius NUMERIC
+);
+

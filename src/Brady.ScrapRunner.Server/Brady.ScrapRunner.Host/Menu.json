@@ -1,0 +1,35 @@
+﻿{
+    "text": "ScrapRunner",
+    "link": "{{appSetting-ExplorerHostUrl}}/view/#default/explorer/View",
+    "items": [
+        {
+            "text": "Types",
+          "items": [
+            {
+              "text": "EmployeeMasters",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
+            },
+            {
+              "text": "Preferences",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Preference"
+            },
+            {
+              "text": "PowerMasters",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerMaster"
+            },
+            {
+              "text": "DriverStatus",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverStatus"
+            },
+            {
+              "text": "Trip",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Trip"
+            },
+            {
+              "text": "TripSegment",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegment"
+            }
+          ]
+        }
+    ]
+}
