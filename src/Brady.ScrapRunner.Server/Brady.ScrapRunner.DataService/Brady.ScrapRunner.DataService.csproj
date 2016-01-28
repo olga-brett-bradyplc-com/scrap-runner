@@ -173,6 +173,10 @@
     <Compile Include="Concrete\SRDataService.cs" />
     <Compile Include="Concrete\SRRepository.cs" />
     <Compile Include="Interfaces\ISRRepository.cs" />
+    <Compile Include="Mappings\CustomerMasterMap.cs" />
+    <Compile Include="Mappings\RegionMasterMap.cs" />
+    <Compile Include="Mappings\CodeTableMap.cs" />
+    <Compile Include="Mappings\CodeTableHdrMap.cs" />
     <Compile Include="Mappings\DriverHistoryMap.cs" />
     <Compile Include="Mappings\DriverDelayMap.cs" />
     <Compile Include="Mappings\TerminalMasterMap.cs" />
@@ -184,6 +188,10 @@
     <Compile Include="Mappings\TripSegmentMap.cs" />
     <Compile Include="Mappings\PreferenceMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RecordTypes\CustomerMasterRecordType.cs" />
+    <Compile Include="RecordTypes\RegionMasterRecordType.cs" />
+    <Compile Include="RecordTypes\CodeTableRecordType.cs" />
+    <Compile Include="RecordTypes\CodeTableHdrRecordType.cs" />
     <Compile Include="RecordTypes\DriverHistoryRecordType.cs" />
     <Compile Include="RecordTypes\DriverDelayRecordType.cs" />
     <Compile Include="RecordTypes\TerminalMasterRecordType.cs" />
@@ -193,6 +201,14 @@
     <Compile Include="RecordTypes\TripRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentMileageRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentRecordType.cs" />
+    <Compile Include="Validators\CodeTableDeletionValidator.cs" />
+    <Compile Include="Validators\CustomerMasterValidator.cs" />
+    <Compile Include="Validators\CustomerMasterDeletionValidator.cs" />
+    <Compile Include="Validators\RegionMasterValidator.cs" />
+    <Compile Include="Validators\RegionMasterDeletionValidator.cs" />
+    <Compile Include="Validators\CodeTableHdrDeletionValidator.cs" />
+    <Compile Include="Validators\CodeTableValidator.cs" />
+    <Compile Include="Validators\CodeTableHdrValidator.cs" />
     <Compile Include="Validators\DriverHistoryValidator.cs" />
     <Compile Include="Validators\DriverHistoryDeletionValidator.cs" />
     <Compile Include="Validators\DriverDelayDeletionValidator.cs" />
