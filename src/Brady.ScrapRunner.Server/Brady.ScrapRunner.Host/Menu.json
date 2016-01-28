@@ -14,6 +14,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTableHdr"
             },
             {
+              "text": "ContainerChange",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChange"
+            },
+            {
               "text": "CustomerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CustomerMaster"
             },
@@ -34,6 +38,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
             },
             {
+              "text": "PowerHistory",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerHistory"
+            },
+            {
               "text": "PowerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerMaster"
             },
@@ -44,6 +52,10 @@
             {
               "text": "RegionMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/RegionMaster"
+            },
+            {
+              "text": "TerminalChange",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TerminalChange"
             },
             {
               "text": "TerminalMaster",
@@ -60,6 +72,10 @@
             {
               "text": "TripSegmentMileage",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentMileage"
+            },
+            {
+              "text": "TripTypeBasic",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeBasic"
             }
           ]
         }

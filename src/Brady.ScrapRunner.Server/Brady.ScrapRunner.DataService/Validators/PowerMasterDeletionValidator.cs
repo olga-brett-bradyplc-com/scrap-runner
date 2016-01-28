@@ -10,8 +10,7 @@ using Brady.ScrapRunner.Domain.Models;
 namespace Brady.ScrapRunner.DataService.Validators
 {
     public class PowerMasterDeletionValidator :
-        AbstractValidator<PowerMaster>,
-        IRequireCrudingDataServiceRepository
+        AbstractValidator<PowerMaster>, IRequireCrudingDataServiceRepository
     {
         ICrudingDataServiceRepository _repository;
 
