@@ -20,6 +20,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new TerminalMasterMetadata()
                   , new DriverDelayMetadata()
                   , new DriverHistoryMetadata()
+                  , new TripSegmentMileageMetadata()
             )
         {
             

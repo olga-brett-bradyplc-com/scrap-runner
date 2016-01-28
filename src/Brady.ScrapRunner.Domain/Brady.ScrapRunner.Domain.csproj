@@ -50,6 +50,7 @@
     <Compile Include="Metadata\PreferenceMetadata.cs" />
     <Compile Include="Metadata\SRMetadataBundle.cs" />
     <Compile Include="Metadata\TripMetadata.cs" />
+    <Compile Include="Metadata\TripSegmentMileageMetadata.cs" />
     <Compile Include="Metadata\TripSegmentMetadata.cs" />
     <Compile Include="Models\DriverHistory.cs" />
     <Compile Include="Models\DriverDelay.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Models\PowerMaster.cs" />
     <Compile Include="Models\Preference.cs" />
     <Compile Include="Models\Trip.cs" />
+    <Compile Include="Models\TripSegmentMileage.cs" />
     <Compile Include="Models\TripSegment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
