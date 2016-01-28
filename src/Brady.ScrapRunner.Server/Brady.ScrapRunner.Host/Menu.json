@@ -14,8 +14,16 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTableHdr"
             },
             {
+              "text": "CommodityMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CommodityMaster"
+            },
+            {
               "text": "ContainerChange",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChange"
+            },
+            {
+              "text": "CustomerLocation",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CustomerLocation"
             },
             {
               "text": "CustomerMaster",

@@ -13,7 +13,9 @@ namespace Brady.ScrapRunner.Domain.Metadata
             : base(Constants.ScrapRunner
                   , new CodeTableMetadata()
                   , new CodeTableHdrMetadata()
+                  , new CommodityMasterMetadata()
                   , new ContainerChangeMetadata()
+                  , new CustomerLocationMetadata()
                   , new CustomerMasterMetadata()
                   , new DriverDelayMetadata()
                   , new DriverHistoryMetadata()
