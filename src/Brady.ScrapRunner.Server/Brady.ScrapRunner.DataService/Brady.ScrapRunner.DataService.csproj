@@ -180,6 +180,7 @@
     <Compile Include="Mappings\EmployeeMasterMap.cs" />
     <Compile Include="Mappings\PowerMasterMap.cs" />
     <Compile Include="Mappings\TripMap.cs" />
+    <Compile Include="Mappings\TripSegmentMileageMap.cs" />
     <Compile Include="Mappings\TripSegmentMap.cs" />
     <Compile Include="Mappings\PreferenceMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -190,6 +191,7 @@
     <Compile Include="RecordTypes\EmployeeMasterRecordType.cs" />
     <Compile Include="RecordTypes\PowerMasterRecordType.cs" />
     <Compile Include="RecordTypes\TripRecordType.cs" />
+    <Compile Include="RecordTypes\TripSegmentMileageRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentRecordType.cs" />
     <Compile Include="Validators\DriverHistoryValidator.cs" />
     <Compile Include="Validators\DriverHistoryDeletionValidator.cs" />
@@ -205,6 +207,8 @@
     <Compile Include="Validators\EmployeeMasterDeletionValidator.cs" />
     <Compile Include="Validators\EmployeeMasterValidator.cs" />
     <Compile Include="Validators\TripDeletionValidator.cs" />
+    <Compile Include="Validators\TripSegmentMileageDeletionValidator.cs" />
+    <Compile Include="Validators\TripSegmentMileageValidator.cs" />
     <Compile Include="Validators\TripValidator.cs" />
     <Compile Include="Validators\TripSegmentValidator.cs" />
     <Compile Include="Validators\TripSegmentDeletionValidator.cs" />

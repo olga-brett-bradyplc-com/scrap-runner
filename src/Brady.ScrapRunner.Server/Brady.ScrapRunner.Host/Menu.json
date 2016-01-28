@@ -3,23 +3,35 @@
     "link": "{{appSetting-ExplorerHostUrl}}/view/#default/explorer/View",
     "items": [
         {
-            "text": "Types",
+            "text": "SR Tables",
           "items": [
+            {
+              "text": "DriverDelay",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverDelay"
+            },
+            {
+              "text": "DriverHistory",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverHistory"
+            },
+            {
+              "text": "DriverStatus",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverStatus"
+            },
             {
               "text": "EmployeeMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
-            },
-            {
-              "text": "Preferences",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Preference"
             },
             {
               "text": "PowerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerMaster"
             },
             {
-              "text": "DriverStatus",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverStatus"
+              "text": "Preferences",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Preference"
+            },
+            {
+              "text": "TerminalMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TerminalMaster"
             },
             {
               "text": "Trip",
@@ -30,16 +42,8 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegment"
             },
             {
-              "text": "TerminalMaster",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TerminalMaster"
-            },
-            {
-              "text": "DriverDelay",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverDelay"
-            },
-            {
-              "text": "DriverHistory",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverHistory"
+              "text": "TripSegmentMileage",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentMileage"
             }
           ]
         }
