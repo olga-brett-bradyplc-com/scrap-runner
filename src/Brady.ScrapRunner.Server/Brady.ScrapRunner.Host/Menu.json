@@ -6,6 +6,18 @@
             "text": "SR Tables",
           "items": [
             {
+              "text": "CodeTable",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTable"
+            },
+            {
+              "text": "CodeTableHdr",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTableHdr"
+            },
+            {
+              "text": "CustomerMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CustomerMaster"
+            },
+            {
               "text": "DriverDelay",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverDelay"
             },
@@ -28,6 +40,10 @@
             {
               "text": "Preferences",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Preference"
+            },
+            {
+              "text": "RegionMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/RegionMaster"
             },
             {
               "text": "TerminalMaster",
