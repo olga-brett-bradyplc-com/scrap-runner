@@ -9,14 +9,15 @@ using Brady.ScrapRunner.Domain.Models;
 
 namespace Brady.ScrapRunner.DataService.Validators
 {
-    public class PowerMasterValidator :
-        AbstractValidator<PowerMaster>, IRequireCrudingDataServiceRepository
+    public class PowerHistoryDeletionValidator :
+        AbstractValidator<PowerHistory>, IRequireCrudingDataServiceRepository
     {
         ICrudingDataServiceRepository _repository;
 
-        public PowerMasterValidator()
+        public PowerHistoryDeletionValidator()
         {
             RuleFor(x => x.PowerId).NotEmpty();
+            RuleFor(x => x.PowerSeqNumber).NotEmpty();
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)
@@ -24,5 +25,4 @@ namespace Brady.ScrapRunner.DataService.Validators
             _repository = repository;
         }
     }
-
 }

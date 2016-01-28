@@ -13,18 +13,22 @@ namespace Brady.ScrapRunner.Domain.Metadata
             : base(Constants.ScrapRunner
                   , new CodeTableMetadata()
                   , new CodeTableHdrMetadata()
+                  , new ContainerChangeMetadata()
                   , new CustomerMasterMetadata()
                   , new DriverDelayMetadata()
                   , new DriverHistoryMetadata()
                   , new DriverStatusMetadata()
                   , new EmployeeMasterMetadata()
+                  , new PowerHistoryMetadata()
                   , new PowerMasterMetadata()
                   , new PreferenceMetadata()
                   , new RegionMasterMetadata()
+                  , new TerminalChangeMetadata()
                   , new TerminalMasterMetadata()
                   , new TripMetadata()
                   , new TripSegmentMetadata()
-                  , new TripSegmentMileageMetadata()
+                  , new TripSegmentMileageMetadata() 
+                  , new TripTypeBasicMetadata()
             )
         {
             
