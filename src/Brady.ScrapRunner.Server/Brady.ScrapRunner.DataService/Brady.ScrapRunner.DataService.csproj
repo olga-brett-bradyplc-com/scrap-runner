@@ -173,6 +173,8 @@
     <Compile Include="Concrete\SRDataService.cs" />
     <Compile Include="Concrete\SRRepository.cs" />
     <Compile Include="Interfaces\ISRRepository.cs" />
+    <Compile Include="Mappings\CustomerLocationMap.cs" />
+    <Compile Include="Mappings\CommodityMasterMap.cs" />
     <Compile Include="Mappings\TerminalChangeMap.cs" />
     <Compile Include="Mappings\ContainerChangeMap.cs" />
     <Compile Include="Mappings\CustomerMasterMap.cs" />
@@ -192,6 +194,8 @@
     <Compile Include="Mappings\TripSegmentMap.cs" />
     <Compile Include="Mappings\PreferenceMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RecordTypes\CustomerLocationRecordType.cs" />
+    <Compile Include="RecordTypes\CommodityMasterRecordType.cs" />
     <Compile Include="RecordTypes\TerminalChangeRecordType.cs" />
     <Compile Include="RecordTypes\ContainerChangeRecordType.cs" />
     <Compile Include="RecordTypes\CustomerMasterRecordType.cs" />
@@ -210,6 +214,10 @@
     <Compile Include="RecordTypes\TripSegmentMileageRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentRecordType.cs" />
     <Compile Include="Validators\CodeTableDeletionValidator.cs" />
+    <Compile Include="Validators\CustomerLocationDeletionValidator.cs" />
+    <Compile Include="Validators\CustomerLocationValidator.cs" />
+    <Compile Include="Validators\CommodityMasterDeletionValidator.cs" />
+    <Compile Include="Validators\CommodityMasterValidator.cs" />
     <Compile Include="Validators\TerminalChangeValidator.cs" />
     <Compile Include="Validators\TerminalChangeDeletionValidator.cs" />
     <Compile Include="Validators\ContainerChangeValidator.cs" />

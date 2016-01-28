@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Metadata\CustomerLocationMetadata.cs" />
+    <Compile Include="Metadata\CommodityMasterMetadata.cs" />
     <Compile Include="Metadata\TerminalChangeMetadata.cs" />
     <Compile Include="Metadata\ContainerChangeMetadata.cs" />
     <Compile Include="Metadata\CustomerMasterMetadata.cs" />
@@ -61,6 +63,8 @@
     <Compile Include="Metadata\TripSegmentMileageMetadata.cs" />
     <Compile Include="Metadata\TripSegmentMetadata.cs" />
     <Compile Include="Models\CodeTable.cs" />
+    <Compile Include="Models\CustomerLocation.cs" />
+    <Compile Include="Models\CommodityMaster.cs" />
     <Compile Include="Models\TerminalChange.cs" />
     <Compile Include="Models\ContainerChange.cs" />
     <Compile Include="Models\CustomerMaster.cs" />
