@@ -8,6 +8,7 @@ namespace Brady.ScrapRunner.Domain
 {
     public static class Constants
     {
-        public readonly static string ScrapRunner = "ScrapRunner";
+        public static readonly string ScrapRunner = "ScrapRunner";
+
     }
 }

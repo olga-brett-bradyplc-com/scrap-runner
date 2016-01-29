@@ -5,10 +5,8 @@ using Brady.ScrapRunner.Domain.Models;
 namespace Brady.ScrapRunner.DataService.Validators
 {
 
-
     public class TripValidator :
-        AbstractValidator<Trip>,
-        IRequireCrudingDataServiceRepository
+        AbstractValidator<Trip>, IRequireCrudingDataServiceRepository
     {
         ICrudingDataServiceRepository _repository;
 

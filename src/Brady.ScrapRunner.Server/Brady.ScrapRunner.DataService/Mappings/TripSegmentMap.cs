@@ -24,7 +24,7 @@ namespace Brady.ScrapRunner.DataService.Mappings
 
             Property(x => x.Id, m =>
             {
-                m.Formula("TripNumber + ';' + TripSegNumber");
+                m.Formula("concat(TripNumber, ';', TripSegNumber)");
                 m.Insert(false);
                 m.Update(false);
             });
