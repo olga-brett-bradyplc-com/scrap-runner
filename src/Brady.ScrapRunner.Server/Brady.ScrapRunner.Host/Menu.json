@@ -18,8 +18,17 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CommodityMaster"
         },
         {
-          "text": "ContainerChange",
-          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChange"
+          "text": "Container",
+          "items": [
+            {
+              "text": "ContainerChange",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChange"
+            },
+            {
+              "text": "ContainerMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerMaster"
+            }
+          ]
         },
         {
           "text": "Customer",
@@ -58,6 +67,19 @@
         {
           "text": "EmployeeMaster",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
+        },
+        {
+          "text": "Logs",
+          "items": [
+            {
+              "text": "ErrorLog",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ErrorLog"
+            },
+            {
+              "text": "EventLog",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EventLog"
+            }
+          ]
         },
         {
           "text": "Power",
