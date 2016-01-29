@@ -1,25 +1,32 @@
 ﻿{
-    "text": "ScrapRunner",
-    "link": "{{appSetting-ExplorerHostUrl}}/view/#default/explorer/View",
-    "items": [
+  "text": "ScrapRunner",
+  "link": "{{appSetting-ExplorerHostUrl}}/view/#default/explorer/View",
+  "items": [
+    {
+      "text": "SR Tables",
+      "items": [
         {
-            "text": "SR Tables",
+          "text": "CodeTable",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTable"
+        },
+        {
+          "text": "CodeTableHdr",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTableHdr"
+        },
+        {
+          "text": "CommodityMaster",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CommodityMaster"
+        },
+        {
+          "text": "ContainerChange",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChange"
+        },
+        {
+          "text": "Customer",
           "items": [
             {
-              "text": "CodeTable",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTable"
-            },
-            {
-              "text": "CodeTableHdr",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTableHdr"
-            },
-            {
-              "text": "CommodityMaster",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CommodityMaster"
-            },
-            {
-              "text": "ContainerChange",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChange"
+              "text": "CustomerCommodity",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CustomerCommodity"
             },
             {
               "text": "CustomerLocation",
@@ -28,7 +35,12 @@
             {
               "text": "CustomerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CustomerMaster"
-            },
+            }
+          ]
+        },
+        {
+          "text": "Driver",
+          "items": [
             {
               "text": "DriverDelay",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverDelay"
@@ -40,11 +52,16 @@
             {
               "text": "DriverStatus",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverStatus"
-            },
-            {
-              "text": "EmployeeMaster",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
-            },
+            }
+          ]
+        },
+        {
+          "text": "EmployeeMaster",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
+        },
+        {
+          "text": "Power",
+          "items": [
             {
               "text": "PowerHistory",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerHistory"
@@ -52,15 +69,20 @@
             {
               "text": "PowerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerMaster"
-            },
-            {
-              "text": "Preferences",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Preference"
-            },
-            {
-              "text": "RegionMaster",
-              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/RegionMaster"
-            },
+            }
+          ]
+        },
+        {
+          "text": "Preferences",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Preference"
+        },
+        {
+          "text": "RegionMaster",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/RegionMaster"
+        },
+        {
+          "text": "Terminal",
+          "items": [
             {
               "text": "TerminalChange",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TerminalChange"
@@ -68,10 +90,19 @@
             {
               "text": "TerminalMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TerminalMaster"
-            },
+            }
+          ]
+        },
+        {
+          "text": "Trip",
+          "items": [
             {
               "text": "Trip",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Trip"
+            },
+            {
+              "text": "TripReferenceNumber",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripReferenceNumber"
             },
             {
               "text": "TripSegment",
@@ -87,5 +118,7 @@
             }
           ]
         }
-    ]
+      ]
+    }
+  ]
 }
