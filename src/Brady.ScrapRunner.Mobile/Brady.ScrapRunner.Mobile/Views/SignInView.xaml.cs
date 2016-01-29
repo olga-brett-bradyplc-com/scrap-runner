@@ -15,6 +15,7 @@ namespace Brady.ScrapRunner.Mobile.Views
             SignInButton.Clicked += async (sender, e) =>
             {
                 await Navigation.PushAsync(new PowerUnitView(), false);
+                Navigation.RemovePage(this);
             };
         }
     }

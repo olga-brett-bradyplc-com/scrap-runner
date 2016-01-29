@@ -24,6 +24,7 @@ namespace Brady.ScrapRunner.Mobile.Views
             SetPowerUnitIdButton.Clicked += async (sender, e) =>
             {
                 await Navigation.PushAsync(new RouteSummaryView(), false);
+                Navigation.RemovePage(this);
             };
         }
     }
