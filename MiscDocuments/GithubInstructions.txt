@@ -7,22 +7,22 @@ Useful Github instructions:
 	https://help.github.com/articles/pushing-to-a-remote/
 	https://help.github.com/articles/using-pull-requests/
 
-I’m having modest success with modeling the typical workflow:
+I’m having success with modeling the typical workflow:
 
-1) fork the “upstream” repository
+1) fork the “BradyMetals” repository
 2) clone the fork to local machine
 3) create a branch, make modifications on a branch, commit and push to my fork
-4) make a pull request to the  “upstream”
-5) merge my branch into the upstream/master.
+4) make a pull request to the  “BradyMetals”
+5) merge my branch into the BradyMetals/master.
 
-To close the loop and update everything from upstream: 
+To close the loop and update everything from BradyMetals: 
 
-1)	git fetch upstream			Fetch all changes form “upstream”  
-						where upstream is defined to be https://github.com/BradyMetals/scrap-runner
+1)	git fetch BradyMetals			Fetch all changes form “BradyMetals”  
+						where BradyMetals is defined to be https://github.com/BradyMetals/scrap-runner
 
 2)	git checkout master			Change to local master branch
 
-3)	git merge upstream/master		Merge the (previously fetched) changes from upstream/master into local master.		
+3)	git merge BradyMetals/master		Merge the (previously fetched) changes from BradyMetals/master into local master.		
 						My master is now up to date with https://github.com/BradyMetals/scrap-runner
 
 4)	git checkout development		Change to my development branch
