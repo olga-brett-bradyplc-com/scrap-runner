@@ -1,9 +1,8 @@
 ﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
+    using GalaSoft.MvvmLight;
 
-    public class BaseViewModel : INotifyPropertyChanged
+    public class BaseViewModel : ViewModelBase
     {
         public BaseViewModel()
         {
@@ -12,28 +11,15 @@
         private bool _isBusy;
         public bool IsBusy
         {
-            get {  return _isBusy; }
-            set { SetProperty(ref _isBusy, value); }
+            get { return _isBusy; }
+            set { Set(ref _isBusy, value); }
         }
 
         private string _title;
         public string Title
         {
             get { return _title; }
-            set { SetProperty(ref _title, value); }
-        }
-
-        protected void SetProperty<T>(ref T backingField, T newValue, [CallerMemberName] string propertyName = null)
-        {
-            if (Equals(backingField, newValue)) return;
-            backingField = newValue;
-            if (propertyName != null) OnPropertyChanged(propertyName);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            set { Set(ref _title, value); }
         }
     }
 }

@@ -22,7 +22,7 @@
         public string TripId
         {
             get { return _tripId; }
-            set { SetProperty(ref _tripId, value); }
+            set { Set(ref _tripId, value); }
         }
 
         public ObservableCollection<Route> RouteSummaryList { get; private set; }
@@ -87,7 +87,7 @@
         public Route SelectedRoute
         {
             get { return _selectedRoute; }
-            set { SetProperty(ref _selectedRoute, value); }
+            set { Set(ref _selectedRoute, value); }
         }
 
         public RelayCommand RouteSelectedCommand { get; private set; }

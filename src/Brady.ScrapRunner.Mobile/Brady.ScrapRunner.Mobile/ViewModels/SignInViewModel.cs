@@ -24,7 +24,7 @@
             get { return _userName; }
             set
             {
-                SetProperty(ref _userName, value);
+                Set(ref _userName, value);
                 SignInCommand.RaiseCanExecuteChanged();
             }
         }
@@ -35,7 +35,7 @@
             get { return _password; }
             set
             {
-                SetProperty(ref _password, value);
+                Set(ref _password, value);
                 SignInCommand.RaiseCanExecuteChanged();
             }
         }

@@ -23,13 +23,13 @@
         public string TruckId
         {
             get { return _truckId; }
-            set { SetProperty(ref _truckId, value); }
+            set { Set(ref _truckId, value); }
         }
 
         public string Odometer
         {
             get { return _odometer; }
-            set { SetProperty(ref _odometer, value); }
+            set { Set(ref _odometer, value); }
         }
 
         public RelayCommand PowerUnitIdCommand { get; protected set; }
