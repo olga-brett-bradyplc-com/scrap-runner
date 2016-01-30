@@ -8,6 +8,8 @@ namespace Brady.ScrapRunner.Mobile.Models
 {
     public class Route
     {
+        public string TripNumber { get; set; }
+
         // Properties for Route Summary
         public string TripType { get; set; }
         public string Notes { get; set; }

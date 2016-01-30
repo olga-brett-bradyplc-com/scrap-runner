@@ -13,7 +13,7 @@
         {
             _navigationService = navigationService;
             Title = "Route Summary";
-            RouteSelectedCommand = new RelayCommand(ExecuteRouteSelectedCommand);
+            RouteSelectedCommand = new RelayCommand<Route>(ExecuteRouteSelectedCommand);
             CreateDummyData();
         }
 
@@ -90,11 +90,11 @@
             set { Set(ref _selectedRoute, value); }
         }
 
-        public RelayCommand RouteSelectedCommand { get; private set; }
+        public RelayCommand<Route> RouteSelectedCommand { get; private set; }
 
-        public void ExecuteRouteSelectedCommand()
+        public void ExecuteRouteSelectedCommand(Route selectedRoute)
         {
-            _navigationService.NavigateTo(Locator.RouteDetailView, SelectedRoute);
+            _navigationService.NavigateTo(Locator.RouteDetailView/*, selectedRoute.TripNumber*/);
         }
     }
 }
