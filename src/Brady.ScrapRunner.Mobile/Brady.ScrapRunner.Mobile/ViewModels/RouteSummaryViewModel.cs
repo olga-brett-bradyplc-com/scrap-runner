@@ -1,15 +1,19 @@
-﻿using Brady.ScrapRunner.Mobile.Models;
-
-namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using System;
     using System.Collections.ObjectModel;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Views;
+    using Models;
 
     public class RouteSummaryViewModel : BaseViewModel
     {
-        public RouteSummaryViewModel()
+        private readonly INavigationService _navigationService;
+
+        public RouteSummaryViewModel(INavigationService navigationService)
         {
+            _navigationService = navigationService;
             Title = "Route Summary";
+            RouteSelectedCommand = new RelayCommand(ExecuteRouteSelectedCommand);
             CreateDummyData();
         }
 
@@ -77,7 +81,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     OpenTime = "0900"
                 }
             };
+        }
 
+        private Route _selectedRoute;
+        public Route SelectedRoute
+        {
+            get { return _selectedRoute; }
+            set { SetProperty(ref _selectedRoute, value); }
+        }
+
+        public RelayCommand RouteSelectedCommand { get; private set; }
+
+        public void ExecuteRouteSelectedCommand()
+        {
+            _navigationService.NavigateTo(Locator.RouteDetailView, SelectedRoute);
         }
     }
 }

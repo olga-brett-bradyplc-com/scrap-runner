@@ -1,14 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewModels="clr-namespace:Brady.ScrapRunner.Mobile.ViewModels;assembly=Brady.ScrapRunner.Mobile"
              xmlns:custom="clr-namespace:Brady.ScrapRunner.Mobile.Renderers;assembly=Brady.ScrapRunner.Mobile"
              xmlns:resources="clr-namespace:Brady.ScrapRunner.Mobile.Resources;assembly=Brady.ScrapRunner.Mobile"
              x:Class="Brady.ScrapRunner.Mobile.Views.PowerUnitView"
              BackgroundImage="loginsplash800x1280.jpg">
-  <ContentPage.BindingContext>
-    <viewModels:PowerUnitViewModel/>
-  </ContentPage.BindingContext>
   <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" Padding="10" x:Name="StackLayout">
 
     <custom:ExtendedEntry

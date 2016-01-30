@@ -1,19 +1,20 @@
-﻿using System;
-using FluentValidation.Resources;
-
-namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System.Linq;
     using Acr.UserDialogs;
-    using Xamarin.Forms;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Views;
+    using Models;
 
     public class PowerUnitViewModel : BaseViewModel
     {
+        private readonly INavigationService _navigationService;
 
-        public PowerUnitViewModel()
+        public PowerUnitViewModel(INavigationService navigationService)
         {
+            _navigationService = navigationService;
             Title = "Power Unit ID and Odometer Reading";
-            PowerUnitIdCommand = new Command(ExecutePowerUnitIdCommand);
+            PowerUnitIdCommand = new RelayCommand(ExecutePowerUnitIdCommand);
         }
 
         private string _truckId;
@@ -31,7 +32,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _odometer, value); }
         }
 
-        public Command PowerUnitIdCommand { get; protected set; }
+        public RelayCommand PowerUnitIdCommand { get; protected set; }
 
         protected void ExecutePowerUnitIdCommand()
         {
@@ -43,7 +44,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 UserDialogs.Instance.Alert(results.Errors.First().ErrorMessage);
                 return;
             }
+            _navigationService.NavigateTo(Locator.RouteSummaryView);
         }
-
     }
 }

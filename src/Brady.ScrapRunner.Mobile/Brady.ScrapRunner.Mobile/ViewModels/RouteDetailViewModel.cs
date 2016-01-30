@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Text;
-
-using Xamarin.Forms;
-
-namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using GalaSoft.MvvmLight.Views;
+
     // This is still a work in progress
     public class RouteDetailViewModel : BaseViewModel
     {
-        public RouteDetailViewModel()
+        private readonly INavigationService _navigationService;
+
+        public RouteDetailViewModel(INavigationService navigationService)
         {
+            _navigationService = navigationService;
             Title = "Switch Trip";
         }
     }

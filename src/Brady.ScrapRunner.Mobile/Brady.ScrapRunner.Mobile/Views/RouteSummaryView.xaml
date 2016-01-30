@@ -1,12 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:Brady.ScrapRunner.Mobile.ViewModels;assembly=Brady.ScrapRunner.Mobile"
              x:Class="Brady.ScrapRunner.Mobile.Views.RouteSummaryView"
              Title="{Binding Title}">
-  <ContentPage.BindingContext>
-    <vm:RouteSummaryViewModel/>
-  </ContentPage.BindingContext>
   <ContentPage.ToolbarItems>
     <ToolbarItem Text="OptionsMenu" Clicked="OnClick" Order="Primary" Priority="2">
       <ToolbarItem.Icon>
@@ -17,7 +13,10 @@
   </ContentPage.ToolbarItems>
   <ContentPage.Content>
     <StackLayout Orientation="Vertical" VerticalOptions="Fill">
-      <ListView x:Name="RouteSummaryListView" HasUnevenRows="True" ItemsSource="{Binding RouteSummaryList}">
+      <ListView x:Name="RouteSummaryListView" 
+        HasUnevenRows="True" 
+        ItemsSource="{Binding RouteSummaryList}"
+        SelectedItem="{Binding SelectedRoute, Mode=TwoWay}">
         <ListView.ItemTemplate>
           <DataTemplate>
             <ViewCell>

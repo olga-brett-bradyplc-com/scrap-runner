@@ -2,15 +2,20 @@
 {
     using System.Linq;
     using Acr.UserDialogs;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Views;
+    using Models;
     using Resources;
-    using Xamarin.Forms;
 
     public class SignInViewModel : BaseViewModel
     {
-        public SignInViewModel()
+        private readonly INavigationService _navigationService;
+
+        public SignInViewModel(INavigationService navigationService)
         {
+            _navigationService = navigationService;
             Title = AppResources.SignIn;
-            SignInCommand = new Command(ExecuteSignInCommand);
+            SignInCommand = new RelayCommand(ExecuteSignInCommand);
         }
 
         private string _userName;
@@ -20,7 +25,7 @@
             set
             {
                 SetProperty(ref _userName, value);
-                SignInCommand.ChangeCanExecute();
+                SignInCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -31,11 +36,11 @@
             set
             {
                 SetProperty(ref _password, value);
-                SignInCommand.ChangeCanExecute();
+                SignInCommand.RaiseCanExecuteChanged();
             }
         }
 
-        public Command SignInCommand { get; protected set; }
+        public RelayCommand SignInCommand { get; protected set; }
 
         protected void ExecuteSignInCommand()
         {
@@ -47,7 +52,7 @@
                 UserDialogs.Instance.Alert(results.Errors.First().ErrorMessage);
                 return;
             }
-            // @TODO: INavigation.PushAsync(new TruckView());
+            _navigationService.NavigateTo(Locator.PowerUnitView);
         }
     }
 }

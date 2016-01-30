@@ -38,6 +38,7 @@
     <Compile Include="App.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
+    <Compile Include="Models\Locator.cs" />
     <Compile Include="Models\PreferenceModel.cs" />
     <Compile Include="Models\SqliteRepository.cs" />
     <Compile Include="Models\Route.cs" />
@@ -52,6 +53,7 @@
     </Compile>
     <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="Resources\TranslateExtension.cs" />
+    <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\SignInCommandValidator.cs" />
     <Compile Include="ViewModels\PowerUnitViewModel.cs" />
@@ -65,15 +67,11 @@
     <Compile Include="Views\RouteDetailView.xaml.cs">
       <DependentUpon>RouteDetailView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\TruckViewModel.cs" />
     <Compile Include="Views\RouteSummaryView.xaml.cs">
       <DependentUpon>RouteSummaryView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SignInView.xaml.cs">
       <DependentUpon>SignInView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\TruckView.xaml.cs">
-      <DependentUpon>TruckView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -159,12 +157,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\RouteSummaryView.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Views\TruckView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
