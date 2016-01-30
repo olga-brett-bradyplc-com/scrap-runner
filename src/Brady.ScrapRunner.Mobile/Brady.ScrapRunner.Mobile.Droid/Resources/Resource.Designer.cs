@@ -63,6 +63,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahText = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahText;
 			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahTextColor = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahTextColor;
 			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahTextSize = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahTextSize;
+			global::GalaSoft.MvvmLight.Resource.String.ApplicationName = global::Brady.ScrapRunner.Mobile.Droid.Resource.String.ApplicationName;
+			global::GalaSoft.MvvmLight.Resource.String.Hello = global::Brady.ScrapRunner.Mobile.Droid.Resource.String.Hello;
 			global::Splat.Resource.String.library_name = global::Brady.ScrapRunner.Mobile.Droid.Resource.String.library_name;
 			global::SQLite.Net.Platform.XamarinAndroid.Resource.String.ApplicationName = global::Brady.ScrapRunner.Mobile.Droid.Resource.String.ApplicationName;
 			global::SQLite.Net.Platform.XamarinAndroid.Resource.String.Hello = global::Brady.ScrapRunner.Mobile.Droid.Resource.String.Hello;
