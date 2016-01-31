@@ -1,5 +1,7 @@
 ﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using FluentValidation;
+    using FluentValidation.Results;
     using GalaSoft.MvvmLight;
 
     public class BaseViewModel : ViewModelBase
@@ -20,6 +22,12 @@
         {
             get { return _title; }
             set { Set(ref _title, value); }
+        }
+
+        protected ValidationResult Validate<TValidator, TType>(TType type) where TValidator : AbstractValidator<TType>, new()
+        {
+            var validator = new TValidator();
+            return validator.Validate(type);
         }
     }
 }

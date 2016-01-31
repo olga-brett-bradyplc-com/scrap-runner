@@ -39,6 +39,7 @@
     <Compile Include="Behaviors\BindableBehavior.cs" />
     <Compile Include="Behaviors\EventToCommandBehavior.cs" />
     <Compile Include="Converters\ItemTappedEventArgsConverter.cs" />
+    <Compile Include="Converters\NullableIntConverter.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
     <Compile Include="Models\Locator.cs" />
@@ -57,8 +58,10 @@
     <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="Resources\TranslateExtension.cs" />
     <Compile Include="Services\NavigationService.cs" />
+    <Compile Include="Validators\OdometerRangeValidator.cs" />
+    <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
-    <Compile Include="Validators\SignInCommandValidator.cs" />
+    <Compile Include="Validators\UsernameValidator.cs" />
     <Compile Include="ViewModels\PowerUnitViewModel.cs" />
     <Compile Include="ViewModels\RouteDetailViewModel.cs" />
     <Compile Include="ViewModels\RouteSummaryViewModel.cs" />

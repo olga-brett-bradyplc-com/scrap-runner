@@ -162,4 +162,16 @@
   <data name="OdometerRequired" xml:space="preserve">
     <value>A current odometer reading is required</value>
   </data>
+  <data name="OdometerOutOfRange" xml:space="preserve">
+    <value>Odometer must be between {0} and {1}.</value>
+  </data>
+  <data name="TruckIdOutOfRange" xml:space="preserve">
+    <value>Truck Id must be less than {0} characters.</value>
+  </data>
+  <data name="PasswordOutOfRange" xml:space="preserve">
+    <value>Password must be less than {0} characters.</value>
+  </data>
+  <data name="UserNameOutOfRange" xml:space="preserve">
+    <value>Username must be less than {0} characters.</value>
+  </data>
 </root>

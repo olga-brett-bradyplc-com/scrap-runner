@@ -6,6 +6,7 @@
     using GalaSoft.MvvmLight.Views;
     using Models;
     using Resources;
+    using Validators;
 
     public class SignInViewModel : BaseViewModel
     {
@@ -15,7 +16,7 @@
         {
             _navigationService = navigationService;
             Title = AppResources.SignIn;
-            SignInCommand = new RelayCommand(ExecuteSignInCommand);
+            SignInCommand = new RelayCommand(ExecuteSignInCommand, CanExecuteSignInCommand);
         }
 
         private string _userName;
@@ -44,15 +45,26 @@
 
         protected void ExecuteSignInCommand()
         {
-            var validator = new Validators.SignInCommandValidator();
-            var results = validator.Validate(this);
-            var validationSucceeded = results.IsValid;
-            if (!validationSucceeded)
+            var userNameResults = Validate<UsernameValidator, string>(UserName);
+            if (!userNameResults.IsValid)
             {
-                UserDialogs.Instance.Alert(results.Errors.First().ErrorMessage);
+                UserDialogs.Instance.Alert(userNameResults.Errors.First().ErrorMessage);
                 return;
             }
+            var passwordResults = Validate<PasswordValidator, string>(Password);
+            if (!passwordResults.IsValid)
+            {
+                UserDialogs.Instance.Alert(userNameResults.Errors.First().ErrorMessage);
+                return;
+            }
+            // @TODO: Get Driver data using BWF Client Library Here.
             _navigationService.NavigateTo(Locator.PowerUnitView);
+        }
+
+        protected bool CanExecuteSignInCommand()
+        {
+            return !string.IsNullOrWhiteSpace(UserName)
+                   && !string.IsNullOrWhiteSpace(Password);
         }
     }
 }

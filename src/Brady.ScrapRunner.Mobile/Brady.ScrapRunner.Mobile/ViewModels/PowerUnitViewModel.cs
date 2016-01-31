@@ -5,6 +5,7 @@
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Views;
     using Models;
+    using Validators;
 
     public class PowerUnitViewModel : BaseViewModel
     {
@@ -14,37 +15,56 @@
         {
             _navigationService = navigationService;
             Title = "Power Unit ID and Odometer Reading";
-            PowerUnitIdCommand = new RelayCommand(ExecutePowerUnitIdCommand);
+            PowerUnitIdCommand = new RelayCommand(ExecutePowerUnitIdCommand, CanExecutePowerUnitIdCommand);
         }
 
         private string _truckId;
-        private string _odometer;
+        private int? _odometer;
 
         public string TruckId
         {
             get { return _truckId; }
-            set { Set(ref _truckId, value); }
+            set
+            {
+                Set(ref _truckId, value);
+                PowerUnitIdCommand.RaiseCanExecuteChanged();
+            }
         }
 
-        public string Odometer
+        public int? Odometer
         {
             get { return _odometer; }
-            set { Set(ref _odometer, value); }
+            set
+            {
+                Set(ref _odometer, value);
+                PowerUnitIdCommand.RaiseCanExecuteChanged();
+            }
         }
 
         public RelayCommand PowerUnitIdCommand { get; protected set; }
 
         protected void ExecutePowerUnitIdCommand()
         {
-            var validator = new Validators.PowerUnitValidator();
-            var results = validator.Validate(this);
-            var validationSucceeded = results.IsValid;
-            if (!validationSucceeded)
+            var truckIdResults = Validate<PowerUnitValidator, string>(TruckId);
+            if (!truckIdResults.IsValid)
             {
-                UserDialogs.Instance.Alert(results.Errors.First().ErrorMessage);
+                UserDialogs.Instance.Alert(truckIdResults.Errors.First().ErrorMessage);
                 return;
             }
+            var odometerResults = Validate<OdometerRangeValidator, int?>(Odometer);
+            if (!odometerResults.IsValid)
+            {
+                UserDialogs.Instance.Alert(odometerResults.Errors.First().ErrorMessage);
+                return;
+            }
+            // @TODO: Validate odometer using BWF Client Library here.
             _navigationService.NavigateTo(Locator.RouteSummaryView);
+        }
+
+        protected bool CanExecutePowerUnitIdCommand()
+        {
+            return !string.IsNullOrWhiteSpace(TruckId)
+                   && Odometer.HasValue;
         }
     }
 }

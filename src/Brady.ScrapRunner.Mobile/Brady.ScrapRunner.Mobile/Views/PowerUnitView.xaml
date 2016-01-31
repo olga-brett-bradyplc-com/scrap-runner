@@ -3,8 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:custom="clr-namespace:Brady.ScrapRunner.Mobile.Renderers;assembly=Brady.ScrapRunner.Mobile"
              xmlns:resources="clr-namespace:Brady.ScrapRunner.Mobile.Resources;assembly=Brady.ScrapRunner.Mobile"
+             xmlns:converters="clr-namespace:Brady.ScrapRunner.Mobile.Converters;assembly=Brady.ScrapRunner.Mobile"
              x:Class="Brady.ScrapRunner.Mobile.Views.PowerUnitView"
              BackgroundImage="loginsplash800x1280.jpg">
+  <ContentPage.Resources>
+    <ResourceDictionary>
+      <converters:NullableIntConverter x:Key="nullableInt"></converters:NullableIntConverter>
+    </ResourceDictionary>
+  </ContentPage.Resources>
   <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" Padding="10" x:Name="StackLayout">
 
     <custom:ExtendedEntry
@@ -21,7 +27,7 @@
       />
 
     <custom:ExtendedEntry
-        Text="{Binding Odometer}"
+        Text="{Binding Odometer, Converter={StaticResource nullableInt}}"
         StyleId="TruckIdInputField"
         Placeholder="Current Odometer Reading"
         CornerRadius="5"
