@@ -107,6 +107,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Odometer must be between {0} and {1}..
+        /// </summary>
+        internal static string OdometerOutOfRange {
+            get {
+                return ResourceManager.GetString("OdometerOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A current odometer reading is required.
         /// </summary>
         internal static string OdometerRequired {
@@ -143,11 +152,29 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Password must be less than {0} characters..
+        /// </summary>
+        internal static string PasswordOutOfRange {
+            get {
+                return ResourceManager.GetString("PasswordOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sign In.
         /// </summary>
         internal static string SignIn {
             get {
                 return ResourceManager.GetString("SignIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sign in process failed..
+        /// </summary>
+        internal static string SignInProcessFailed {
+            get {
+                return ResourceManager.GetString("SignInProcessFailed", resourceCulture);
             }
         }
         
@@ -166,6 +193,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         internal static string TruckId {
             get {
                 return ResourceManager.GetString("TruckId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Truck Id must be less than {0} characters..
+        /// </summary>
+        internal static string TruckIdOutOfRange {
+            get {
+                return ResourceManager.GetString("TruckIdOutOfRange", resourceCulture);
             }
         }
         
@@ -193,6 +229,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         internal static string UserNameNotEmpty {
             get {
                 return ResourceManager.GetString("UserNameNotEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Username must be less than {0} characters..
+        /// </summary>
+        internal static string UserNameOutOfRange {
+            get {
+                return ResourceManager.GetString("UserNameOutOfRange", resourceCulture);
             }
         }
     }

@@ -1,16 +1,34 @@
 ﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using System;
     using System.Linq;
+    using System.Threading.Tasks;
     using Acr.UserDialogs;
+    using Domain.Models;
+    using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Views;
+    using Interfaces;
+    using Models;
     using Resources;
+    using Validators;
     using Xamarin.Forms;
 
     public class SignInViewModel : BaseViewModel
     {
-        public SignInViewModel()
+        private readonly ISqliteDatabase _sqliteDatabase;
+        private readonly INavigationService _navigationService;
+        private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository;
+
+        public SignInViewModel(
+            INavigationService navigationService,
+            IRepository<EmployeeMasterModel> employeeMasterRepository
+            )
         {
+            _navigationService = navigationService;
+            _employeeMasterRepository = employeeMasterRepository;
+            _sqliteDatabase = DependencyService.Get<ISqliteDatabase>();
             Title = AppResources.SignIn;
-            SignInCommand = new Command(ExecuteSignInCommand);
+            SignInCommand = new RelayCommand(ExecuteSignInCommand, CanExecuteSignInCommand);
         }
 
         private string _userName;
@@ -19,8 +37,8 @@
             get { return _userName; }
             set
             {
-                SetProperty(ref _userName, value);
-                SignInCommand.ChangeCanExecute();
+                Set(ref _userName, value);
+                SignInCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -30,24 +48,78 @@
             get { return _password; }
             set
             {
-                SetProperty(ref _password, value);
-                SignInCommand.ChangeCanExecute();
+                Set(ref _password, value);
+                SignInCommand.RaiseCanExecuteChanged();
             }
         }
 
-        public Command SignInCommand { get; protected set; }
+        public RelayCommand SignInCommand { get; protected set; }
 
-        protected void ExecuteSignInCommand()
+        protected async void ExecuteSignInCommand()
         {
-            var validator = new Validators.SignInCommandValidator();
-            var results = validator.Validate(this);
-            var validationSucceeded = results.IsValid;
-            if (!validationSucceeded)
+            var userNameResults = Validate<UsernameValidator, string>(UserName);
+            if (!userNameResults.IsValid)
             {
-                UserDialogs.Instance.Alert(results.Errors.First().ErrorMessage);
+                UserDialogs.Instance.Alert(userNameResults.Errors.First().ErrorMessage);
                 return;
             }
-            // @TODO: INavigation.PushAsync(new TruckView());
+            var passwordResults = Validate<PasswordValidator, string>(Password);
+            if (!passwordResults.IsValid)
+            {
+                UserDialogs.Instance.Alert(userNameResults.Errors.First().ErrorMessage);
+                return;
+            }
+            try
+            {
+                var signInResult = await SignInAsync();
+                if (!signInResult)
+                {
+                    await UserDialogs.Instance.AlertAsync(AppResources.SignInProcessFailed, 
+                        AppResources.Error, AppResources.OK);
+                    return;
+                }
+                _navigationService.NavigateTo(Locator.PowerUnitView);
+            }
+            catch (Exception exception)
+            {
+                await UserDialogs.Instance.AlertAsync(
+                    exception.Message, AppResources.Error, AppResources.OK);
+            }
+        }
+
+        protected bool CanExecuteSignInCommand()
+        {
+            return !string.IsNullOrWhiteSpace(UserName)
+                   && !string.IsNullOrWhiteSpace(Password);
+        }
+
+        private async Task<bool> SignInAsync()
+        {
+            await _sqliteDatabase.InitializeAsync();
+            var employeeMaster = await GetEmployeeMasterAsync();
+            if (employeeMaster == null) return false;
+            await SaveEmployeeAsync(employeeMaster);
+            return true;
+        }
+
+        private Task<EmployeeMaster> GetEmployeeMasterAsync()
+        {
+            // @TODO: Get EmployeeMaster where EmployeeId = {Username} using BWF Client Library.
+            return Task.FromResult(new EmployeeMaster
+            {
+                EmployeeId = UserName,
+                AreaId = "ALL",
+                FirstName = "BRADY TEST",
+                LastName = "DRIVER",
+                RegionId = "SDF",
+                TerminalId = "F1"
+            });
+        }
+
+        private Task SaveEmployeeAsync(EmployeeMaster employeeMaster)
+        {
+            var mapped = AutoMapper.Mapper.Map<EmployeeMaster, EmployeeMasterModel>(employeeMaster);
+            return _employeeMasterRepository.InsertAsync(mapped);
         }
     }
 }

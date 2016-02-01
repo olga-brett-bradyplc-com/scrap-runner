@@ -5,7 +5,9 @@ using Xamarin.Forms;
 namespace Brady.ScrapRunner.Mobile.Droid.Dependencies
 {
     using System;
+    using System.Threading.Tasks;
     using Interfaces;
+    using Models;
     using SQLite.Net;
     using SQLite.Net.Async;
     using SQLite.Net.Platform.XamarinAndroid;
@@ -23,5 +25,16 @@ namespace Brady.ScrapRunner.Mobile.Droid.Dependencies
         }
 
         public SQLiteAsyncConnection Connection { get; }
+
+        public async Task InitializeAsync()
+        {
+            // @TODO: Call CreateTableAsync<Model> here for each SQLite table.
+            await Connection.CreateTableAsync<EmployeeMasterModel>();
+            await Connection.CreateTableAsync<CustomerDirectionModel>();
+
+            // Clear the data in these tables at startup:
+            await Connection.DeleteAllAsync<EmployeeMasterModel>();
+            await Connection.DeleteAllAsync<CustomerDirectionModel>();
+        }
     }
 }
