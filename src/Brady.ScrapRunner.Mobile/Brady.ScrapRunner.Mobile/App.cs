@@ -42,6 +42,7 @@
             nav.Configure(Locator.PowerUnitView, typeof(PowerUnitView));
             nav.Configure(Locator.RouteSummaryView, typeof(RouteSummaryView));
             nav.Configure(Locator.RouteDetailView, typeof(RouteDetailView));
+            nav.Configure(Locator.RouteDirectionsView, typeof(RouteDirectionsView));
         }
 
         protected override void OnStart()

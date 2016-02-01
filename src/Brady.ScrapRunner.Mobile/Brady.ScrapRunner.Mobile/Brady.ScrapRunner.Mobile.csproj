@@ -42,6 +42,7 @@
     <Compile Include="Converters\NullableIntConverter.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
+    <Compile Include="Models\CustomerDirectionModel.cs" />
     <Compile Include="Models\EmployeeMasterModel.cs" />
     <Compile Include="Models\Locator.cs" />
     <Compile Include="Models\PreferenceModel.cs" />
@@ -64,11 +65,15 @@
     <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
+    <Compile Include="ViewModels\RouteDirectionsViewModel.cs" />
     <Compile Include="ViewModels\PowerUnitViewModel.cs" />
     <Compile Include="ViewModels\RouteDetailViewModel.cs" />
     <Compile Include="ViewModels\RouteSummaryViewModel.cs" />
     <Compile Include="ViewModels\SignInViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="Views\RouteDirectionsView.xaml.cs">
+      <DependentUpon>RouteDirectionsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PowerUnitView.xaml.cs">
       <DependentUpon>PowerUnitView.xaml</DependentUpon>
     </Compile>
@@ -174,6 +179,12 @@
       <Project>{1ea17373-9a27-4090-a3bf-f8e290c97561}</Project>
       <Name>Brady.ScrapRunner.Domain</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\RouteDirectionsView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />

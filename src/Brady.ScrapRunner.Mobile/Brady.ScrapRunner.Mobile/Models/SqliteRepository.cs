@@ -23,7 +23,14 @@
             return _connection.Table<T>().ToListAsync();
         }
 
-        public Task<List<T>> FindAsync<TValue>(Expression<Func<T, bool>> predicate = null, 
+        public Task<List<T>> ToListAsync(Expression<Func<T, bool>> predicate)
+        {
+            return _connection.Table<T>()
+                .Where(predicate)
+                .ToListAsync();
+        }
+
+        public Task<List<T>> ToListAsync<TValue>(Expression<Func<T, bool>> predicate = null, 
             Expression<Func<T, TValue>> orderBy = null)
         {
             var query = _connection.Table<T>();

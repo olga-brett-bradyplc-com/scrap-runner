@@ -9,7 +9,8 @@
     public interface IRepository<T> where T : class, new()
     {
         Task<List<T>> AllAsync();
-        Task<List<T>> FindAsync<TValue>(Expression<Func<T, bool>> predicate = null, Expression<Func<T, TValue>> orderBy = null);
+        Task<List<T>> ToListAsync(Expression<Func<T, bool>> predicate);
+        Task<List<T>> ToListAsync<TValue>(Expression<Func<T, bool>> predicate, Expression<Func<T, TValue>> orderBy);
         Task<T> FindAsync(Expression<Func<T, bool>> predicate);
         AsyncTableQuery<T> AsQueryable();
         Task<int> InsertAsync(T entity);
