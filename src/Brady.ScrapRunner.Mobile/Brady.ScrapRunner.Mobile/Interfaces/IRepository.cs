@@ -13,6 +13,7 @@
         Task<T> FindAsync(Expression<Func<T, bool>> predicate);
         AsyncTableQuery<T> AsQueryable();
         Task<int> InsertAsync(T entity);
+        Task<int> InsertOrReplaceAsync(T entity);
         Task<int> UpdateAsync(T entity);
         Task<int> DeleteAsync(T entity);
     }

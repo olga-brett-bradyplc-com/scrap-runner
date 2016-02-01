@@ -49,6 +49,11 @@
             return _connection.InsertAsync(entity);
         }
 
+        public Task<int> InsertOrReplaceAsync(T entity)
+        {
+            return _connection.InsertOrReplaceAsync(entity);
+        }
+
         public Task<int> UpdateAsync(T entity)
         {
             return _connection.UpdateAsync(entity);

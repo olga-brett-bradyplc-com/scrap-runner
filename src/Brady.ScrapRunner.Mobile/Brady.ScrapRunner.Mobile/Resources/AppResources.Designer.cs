@@ -170,6 +170,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sign in process failed..
+        /// </summary>
+        internal static string SignInProcessFailed {
+            get {
+                return ResourceManager.GetString("SignInProcessFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sign Out.
         /// </summary>
         internal static string SignOut {

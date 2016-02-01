@@ -1,6 +1,7 @@
 ﻿namespace Brady.ScrapRunner.Mobile.Models
 {
     using GalaSoft.MvvmLight.Ioc;
+    using Interfaces;
     using Microsoft.Practices.ServiceLocation;
     using ViewModels;
 
@@ -9,6 +10,9 @@
         public Locator()
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+
+            SimpleIoc.Default.Register<IRepository<EmployeeMasterModel>,
+                SqliteRepository<EmployeeMasterModel>>();
 
             SimpleIoc.Default.Register<SignInViewModel>();
             SimpleIoc.Default.Register<PowerUnitViewModel>();

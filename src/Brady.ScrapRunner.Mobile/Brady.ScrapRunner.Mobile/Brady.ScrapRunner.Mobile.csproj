@@ -42,6 +42,7 @@
     <Compile Include="Converters\NullableIntConverter.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
+    <Compile Include="Models\EmployeeMasterModel.cs" />
     <Compile Include="Models\Locator.cs" />
     <Compile Include="Models\PreferenceModel.cs" />
     <Compile Include="Models\SqliteRepository.cs" />
@@ -57,6 +58,7 @@
     </Compile>
     <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="Resources\TranslateExtension.cs" />
+    <Compile Include="ScrapRunnerMapperProfile.cs" />
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Validators\OdometerRangeValidator.cs" />
     <Compile Include="Validators\PasswordValidator.cs" />

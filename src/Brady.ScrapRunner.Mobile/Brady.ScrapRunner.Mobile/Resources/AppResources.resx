@@ -174,4 +174,7 @@
   <data name="UserNameOutOfRange" xml:space="preserve">
     <value>Username must be less than {0} characters.</value>
   </data>
+  <data name="SignInProcessFailed" xml:space="preserve">
+    <value>Sign in process failed.</value>
+  </data>
 </root>

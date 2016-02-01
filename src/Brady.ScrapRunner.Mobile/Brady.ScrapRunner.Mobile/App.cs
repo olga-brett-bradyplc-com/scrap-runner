@@ -1,5 +1,6 @@
 ﻿namespace Brady.ScrapRunner.Mobile
 {
+    using AutoMapper;
     using GalaSoft.MvvmLight.Ioc;
     using GalaSoft.MvvmLight.Views;
     using Interfaces;
@@ -26,6 +27,9 @@
             {
                 ConfigureViews(nav);
                 SimpleIoc.Default.Register<INavigationService>(() => nav);
+                Mapper.Initialize(cfg => {
+                    cfg.AddProfile<ScrapRunnerMapperProfile>();
+                });
             }
             var firstPage = new NavigationPage(new SignInView());
             nav.Initialize(firstPage);
