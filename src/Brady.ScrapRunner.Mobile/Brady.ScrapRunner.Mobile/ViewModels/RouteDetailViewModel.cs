@@ -9,12 +9,12 @@ using Xamarin.Forms;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    // This is still a work in progress
     public class RouteDetailViewModel : BaseViewModel
     {
         public RouteDetailViewModel()
         {
             Title = "Switch Trip";
+            SubTitle = "Trip 615112";
         }
     }
 }

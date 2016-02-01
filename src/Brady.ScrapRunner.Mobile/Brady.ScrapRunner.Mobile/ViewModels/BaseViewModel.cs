@@ -23,6 +23,14 @@
             set { SetProperty(ref _title, value); }
         }
 
+        private string _subTitle;
+
+        public string SubTitle
+        {
+            get { return _subTitle; }
+            set { SetProperty(ref _subTitle, value); }
+        }
+
         protected void SetProperty<T>(ref T backingField, T newValue, [CallerMemberName] string propertyName = null)
         {
             if (Equals(backingField, newValue)) return;

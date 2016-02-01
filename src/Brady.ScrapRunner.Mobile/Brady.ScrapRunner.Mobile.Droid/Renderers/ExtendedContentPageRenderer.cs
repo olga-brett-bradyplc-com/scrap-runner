@@ -16,7 +16,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Renderers
             var appBar = ((FormsApplicationActivity) Context).ActionBar;
             
             appBar.SetBackgroundDrawable(new ColorDrawable(Color.Maroon.ToAndroid()));
-            appBar.Subtitle = ecp.SubTitle;
+
+            appBar.Subtitle = string.IsNullOrWhiteSpace(ecp.SubTitle) ? "" : ecp.SubTitle;
+
+            appBar.SetDisplayShowCustomEnabled(true);
         }
     }
 }

@@ -1,20 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<renderers:ExtendedContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Brady.ScrapRunner.Mobile.ViewModels;assembly=Brady.ScrapRunner.Mobile"
+             xmlns:renderers="clr-namespace:Brady.ScrapRunner.Mobile.Renderers;assembly=Brady.ScrapRunner.Mobile"
              x:Class="Brady.ScrapRunner.Mobile.Views.RouteSummaryView"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             SubTitle="">
   <ContentPage.BindingContext>
     <vm:RouteSummaryViewModel/>
   </ContentPage.BindingContext>
-  <ContentPage.ToolbarItems>
-    <ToolbarItem Text="OptionsMenu" Clicked="OnClick" Order="Primary" Priority="2">
-      <ToolbarItem.Icon>
-        <OnPlatform x:TypeArguments="FileImageSource"
-             Android="drawericon2.png" />
-      </ToolbarItem.Icon>
-    </ToolbarItem>
-  </ContentPage.ToolbarItems>
   <ContentPage.Content>
     <StackLayout Orientation="Vertical" VerticalOptions="Fill">
       <ListView x:Name="RouteSummaryListView" HasUnevenRows="True" ItemsSource="{Binding RouteSummaryList}">
@@ -28,7 +22,7 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="*" />
-                  <ColumnDefinition Width="1*" />
+                  <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackLayout Grid.Row="0" Grid.Column="0" Padding="10, 15, 0, 10" Spacing="1">
                   <Label Text="{Binding TripType}" FontSize="Large" FontAttributes="Bold"/>
@@ -50,4 +44,4 @@
       </ListView>
     </StackLayout>
   </ContentPage.Content>
-</ContentPage>
+</renderers:ExtendedContentPage>
