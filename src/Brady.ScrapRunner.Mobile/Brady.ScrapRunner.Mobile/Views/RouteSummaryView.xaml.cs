@@ -1,24 +1,15 @@
 ﻿namespace Brady.ScrapRunner.Mobile.Views
 {
-    using ViewModels;
-    using System.Collections.Generic;
-    using Xamarin.Forms;
-    using System.Collections.ObjectModel;
     using System;
-    using Models;
-    public partial class RouteSummaryView
+    using Xamarin.Forms;
+
+    public partial class RouteSummaryView : ContentPage
     {
         public RouteSummaryView()
         {
             InitializeComponent();
-
             NavigationPage.SetHasBackButton(this, false);
-
-            // @TODO: Remove once proper navigation system is developed
-            RouteSummaryListView.ItemSelected += async (sender, e) =>
-            {
-                await Navigation.PushAsync(new RouteDetailView(), false);
-            };
+            BindingContext = App.Locator.RouteSummary;
         }
 
         void OnClick(object sender, EventArgs e)

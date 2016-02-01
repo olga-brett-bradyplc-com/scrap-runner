@@ -137,6 +137,46 @@ curl --silent --insecure --request GET \
 		"Query":"EmployeeMasters?$filter=EmployeeId='001'"
 	}
 
+***
+*** Rest Lifecycle tests.   Still have a ways to go on single id....
+*** EventLog
+***
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=0a34adcd-c376-48a0-aa0a-9db96d25146c" \
+"https://localhost:7776/api/scraprunner/EventLog/2014-06-26T16:50:41;0"
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=0a34adcd-c376-48a0-aa0a-9db96d25146c" \
+"https://localhost:7776/api/scraprunner/EventLog/2016-01-29T16:30:00;1"
+
+curl --silent --insecure --request POST \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=0a34adcd-c376-48a0-aa0a-9db96d25146c" \
+       --data "{ \"EventDateTime\": \"2016-01-29T16:30:00\", \"EventSeqNo\": 1, \"EventTerminalId\": \"F1\", \"EventAction\": \"ADD\"  }" \
+"https://localhost:7776/api/scraprunner/EventLog/"
+
+curl --silent --insecure --request PUT \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=0a34adcd-c376-48a0-aa0a-9db96d25146c" \
+       --data "{ \"EventDateTime\": \"2016-01-29T16:30:00\", \"EventSeqNo\": 1, \"EventTerminalId\": \"F1\", "EventEmployeeName": null, \"EventTripNumber\": \"T1\", \"EventProgram\": \"TST\", \"EventAction\": \"ADD\",  \"EventComment\": \"STM update\" }" \
+"https://localhost:7776/api/scraprunner/EventLog/2016-01-29T16:30:00;1"
+
+curl --silent --insecure --request DELETE \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=0a34adcd-c376-48a0-aa0a-9db96d25146c" \
+"https://localhost:7776/api/scraprunner/EventLog/2016-01-29T16:30:00;1"
+
+***
+*** Note miliseconds are generally ignored in GET/POST/PUT except I had to remote them from the DELETE url to make it work
+***
+curl --silent --insecure --request DELETE \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=0a34adcd-c376-48a0-aa0a-9db96d25146c" \
+"https://localhost:7776/api/scraprunner/EventLog/2014-06-26T16:50:41;1"
+
 
 ***
 *** Rest Lifecycle tests.   Still have a ways to go on single id....
@@ -341,37 +381,46 @@ curl --silent --insecure --request DELETE \
 #
 curl --silent --insecure --request GET \
        --header "Content-Type: application/json" \
-       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+       --header "cookie: bwftoken=f06886c0-593f-4060-9783-c021d583fd58" \
 "https://localhost:7776/api/scraprunner/Preference/foo;x"
 
 #
-# quietly fails  (405 method not allowed)
+# quietly fails  (405 method not allowed IF key IS APPENDED)
 #
 curl --silent --insecure --request POST \
        --header "Content-Type: application/json" \
-       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+       --header "cookie: bwftoken=f06886c0-593f-4060-9783-c021d583fd58" \
      --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"parameterValue\":\"Maniak\"}" \
 "https://localhost:7776/api/scraprunner/Preference/foo;x"
 
 #
-# PUT for insert and update.  partial messages cause nulling of unspecified fields on both insert and update.
+# WORKS 
+#
+curl --silent --insecure --request POST \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=f06886c0-593f-4060-9783-c021d583fd58" \
+     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"parameterValue\":\"Maniak\"}" \
+"https://localhost:7776/api/scraprunner/Preference"
+
+#
+# PUT for update (can also work for insert).  Pass full message everytime as partial messages cause nulling of unspecified fields on both insert and update.
 #
 curl --silent --insecure --request PUT \
        --header "Content-Type: application/json" \
-       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
-     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"parameterValue\":\"Maniak\", \"description\":\"updated desc\"}" \
+       --header "cookie: bwftoken=f06886c0-593f-4060-9783-c021d583fd58" \
+     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"parameterValue\":\"Maniak\", \"description\":\"desc\"}" \
 "https://localhost:7776/api/scraprunner/Preference/foo;x"
 
 curl --silent --insecure --request PUT \
        --header "Content-Type: application/json" \
-       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
-     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"description\":\"updated desc\"}" \
+       --header "cookie: bwftoken=f06886c0-593f-4060-9783-c021d583fd58" \
+     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"parameterValue\":\"Maniak\", \"description\":\"updated desc\", \"Id\":\"ignored\"}" \
 "https://localhost:7776/api/scraprunner/Preference/foo;x"
 
 curl --silent --insecure --request PUT \
        --header "Content-Type: application/json" \
-       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
-     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"parameterValue\":\"Maniak\", \"description\":\"updated desc\"}" \
+       --header "cookie: bwftoken=f06886c0-593f-4060-9783-c021d583fd58" \
+     --data "{\"terminalId\":\"x\", \"parameter\":\"foo\", \"parameterValue\":\"Maniak\", \"description\":\"updated desc 3\"}" \
 "https://localhost:7776/api/scraprunner/Preference/foo;x"
 
 #
@@ -379,7 +428,7 @@ curl --silent --insecure --request PUT \
 #
 curl --silent --insecure --request DELETE \
        --header "Content-Type: application/json" \
-       --header "cookie: bwftoken=16c30bb4-32c8-4c47-a530-70dad26d3a4e" \
+       --header "cookie: bwftoken=f06886c0-593f-4060-9783-c021d583fd58" \
 "https://localhost:7776/api/scraprunner/Preference/foo;x"
 
 

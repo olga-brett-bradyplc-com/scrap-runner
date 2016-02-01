@@ -36,9 +36,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
-    <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
+    <Compile Include="Models\CustomerDirectionModel.cs" />
+    <Compile Include="Models\EmployeeMasterModel.cs" />
+    <Compile Include="Models\Locator.cs" />
     <Compile Include="Models\PreferenceModel.cs" />
     <Compile Include="Models\SqliteRepository.cs" />
     <Compile Include="Models\Route.cs" />
@@ -54,29 +56,29 @@
     </Compile>
     <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="Resources\TranslateExtension.cs" />
+    <Compile Include="ScrapRunnerMapperProfile.cs" />
+    <Compile Include="Services\NavigationService.cs" />
+    <Compile Include="Validators\OdometerRangeValidator.cs" />
+    <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
-    <Compile Include="Validators\SignInCommandValidator.cs" />
+    <Compile Include="Validators\UsernameValidator.cs" />
+    <Compile Include="ViewModels\RouteDirectionsViewModel.cs" />
     <Compile Include="ViewModels\PowerUnitViewModel.cs" />
     <Compile Include="ViewModels\RouteDetailViewModel.cs" />
     <Compile Include="ViewModels\RouteSummaryViewModel.cs" />
     <Compile Include="ViewModels\SignInViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
-    <Compile Include="ViewModels\TransactionsViewModel.cs" />
     <Compile Include="Views\PowerUnitView.xaml.cs">
       <DependentUpon>PowerUnitView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\RouteDetailView.xaml.cs">
       <DependentUpon>RouteDetailView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\TruckViewModel.cs" />
     <Compile Include="Views\RouteSummaryView.xaml.cs">
       <DependentUpon>RouteSummaryView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SignInView.xaml.cs">
       <DependentUpon>SignInView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\TransactionsView.xaml.cs">
-      <DependentUpon>TransactionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TruckView.xaml.cs">
       <DependentUpon>TruckView.xaml</DependentUpon>
@@ -109,6 +111,18 @@
       <HintPath>..\..\..\packages\FluentValidation.6.1.0.0\lib\portable-net45+wp80+win8+wpa81\FluentValidation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="GalaSoft.MvvmLight, Version=5.2.0.37222, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\MvvmLightLibs.5.2.0.0\lib\portable-net45+wp8+wpa81+netcore45+monoandroid1+xamarin.ios10\GalaSoft.MvvmLight.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.Extras, Version=5.2.0.37222, Culture=neutral, PublicKeyToken=669f0b5e8f868abf, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\MvvmLightLibs.5.2.0.0\lib\portable-net45+wp8+wpa81+netcore45+monoandroid1+xamarin.ios10\GalaSoft.MvvmLight.Extras.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Splat.1.6.2\lib\Portable-net45+win+wpa81+wp80\Splat.dll</HintPath>
       <Private>True</Private>
@@ -122,15 +136,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Forms.Core, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Forms.2.0.1.6495\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Core.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Forms.2.0.1.6505\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Forms.Platform, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Forms.2.0.1.6495\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Platform.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Forms.2.0.1.6505\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Forms.Xaml, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Forms.2.0.1.6495\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Forms.2.0.1.6505\lib\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -158,30 +172,18 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\TruckView.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Brady.ScrapRunner.Domain\Brady.ScrapRunner.Domain.csproj">
       <Project>{1ea17373-9a27-4090-a3bf-f8e290c97561}</Project>
       <Name>Brady.ScrapRunner.Domain</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Views\TransactionsView.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <Import Project="..\..\..\packages\Xamarin.Forms.2.0.1.6495\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.0.1.6495\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
+  <Import Project="..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\packages\Xamarin.Forms.2.0.1.6495\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Xamarin.Forms.2.0.1.6495\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Xamarin.Forms.2.0.1.6505\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
