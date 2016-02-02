@@ -16,6 +16,8 @@
             SimpleIoc.Default.Register<IRepository<CustomerDirectionModel>,
                 SqliteRepository<CustomerDirectionModel>>();
 
+            SimpleIoc.Default.Register<SettingsViewModel>();
+            SimpleIoc.Default.Register<ChangeLanguageViewModel>();
             SimpleIoc.Default.Register<SignInViewModel>();
             SimpleIoc.Default.Register<PowerUnitViewModel>();
             SimpleIoc.Default.Register<RouteSummaryViewModel>();
@@ -23,12 +25,16 @@
             SimpleIoc.Default.Register<RouteDirectionsViewModel>();
         }
 
+        public const string SettingsView = "SettingsView";
+        public const string ChangeLanguageView = "ChangeLanguageView";
         public const string SignInView = "SignInView";
         public const string PowerUnitView = "PowerUnitView";
         public const string RouteSummaryView = "RouteSummaryView";
         public const string RouteDetailView = "RouteDetailView";
         public const string RouteDirectionsView = "RouteDirectionsView";
 
+        public ChangeLanguageViewModel ChangeLanguage => ServiceLocator.Current.GetInstance<ChangeLanguageViewModel>();
+        public SettingsViewModel Settings => ServiceLocator.Current.GetInstance<SettingsViewModel>();
         public SignInViewModel SignIn => ServiceLocator.Current.GetInstance<SignInViewModel>();
         public PowerUnitViewModel PowerUnit => ServiceLocator.Current.GetInstance<PowerUnitViewModel>();
         public RouteSummaryViewModel RouteSummary => ServiceLocator.Current.GetInstance<RouteSummaryViewModel>();
