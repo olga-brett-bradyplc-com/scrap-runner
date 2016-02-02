@@ -19,7 +19,8 @@
     </ResourceDictionary>
   </ContentPage.Resources>
   <ContentPage.Content>
-    <StackLayout Orientation="Vertical" VerticalOptions="Fill">
+    <ScrollView>
+      <StackLayout Orientation="Vertical" VerticalOptions="Fill">
       <ListView x:Name="RouteSummaryListView" 
         HasUnevenRows="True" 
         ItemsSource="{Binding RouteSummaryList}"
@@ -61,5 +62,6 @@
         </ListView.ItemTemplate>
       </ListView>
     </StackLayout>
+    </ScrollView>
   </ContentPage.Content>
 </ContentPage>
