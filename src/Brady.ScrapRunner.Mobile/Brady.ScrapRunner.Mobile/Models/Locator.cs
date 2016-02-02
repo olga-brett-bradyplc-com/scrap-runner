@@ -25,7 +25,7 @@ namespace Brady.ScrapRunner.Mobile.Models
             SimpleIoc.Default.Register<RouteSummaryViewModel>();
             SimpleIoc.Default.Register<RouteDetailViewModel>();
             SimpleIoc.Default.Register<RouteDirectionsViewModel>();
-            SimpleIoc.Default.Register<TransactionsViewModel>();
+            SimpleIoc.Default.Register<TransactionSummaryViewModel>();
             SimpleIoc.Default.Register<TransactionDetailViewModel>();
         }
 
@@ -36,7 +36,7 @@ namespace Brady.ScrapRunner.Mobile.Models
         public const string RouteSummaryView = "RouteSummaryView";
         public const string RouteDetailView = "RouteDetailView";
         public const string RouteDirectionsView = "RouteDirectionsView";
-        public const string TransactionsView = "TransactionsView";
+        public const string TransactionSummaryView = "TransactionSummaryView";
         public const string TransactionDetailView = "TransactionDetailView";
 
         public ChangeLanguageViewModel ChangeLanguage => ServiceLocator.Current.GetInstance<ChangeLanguageViewModel>();
@@ -46,7 +46,7 @@ namespace Brady.ScrapRunner.Mobile.Models
         public RouteSummaryViewModel RouteSummary => ServiceLocator.Current.GetInstance<RouteSummaryViewModel>();
         public RouteDetailViewModel RouteDetail => ServiceLocator.Current.GetInstance<RouteDetailViewModel>();
         public RouteDirectionsViewModel RouteDirections => ServiceLocator.Current.GetInstance<RouteDirectionsViewModel>();
-        public TransactionsViewModel Transactions => ServiceLocator.Current.GetInstance<TransactionsViewModel>();
+        public TransactionSummaryViewModel TransactionSummary => ServiceLocator.Current.GetInstance<TransactionSummaryViewModel>();
         public TransactionDetailViewModel TransactionDetail => ServiceLocator.Current.GetInstance<TransactionDetailViewModel>();
     }
 }

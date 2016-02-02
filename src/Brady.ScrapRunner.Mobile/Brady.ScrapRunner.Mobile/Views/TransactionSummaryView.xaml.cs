@@ -9,12 +9,12 @@ using Brady.ScrapRunner.Mobile.Renderers;
 
 namespace Brady.ScrapRunner.Mobile.Views
 {
-    public partial class TransactionsView : ContentPage
+    public partial class TransactionSummaryView : ContentPage
     {
-        public TransactionsView()
+        public TransactionSummaryView()
         {
             InitializeComponent();
-            BindingContext = App.Locator.Transactions;
+            BindingContext = App.Locator.TransactionSummary;
         }
 
     }

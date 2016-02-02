@@ -14,11 +14,11 @@ using Xamarin.Forms;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    public class TransactionsViewModel : BaseViewModel
+    public class TransactionSummaryViewModel : BaseViewModel
     {
         private readonly INavigationService _navigationService;
 
-        public TransactionsViewModel(INavigationService navigationService)
+        public TransactionSummaryViewModel(INavigationService navigationService)
         {
             _navigationService = navigationService;
             Title = "Transactions";
