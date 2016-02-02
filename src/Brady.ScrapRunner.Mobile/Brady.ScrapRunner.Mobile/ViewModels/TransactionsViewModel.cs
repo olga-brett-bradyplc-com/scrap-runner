@@ -8,25 +8,28 @@ using System.Text;
 using System.Threading.Tasks;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Models;
+using GalaSoft.MvvmLight.Views;
 using Xamarin.Forms;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     public class TransactionsViewModel : BaseViewModel
     {
-        public TransactionsViewModel()
+        private readonly INavigationService _navigationService;
+
+        public TransactionsViewModel(INavigationService navigationService)
         {
+            _navigationService = navigationService;
             Title = "Transactions";
-            SubTitle = "Trip 615112";
 
             TransactionDetailList = new ObservableCollection<TransactionDetail>();
             CreateDummyData();
 
             var grouped = from details in TransactionDetailList
-                orderby details.Order
-                group details by details.Type
+                          orderby details.Order
+                          group details by details.Type
                 into detailsGroup
-                select new Grouping<string, TransactionDetail>(detailsGroup.Key, detailsGroup);
+                          select new Grouping<string, TransactionDetail>(detailsGroup.Key, detailsGroup);
 
             TransactionList = new ObservableCollection<Grouping<string, TransactionDetail>>(grouped);
         }

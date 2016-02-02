@@ -14,7 +14,7 @@ namespace Brady.ScrapRunner.Mobile.Helpers
         public Grouping(TKey key, IEnumerable<TItem> items)
         {
             Key = key;
-            foreach(var item in items)
+            foreach (var item in items)
                 Items.Add(item);
         }
     }

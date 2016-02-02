@@ -21,6 +21,7 @@
             SimpleIoc.Default.Register<RouteSummaryViewModel>();
             SimpleIoc.Default.Register<RouteDetailViewModel>();
             SimpleIoc.Default.Register<RouteDirectionsViewModel>();
+            SimpleIoc.Default.Register<TransactionsViewModel>();
         }
 
         public const string SignInView = "SignInView";
@@ -28,11 +29,13 @@
         public const string RouteSummaryView = "RouteSummaryView";
         public const string RouteDetailView = "RouteDetailView";
         public const string RouteDirectionsView = "RouteDirectionsView";
+        public const string TransactionsView = "TransactionsView";
 
         public SignInViewModel SignIn => ServiceLocator.Current.GetInstance<SignInViewModel>();
         public PowerUnitViewModel PowerUnit => ServiceLocator.Current.GetInstance<PowerUnitViewModel>();
         public RouteSummaryViewModel RouteSummary => ServiceLocator.Current.GetInstance<RouteSummaryViewModel>();
         public RouteDetailViewModel RouteDetail => ServiceLocator.Current.GetInstance<RouteDetailViewModel>();
         public RouteDirectionsViewModel RouteDirections => ServiceLocator.Current.GetInstance<RouteDirectionsViewModel>();
+        public TransactionsViewModel Transactions => ServiceLocator.Current.GetInstance<TransactionsViewModel>();
     }
 }

@@ -1,20 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- This is all static data, as I'll need to create to create custom renders for the collapsable listviews and navigation controls -->
-<renderers:ExtendedContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewModels="clr-namespace:Brady.ScrapRunner.Mobile.ViewModels;assembly=Brady.ScrapRunner.Mobile"
-             xmlns:renderers="clr-namespace:Brady.ScrapRunner.Mobile.Renderers;assembly=Brady.ScrapRunner.Mobile"
              x:Class="Brady.ScrapRunner.Mobile.Views.RouteDetailView"
-             Title="{Binding Title}"
-             SubTitle="{Binding SubTitle}">
-  <ContentPage.BindingContext>
-    <viewModels:RouteDetailViewModel/>
-  </ContentPage.BindingContext>
+             Title="{Binding Title}">
+  <ContentPage.ToolbarItems>
+    <ToolbarItem Text="OptionsMenu" Clicked="OnClick" Order="Primary" Priority="2">
+      <ToolbarItem.Icon>
+        <OnPlatform x:TypeArguments="FileImageSource"
+             Android="drawericon2.png" />
+      </ToolbarItem.Icon>
+    </ToolbarItem>
+  </ContentPage.ToolbarItems>
   <ContentPage.Content>
     <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand">
 
       <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" BackgroundColor="#2f2f2f" Padding="15">
-        <Label 
+        <Label
           Text="Kaman Aerospace"
           HorizontalOptions="Start"
           FontSize="18"
@@ -40,7 +42,7 @@
               HorizontalOptions="Start"
               FontSize="18"
               TextColor="#2f2f2f"/>
-          </StackLayout>            
+          </StackLayout>
           <Grid ColumnSpacing="0" RowSpacing="0">
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto" />
@@ -101,11 +103,8 @@
               <Label Text="#20 SHEARING IRON" FontSize="13"/>
             </StackLayout>
           </Grid>
-        </StackLayout>        
+        </StackLayout>
       </ScrollView>
-
-      
-      
     </StackLayout>
   </ContentPage.Content>
-</renderers:ExtendedContentPage>
+</ContentPage>
