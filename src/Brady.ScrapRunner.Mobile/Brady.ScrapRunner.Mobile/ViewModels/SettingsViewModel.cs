@@ -3,6 +3,7 @@
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Views;
     using Models;
+    using Resources;
 
     public class SettingsViewModel : BaseViewModel
     {
@@ -11,7 +12,7 @@
         public SettingsViewModel(INavigationService navigationService)
         {
             _navigationService = navigationService;
-            ChangeLanguageCommand = new RelayCommand(ExecuteChangeLanguageCommand);
+            Title = AppResources.Settings;
         }
 
         private string _currentLanguage;
@@ -21,7 +22,10 @@
             set { Set(ref _currentLanguage, value); }
         }
 
-        public RelayCommand ChangeLanguageCommand { get; private set; }
+        private RelayCommand _changeLanguageCommand;
+        public RelayCommand ChangeLanguageCommand => _changeLanguageCommand ?? 
+            (_changeLanguageCommand = new RelayCommand(ExecuteChangeLanguageCommand));
+
         private void ExecuteChangeLanguageCommand()
         {
             _navigationService.NavigateTo(Locator.ChangeLanguageView);

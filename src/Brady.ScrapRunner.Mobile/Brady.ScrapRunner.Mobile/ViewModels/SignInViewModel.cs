@@ -121,5 +121,13 @@
             var mapped = AutoMapper.Mapper.Map<EmployeeMaster, EmployeeMasterModel>(employeeMaster);
             return _employeeMasterRepository.InsertAsync(mapped);
         }
+
+        private RelayCommand _settingsCommand;
+        public RelayCommand SettingsCommand => _settingsCommand ?? (_settingsCommand = new RelayCommand(ExecuteSettingsCommand));
+
+        private void ExecuteSettingsCommand()
+        {
+            _navigationService.NavigateTo(Locator.SettingsView);
+        }
     }
 }
