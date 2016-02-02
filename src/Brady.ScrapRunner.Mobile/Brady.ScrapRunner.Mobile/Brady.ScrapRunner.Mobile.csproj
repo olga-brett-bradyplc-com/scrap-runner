@@ -40,6 +40,7 @@
     <Compile Include="Behaviors\EventToCommandBehavior.cs" />
     <Compile Include="Converters\ItemTappedEventArgsConverter.cs" />
     <Compile Include="Converters\NullableIntConverter.cs" />
+    <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
     <Compile Include="Models\CustomerDirectionModel.cs" />
@@ -48,10 +49,10 @@
     <Compile Include="Models\PreferenceModel.cs" />
     <Compile Include="Models\SqliteRepository.cs" />
     <Compile Include="Models\Route.cs" />
+    <Compile Include="Models\TransactionDetail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderers\ExtendedEntry.cs" />
     <Compile Include="Renderers\CollapsibleListView.cs" />
-    <Compile Include="Renderers\ExtendedNavigationPage.cs" />
     <Compile Include="Resources\AppResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -65,6 +66,7 @@
     <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
+    <Compile Include="ViewModels\TransactionsViewModel.cs" />
     <Compile Include="ViewModels\ChangeLanguageViewModel.cs" />
     <Compile Include="ViewModels\RouteDirectionsViewModel.cs" />
     <Compile Include="ViewModels\PowerUnitViewModel.cs" />
@@ -93,6 +95,9 @@
     </Compile>
     <Compile Include="Views\SignInView.xaml.cs">
       <DependentUpon>SignInView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TransactionsView.xaml.cs">
+      <DependentUpon>TransactionsView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +195,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\RouteDirectionsView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\TransactionsView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
