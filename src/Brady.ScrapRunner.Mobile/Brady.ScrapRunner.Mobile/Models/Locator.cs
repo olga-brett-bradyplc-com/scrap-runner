@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.Models
+﻿using Brady.ScrapRunner.Mobile.Views;
+
+namespace Brady.ScrapRunner.Mobile.Models
 {
     using GalaSoft.MvvmLight.Ioc;
     using Interfaces;
@@ -24,6 +26,7 @@
             SimpleIoc.Default.Register<RouteDetailViewModel>();
             SimpleIoc.Default.Register<RouteDirectionsViewModel>();
             SimpleIoc.Default.Register<TransactionsViewModel>();
+            SimpleIoc.Default.Register<TransactionDetailViewModel>();
         }
 
         public const string SettingsView = "SettingsView";
@@ -34,6 +37,7 @@
         public const string RouteDetailView = "RouteDetailView";
         public const string RouteDirectionsView = "RouteDirectionsView";
         public const string TransactionsView = "TransactionsView";
+        public const string TransactionDetailView = "TransactionDetailView";
 
         public ChangeLanguageViewModel ChangeLanguage => ServiceLocator.Current.GetInstance<ChangeLanguageViewModel>();
         public SettingsViewModel Settings => ServiceLocator.Current.GetInstance<SettingsViewModel>();
@@ -43,5 +47,6 @@
         public RouteDetailViewModel RouteDetail => ServiceLocator.Current.GetInstance<RouteDetailViewModel>();
         public RouteDirectionsViewModel RouteDirections => ServiceLocator.Current.GetInstance<RouteDirectionsViewModel>();
         public TransactionsViewModel Transactions => ServiceLocator.Current.GetInstance<TransactionsViewModel>();
+        public TransactionDetailViewModel TransactionDetail => ServiceLocator.Current.GetInstance<TransactionDetailViewModel>();
     }
 }

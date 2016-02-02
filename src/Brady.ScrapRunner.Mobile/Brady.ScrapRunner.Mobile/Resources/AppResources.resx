@@ -183,4 +183,28 @@
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
+  <data name="Commodity" xml:space="preserve">
+    <value>Commodity</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="ContainerId" xml:space="preserve">
+    <value>Container ID</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="Level" xml:space="preserve">
+    <value>Level</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="CustomerLocation" xml:space="preserve">
+    <value>Customer Location</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notes</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="ReferenceNumber" xml:space="preserve">
+    <value>Reference Number</value>
+    <comment>Transaction Detail View</comment>
+  </data>
 </root>

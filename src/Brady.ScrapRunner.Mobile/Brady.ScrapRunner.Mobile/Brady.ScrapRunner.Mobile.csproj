@@ -66,6 +66,7 @@
     <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
+    <Compile Include="ViewModels\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModels\TransactionsViewModel.cs" />
     <Compile Include="ViewModels\ChangeLanguageViewModel.cs" />
     <Compile Include="ViewModels\RouteDirectionsViewModel.cs" />
@@ -95,6 +96,9 @@
     </Compile>
     <Compile Include="Views\SignInView.xaml.cs">
       <DependentUpon>SignInView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TransactionDetailView.xaml.cs">
+      <DependentUpon>TransactionDetailView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TransactionsView.xaml.cs">
       <DependentUpon>TransactionsView.xaml</DependentUpon>
@@ -213,6 +217,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\ChangeLanguageView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\TransactionDetailView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

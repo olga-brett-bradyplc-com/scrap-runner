@@ -26,6 +26,21 @@
 
         public ObservableCollection<Route> RouteSummaryList { get; private set; }
 
+        private Route _selectedRoute;
+        public Route SelectedRoute
+        {
+            get { return _selectedRoute; }
+            set { Set(ref _selectedRoute, value); }
+        }
+
+        public RelayCommand<Route> RouteSelectedCommand { get; private set; }
+
+        public void ExecuteRouteSelectedCommand(Route selectedRoute)
+        {
+            _navigationService.NavigateTo(Locator.RouteDetailView, selectedRoute.TripNumber);
+        }
+
+        // @TODO : Refactor using Brady.Domain objects when appropiate
         public void CreateDummyData()
         {
             RouteSummaryList = new ObservableCollection<Route>
@@ -84,20 +99,6 @@
                     TripNumber = "615115"
                 }
             };
-        }
-
-        private Route _selectedRoute;
-        public Route SelectedRoute
-        {
-            get { return _selectedRoute; }
-            set { Set(ref _selectedRoute, value); }
-        }
-
-        public RelayCommand<Route> RouteSelectedCommand { get; private set; }
-
-        public void ExecuteRouteSelectedCommand(Route selectedRoute)
-        {
-            _navigationService.NavigateTo(Locator.RouteDetailView, selectedRoute.TripNumber);
         }
     }
 }
