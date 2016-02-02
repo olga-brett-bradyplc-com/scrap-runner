@@ -6,57 +6,60 @@
              x:Class="Brady.ScrapRunner.Mobile.Views.SignInView"
              Title="{Binding Title}"
              BackgroundImage="loginsplash800x1280.jpg">
-  <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" Padding="10" x:Name="StackLayout">
-    <Image Source="scraprunnertemplogo.png" />
+  <StackLayout>
+    <StackLayout Orientation="Vertical" VerticalOptions="CenterAndExpand" Padding="10" x:Name="StackLayout">
+      <Image Source="scraprunnertemplogo.png" />
 
-    <!-- See comment in Brady.ScrapRunner.Mobile.Renderers.BradyEntry on why to use BgColor vs. BackgroundColor -->
-    <custom:ExtendedEntry
-        Text="{Binding UserName}"
-        StyleId="UserNameInputField"
-        Placeholder="{i18N:Translate UserName}"
-        CornerRadius="5"
-        StrokeColor="White"
-        StrokeThickness="17"
-        PlaceholderColor="#b4b4b4"
-        BgColor="White"
-        TextColor="#000000"
-        x:Name="UserNameInputField"
+      <!-- See comment in Brady.ScrapRunner.Mobile.Renderers.BradyEntry on why to use BgColor vs. BackgroundColor -->
+      <custom:ExtendedEntry
+          Text="{Binding UserName}"
+          StyleId="UserNameInputField"
+          Placeholder="{i18N:Translate UserName}"
+          CornerRadius="2"
+          StrokeColor="White"
+          StrokeThickness="17"
+          PlaceholderColor="#b4b4b4"
+          BgColor="White"
+          TextColor="#000000"
+          x:Name="UserNameInputField"
       />
 
-    <custom:ExtendedEntry
-        Text="{Binding Password}"
-        StyleId="PasswordInputField"
-        Placeholder="{i18N:Translate Password}"
-        CornerRadius="5"
-        StrokeColor="White"
-        StrokeThickness="17"
-        PlaceholderColor="#b4b4b4"
-        BgColor="White"
-        TextColor="#000000"
-        x:Name="PasswordInput"
-        IsPassword="True"
-      />    
+      <custom:ExtendedEntry
+          Text="{Binding Password}"
+          StyleId="PasswordInputField"
+          Placeholder="{i18N:Translate Password}"
+          CornerRadius="2"
+          StrokeColor="White"
+          StrokeThickness="17"
+          PlaceholderColor="#b4b4b4"
+          BgColor="White"
+          TextColor="#000000"
+          x:Name="PasswordInput"
+          IsPassword="True"
+      />
 
-    <Button Text="{i18N:Translate SignIn}"
-            x:Name="SignInButton"
-            StyleId="SignInButton"
-            HorizontalOptions="Fill"
-            BackgroundColor="#eb8939"
-            BorderColor="#ffffff"
-            BorderWidth="2"
-            BorderRadius="10"
-            TextColor="#ffffff"
-            Command="{Binding SignInCommand}"/>
-    <!-- @TODO: Use proper styling -->
-    <Button Text="{i18N:Translate Settings}"
-            x:Name="SettingsButton"
-            StyleId="SignInButton"
-            HorizontalOptions="Fill"
-            BackgroundColor="#eb8939"
-            BorderColor="#ffffff"
-            BorderWidth="2"
-            BorderRadius="10"
-            TextColor="#ffffff"
-            Command="{Binding SettingsCommand}" />
+      <Button Text="{i18N:Translate SignIn}"
+              x:Name="SignInButton"
+              StyleId="SignInButton"
+              HorizontalOptions="Fill"
+              BackgroundColor="#eb8939"
+              BorderColor="#ffffff"
+              BorderWidth="2"
+              BorderRadius="10"
+              TextColor="#ffffff"
+              Command="{Binding SignInCommand}"/>
+    </StackLayout>
+    <StackLayout Orientation="Vertical" VerticalOptions="End" HorizontalOptions="End" Padding="10">
+        <!-- Maybe we should create a custom button renderer to use android's ImageButton ? -->
+        <Button
+                x:Name="SettingsButton"
+                StyleId="SettingsButton"
+                HeightRequest="75"
+                WidthRequest="75"
+                HorizontalOptions="Start"
+                Image="settingsicon.png"
+                BackgroundColor="Transparent"
+                Command="{Binding SettingsCommand}" />
+    </StackLayout>
   </StackLayout>
 </ContentPage>

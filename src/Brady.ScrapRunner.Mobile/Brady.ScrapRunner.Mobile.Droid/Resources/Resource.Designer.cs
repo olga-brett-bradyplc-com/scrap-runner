@@ -3435,8 +3435,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f020068
 			public const int mr_ic_settings_light = 2130837608;
 			
-			// aapt resource value: 0x7f02006c
-			public const int notification_template_icon_bg = 2130837612;
+			// aapt resource value: 0x7f02006d
+			public const int notification_template_icon_bg = 2130837613;
 			
 			// aapt resource value: 0x7f020069
 			public const int roundedbg = 2130837609;
@@ -3446,6 +3446,9 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			
 			// aapt resource value: 0x7f02006b
 			public const int scraprunnertemplogo = 2130837611;
+			
+			// aapt resource value: 0x7f02006c
+			public const int settingsicon = 2130837612;
 			
 			static Drawable()
 			{
