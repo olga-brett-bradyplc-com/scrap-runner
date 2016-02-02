@@ -66,6 +66,8 @@
     <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
+    <Compile Include="ViewModels\ScaleDetailViewModel.cs" />
+    <Compile Include="ViewModels\ScaleSummaryViewModel.cs" />
     <Compile Include="ViewModels\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModels\TransactionSummaryViewModel.cs" />
     <Compile Include="ViewModels\ChangeLanguageViewModel.cs" />
@@ -90,6 +92,12 @@
     </Compile>
     <Compile Include="Views\RouteSummaryView.xaml.cs">
       <DependentUpon>RouteSummaryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ScaleDetailView.xaml.cs">
+      <DependentUpon>ScaleDetailView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ScaleSummaryView.xaml.cs">
+      <DependentUpon>ScaleSummaryView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
@@ -223,6 +231,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\TransactionDetailView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\ScaleDetailView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\ScaleSummaryView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
