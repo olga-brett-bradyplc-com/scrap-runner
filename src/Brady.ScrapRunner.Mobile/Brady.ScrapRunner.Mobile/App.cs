@@ -38,6 +38,8 @@
 
         protected void ConfigureViews(NavigationService nav)
         {
+            nav.Configure(Locator.SettingsView, typeof(SettingsView));
+            nav.Configure(Locator.ChangeLanguageView, typeof(ChangeLanguageView));
             nav.Configure(Locator.SignInView, typeof(SignInView));
             nav.Configure(Locator.PowerUnitView, typeof(PowerUnitView));
             nav.Configure(Locator.RouteSummaryView, typeof(RouteSummaryView));

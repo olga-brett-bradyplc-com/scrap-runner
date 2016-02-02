@@ -1,8 +1,12 @@
 ﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using System;
+    using System.Threading.Tasks;
+    using Acr.UserDialogs;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Views;
     using Models;
+    using Resources;
 
     // This is still a work in progress
     public class RouteDetailViewModel : BaseViewModel
@@ -16,6 +20,13 @@
             DirectionsCommand = new RelayCommand(ExecuteDrivingDirectionsCommand);
             EnRouteCommand = new RelayCommand(ExecuteEnRouteCommand);
             ArriveCommand = new RelayCommand(ExecuteArriveCommand);
+        }
+
+        private string _tripNumber;
+        public string TripNumber
+        {
+            get { return _tripNumber; }
+            set { Set(ref _tripNumber, value); }
         }
 
         public RelayCommand DirectionsCommand { get; private set; }

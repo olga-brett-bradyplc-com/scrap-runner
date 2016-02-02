@@ -68,12 +68,17 @@
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
     <Compile Include="ViewModels\TransactionsViewModel.cs" />
+    <Compile Include="ViewModels\ChangeLanguageViewModel.cs" />
     <Compile Include="ViewModels\RouteDirectionsViewModel.cs" />
     <Compile Include="ViewModels\PowerUnitViewModel.cs" />
     <Compile Include="ViewModels\RouteDetailViewModel.cs" />
     <Compile Include="ViewModels\RouteSummaryViewModel.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\SignInViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="Views\ChangeLanguageView.xaml.cs">
+      <DependentUpon>ChangeLanguageView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\RouteDirectionsView.xaml.cs">
       <DependentUpon>RouteDirectionsView.xaml</DependentUpon>
     </Compile>
@@ -85,6 +90,9 @@
     </Compile>
     <Compile Include="Views\RouteSummaryView.xaml.cs">
       <DependentUpon>RouteSummaryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SignInView.xaml.cs">
       <DependentUpon>SignInView.xaml</DependentUpon>
@@ -192,9 +200,20 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Views\TransactionsView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\SettingsView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\ChangeLanguageView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

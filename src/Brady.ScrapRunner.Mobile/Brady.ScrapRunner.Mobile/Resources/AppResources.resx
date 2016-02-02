@@ -177,4 +177,7 @@
   <data name="SignInProcessFailed" xml:space="preserve">
     <value>Sign in process failed.</value>
   </data>
+  <data name="ConfirmEnRoute" xml:space="preserve">
+    <value>You are about to go en route to:{0}{1}{0}{2}{0}{3}, {4} {5}{0}Are you sure you want to start this trip?</value>
+  </data>
 </root>

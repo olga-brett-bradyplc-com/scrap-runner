@@ -80,6 +80,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are about to go en route to:{0}{1}{0}{2}{0}{3}, {4} {5}{0}Are you sure you want to start this trip?.
+        /// </summary>
+        internal static string ConfirmEnRoute {
+            get {
+                return ResourceManager.GetString("ConfirmEnRoute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         internal static string Error {
