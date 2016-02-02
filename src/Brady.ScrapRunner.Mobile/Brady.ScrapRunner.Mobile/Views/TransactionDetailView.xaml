@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Brady.ScrapRunner.Mobile.Views.TransactionDetailView"
+             xmlns:i18N="clr-namespace:Brady.ScrapRunner.Mobile.Resources;assembly=Brady.ScrapRunner.Mobile"
+             xmlns:renderers="clr-namespace:Brady.ScrapRunner.Mobile.Renderers;assembly=Brady.ScrapRunner.Mobile"
+             Title="{Binding Title}">
+  <StackLayout>
+    <StackLayout
+      BackgroundColor="#d8d8d8"
+      Padding="15, 10, 0, 10"
+      Spacing="1">
+      <Label TextColor="Black" Text="&lt;NO NUMBER&gt; LUGGER-20" />
+      <Label TextColor="Black" Text="DOCK DOOR 10" />
+      <Label TextColor="Black" Text="#15 SHEARING IRON" />
+    </StackLayout>
+    <StackLayout
+      Padding="10, 0">
+      <Label Text="{i18N:Translate ContainerId}" />
+      <renderers:ExtendedEntry
+        Text="{Binding ContainerId}"
+        StrokeThickness="5"
+        CornerRadius="3"
+        StrokeColor="#2f2f2f"
+        BgColor="White"
+        />
+      <Label Text="{i18N:Translate CustomerLocation}" />
+      <renderers:ExtendedEntry
+        StrokeThickness="5"
+        CornerRadius="3"
+        StrokeColor="#2f2f2f"
+        BgColor="White"
+        Text="{Binding Location}"
+        />
+      <Label Text="{i18N:Translate Commodity}" />
+      <renderers:ExtendedEntry
+        Text="{Binding Commodity}"
+        StrokeThickness="5"
+        CornerRadius="3"
+        StrokeColor="#2f2f2f"
+        BgColor="White"
+        />
+      <Label Text="{i18N:Translate Level}" />
+      <renderers:ExtendedEntry
+        Text="{Binding Level}"
+        StrokeThickness="5"
+        CornerRadius="3"
+        StrokeColor="#2f2f2f"
+        BgColor="White"
+        />
+      <Label Text="{i18N:Translate Notes}" />
+      <renderers:ExtendedEntry
+        Text="{Binding Notes}"
+        StrokeThickness="5"
+        CornerRadius="3"
+        StrokeColor="#2f2f2f"
+        BgColor="White"
+        />
+      <Label Text="{i18N:Translate ReferenceNumber}" />
+      <renderers:ExtendedEntry
+        Text="{Binding ReferenceNumber}"
+        StrokeThickness="5"
+        CornerRadius="3"
+        StrokeColor="#2f2f2f"
+        BgColor="White"
+        />
+    </StackLayout>
+  </StackLayout>
+</ContentPage>

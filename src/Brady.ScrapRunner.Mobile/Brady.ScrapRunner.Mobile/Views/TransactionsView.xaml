@@ -1,30 +1,45 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:Brady.ScrapRunner.Mobile.Converters;assembly=Brady.ScrapRunner.Mobile"
+             xmlns:behaviors="clr-namespace:Brady.ScrapRunner.Mobile.Behaviors;assembly=Brady.ScrapRunner.Mobile"
              x:Class="Brady.ScrapRunner.Mobile.Views.TransactionsView"
              Title="{Binding Title}">
+  <ContentPage.Resources>
+    <ResourceDictionary>
+      <converters:ItemTappedEventArgsConverter x:Key="ItemTappedConverter" />
+    </ResourceDictionary>
+  </ContentPage.Resources>
   <ContentPage.Content>
     <StackLayout Orientation="Vertical"
+                 Spacing="0"
                  VerticalOptions="Fill">
 
       <!-- Fill-in for where the camera would be located -->
       <BoxView
         WidthRequest="800"
-        HeightRequest="250"
+        HeightRequest="260"
         Color="Black"/>
 
       <ListView x:Name="TransactionListView"
                 ItemsSource="{Binding TransactionList}"
                 IsGroupingEnabled="True"
                 GroupDisplayBinding="{Binding Key}"
+                SelectedItem="{Binding TransactionSelected, Mode=TwoWay}"
                 HasUnevenRows="True">
+        <ListView.Behaviors>
+          <behaviors:EventToCommandBehavior
+            EventName="ItemTapped"
+            Command="{Binding TransactionSelectedCommand}"
+            EventArgsConverter="{StaticResource ItemTappedConverter}" />
+        </ListView.Behaviors>
         <ListView.GroupHeaderTemplate>
           <DataTemplate>
             <ViewCell Height="45">
-              <StackLayout VerticalOptions="FillAndExpand"
+              <StackLayout VerticalOptions="CenterAndExpand"
                            Padding="10"
                            BackgroundColor="Gray">
-                <Label Text="{Binding Key}" TextColor="White" VerticalOptions="Center" />
+                <Label FontSize="17" Text="{Binding Key}" TextColor="White" VerticalOptions="Center" />
               </StackLayout>
             </ViewCell>
           </DataTemplate>
@@ -32,11 +47,23 @@
         <ListView.ItemTemplate>
           <DataTemplate>
             <ViewCell>
-              <StackLayout Padding="10">
-                <Label Text="{Binding Id}" />
-                <Label Text="{Binding Location}" />
-                <Label Text="{Binding MaterialType}" />
-              </StackLayout>
+              <Grid>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackLayout VerticalOptions="Center" Grid.Row="0" Grid.Column="0" Padding="10, 15, 0, 10" Spacing="1">
+                  <Label Text="{Binding Id}"/>
+                  <Label Text="{Binding Location}" />
+                  <Label Text="{Binding MaterialType}" />
+                </StackLayout>
+                <StackLayout VerticalOptions="Center" Grid.Row="0" Grid.Column="1" Padding="10, 15, 15, 10" Spacing="1">
+                  <Image Source="arrowright2.png" />
+                </StackLayout>
+              </Grid>
             </ViewCell>
           </DataTemplate>
         </ListView.ItemTemplate>
