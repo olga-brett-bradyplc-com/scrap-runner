@@ -34,6 +34,7 @@
         BgColor="White"
         TextColor="#000000"
         x:Name="PasswordInput"
+        IsPassword="True"
       />    
 
     <Button Text="{i18N:Translate SignIn}"
@@ -46,5 +47,16 @@
             BorderRadius="10"
             TextColor="#ffffff"
             Command="{Binding SignInCommand}"/>
+    <!-- @TODO: Use proper styling -->
+    <Button Text="{i18N:Translate Settings}"
+            x:Name="SettingsButton"
+            StyleId="SignInButton"
+            HorizontalOptions="Fill"
+            BackgroundColor="#eb8939"
+            BorderColor="#ffffff"
+            BorderWidth="2"
+            BorderRadius="10"
+            TextColor="#ffffff"
+            Command="{Binding SettingsCommand}" />
   </StackLayout>
 </ContentPage>
