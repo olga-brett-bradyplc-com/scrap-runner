@@ -207,4 +207,20 @@
     <value>Reference Number</value>
     <comment>Transaction Detail View</comment>
   </data>
+  <data name="SetDown" xml:space="preserve">
+    <value>Set Down</value>
+    <comment>Scale Detail View</comment>
+  </data>
+  <data name="SetDownContainerMessage" xml:space="preserve">
+    <value>Are you sure you want to set this container down?</value>
+    <comment>Scale Detail View</comment>
+  </data>
+  <data name="LeftOnTruck" xml:space="preserve">
+    <value>Left On Truck</value>
+    <comment>Scale Detail View</comment>
+  </data>
+  <data name="LeftOnTruckContainerMessage" xml:space="preserve">
+    <value>Are you sure you want to mark containers as left on truck?</value>
+    <comment>Scale Detail View</comment>
+  </data>
 </root>

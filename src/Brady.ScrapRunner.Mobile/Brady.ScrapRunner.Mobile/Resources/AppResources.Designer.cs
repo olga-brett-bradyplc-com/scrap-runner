@@ -125,6 +125,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Left On Truck.
+        /// </summary>
+        internal static string LeftOnTruck {
+            get {
+                return ResourceManager.GetString("LeftOnTruck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to mark containers as left on truck?.
+        /// </summary>
+        internal static string LeftOnTruckContainerMessage {
+            get {
+                return ResourceManager.GetString("LeftOnTruckContainerMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Level.
         /// </summary>
         internal static string Level {
@@ -220,6 +238,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         internal static string ReferenceNumber {
             get {
                 return ResourceManager.GetString("ReferenceNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set Down.
+        /// </summary>
+        internal static string SetDown {
+            get {
+                return ResourceManager.GetString("SetDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to set this container down?.
+        /// </summary>
+        internal static string SetDownContainerMessage {
+            get {
+                return ResourceManager.GetString("SetDownContainerMessage", resourceCulture);
             }
         }
         

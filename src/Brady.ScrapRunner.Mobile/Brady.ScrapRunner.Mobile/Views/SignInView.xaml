@@ -54,11 +54,14 @@
         <Button
                 x:Name="SettingsButton"
                 StyleId="SettingsButton"
-                HeightRequest="75"
-                WidthRequest="75"
+                HeightRequest="60"
+                BorderRadius="60"
+                WidthRequest="60"
                 HorizontalOptions="Start"
-                Image="settingsicon.png"
-                BackgroundColor="Transparent"
+                Image="ic_settings_white_36dp.png"
+                BorderWidth="5"
+                BorderColor="#ffffff"
+                BackgroundColor="#b0b0b0"
                 Command="{Binding SettingsCommand}" />
     </StackLayout>
   </StackLayout>

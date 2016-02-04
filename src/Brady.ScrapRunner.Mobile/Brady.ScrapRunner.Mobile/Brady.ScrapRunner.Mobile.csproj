@@ -43,6 +43,7 @@
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
+    <Compile Include="Models\ContainerMasterModel.cs" />
     <Compile Include="Models\CustomerDirectionModel.cs" />
     <Compile Include="Models\EmployeeMasterModel.cs" />
     <Compile Include="Models\Locator.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Models\Route.cs" />
     <Compile Include="Models\TransactionDetail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Renderers\ExtendedButton.cs" />
     <Compile Include="Renderers\ExtendedEntry.cs" />
     <Compile Include="Renderers\CollapsibleListView.cs" />
     <Compile Include="Resources\AppResources.Designer.cs">

@@ -27,6 +27,8 @@ namespace Brady.ScrapRunner.Mobile.Models
             SimpleIoc.Default.Register<RouteDirectionsViewModel>();
             SimpleIoc.Default.Register<TransactionSummaryViewModel>();
             SimpleIoc.Default.Register<TransactionDetailViewModel>();
+            SimpleIoc.Default.Register<ScaleSummaryViewModel>();
+            SimpleIoc.Default.Register<ScaleDetailViewModel>();
         }
 
         public const string SettingsView = "SettingsView";
@@ -38,6 +40,8 @@ namespace Brady.ScrapRunner.Mobile.Models
         public const string RouteDirectionsView = "RouteDirectionsView";
         public const string TransactionSummaryView = "TransactionSummaryView";
         public const string TransactionDetailView = "TransactionDetailView";
+        public const string ScaleSummaryView = "ScaleSummaryView";
+        public const string ScaleDetailView = "ScaleDetailView";
 
         public ChangeLanguageViewModel ChangeLanguage => ServiceLocator.Current.GetInstance<ChangeLanguageViewModel>();
         public SettingsViewModel Settings => ServiceLocator.Current.GetInstance<SettingsViewModel>();
@@ -48,5 +52,7 @@ namespace Brady.ScrapRunner.Mobile.Models
         public RouteDirectionsViewModel RouteDirections => ServiceLocator.Current.GetInstance<RouteDirectionsViewModel>();
         public TransactionSummaryViewModel TransactionSummary => ServiceLocator.Current.GetInstance<TransactionSummaryViewModel>();
         public TransactionDetailViewModel TransactionDetail => ServiceLocator.Current.GetInstance<TransactionDetailViewModel>();
+        public ScaleSummaryViewModel ScaleSummary => ServiceLocator.Current.GetInstance<ScaleSummaryViewModel>();
+        public ScaleDetailViewModel ScaleDetail => ServiceLocator.Current.GetInstance<ScaleDetailViewModel>();
     }
 }
