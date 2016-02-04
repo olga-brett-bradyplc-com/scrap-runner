@@ -43,6 +43,7 @@
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
+    <Compile Include="Models\ContainerMasterModel.cs" />
     <Compile Include="Models\CustomerDirectionModel.cs" />
     <Compile Include="Models\EmployeeMasterModel.cs" />
     <Compile Include="Models\Locator.cs" />

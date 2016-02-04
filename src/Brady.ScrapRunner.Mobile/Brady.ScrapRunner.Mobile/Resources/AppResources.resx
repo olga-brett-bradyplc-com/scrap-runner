@@ -207,4 +207,10 @@
     <value>Reference Number</value>
     <comment>Transaction Detail View</comment>
   </data>
+  <data name="SetDown" xml:space="preserve">
+    <value>Set Down</value>
+  </data>
+  <data name="SetDownContainerMessage" xml:space="preserve">
+    <value>Are you sure you want to set this container down?</value>
+  </data>
 </root>

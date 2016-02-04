@@ -224,6 +224,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Set Down.
+        /// </summary>
+        internal static string SetDown {
+            get {
+                return ResourceManager.GetString("SetDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to set this container down?.
+        /// </summary>
+        internal static string SetDownContainerMessage {
+            get {
+                return ResourceManager.GetString("SetDownContainerMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
         internal static string Settings {
