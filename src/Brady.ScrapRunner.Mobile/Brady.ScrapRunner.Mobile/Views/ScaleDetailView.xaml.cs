@@ -13,6 +13,7 @@ namespace Brady.ScrapRunner.Mobile.Views
         public ScaleDetailView()
         {
             InitializeComponent();
+            NavigationPage.SetHasBackButton(this, false);
             BindingContext = App.Locator.ScaleDetail;
         }
     }

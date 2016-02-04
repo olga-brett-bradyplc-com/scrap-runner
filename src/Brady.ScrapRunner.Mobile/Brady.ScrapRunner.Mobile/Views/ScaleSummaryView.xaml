@@ -50,7 +50,7 @@
                   <Label Text="{Binding ContainerCommodityDesc}" />
                 </StackLayout>
                 <StackLayout VerticalOptions="Center" Grid.Row="0" Grid.Column="1" Padding="10, 15, 15, 10" Spacing="1">
-                  <Image Source="arrowright2.png" />
+                  <Image Source="ic_keyboard_arrow_right_black_24dp.png" />
                 </StackLayout>
               </Grid>
             </ViewCell>

@@ -20,10 +20,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _navigationService = navigationService;
             Title = "Yard/Scale";
             Container = CreateDummyData();
+
             GrossWeightSetCommand = new RelayCommand(ExecuteGrossWeightSetCommand);
             SecondGrossWeightSetCommand = new RelayCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);
             TareWeightSetCommand = new RelayCommand(ExecuteTareWeightSetCommand, IsGrossWeightSet);
+
             ContainerSetDownCommand = new RelayCommand(ExecuteContainerSetDownCommand);
+            ContainerLeftOnTruckCommand = new RelayCommand(ExecuteContainerLeftOnTruckCommand);
         }
 
         // Field bindings
@@ -66,12 +69,28 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // Command impl
         public async void ExecuteContainerSetDownCommand()
         {
+            // @TODO : Determine if this is the last set of containers for trip, then either navigate back to scale summary
+            // @TODO : or finish route and navigate to route summary screen
             var result = await UserDialogs.Instance.ConfirmAsync(AppResources.SetDownContainerMessage, AppResources.SetDown);
             if (result)
             {
+                // @TODO : Make sure these pages are removed from navigation stack
                 _navigationService.NavigateTo(Locator.RouteSummaryView);
             }
         }
+
+        public async void ExecuteContainerLeftOnTruckCommand()
+        {
+            // @TODO : Determine if this is the last set of containers for trip, then either navigate back to scale summary
+            // @TODO : or finish route and navigate to route summary screen
+            var result = await UserDialogs.Instance.ConfirmAsync(AppResources.LeftOnTruckContainerMessage, AppResources.LeftOnTruck);
+            if (result)
+            {
+                // @TODO : Make sure these pages are removed from navigation stack
+                _navigationService.NavigateTo(Locator.RouteSummaryView);
+            }
+        }
+
         public void ExecuteGrossWeightSetCommand()
         {
             GrossTime = DateTime.Now.ToString("hh:mm tt");
