@@ -52,6 +52,7 @@
     <Compile Include="Models\Route.cs" />
     <Compile Include="Models\TransactionDetail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Renderers\ExtendedButton.cs" />
     <Compile Include="Renderers\ExtendedEntry.cs" />
     <Compile Include="Renderers\CollapsibleListView.cs" />
     <Compile Include="Resources\AppResources.Designer.cs">
