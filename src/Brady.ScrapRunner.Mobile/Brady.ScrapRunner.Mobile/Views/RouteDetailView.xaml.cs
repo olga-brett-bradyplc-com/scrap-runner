@@ -1,15 +1,17 @@
 ﻿namespace Brady.ScrapRunner.Mobile.Views
 {
     using System;
+    using ViewModels;
     using Xamarin.Forms;
 
     public partial class RouteDetailView : ContentPage
     {
-        public RouteDetailView()
+        public RouteDetailView(string tripNumber)
         {
             InitializeComponent();
             NavigationPage.SetHasBackButton(this, false);
             BindingContext = App.Locator.RouteDetail;
+            ((RouteDetailViewModel) BindingContext).TripNumber = tripNumber;
         }
 
         void OnClick(object sender, EventArgs e)

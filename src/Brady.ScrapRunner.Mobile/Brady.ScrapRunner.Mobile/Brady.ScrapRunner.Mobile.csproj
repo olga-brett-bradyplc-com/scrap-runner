@@ -40,6 +40,7 @@
     <Compile Include="Behaviors\EventToCommandBehavior.cs" />
     <Compile Include="Converters\ItemTappedEventArgsConverter.cs" />
     <Compile Include="Converters\NullableIntConverter.cs" />
+    <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
     <Compile Include="Models\CustomerDirectionModel.cs" />
@@ -48,10 +49,10 @@
     <Compile Include="Models\PreferenceModel.cs" />
     <Compile Include="Models\SqliteRepository.cs" />
     <Compile Include="Models\Route.cs" />
+    <Compile Include="Models\TransactionDetail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderers\ExtendedEntry.cs" />
     <Compile Include="Renderers\CollapsibleListView.cs" />
-    <Compile Include="Renderers\ExtendedNavigationPage.cs" />
     <Compile Include="Resources\AppResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -65,12 +66,21 @@
     <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
+    <Compile Include="ViewModels\ScaleDetailViewModel.cs" />
+    <Compile Include="ViewModels\ScaleSummaryViewModel.cs" />
+    <Compile Include="ViewModels\TransactionDetailViewModel.cs" />
+    <Compile Include="ViewModels\TransactionSummaryViewModel.cs" />
+    <Compile Include="ViewModels\ChangeLanguageViewModel.cs" />
     <Compile Include="ViewModels\RouteDirectionsViewModel.cs" />
     <Compile Include="ViewModels\PowerUnitViewModel.cs" />
     <Compile Include="ViewModels\RouteDetailViewModel.cs" />
     <Compile Include="ViewModels\RouteSummaryViewModel.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\SignInViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="Views\ChangeLanguageView.xaml.cs">
+      <DependentUpon>ChangeLanguageView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\RouteDirectionsView.xaml.cs">
       <DependentUpon>RouteDirectionsView.xaml</DependentUpon>
     </Compile>
@@ -83,8 +93,23 @@
     <Compile Include="Views\RouteSummaryView.xaml.cs">
       <DependentUpon>RouteSummaryView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ScaleDetailView.xaml.cs">
+      <DependentUpon>ScaleDetailView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ScaleSummaryView.xaml.cs">
+      <DependentUpon>ScaleSummaryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SignInView.xaml.cs">
       <DependentUpon>SignInView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TransactionDetailView.xaml.cs">
+      <DependentUpon>TransactionDetailView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TransactionSummaryView.xaml.cs">
+      <DependentUpon>TransactionSummaryView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +207,42 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\RouteDirectionsView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\TransactionSummaryView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\SettingsView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\ChangeLanguageView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\TransactionDetailView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\ScaleDetailView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\ScaleSummaryView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

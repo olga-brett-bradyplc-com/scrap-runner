@@ -38,11 +38,15 @@
 
         protected void ConfigureViews(NavigationService nav)
         {
+            nav.Configure(Locator.SettingsView, typeof(SettingsView));
+            nav.Configure(Locator.ChangeLanguageView, typeof(ChangeLanguageView));
             nav.Configure(Locator.SignInView, typeof(SignInView));
             nav.Configure(Locator.PowerUnitView, typeof(PowerUnitView));
             nav.Configure(Locator.RouteSummaryView, typeof(RouteSummaryView));
             nav.Configure(Locator.RouteDetailView, typeof(RouteDetailView));
             nav.Configure(Locator.RouteDirectionsView, typeof(RouteDirectionsView));
+            nav.Configure(Locator.TransactionSummaryView, typeof(TransactionSummaryView));
+            nav.Configure(Locator.TransactionDetailView, typeof(TransactionDetailView));
         }
 
         protected override void OnStart()

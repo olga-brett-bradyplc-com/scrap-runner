@@ -80,11 +80,65 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Commodity.
+        /// </summary>
+        internal static string Commodity {
+            get {
+                return ResourceManager.GetString("Commodity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are about to go en route to:{0}{1}{0}{2}{0}{3}, {4} {5}{0}Are you sure you want to start this trip?.
+        /// </summary>
+        internal static string ConfirmEnRoute {
+            get {
+                return ResourceManager.GetString("ConfirmEnRoute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Container ID.
+        /// </summary>
+        internal static string ContainerId {
+            get {
+                return ResourceManager.GetString("ContainerId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Customer Location.
+        /// </summary>
+        internal static string CustomerLocation {
+            get {
+                return ResourceManager.GetString("CustomerLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         internal static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Level.
+        /// </summary>
+        internal static string Level {
+            get {
+                return ResourceManager.GetString("Level", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notes.
+        /// </summary>
+        internal static string Notes {
+            get {
+                return ResourceManager.GetString("Notes", resourceCulture);
             }
         }
         
@@ -157,6 +211,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         internal static string PasswordOutOfRange {
             get {
                 return ResourceManager.GetString("PasswordOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reference Number.
+        /// </summary>
+        internal static string ReferenceNumber {
+            get {
+                return ResourceManager.GetString("ReferenceNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        internal static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
             }
         }
         

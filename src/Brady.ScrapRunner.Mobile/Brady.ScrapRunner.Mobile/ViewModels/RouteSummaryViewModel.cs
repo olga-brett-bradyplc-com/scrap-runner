@@ -18,7 +18,6 @@
         }
 
         private string _tripId;
-
         public string TripId
         {
             get { return _tripId; }
@@ -27,6 +26,21 @@
 
         public ObservableCollection<Route> RouteSummaryList { get; private set; }
 
+        private Route _selectedRoute;
+        public Route SelectedRoute
+        {
+            get { return _selectedRoute; }
+            set { Set(ref _selectedRoute, value); }
+        }
+
+        public RelayCommand<Route> RouteSelectedCommand { get; private set; }
+
+        public void ExecuteRouteSelectedCommand(Route selectedRoute)
+        {
+            _navigationService.NavigateTo(Locator.RouteDetailView, selectedRoute.TripNumber);
+        }
+
+        // @TODO : Refactor using Brady.Domain objects when appropiate
         public void CreateDummyData()
         {
             RouteSummaryList = new ObservableCollection<Route>
@@ -41,7 +55,8 @@
                     State = "OH",
                     Zipcode = "43537",
                     CloseTime = "2000",
-                    OpenTime = "0900"
+                    OpenTime = "0900",
+                    TripNumber = "615112"
                 },
                 new Route
                 {
@@ -53,7 +68,8 @@
                     State = "OH",
                     Zipcode = "43537",
                     CloseTime = "2000",
-                    OpenTime = "2000"
+                    OpenTime = "2000",
+                    TripNumber = "615113"
                 },
                 new Route
                 {
@@ -65,7 +81,8 @@
                     State = "OH",
                     Zipcode = "43900",
                     CloseTime = "0500",
-                    OpenTime = "0900"
+                    OpenTime = "0900",
+                    TripNumber = "615114"
                 },
                 new Route
                 {
@@ -78,23 +95,10 @@
                     State = "OH",
                     Zipcode = "43537",
                     CloseTime = "2000",
-                    OpenTime = "0900"
+                    OpenTime = "0900",
+                    TripNumber = "615115"
                 }
             };
-        }
-
-        private Route _selectedRoute;
-        public Route SelectedRoute
-        {
-            get { return _selectedRoute; }
-            set { Set(ref _selectedRoute, value); }
-        }
-
-        public RelayCommand<Route> RouteSelectedCommand { get; private set; }
-
-        public void ExecuteRouteSelectedCommand(Route selectedRoute)
-        {
-            _navigationService.NavigateTo(Locator.RouteDetailView/*, selectedRoute.TripNumber*/);
         }
     }
 }

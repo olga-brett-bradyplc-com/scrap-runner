@@ -13,61 +13,98 @@
     </ToolbarItem>
   </ContentPage.ToolbarItems>
   <ContentPage.Content>
-    <StackLayout VerticalOptions="Start">
+    <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand">
+
       <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" BackgroundColor="#2f2f2f" Padding="15">
-        <Label 
+        <Label
           Text="Kaman Aerospace"
           HorizontalOptions="Start"
           FontSize="18"
           TextColor="#ffffff"
           BackgroundColor="#2f2f2f"/>
       </StackLayout>
-    
-      <StackLayout Orientation="Vertical" Spacing="0" VerticalOptions="StartAndExpand" BackgroundColor="#ffffff" Padding="15">
-        <Label 
-          Text="Kaman Aerospace"
-          HorizontalOptions="Start"
-          FontSize="18"
-          TextColor="#2f2f2f"/>
-         <Label 
-          Text="1701 Indianwood Circle"
-          HorizontalOptions="Start"
-          FontSize="18"
-          TextColor="#2f2f2f"/>
-         <Label 
-          Text="Maumee, OH 43537"
-          HorizontalOptions="Start"
-          FontSize="18"
-          TextColor="#2f2f2f"/>
-      </StackLayout>
-    
-      <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" Padding="8">
-        <StackLayout Padding="15" BackgroundColor="#ffffff" >
-          <Label Text="Notes"
-                 FontSize="18"
-          />
-          <Label Text="This is just a sample notes section" FontSize="13"/>
-        </StackLayout> 
-      </StackLayout>
 
-      <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" Padding="8">
-        <StackLayout Padding="15" BackgroundColor="#ffffff" >
-          <Label Text="Drop Empty (2)" FontSize="18" />
-          <Label Text="&lt;NO NUMBER&gt; LUGGER-10" FontSize="13"/>
-          <Label Text="DOCK DOOR 14" FontSize="13"/>
-          <Label Text="#15 SHEARING IRON" FontSize="13"/>
-        </StackLayout>
-      </StackLayout>
+      <ScrollView Orientation="Vertical" VerticalOptions="StartAndExpand">
+        <StackLayout Orientation="Vertical" VerticalOptions="FillAndExpand" Padding="8">
+          <StackLayout Orientation="Vertical" Spacing="0" VerticalOptions="StartAndExpand" BackgroundColor="#ffffff" Padding="15">
+            <Label
+              Text="Kaman Aerospace"
+              HorizontalOptions="Start"
+              FontSize="18"
+              TextColor="#2f2f2f"/>
+            <Label
+              Text="1701 Indianwood Circle"
+              HorizontalOptions="Start"
+              FontSize="18"
+              TextColor="#2f2f2f"/>
+            <Label
+              Text="Maumee, OH 43537"
+              HorizontalOptions="Start"
+              FontSize="18"
+              TextColor="#2f2f2f"/>
+          </StackLayout>
+          <Grid ColumnSpacing="0" RowSpacing="0">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackLayout Grid.Row="0" Grid.Column="0" Padding="10" BackgroundColor="#ffffff" Spacing="0">
+              <Label Text="Notes"  FontSize="18"/>
+            </StackLayout>
+            <StackLayout Grid.Row="1" Grid.Column="0" Padding="10" BackgroundColor="#ffffff" >
+              <Label Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam ut erat id ligula feugiat congue. Maecenas molestie interdum nunc sed pretium. Nam ac tortor commodo mauris dictum mollis. Vivamus tincidunt sit amet dolor at ultrices. Vestibulum enim mi, semper nec vulputate a, euismod vitae posuere."></Label>
+            </StackLayout>
+          </Grid>
 
-      <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" Padding="8">
-        <StackLayout Padding="15" BackgroundColor="#ffffff" >
-          <Label Text="Pickup Full (1)" FontSize="18" />
-          <Label Text="&lt;NO NUMBER&gt; LUGGER-20" FontSize="13"/>
-          <Label Text="DOCK DOOR 20" FontSize="13"/>
-          <Label Text="#14 SHEARING IRON" FontSize="13"/>
+          <Grid ColumnSpacing="0" RowSpacing="0">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackLayout Grid.Row="0" Grid.Column="0" Padding="10" BackgroundColor="#ffffff" Spacing="0">
+              <Label Text="Drop Empty (2)" FontSize="18" />
+            </StackLayout>
+            <StackLayout Grid.Row="0" Grid.Column="1" Padding="10" BackgroundColor="#ffffff" Spacing="0">
+              <Label Text="+" FontSize="18" />
+            </StackLayout>
+            <StackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Padding="10" BackgroundColor="#ffffff" >
+              <StackLayout>
+                <Label Text="&lt;NO NUMBER&gt; LUGGER-10" FontSize="13"/>
+                <Label Text="DOCK DOOR 14" FontSize="13"/>
+                <Label Text="#15 SHEARING IRON" FontSize="13"/>
+              </StackLayout>
+            </StackLayout>
+          </Grid>
+          <Grid ColumnSpacing="0" RowSpacing="0">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackLayout Grid.Row="0" Grid.Column="0" Padding="10" BackgroundColor="#ffffff" Spacing="0">
+              <Label Text="Return To Yard (1)" FontSize="18" />
+            </StackLayout>
+            <StackLayout Grid.Row="0" Grid.Column="1" Padding="10" BackgroundColor="#ffffff" Spacing="0">
+              <Label Text="+" FontSize="18" />
+            </StackLayout>
+            <StackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Padding="10" BackgroundColor="#ffffff" >
+              <Label Text="&lt;NO NUMBER&gt; LUGGER-10" FontSize="13"/>
+              <Label Text="DOCK DOOR 14" FontSize="13"/>
+              <Label Text="#20 SHEARING IRON" FontSize="13"/>
+            </StackLayout>
+          </Grid>
         </StackLayout>
-      </StackLayout>      
-      
+      </ScrollView>
     </StackLayout>
   </ContentPage.Content>
 </ContentPage>

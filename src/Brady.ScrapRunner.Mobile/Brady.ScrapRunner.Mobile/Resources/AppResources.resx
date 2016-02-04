@@ -177,4 +177,34 @@
   <data name="SignInProcessFailed" xml:space="preserve">
     <value>Sign in process failed.</value>
   </data>
+  <data name="ConfirmEnRoute" xml:space="preserve">
+    <value>You are about to go en route to:{0}{1}{0}{2}{0}{3}, {4} {5}{0}Are you sure you want to start this trip?</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Commodity" xml:space="preserve">
+    <value>Commodity</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="ContainerId" xml:space="preserve">
+    <value>Container ID</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="Level" xml:space="preserve">
+    <value>Level</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="CustomerLocation" xml:space="preserve">
+    <value>Customer Location</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notes</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="ReferenceNumber" xml:space="preserve">
+    <value>Reference Number</value>
+    <comment>Transaction Detail View</comment>
+  </data>
 </root>
