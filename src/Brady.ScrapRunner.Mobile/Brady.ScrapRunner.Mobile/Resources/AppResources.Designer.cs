@@ -89,11 +89,20 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You are about to go en route to:{0}{1}{0}{2}{0}{3}, {4} {5}{0}Are you sure you want to start this trip?.
+        ///   Looks up a localized string similar to You are about to go en route to:{0}{2}{1}{3}{1}{4}, {5} {6}{0}Are you sure you want to start this trip?.
         /// </summary>
-        internal static string ConfirmEnRoute {
+        internal static string ConfirmEnRouteMessage {
             get {
-                return ResourceManager.GetString("ConfirmEnRoute", resourceCulture);
+                return ResourceManager.GetString("ConfirmEnRouteMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm Enroute.
+        /// </summary>
+        internal static string ConfirmEnrouteTitle {
+            get {
+                return ResourceManager.GetString("ConfirmEnrouteTitle", resourceCulture);
             }
         }
         

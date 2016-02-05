@@ -38,8 +38,21 @@
             _navigationService.NavigateTo(Locator.RouteDirectionsView);
         }
 
-        private void ExecuteEnRouteCommand()
+        private async void ExecuteEnRouteCommand()
         {
+            var message = string.Format(AppResources.ConfirmEnRouteMessage, 
+                "\n\n",
+                "\n", 
+                "Kaman Aerospace",
+                "1701 Indianwood Circle",
+                "Maumee",
+                "OH",
+                "43537");
+            var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmEnrouteTitle);
+            if (confirm)
+            {
+                _navigationService.NavigateTo(Locator.TransactionSummaryView);
+            }
         }
 
         private void ExecuteArriveCommand()
