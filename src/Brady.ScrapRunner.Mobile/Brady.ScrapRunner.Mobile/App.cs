@@ -47,6 +47,8 @@
             nav.Configure(Locator.RouteDirectionsView, typeof(RouteDirectionsView));
             nav.Configure(Locator.TransactionSummaryView, typeof(TransactionSummaryView));
             nav.Configure(Locator.TransactionDetailView, typeof(TransactionDetailView));
+            nav.Configure(Locator.ScaleSummaryView, typeof(ScaleSummaryView));
+            nav.Configure(Locator.ScaleDetailView, typeof(ScaleDetailView));
         }
 
         protected override void OnStart()

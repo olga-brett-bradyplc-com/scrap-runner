@@ -13,6 +13,7 @@ namespace Brady.ScrapRunner.Mobile.Views
         public ScaleSummaryView()
         {
             InitializeComponent();
+            BindingContext = App.Locator.ScaleSummary;
         }
     }
 }
