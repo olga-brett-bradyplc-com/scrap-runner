@@ -24,7 +24,7 @@
       <ListView x:Name="RouteSummaryListView"
         HasUnevenRows="True"
         ItemsSource="{Binding RouteSummaryList}"
-        SelectedItem="{Binding SelectedRoute, Mode=TwoWay}">
+        SelectedItem="{Binding SelectedTrip, Mode=TwoWay}">
         <ListView.Behaviors>
           <behaviors:EventToCommandBehavior
             EventName="ItemTapped"
