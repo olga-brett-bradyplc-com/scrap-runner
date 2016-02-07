@@ -3,7 +3,8 @@
     public static class Constants
     {
         public static readonly string ScrapRunner = "ScrapRunner";
-
+        public static readonly string Yes = "Y";
+        public static readonly string No = "N";
     }
 
     public static class TripStatusConstants
