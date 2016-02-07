@@ -53,6 +53,7 @@
     <Compile Include="Models\Route.cs" />
     <Compile Include="Models\TransactionDetail.cs" />
     <Compile Include="Models\TripModel.cs" />
+    <Compile Include="Models\TripSegmentContainerModel.cs" />
     <Compile Include="Models\TripSegmentModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderers\ExtendedButton.cs" />

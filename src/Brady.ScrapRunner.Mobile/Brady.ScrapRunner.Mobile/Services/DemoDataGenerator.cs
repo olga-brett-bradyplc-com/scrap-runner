@@ -8,14 +8,17 @@
     public class DemoDataGenerator
     {
         private readonly IRepository<TripModel> _tripRepository;
-        private readonly IRepository<TripSegmentModel> _tripSegmentRepository; 
+        private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
+        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
 
         public DemoDataGenerator(
             IRepository<TripModel> tripRepository, 
-            IRepository<TripSegmentModel> tripSegmentRepository)
+            IRepository<TripSegmentModel> tripSegmentRepository, 
+            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
         {
             _tripRepository = tripRepository;
             _tripSegmentRepository = tripSegmentRepository;
+            _tripSegmentContainerRepository = tripSegmentContainerRepository;
         }
 
         public async Task GenerateDemoDataAsync()
@@ -56,6 +59,26 @@
                 TripSegNumber = "02",
                 TripSegType = "PF",
                 TripSegTypeDesc = "PICKUP FULL"
+            });
+            await _tripSegmentContainerRepository.InsertAsync(new TripSegmentContainerModel
+            {
+                TripNumber = "615112",
+                TripSegNumber = "01",
+                TripSegContainerNumber = string.Empty,
+                TripSegContainerType = "LU",
+                TripSegContainerSize = "10",
+                TripSegContainerCommodityDesc = "#15 SHEARING IRON",
+                TripSegContainerLocation = "DOCK DOOR 14"
+            });
+            await _tripSegmentContainerRepository.InsertAsync(new TripSegmentContainerModel
+            {
+                TripNumber = "615112",
+                TripSegNumber = "02",
+                TripSegContainerNumber = string.Empty,
+                TripSegContainerType = "LU",
+                TripSegContainerSize = "20",
+                TripSegContainerCommodityDesc = "#14 SHEARING IRON",
+                TripSegContainerLocation = "DOCK DOOR 20"
             });
             await _tripRepository.InsertAsync(new TripModel
             {

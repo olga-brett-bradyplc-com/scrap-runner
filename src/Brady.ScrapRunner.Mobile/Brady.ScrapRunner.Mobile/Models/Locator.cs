@@ -22,6 +22,8 @@ namespace Brady.ScrapRunner.Mobile.Models
                 SqliteRepository<TripModel>>();
             SimpleIoc.Default.Register<IRepository<TripSegmentModel>,
                 SqliteRepository<TripSegmentModel>>();
+            SimpleIoc.Default.Register<IRepository<TripSegmentContainerModel>,
+                SqliteRepository<TripSegmentContainerModel>>();
 
             SimpleIoc.Default.Register<DemoDataGenerator>();
 
