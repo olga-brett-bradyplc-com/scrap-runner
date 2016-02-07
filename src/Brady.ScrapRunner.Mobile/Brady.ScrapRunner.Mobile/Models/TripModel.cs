@@ -12,8 +12,14 @@
         [MaxLength(1)]
         public string TripStatus { get; set; }
 
+        [MaxLength(20)]
+        public string TripStatusDesc { get; set; }
+
         [MaxLength(1)]
         public string TripAssignStatus { get; set; }
+
+        [MaxLength(35)]
+        public string TripAssignStatusDesc { get; set; }
 
         [MaxLength(4)]
         public string TripType { get; set; }
@@ -62,6 +68,9 @@
 
         [MaxLength(300)]
         public string TripDriverInstructions { get; set; }
+
+        [MaxLength(60)]
+        public string TripSpecInstructions { get; set; }
 
         [Ignore]
         public string CityStateZipFormatted => $"{TripCustCity}, {TripCustState} {TripCustZip}";
