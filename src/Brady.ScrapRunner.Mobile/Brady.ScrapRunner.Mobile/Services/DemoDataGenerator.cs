@@ -8,10 +8,14 @@
     public class DemoDataGenerator
     {
         private readonly IRepository<TripModel> _tripRepository;
+        private readonly IRepository<TripSegmentModel> _tripSegmentRepository; 
 
-        public DemoDataGenerator(IRepository<TripModel> tripRepository)
+        public DemoDataGenerator(
+            IRepository<TripModel> tripRepository, 
+            IRepository<TripSegmentModel> tripSegmentRepository)
         {
             _tripRepository = tripRepository;
+            _tripSegmentRepository = tripSegmentRepository;
         }
 
         public async Task GenerateDemoDataAsync()
@@ -39,6 +43,20 @@
                 TripType = "SW",
                 TripTypeDesc = "SWITCH"
             });
+            await _tripSegmentRepository.InsertAsync(new TripSegmentModel
+            {
+                TripNumber = "615112",
+                TripSegNumber = "01",
+                TripSegType = "DE",
+                TripSegTypeDesc = "DROP EMPTY"
+            });
+            await _tripSegmentRepository.InsertAsync(new TripSegmentModel
+            {
+                TripNumber = "615112",
+                TripSegNumber = "02",
+                TripSegType = "PF",
+                TripSegTypeDesc = "PICKUP FULL"
+            });
             await _tripRepository.InsertAsync(new TripModel
             {
                 TripCustName = "Jay's Scrap Metal",
@@ -56,6 +74,13 @@
                 TripDriverInstructions = "This should be an easy trip",
                 TripType = "RT",
                 TripTypeDesc = "RETURN TO YARD"
+            });
+            await _tripSegmentRepository.InsertAsync(new TripSegmentModel
+            {
+                TripNumber = "615113",
+                TripSegNumber = "01",
+                TripSegType = "RT",
+                TripSegTypeDesc = "RETURN TO YARD"
             });
             await _tripRepository.InsertAsync(new TripModel
             {
