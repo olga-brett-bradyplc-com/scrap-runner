@@ -17,7 +17,7 @@
 
       <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" BackgroundColor="#2f2f2f" Padding="15">
         <Label
-          Text="Kaman Aerospace"
+          Text="{Binding TripCustName}"
           HorizontalOptions="Start"
           FontSize="18"
           TextColor="#ffffff"
@@ -28,17 +28,17 @@
         <StackLayout Orientation="Vertical" VerticalOptions="FillAndExpand" Padding="8">
           <StackLayout Orientation="Vertical" Spacing="0" VerticalOptions="StartAndExpand" BackgroundColor="#ffffff" Padding="15">
             <Label
-              Text="Kaman Aerospace"
+              Text="{Binding TripCustName}"
               HorizontalOptions="Start"
               FontSize="18"
               TextColor="#2f2f2f"/>
             <Label
-              Text="1701 Indianwood Circle"
+              Text="{Binding TripCustAddress}"
               HorizontalOptions="Start"
               FontSize="18"
               TextColor="#2f2f2f"/>
             <Label
-              Text="Maumee, OH 43537"
+              Text="{Binding TripCustCityStateZip}"
               HorizontalOptions="Start"
               FontSize="18"
               TextColor="#2f2f2f"/>

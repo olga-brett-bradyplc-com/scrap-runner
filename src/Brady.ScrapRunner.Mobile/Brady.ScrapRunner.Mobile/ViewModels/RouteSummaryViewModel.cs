@@ -24,6 +24,7 @@
 
         public async void ShowData()
         {
+            // @TODO: Use a better query
             var trips = await _tripRepository.AsQueryable()
                 .Where(t => t.TripStatus != "D")
                 .OrderBy(t => t.TripSequenceNumber).ToListAsync();
@@ -49,6 +50,7 @@
         public void ExecuteRouteSelectedCommand(TripModel selectedTrip)
         {
             _navigationService.NavigateTo(Locator.RouteDetailView, selectedTrip.TripNumber);
+            SelectedTrip = null;
         }
     }
 }
