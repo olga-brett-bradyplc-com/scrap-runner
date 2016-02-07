@@ -1,6 +1,7 @@
 ﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System.Collections.ObjectModel;
+    using Domain;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Views;
     using Interfaces;
@@ -24,9 +25,8 @@
 
         public async void ShowData()
         {
-            // @TODO: Use a better query
             var trips = await _tripRepository.AsQueryable()
-                .Where(t => t.TripStatus != "D")
+                .Where(t => t.TripStatus == TripStatusConstants.Pending)
                 .OrderBy(t => t.TripSequenceNumber).ToListAsync();
             RouteSummaryList = new ObservableCollection<TripModel>(trips);
         }

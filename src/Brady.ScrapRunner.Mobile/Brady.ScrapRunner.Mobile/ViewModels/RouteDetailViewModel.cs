@@ -1,15 +1,12 @@
 ﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using System;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading.Tasks;
-    using Acr.UserDialogs;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Views;
     using Interfaces;
     using Models;
-    using Resources;
 
     // This is still a work in progress
     public class RouteDetailViewModel : BaseViewModel
@@ -34,16 +31,19 @@
         public async Task LoadAsync(string tripNumber)
         {
             var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
-            if (trip == null) return;
-            Title = trip.TripTypeDesc;
-            TripCustName = trip.TripCustName;
-            TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;
-            TripCustCityStateZip = $"{trip.TripCustCity}, {trip.TripCustState} {trip.TripCustZip}";
+            if (trip != null)
+            {
+                Title = trip.TripTypeDesc;
+                TripCustName = trip.TripCustName;
+                TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;
+                TripCustCityStateZip = $"{trip.TripCustCity}, {trip.TripCustState} {trip.TripCustZip}";
+            }
 
-            var containers = await _tripSegmentContainerRepository.ToListAsync(tsc =>
-                tsc.TripNumber == trip.TripNumber);
-            if (!containers.Any()) return;
-            Containers = new ObservableCollection<TripSegmentContainerModel>(containers);
+            var containers = await _tripSegmentContainerRepository.ToListAsync(tsc => tsc.TripNumber == tripNumber);
+            if (containers.Any())
+            {
+                Containers = new ObservableCollection<TripSegmentContainerModel>(containers);
+            }
         }
 
         private string _tripCustName;
