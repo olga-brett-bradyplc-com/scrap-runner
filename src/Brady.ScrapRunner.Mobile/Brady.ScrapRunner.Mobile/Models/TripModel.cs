@@ -18,6 +18,9 @@
         [MaxLength(4)]
         public string TripType { get; set; }
 
+        [MaxLength(35)]
+        public string TripTypeDesc { get; set; }
+
         public int? TripSequenceNumber { get; set; }
 
         [MaxLength(15)]
@@ -56,5 +59,11 @@
         public DateTime? TripCustOpenTime { get; set; }
         public DateTime? TripCustCloseTime { get; set; }
         public DateTime? TripReadyDateTime { get; set; }
+
+        [MaxLength(300)]
+        public string TripDriverInstructions { get; set; }
+
+        [Ignore]
+        public string CityStateZipFormatted => $"{TripCustCity}, {TripCustState} {TripCustZip}";
     }
 }

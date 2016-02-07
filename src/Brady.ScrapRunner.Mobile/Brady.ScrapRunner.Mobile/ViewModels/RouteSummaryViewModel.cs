@@ -3,102 +3,52 @@
     using System.Collections.ObjectModel;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Views;
+    using Interfaces;
     using Models;
 
     public class RouteSummaryViewModel : BaseViewModel
     {
         private readonly INavigationService _navigationService;
+        private readonly IRepository<TripModel> _tripRepository; 
 
-        public RouteSummaryViewModel(INavigationService navigationService)
+        public RouteSummaryViewModel(
+            INavigationService navigationService, 
+            IRepository<TripModel> tripRepository)
         {
             _navigationService = navigationService;
+            _tripRepository = tripRepository;
             Title = "Route Summary";
-            RouteSelectedCommand = new RelayCommand<Route>(ExecuteRouteSelectedCommand);
-            CreateDummyData();
+            RouteSelectedCommand = new RelayCommand<TripModel>(ExecuteRouteSelectedCommand);
+            ShowData();
         }
 
-        private string _tripId;
-        public string TripId
+        public async void ShowData()
         {
-            get { return _tripId; }
-            set { Set(ref _tripId, value); }
+            var trips = await _tripRepository.AsQueryable()
+                .Where(t => t.TripStatus != "D")
+                .OrderBy(t => t.TripSequenceNumber).ToListAsync();
+            RouteSummaryList = new ObservableCollection<TripModel>(trips);
         }
 
-        public ObservableCollection<Route> RouteSummaryList { get; private set; }
-
-        private Route _selectedRoute;
-        public Route SelectedRoute
+        private ObservableCollection<TripModel> _routeSummaryList;
+        public ObservableCollection<TripModel> RouteSummaryList
         {
-            get { return _selectedRoute; }
-            set { Set(ref _selectedRoute, value); }
+            get { return _routeSummaryList; }
+            set { Set(ref _routeSummaryList, value); }
         }
 
-        public RelayCommand<Route> RouteSelectedCommand { get; private set; }
-
-        public void ExecuteRouteSelectedCommand(Route selectedRoute)
+        private TripModel _selectedTrip;
+        public TripModel SelectedTrip
         {
-            _navigationService.NavigateTo(Locator.RouteDetailView, selectedRoute.TripNumber);
+            get { return _selectedTrip; }
+            set { Set(ref _selectedTrip, value); }
         }
 
-        // @TODO : Refactor using Brady.Domain objects when appropiate
-        public void CreateDummyData()
+        public RelayCommand<TripModel> RouteSelectedCommand { get; private set; }
+
+        public void ExecuteRouteSelectedCommand(TripModel selectedTrip)
         {
-            RouteSummaryList = new ObservableCollection<Route>
-            {
-                new Route
-                {
-                    Notes = "Do something special with this note",
-                    CompanyName = "Kaman Aerospace",
-                    TripType = "Switch",
-                    Address1 = "1701 Indianwood Circle",
-                    City = "Maumee",
-                    State = "OH",
-                    Zipcode = "43537",
-                    CloseTime = "2000",
-                    OpenTime = "0900",
-                    TripNumber = "615112"
-                },
-                new Route
-                {
-                    Notes = "This should be an easy trip",
-                    CompanyName = "Jay's Scrap Metal",
-                    TripType = "Return To Yard",
-                    Address1 = "6560 Brixton Rd",
-                    City = "Maumee",
-                    State = "OH",
-                    Zipcode = "43537",
-                    CloseTime = "2000",
-                    OpenTime = "2000",
-                    TripNumber = "615113"
-                },
-                new Route
-                {
-                    Notes = "Just drop a few containers and party",
-                    CompanyName = "Jimbo's Recycling",
-                    TripType = "Drop Empty",
-                    Address1 = "Dingbing Rd",
-                    City = "Findlay",
-                    State = "OH",
-                    Zipcode = "43900",
-                    CloseTime = "0500",
-                    OpenTime = "0900",
-                    TripNumber = "615114"
-                },
-                new Route
-                {
-                    Notes =
-                        "WHHHHAAATTTTT? This is a test to see if the content will wrap correctly, otherwise back to the drawing board ...",
-                    TripType = "Switch",
-                    CompanyName = "SIMS Metal Management",
-                    Address1 = "1701 Indianwood Circle",
-                    City = "Maumee",
-                    State = "OH",
-                    Zipcode = "43537",
-                    CloseTime = "2000",
-                    OpenTime = "0900",
-                    TripNumber = "615115"
-                }
-            };
+            _navigationService.NavigateTo(Locator.RouteDetailView, selectedTrip.TripNumber);
         }
     }
 }
