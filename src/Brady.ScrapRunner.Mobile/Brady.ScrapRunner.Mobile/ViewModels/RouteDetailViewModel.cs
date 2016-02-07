@@ -14,6 +14,7 @@
         private readonly INavigationService _navigationService;
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
+        private string _custHostCode;
 
         public RouteDetailViewModel(
             INavigationService navigationService, 
@@ -33,6 +34,7 @@
             var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
             if (trip != null)
             {
+                _custHostCode = trip.TripCustHostCode;
                 Title = trip.TripTypeDesc;
                 TripCustName = trip.TripCustName;
                 TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;
@@ -80,7 +82,8 @@
 
         private void ExecuteDrivingDirectionsCommand()
         {
-            _navigationService.NavigateTo(Locator.RouteDirectionsView);
+            if (!string.IsNullOrEmpty(_custHostCode))
+                _navigationService.NavigateTo(Locator.RouteDirectionsView, _custHostCode);
         }
 
         private void ExecuteEnRouteCommand()

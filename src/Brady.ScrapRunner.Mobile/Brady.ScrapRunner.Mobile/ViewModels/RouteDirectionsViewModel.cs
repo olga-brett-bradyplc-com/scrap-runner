@@ -22,7 +22,7 @@
             BackCommand = new RelayCommand(ExecuteBackCommand);
         }
 
-        private async Task LoadDirectionsAsync(string customerHostCode)
+        public async Task LoadAsync(string customerHostCode)
         {
             var directions = await _repository.ToListAsync(cd => cd.CustHostCode == customerHostCode);
             Directions = new ObservableCollection<CustomerDirectionModel>(directions);
