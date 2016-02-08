@@ -10,11 +10,6 @@
              x:Class="Brady.ScrapRunner.Mobile.Views.RouteDetailView"
              SubTitle="{Binding TripNumber}"
              Title="{Binding Title}">
-  <ContentPage.Resources>
-    <ResourceDictionary>
-      <converters:ColorConverter x:Key="colorConverter"></converters:ColorConverter>
-    </ResourceDictionary>
-  </ContentPage.Resources>
   <ContentPage.Content>
     <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand">
       <RelativeLayout>
