@@ -177,8 +177,9 @@
   <data name="SignInProcessFailed" xml:space="preserve">
     <value>Sign in process failed.</value>
   </data>
-  <data name="ConfirmEnRoute" xml:space="preserve">
-    <value>You are about to go en route to:{0}{1}{0}{2}{0}{3}, {4} {5}{0}Are you sure you want to start this trip?</value>
+  <data name="ConfirmEnRouteMessage" xml:space="preserve">
+    <value>You are about to go en route to:{0}{2}{1}{3}{1}{4}{0}Are you sure you want to start this trip?</value>
+    <comment>Route Detail View</comment>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
@@ -222,5 +223,17 @@
   <data name="LeftOnTruckContainerMessage" xml:space="preserve">
     <value>Are you sure you want to mark containers as left on truck?</value>
     <comment>Scale Detail View</comment>
+  </data>
+  <data name="ConfirmEnrouteTitle" xml:space="preserve">
+    <value>Confirm Enroute</value>
+    <comment>Route Detail View</comment>
+  </data>
+  <data name="ConfirmArrivalMessage" xml:space="preserve">
+    <value>You are arriving at:{0}{2}{1}{3}{1}{4}{0} Are you sure you want to mark trip as arrived?</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="ConfirmArrivalTitle" xml:space="preserve">
+    <value>Arriving</value>
+    <comment>Transaction Detail View</comment>
   </data>
 </root>

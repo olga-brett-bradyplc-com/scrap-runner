@@ -14,8 +14,8 @@ namespace Brady.ScrapRunner.Mobile.Views
         public TransactionSummaryView()
         {
             InitializeComponent();
+            NavigationPage.SetHasBackButton(this, false);
             BindingContext = App.Locator.TransactionSummary;
         }
-
     }
 }
