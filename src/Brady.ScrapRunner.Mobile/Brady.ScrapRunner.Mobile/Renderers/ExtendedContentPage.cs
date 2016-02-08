@@ -9,8 +9,10 @@ namespace Brady.ScrapRunner.Mobile.Renderers
 {
     public class ExtendedContentPage : ContentPage
     {
+
+        // Subtitle property
         public static readonly BindableProperty SubTitleProperty =
-            BindableProperty.Create<ExtendedContentPage, string>(p => p.SubTitle, "");
+            BindableProperty.Create<ExtendedNavigationPage, string>(p => p.SubTitle, "");
 
         public string SubTitle
         {
@@ -18,13 +20,14 @@ namespace Brady.ScrapRunner.Mobile.Renderers
             set { SetValue(SubTitleProperty, value); }
         }
 
-        public static readonly BindableProperty AppBarColorProperty =
-            BindableProperty.Create<ExtendedContentPage, Color>(p => p.AppBarColor, Color.Gray);
+        // Navigation bar property
+        public static readonly BindableProperty BarBgColorProperty =
+            BindableProperty.Create<ExtendedNavigationPage, string>(p => p.BarBgColor, "");
 
-        public Color AppBarColor
+        public string BarBgColor
         {
-            get { return (Color) GetValue(AppBarColorProperty); }
-            set { SetValue(AppBarColorProperty, value); }
+            get { return (string)GetValue(BarBgColorProperty); }
+            set { SetValue(BarBgColorProperty, value); }
         }
     }
 }

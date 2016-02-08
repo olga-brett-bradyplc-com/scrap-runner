@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile
+﻿using Brady.ScrapRunner.Mobile.Renderers;
+
+namespace Brady.ScrapRunner.Mobile
 {
     using AutoMapper;
     using GalaSoft.MvvmLight.Ioc;

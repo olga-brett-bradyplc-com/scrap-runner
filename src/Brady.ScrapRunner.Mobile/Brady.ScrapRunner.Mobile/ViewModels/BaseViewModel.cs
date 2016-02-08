@@ -24,6 +24,13 @@
             set { Set(ref _title, value); }
         }
 
+        private string _subTitle;
+        public string SubTitle
+        {
+            get { return _subTitle; }
+            set { Set(ref _subTitle, value); }
+        }
+
         protected ValidationResult Validate<TValidator, TType>(TType type) where TValidator : AbstractValidator<TType>, new()
         {
             var validator = new TValidator();
