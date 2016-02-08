@@ -6,10 +6,12 @@
     using Acr.UserDialogs;
     using Domain.Models;
     using GalaSoft.MvvmLight.Command;
+    using GalaSoft.MvvmLight.Ioc;
     using GalaSoft.MvvmLight.Views;
     using Interfaces;
     using Models;
     using Resources;
+    using Services;
     using Validators;
     using Xamarin.Forms;
 
@@ -99,6 +101,8 @@
             var employeeMaster = await GetEmployeeMasterAsync();
             if (employeeMaster == null) return false;
             await SaveEmployeeAsync(employeeMaster);
+            var demoData = (DemoDataGenerator)SimpleIoc.Default.GetInstance(typeof(DemoDataGenerator));
+            await demoData.GenerateDemoDataAsync();
             return true;
         }
 

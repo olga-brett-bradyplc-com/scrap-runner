@@ -11,8 +11,9 @@
         {
             InitializeComponent();
             NavigationPage.SetHasBackButton(this, false);
+            // @TODO: This isn't right.
             BindingContext = App.Locator.RouteDetail;
-            ((RouteDetailViewModel) BindingContext).TripNumber = tripNumber;
+            ((RouteDetailViewModel) BindingContext).LoadAsync(tripNumber);
         }
     }
 }

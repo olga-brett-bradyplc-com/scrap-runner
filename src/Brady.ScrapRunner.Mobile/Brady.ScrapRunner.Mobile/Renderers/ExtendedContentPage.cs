@@ -12,7 +12,7 @@ namespace Brady.ScrapRunner.Mobile.Renderers
 
         // Subtitle property
         public static readonly BindableProperty SubTitleProperty =
-            BindableProperty.Create<ExtendedNavigationPage, string>(p => p.SubTitle, "");
+            BindableProperty.Create<ExtendedContentPage, string>(p => p.SubTitle, "");
 
         public string SubTitle
         {
@@ -22,7 +22,7 @@ namespace Brady.ScrapRunner.Mobile.Renderers
 
         // Navigation bar property
         public static readonly BindableProperty BarBgColorProperty =
-            BindableProperty.Create<ExtendedNavigationPage, string>(p => p.BarBgColor, "");
+            BindableProperty.Create<ExtendedContentPage, string>(p => p.BarBgColor, "");
 
         public string BarBgColor
         {

@@ -5,6 +5,7 @@ namespace Brady.ScrapRunner.Mobile.Models
     using GalaSoft.MvvmLight.Ioc;
     using Interfaces;
     using Microsoft.Practices.ServiceLocation;
+    using Services;
     using ViewModels;
 
     public class Locator
@@ -17,6 +18,14 @@ namespace Brady.ScrapRunner.Mobile.Models
                 SqliteRepository<EmployeeMasterModel>>();
             SimpleIoc.Default.Register<IRepository<CustomerDirectionModel>,
                 SqliteRepository<CustomerDirectionModel>>();
+            SimpleIoc.Default.Register<IRepository<TripModel>,
+                SqliteRepository<TripModel>>();
+            SimpleIoc.Default.Register<IRepository<TripSegmentModel>,
+                SqliteRepository<TripSegmentModel>>();
+            SimpleIoc.Default.Register<IRepository<TripSegmentContainerModel>,
+                SqliteRepository<TripSegmentContainerModel>>();
+
+            SimpleIoc.Default.Register<DemoDataGenerator>();
 
             SimpleIoc.Default.Register<SettingsViewModel>();
             SimpleIoc.Default.Register<ChangeLanguageViewModel>();

@@ -1,103 +1,97 @@
-﻿using System.Drawing;
-using Brady.ScrapRunner.Mobile.Enums;
-using Brady.ScrapRunner.Mobile.Services;
-using Xamarin.Forms;
-
-namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using System;
+    using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Threading.Tasks;
-    using Acr.UserDialogs;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Views;
+    using Interfaces;
     using Models;
-    using Resources;
 
     // This is still a work in progress
     public class RouteDetailViewModel : BaseViewModel
     {
         private readonly INavigationService _navigationService;
+        private readonly IRepository<TripModel> _tripRepository;
+        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
+        private string _custHostCode;
 
-        public RouteDetailViewModel(INavigationService navigationService)
+        public RouteDetailViewModel(
+            INavigationService navigationService, 
+            IRepository<TripModel> tripRepository, 
+            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
         {
             _navigationService = navigationService;
-
-            Title = "Switch Trip";
-            // This seems clunky to do it this way, but having issues getting
-            // view triggers to work with enumerations
-            CurrentStatus = ((int) TripStatusEnum.Stationary).ToString();
-
+            _tripRepository = tripRepository;
+            _tripSegmentContainerRepository = tripSegmentContainerRepository;
             DirectionsCommand = new RelayCommand(ExecuteDrivingDirectionsCommand);
             EnRouteCommand = new RelayCommand(ExecuteEnRouteCommand);
             ArriveCommand = new RelayCommand(ExecuteArriveCommand);
-            TransactionCommand = new RelayCommand(ExecuteTransactionsCommand);
         }
 
-        // Field bindings
-        private string _tripNumber;
-        public string TripNumber
+        public async Task LoadAsync(string tripNumber)
         {
-            get { return _tripNumber; }
-            set { Set(ref _tripNumber, value); }
+            var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
+            if (trip != null)
+            {
+                _custHostCode = trip.TripCustHostCode;
+                Title = trip.TripTypeDesc;
+                TripCustName = trip.TripCustName;
+                TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;
+                TripCustCityStateZip = $"{trip.TripCustCity}, {trip.TripCustState} {trip.TripCustZip}";
+            }
+
+            var containers = await _tripSegmentContainerRepository.ToListAsync(tsc => tsc.TripNumber == tripNumber);
+            if (containers.Any())
+            {
+                Containers = new ObservableCollection<TripSegmentContainerModel>(containers);
+            }
         }
 
-        private string _currentStatus;
-        public string CurrentStatus
+        private string _tripCustName;
+        public string TripCustName
         {
-            get { return _currentStatus; }
-            set { Set(ref _currentStatus, value); }
+            get { return _tripCustName; }
+            set { Set(ref _tripCustName, value); }
         }
 
-        // Command bindings
+        private string _tripCustAddress;
+        public string TripCustAddress
+        {
+            get { return _tripCustAddress; }
+            set { Set(ref _tripCustAddress, value); }
+        }
+
+        private string _tripCustCityStateZip;
+        public string TripCustCityStateZip
+        {
+            get { return _tripCustCityStateZip; }
+            set { Set(ref _tripCustCityStateZip, value); }
+        }
+
+        private ObservableCollection<TripSegmentContainerModel> _containers; 
+        public ObservableCollection<TripSegmentContainerModel> Containers
+        {
+            get { return _containers; }
+            set { Set(ref _containers, value); }
+        }
+
         public RelayCommand DirectionsCommand { get; private set; }
         public RelayCommand EnRouteCommand { get; private set; }
         public RelayCommand ArriveCommand { get; private set; }
-        public RelayCommand TransactionCommand { get; private set; }
 
-        // Command impl
         private void ExecuteDrivingDirectionsCommand()
         {
-            _navigationService.NavigateTo(Locator.RouteDirectionsView);
+            if (!string.IsNullOrEmpty(_custHostCode))
+                _navigationService.NavigateTo(Locator.RouteDirectionsView, _custHostCode);
         }
 
-        private async void ExecuteEnRouteCommand()
+        private void ExecuteEnRouteCommand()
         {
-            var message = string.Format(AppResources.ConfirmEnRouteMessage, 
-                "\n\n",
-                "\n", 
-                "Kaman Aerospace",
-                "1701 Indianwood Circle",
-                "Maumee",
-                "OH",
-                "43537");
-            var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmEnrouteTitle);
-            if (confirm)
-            {
-                //_navigationService.NavigateTo(Locator.TransactionSummaryView);
-                CurrentStatus = ((int)TripStatusEnum.Enroute).ToString();
-            }
         }
 
-        private async void ExecuteArriveCommand()
+        private void ExecuteArriveCommand()
         {
-            var message = string.Format(AppResources.ConfirmArrivalMessage,
-                "\n\n",
-                "\n",
-                "Kaman Aerospace",
-                "1701 Indianwood Circle",
-                "Maumee",
-                "OH",
-                "43537");
-            var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmArrivalTitle);
-            if (confirm)
-            {
-                CurrentStatus = ((int) TripStatusEnum.Arrived).ToString();
-            }
-        }
-
-        private void ExecuteTransactionsCommand()
-        {
-            _navigationService.NavigateTo(Locator.TransactionSummaryView);
         }
     }
 }
