@@ -31,10 +31,16 @@ namespace Brady.ScrapRunner.Mobile.Droid.Dependencies
             // @TODO: Call CreateTableAsync<Model> here for each SQLite table.
             await Connection.CreateTableAsync<EmployeeMasterModel>();
             await Connection.CreateTableAsync<CustomerDirectionModel>();
+            await Connection.CreateTableAsync<TripModel>();
+            await Connection.CreateTableAsync<TripSegmentModel>();
+            await Connection.CreateTableAsync<TripSegmentContainerModel>();
 
             // Clear the data in these tables at startup:
             await Connection.DeleteAllAsync<EmployeeMasterModel>();
             await Connection.DeleteAllAsync<CustomerDirectionModel>();
+            await Connection.DeleteAllAsync<TripModel>();
+            await Connection.DeleteAllAsync<TripSegmentModel>();
+            await Connection.DeleteAllAsync<TripSegmentContainerModel>();
         }
     }
 }

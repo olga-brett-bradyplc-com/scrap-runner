@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.Mobile.Models
 {
+    [Obsolete]
     public class Route
     {
         public string TripNumber { get; set; }

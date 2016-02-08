@@ -10,6 +10,7 @@
         {
             base.Configure();
             CreateMap<EmployeeMaster, EmployeeMasterModel>();
+            CreateMap<Trip, TripModel>();
         }
     }
 }
