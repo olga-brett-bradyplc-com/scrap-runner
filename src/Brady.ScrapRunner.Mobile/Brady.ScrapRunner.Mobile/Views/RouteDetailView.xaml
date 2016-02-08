@@ -8,7 +8,7 @@
              xmlns:enums="clr-namespace:Brady.ScrapRunner.Mobile.Enums;assembly=Brady.ScrapRunner.Mobile"
              xmlns:domain="clr-namespace:Brady.ScrapRunner.Domain;assembly=Brady.ScrapRunner.Domain"
              x:Class="Brady.ScrapRunner.Mobile.Views.RouteDetailView"
-             SubTitle="Trip 123456"
+             SubTitle="{Binding TripNumber}"
              Title="{Binding Title}">
   <ContentPage.Resources>
     <ResourceDictionary>

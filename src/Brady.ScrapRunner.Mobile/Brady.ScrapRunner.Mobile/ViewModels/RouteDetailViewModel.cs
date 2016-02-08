@@ -40,6 +40,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 _custHostCode = trip.TripCustHostCode;
                 Title = trip.TripTypeDesc;
+                TripNumber = $"Trip {trip.TripNumber}";
                 TripCustName = trip.TripCustName;
                 TripDriverInstructions = trip.TripDriverInstructions;
                 TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;
@@ -54,8 +55,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Field bindings
-        private string _tripDriverInstructions;
+        private string _tripNumber;
+        public string TripNumber
+        {
+            get { return _tripNumber; }
+            set { Set(ref _tripNumber, value); }
+        }
 
+        private string _tripDriverInstructions;
         public string TripDriverInstructions
         {
             get { return _tripDriverInstructions; }
