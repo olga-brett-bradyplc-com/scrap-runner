@@ -42,7 +42,6 @@
     <Compile Include="Converters\ItemTappedEventArgsConverter.cs" />
     <Compile Include="Converters\DateTimeConverter.cs" />
     <Compile Include="Converters\NullableIntConverter.cs" />
-    <Compile Include="Enums\TripStatusEnum.cs" />
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />

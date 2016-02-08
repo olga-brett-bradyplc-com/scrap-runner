@@ -1,4 +1,7 @@
-﻿namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿using Acr.UserDialogs;
+using Brady.ScrapRunner.Mobile.Resources;
+
+namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System.Collections.ObjectModel;
     using System.Linq;
@@ -27,8 +30,9 @@
             DirectionsCommand = new RelayCommand(ExecuteDrivingDirectionsCommand);
             EnRouteCommand = new RelayCommand(ExecuteEnRouteCommand);
             ArriveCommand = new RelayCommand(ExecuteArriveCommand);
+            TransactionCommand = new RelayCommand(ExecuteTransactionCommand);
         }
-
+        
         public async Task LoadAsync(string tripNumber)
         {
             var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
@@ -37,6 +41,7 @@
                 _custHostCode = trip.TripCustHostCode;
                 Title = trip.TripTypeDesc;
                 TripCustName = trip.TripCustName;
+                TripDriverInstructions = trip.TripDriverInstructions;
                 TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;
                 TripCustCityStateZip = $"{trip.TripCustCity}, {trip.TripCustState} {trip.TripCustZip}";
             }
@@ -46,6 +51,15 @@
             {
                 Containers = new ObservableCollection<TripSegmentContainerModel>(containers);
             }
+        }
+
+        // Field bindings
+        private string _tripDriverInstructions;
+
+        public string TripDriverInstructions
+        {
+            get { return _tripDriverInstructions; }
+            set { Set(ref _tripDriverInstructions, value); }
         }
 
         private string _tripCustName;
@@ -69,6 +83,14 @@
             set { Set(ref _tripCustCityStateZip, value); }
         }
 
+        private string _currentStatus;
+
+        public string CurrentStatus
+        {
+            get { return _currentStatus; }
+            set { Set(ref _currentStatus, value); }
+        }
+
         private ObservableCollection<TripSegmentContainerModel> _containers; 
         public ObservableCollection<TripSegmentContainerModel> Containers
         {
@@ -76,22 +98,52 @@
             set { Set(ref _containers, value); }
         }
 
+        // Command bindings
         public RelayCommand DirectionsCommand { get; private set; }
         public RelayCommand EnRouteCommand { get; private set; }
         public RelayCommand ArriveCommand { get; private set; }
+        public RelayCommand TransactionCommand { get; private set; }
 
+        // Command impl
         private void ExecuteDrivingDirectionsCommand()
         {
             if (!string.IsNullOrEmpty(_custHostCode))
                 _navigationService.NavigateTo(Locator.RouteDirectionsView, _custHostCode);
         }
 
-        private void ExecuteEnRouteCommand()
+        private async void ExecuteEnRouteCommand()
         {
+            var message = string.Format(AppResources.ConfirmEnRouteMessage,
+                "\n\n",
+                "\n",
+                TripCustName,
+                TripCustAddress,
+                TripCustCityStateZip);
+            var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmEnrouteTitle);
+            if (confirm)
+            {
+                CurrentStatus = "EN"; //DriverStatusConstants.EnRoute;
+            }
         }
 
-        private void ExecuteArriveCommand()
+        private async void ExecuteArriveCommand()
         {
+            var message = string.Format(AppResources.ConfirmArrivalMessage,
+                "\n\n",
+                "\n",
+                TripCustName,
+                TripCustAddress,
+                TripCustCityStateZip);
+            var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmArrivalTitle);
+            if (confirm)
+            {
+                CurrentStatus = "AR"; //DriverStatusConstants.Arrive;
+            }
+        }
+
+        private void ExecuteTransactionCommand()
+        {
+            _navigationService.NavigateTo(Locator.TransactionSummaryView);
         }
     }
 }

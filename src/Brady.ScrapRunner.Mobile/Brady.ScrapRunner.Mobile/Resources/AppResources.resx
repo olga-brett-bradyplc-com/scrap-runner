@@ -178,7 +178,7 @@
     <value>Sign in process failed.</value>
   </data>
   <data name="ConfirmEnRouteMessage" xml:space="preserve">
-    <value>You are about to go en route to:{0}{2}{1}{3}{1}{4}, {5} {6}{0}Are you sure you want to start this trip?</value>
+    <value>You are about to go en route to:{0}{2}{1}{3}{1}{4}{0}Are you sure you want to start this trip?</value>
     <comment>Route Detail View</comment>
   </data>
   <data name="Settings" xml:space="preserve">
@@ -229,7 +229,7 @@
     <comment>Route Detail View</comment>
   </data>
   <data name="ConfirmArrivalMessage" xml:space="preserve">
-    <value>You are arriving at:{0}{2}{1}{3}{1}{4}, {5} {6}{0}</value>
+    <value>You are arriving at:{0}{2}{1}{3}{1}{4}{0} Are you sure you want to mark trip as arrived?</value>
     <comment>Transaction Detail View</comment>
   </data>
   <data name="ConfirmArrivalTitle" xml:space="preserve">

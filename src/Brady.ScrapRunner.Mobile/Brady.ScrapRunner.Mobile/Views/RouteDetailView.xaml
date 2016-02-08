@@ -6,6 +6,7 @@
              xmlns:converters="clr-namespace:Brady.ScrapRunner.Mobile.Converters;assembly=Brady.ScrapRunner.Mobile"
              xmlns:triggers="clr-namespace:Brady.ScrapRunner.Mobile.Triggers;assembly=Brady.ScrapRunner.Mobile"
              xmlns:enums="clr-namespace:Brady.ScrapRunner.Mobile.Enums;assembly=Brady.ScrapRunner.Mobile"
+             xmlns:domain="clr-namespace:Brady.ScrapRunner.Domain;assembly=Brady.ScrapRunner.Domain"
              x:Class="Brady.ScrapRunner.Mobile.Views.RouteDetailView"
              SubTitle="Trip 123456"
              Title="{Binding Title}">
@@ -85,7 +86,7 @@
           <renderers:NavigationButton.Triggers>
             <Trigger TargetType="renderers:NavigationButton"
                      Property="CurrentStatus"
-                     Value="2">
+                     Value="AR">
               <Trigger.EnterActions>
                 <triggers:ToggleTriggerAction MoveX="72" MoveY="0" Duration="100" />
               </Trigger.EnterActions>
@@ -114,7 +115,7 @@
           <renderers:NavigationButton.Triggers>
             <Trigger TargetType="renderers:NavigationButton"
                      Property="CurrentStatus"
-                     Value="1">
+                     Value="EN">
               <Trigger.EnterActions>
                 <triggers:ToggleTriggerAction MoveX="200" MoveY="0" Duration="300"/>
               </Trigger.EnterActions>
@@ -143,14 +144,14 @@
           <renderers:NavigationButton.Triggers>
             <Trigger TargetType="renderers:NavigationButton"
                      Property="CurrentStatus"
-                     Value="1">
+                     Value="EN">
               <Trigger.EnterActions>
                 <triggers:ToggleTriggerAction MoveX="-300" MoveY="0" Duration="300" />
               </Trigger.EnterActions>
             </Trigger>
             <Trigger TargetType="renderers:NavigationButton"
                      Property="CurrentStatus"
-                     Value="2">
+                     Value="AR">
               <Trigger.EnterActions>
                 <triggers:ToggleTriggerAction MoveX="300" MoveY="0" Duration="300" />
               </Trigger.EnterActions>
@@ -176,7 +177,7 @@
               <Label Text="Notes" TextColor="#2f2f2f" FontSize="18"/>
             </StackLayout>
             <StackLayout Grid.Row="1" Grid.Column="0" Padding="10" BackgroundColor="#ffffff" >
-              <Label Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam ut erat id ligula feugiat congue. Maecenas molestie interdum nunc sed pretium. Nam ac tortor commodo mauris dictum mollis. Vivamus tincidunt sit amet dolor at ultrices. Vestibulum enim mi, semper nec vulputate a, euismod vitae posuere."></Label>
+              <Label Text="{Binding TripDriverInstructions}" />
             </StackLayout>
           </Grid>
 
@@ -244,14 +245,14 @@
       </ScrollView>
       <StackLayout BackgroundColor="#2f2f2f" VerticalOptions="EndAndExpand" HorizontalOptions="FillAndExpand" IsVisible="False">
         <StackLayout.Triggers>
-          <DataTrigger TargetType="StackLayout" Binding="{Binding Source={x:Reference ArriveButton}, Path=CurrentStatus}" Value="2">
+          <DataTrigger TargetType="StackLayout" Binding="{Binding Source={x:Reference ArriveButton}, Path=CurrentStatus}" Value="AR">
             <!--<DataTrigger.EnterActions>
                 <triggers:LayoutToggleTriggerAction/>
               </DataTrigger.EnterActions>-->
             <Setter Property="IsVisible" Value="True" />
           </DataTrigger>
         </StackLayout.Triggers>
-        <Button HeightRequest="75" Image="ic_loupe_white_36dp.png" Text="Transactions" TextColor="#ffffff" Command="{Binding TransactionCommand}" BackgroundColor="#2f2f2f" BorderRadius="0"/>
+        <Button HeightRequest="75" Text="Transactions" TextColor="#ffffff" Command="{Binding TransactionCommand}" BackgroundColor="#2f2f2f" BorderRadius="0"/>
       </StackLayout>
     </StackLayout>
   </ContentPage.Content>

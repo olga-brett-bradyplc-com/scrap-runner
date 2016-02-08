@@ -89,7 +89,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You are arriving at:{0}{2}{1}{3}{1}{4}, {5} {6}{0}.
+        ///   Looks up a localized string similar to You are arriving at:{0}{2}{1}{3}{1}{4}{0} Are you sure you want to mark trip as arrived?.
         /// </summary>
         internal static string ConfirmArrivalMessage {
             get {
@@ -107,7 +107,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You are about to go en route to:{0}{2}{1}{3}{1}{4}, {5} {6}{0}Are you sure you want to start this trip?.
+        ///   Looks up a localized string similar to You are about to go en route to:{0}{2}{1}{3}{1}{4}{0}Are you sure you want to start this trip?.
         /// </summary>
         internal static string ConfirmEnRouteMessage {
             get {
