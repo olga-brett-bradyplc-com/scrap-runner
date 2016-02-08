@@ -66,7 +66,7 @@
             FontSize="18"
             TextColor="#2f2f2f"/>
         </StackLayout>
-        <renderers:NavigationButton
+        <renderers:StatusButton
           BackgroundColor="#3F97F6"
           WidthRequest="60"
           Image="ic_directions_white_36dp.png"
@@ -83,17 +83,18 @@
                                       Property=Y, 
                                       ElementName=TestRelativeLayout,
                                       Constant=20}">
-          <renderers:NavigationButton.Triggers>
-            <Trigger TargetType="renderers:NavigationButton"
+          <renderers:StatusButton.Triggers>
+            <Trigger TargetType="renderers:StatusButton"
                      Property="CurrentStatus"
                      Value="AR">
               <Trigger.EnterActions>
                 <triggers:ToggleTriggerAction MoveX="72" MoveY="0" Duration="100" />
               </Trigger.EnterActions>
             </Trigger>
-          </renderers:NavigationButton.Triggers>
-        </renderers:NavigationButton>
-        <renderers:NavigationButton
+          </renderers:StatusButton.Triggers>
+        
+      </renderers:StatusButton>
+        <renderers:StatusButton
           BackgroundColor="#3FC342"
           x:Name="EnrouteButton"
           WidthRequest="60"
@@ -112,17 +113,17 @@
                                         Property=Y, 
                                         ElementName=TestRelativeLayout,
                                         Constant=20}">
-          <renderers:NavigationButton.Triggers>
-            <Trigger TargetType="renderers:NavigationButton"
+          <renderers:StatusButton.Triggers>
+            <Trigger TargetType="renderers:StatusButton"
                      Property="CurrentStatus"
                      Value="EN">
               <Trigger.EnterActions>
                 <triggers:ToggleTriggerAction MoveX="200" MoveY="0" Duration="300"/>
               </Trigger.EnterActions>
             </Trigger>
-          </renderers:NavigationButton.Triggers>
-        </renderers:NavigationButton>
-        <renderers:NavigationButton
+          </renderers:StatusButton.Triggers>
+      </renderers:StatusButton>
+        <renderers:StatusButton
           BackgroundColor="#cd0808"
           x:Name="ArriveButton"
           WidthRequest="60"
@@ -141,24 +142,26 @@
                                         Property=Y, 
                                         ElementName=TestRelativeLayout,
                                         Constant=20}">
-          <renderers:NavigationButton.Triggers>
-            <Trigger TargetType="renderers:NavigationButton"
+          <renderers:StatusButton.Triggers>
+            <Trigger TargetType="renderers:StatusButton"
                      Property="CurrentStatus"
                      Value="EN">
               <Trigger.EnterActions>
                 <triggers:ToggleTriggerAction MoveX="-300" MoveY="0" Duration="300" />
               </Trigger.EnterActions>
             </Trigger>
-            <Trigger TargetType="renderers:NavigationButton"
+            <Trigger TargetType="renderers:StatusButton"
                      Property="CurrentStatus"
                      Value="AR">
               <Trigger.EnterActions>
                 <triggers:ToggleTriggerAction MoveX="300" MoveY="0" Duration="300" />
               </Trigger.EnterActions>
             </Trigger>
-          </renderers:NavigationButton.Triggers>
-        </renderers:NavigationButton>
-      </RelativeLayout>
+          </renderers:StatusButton.Triggers>
+        </renderers:StatusButton>
+      
+    
+    </RelativeLayout>
       <ScrollView Orientation="Vertical" VerticalOptions="StartAndExpand">
         <StackLayout Orientation="Vertical" VerticalOptions="FillAndExpand" Padding="8">
           <Grid ColumnSpacing="0" RowSpacing="0">

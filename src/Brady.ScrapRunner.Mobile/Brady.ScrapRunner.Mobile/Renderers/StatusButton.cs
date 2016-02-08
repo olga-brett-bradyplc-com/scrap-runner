@@ -7,10 +7,11 @@ using Xamarin.Forms;
 
 namespace Brady.ScrapRunner.Mobile.Renderers
 {
-    class NavigationButton : Button
+    // A simple extension of button that can have a "status" binding in order to work in conjunction with actiontriggers
+    class StatusButton : Button
     {
         public static readonly BindableProperty CurrentStatusProperty =
-            BindableProperty.Create<NavigationButton, string>(p => p.CurrentStatus, "");
+            BindableProperty.Create<StatusButton, string>(p => p.CurrentStatus, "");
 
         public string CurrentStatus
         {

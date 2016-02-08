@@ -3,7 +3,7 @@ using Xamarin.Forms;
 
 namespace Brady.ScrapRunner.Mobile.Triggers
 {
-    class ToggleTriggerAction : TriggerAction<NavigationButton>
+    class ToggleTriggerAction : TriggerAction<StatusButton>
     {
         public ToggleTriggerAction() {}
 
@@ -11,7 +11,7 @@ namespace Brady.ScrapRunner.Mobile.Triggers
         public int MoveY { get; set; }
         public int Duration { get; set; }
 
-        protected override async void Invoke(NavigationButton sender)
+        protected override async void Invoke(StatusButton sender)
         {
             await sender.TranslateTo(MoveX, MoveY, (uint)Duration, Easing.Linear); //Easing.BounceOut);
         }

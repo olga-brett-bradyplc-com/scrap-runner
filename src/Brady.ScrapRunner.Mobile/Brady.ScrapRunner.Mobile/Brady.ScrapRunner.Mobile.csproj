@@ -58,7 +58,7 @@
     <Compile Include="Models\TripSegmentModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderers\ExtendedContentPage.cs" />
-    <Compile Include="Renderers\NavigationButton.cs" />
+    <Compile Include="Renderers\StatusButton.cs" />
     <Compile Include="Renderers\ExtendedEntry.cs" />
     <Compile Include="Renderers\CollapsibleListView.cs" />
     <Compile Include="Resources\AppResources.Designer.cs">

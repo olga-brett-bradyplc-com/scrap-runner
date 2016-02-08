@@ -152,7 +152,6 @@
     <Compile Include="Dependencies\SqliteDatabase.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Renderers\ExtendedPageRenderer.cs" />
-    <Compile Include="Renderers\NavigationButtonRenderer.cs" />
     <Compile Include="Renderers\ExtendedEntryRenderer.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
