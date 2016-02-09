@@ -7,7 +7,7 @@
              xmlns:triggers="clr-namespace:Brady.ScrapRunner.Mobile.Triggers;assembly=Brady.ScrapRunner.Mobile"
              xmlns:enums="clr-namespace:Brady.ScrapRunner.Mobile.Enums;assembly=Brady.ScrapRunner.Mobile"
              xmlns:domain="clr-namespace:Brady.ScrapRunner.Domain;assembly=Brady.ScrapRunner.Domain"
-             x:Class="Brady.ScrapRunner.Mobile.Views.RouteDetailView"
+             x:Class="Brady.ScrapRunner.Mobile.Pages.RouteDetailPage"
              SubTitle="{Binding TripNumber}"
              Title="{Binding Title}">
   <ContentPage.Resources>

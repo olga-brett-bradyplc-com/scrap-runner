@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     public class TransactionDetailViewModel : BaseViewModel
     {
@@ -15,11 +9,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         private string _id;
-
         public string Id
         {
             get { return _id; }
-            set { Set(ref _id, value); }
+            set { SetProperty(ref _id, value); }
         }
 
         private string _containerId;
@@ -28,7 +21,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _containerId; }
             set
             {
-                Set(ref _containerId, value);
+                SetProperty(ref _containerId, value);
             }
         }
 
@@ -38,7 +31,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _location; }
             set
             {
-                Set(ref _location, value);
+                SetProperty(ref _location, value);
             }
         }
 
@@ -48,7 +41,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _commodity; }
             set
             {
-                Set(ref _commodity, value);
+                SetProperty(ref _commodity, value);
             }
         }
 
@@ -58,7 +51,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _level; }
             set
             {
-                Set(ref _level, value);
+                SetProperty(ref _level, value);
             }
         }
 
@@ -68,7 +61,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _notes; }
             set
             {
-                Set(ref _notes, value);
+                SetProperty(ref _notes, value);
             }
         }
 
@@ -78,7 +71,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _referenceNumber; }
             set
             {
-                Set(ref _referenceNumber, value);
+                SetProperty(ref _referenceNumber, value);
             }
         }
 

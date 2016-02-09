@@ -2,29 +2,25 @@
 {
     using System.Collections.ObjectModel;
     using Domain;
-    using GalaSoft.MvvmLight.Command;
-    using GalaSoft.MvvmLight.Views;
     using Interfaces;
     using Models;
+    using MvvmCross.Core.ViewModels;
 
     public class RouteSummaryViewModel : BaseViewModel
     {
-        private readonly INavigationService _navigationService;
         private readonly IRepository<TripModel> _tripRepository; 
 
         public RouteSummaryViewModel(
-            INavigationService navigationService, 
             IRepository<TripModel> tripRepository)
         {
-            _navigationService = navigationService;
             _tripRepository = tripRepository;
             Title = "Route Summary";
-            RouteSelectedCommand = new RelayCommand<TripModel>(ExecuteRouteSelectedCommand);
-            ShowData();
+            RouteSelectedCommand = new MvxCommand<TripModel>(ExecuteRouteSelectedCommand);
         }
 
-        public async void ShowData()
+        public override async void Start()
         {
+            base.Start();
             var trips = await _tripRepository.AsQueryable()
                 .Where(t => t.TripStatus == TripStatusConstants.Pending)
                 .OrderBy(t => t.TripSequenceNumber).ToListAsync();
@@ -35,21 +31,21 @@
         public ObservableCollection<TripModel> RouteSummaryList
         {
             get { return _routeSummaryList; }
-            set { Set(ref _routeSummaryList, value); }
+            set { SetProperty(ref _routeSummaryList, value); }
         }
 
         private TripModel _selectedTrip;
         public TripModel SelectedTrip
         {
             get { return _selectedTrip; }
-            set { Set(ref _selectedTrip, value); }
+            set { SetProperty(ref _selectedTrip, value); }
         }
 
-        public RelayCommand<TripModel> RouteSelectedCommand { get; private set; }
+        public MvxCommand<TripModel> RouteSelectedCommand { get; private set; }
 
         public void ExecuteRouteSelectedCommand(TripModel selectedTrip)
         {
-            _navigationService.NavigateTo(Locator.RouteDetailView, selectedTrip.TripNumber);
+            ShowViewModel<RouteDetailViewModel>(new {tripNumber = selectedTrip.TripNumber});
             SelectedTrip = null;
         }
     }

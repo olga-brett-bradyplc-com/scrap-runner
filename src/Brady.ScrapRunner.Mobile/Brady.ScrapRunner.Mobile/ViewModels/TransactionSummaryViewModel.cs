@@ -1,26 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reflection;
-using System.ServiceModel.Channels;
-using System.Text;
-using System.Threading.Tasks;
-using Brady.ScrapRunner.Mobile.Helpers;
-using Brady.ScrapRunner.Mobile.Models;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Views;
-using Xamarin.Forms;
-
-namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using Helpers;
+    using Models;
+    using MvvmCross.Core.ViewModels;
+
     public class TransactionSummaryViewModel : BaseViewModel
     {
-        private readonly INavigationService _navigationService;
-
-        public TransactionSummaryViewModel(INavigationService navigationService)
+        public TransactionSummaryViewModel()
         {
-            _navigationService = navigationService;
             Title = "Transactions";
 
             TransactionDetailList = new ObservableCollection<TransactionDetail>();
@@ -33,7 +22,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                           select new Grouping<string, TransactionDetail>(detailsGroup.Key, detailsGroup);
 
             TransactionList = new ObservableCollection<Grouping<string, TransactionDetail>>(grouped);
-            TransactionSelectedCommand = new RelayCommand(ExecuteTransactionSelectedCommand);
+            TransactionSelectedCommand = new MvxCommand(ExecuteTransactionSelectedCommand);
         }
 
         // Listview bindings
@@ -41,21 +30,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public ObservableCollection<TransactionDetail> TransactionDetailList { get; private set; }
 
         // Command bindings
-        public RelayCommand TransactionSelectedCommand { get; private set; }
-        public RelayCommand TransactionScannedCommand { get; private set; }
+        public MvxCommand TransactionSelectedCommand { get; private set; }
+        public MvxCommand TransactionScannedCommand { get; private set; }
 
         // Field bindings
         private TransactionDetail _transactionSelected;
         public TransactionDetail TransactionSelected
         {
             get { return _transactionSelected; }
-            set { Set(ref _transactionSelected, value); }
+            set { SetProperty(ref _transactionSelected, value); }
         }
 
         // Command impl
         public void ExecuteTransactionSelectedCommand()
         {
-            _navigationService.NavigateTo(Locator.TransactionDetailView);
+            ShowViewModel<TransactionDetailViewModel>();
         }
 
         // @TODO: Refactor using Brady.Domain objects when convenient

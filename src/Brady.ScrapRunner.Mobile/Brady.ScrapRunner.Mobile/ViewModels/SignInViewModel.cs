@@ -5,11 +5,9 @@
     using System.Threading.Tasks;
     using Acr.UserDialogs;
     using Domain.Models;
-    using GalaSoft.MvvmLight.Command;
-    using GalaSoft.MvvmLight.Ioc;
-    using GalaSoft.MvvmLight.Views;
     using Interfaces;
     using Models;
+    using MvvmCross.Core.ViewModels;
     using Resources;
     using Services;
     using Validators;
@@ -18,19 +16,19 @@
     public class SignInViewModel : BaseViewModel
     {
         private readonly ISqliteDatabase _sqliteDatabase;
-        private readonly INavigationService _navigationService;
         private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository;
+        private readonly DemoDataGenerator _demoDataGenerator;
 
         public SignInViewModel(
-            INavigationService navigationService,
-            IRepository<EmployeeMasterModel> employeeMasterRepository
+            IRepository<EmployeeMasterModel> employeeMasterRepository, 
+            DemoDataGenerator demoDataGenerator
             )
         {
-            _navigationService = navigationService;
             _employeeMasterRepository = employeeMasterRepository;
+            _demoDataGenerator = demoDataGenerator;
             _sqliteDatabase = DependencyService.Get<ISqliteDatabase>();
             Title = AppResources.SignIn;
-            SignInCommand = new RelayCommand(ExecuteSignInCommand, CanExecuteSignInCommand);
+            SignInCommand = new MvxCommand(ExecuteSignInCommand, CanExecuteSignInCommand);
         }
 
         private string _userName;
@@ -39,7 +37,7 @@
             get { return _userName; }
             set
             {
-                Set(ref _userName, value);
+                SetProperty(ref _userName, value);
                 SignInCommand.RaiseCanExecuteChanged();
             }
         }
@@ -50,12 +48,12 @@
             get { return _password; }
             set
             {
-                Set(ref _password, value);
+                SetProperty(ref _password, value);
                 SignInCommand.RaiseCanExecuteChanged();
             }
         }
 
-        public RelayCommand SignInCommand { get; protected set; }
+        public MvxCommand SignInCommand { get; protected set; }
 
         protected async void ExecuteSignInCommand()
         {
@@ -80,7 +78,8 @@
                         AppResources.Error, AppResources.OK);
                     return;
                 }
-                _navigationService.NavigateTo(Locator.PowerUnitView);
+                Close(this);
+                ShowViewModel<PowerUnitViewModel>();
             }
             catch (Exception exception)
             {
@@ -101,8 +100,7 @@
             var employeeMaster = await GetEmployeeMasterAsync();
             if (employeeMaster == null) return false;
             await SaveEmployeeAsync(employeeMaster);
-            var demoData = (DemoDataGenerator)SimpleIoc.Default.GetInstance(typeof(DemoDataGenerator));
-            await demoData.GenerateDemoDataAsync();
+            await _demoDataGenerator.GenerateDemoDataAsync();
             return true;
         }
 
@@ -126,12 +124,12 @@
             return _employeeMasterRepository.InsertAsync(mapped);
         }
 
-        private RelayCommand _settingsCommand;
-        public RelayCommand SettingsCommand => _settingsCommand ?? (_settingsCommand = new RelayCommand(ExecuteSettingsCommand));
+        private MvxCommand _settingsCommand;
+        public MvxCommand SettingsCommand => _settingsCommand ?? (_settingsCommand = new MvxCommand(ExecuteSettingsCommand));
 
         private void ExecuteSettingsCommand()
         {
-            _navigationService.NavigateTo(Locator.SettingsView);
+            ShowViewModel<SettingsViewModel>();
         }
     }
 }

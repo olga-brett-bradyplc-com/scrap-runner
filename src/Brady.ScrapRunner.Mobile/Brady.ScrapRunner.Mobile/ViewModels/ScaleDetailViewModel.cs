@@ -1,32 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Acr.UserDialogs;
-using Brady.ScrapRunner.Mobile.Models;
-using Brady.ScrapRunner.Mobile.Resources;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Views;
-
-namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using System;
+    using Acr.UserDialogs;
+    using Models;
+    using MvvmCross.Core.ViewModels;
+    using Resources;
+
     public class ScaleDetailViewModel : BaseViewModel
     {
-        private INavigationService _navigationService;
-
-        public ScaleDetailViewModel(INavigationService navigationService)
+        public ScaleDetailViewModel()
         {
-            _navigationService = navigationService;
             Title = "Yard/Scale";
             Container = CreateDummyData();
 
-            GrossWeightSetCommand = new RelayCommand(ExecuteGrossWeightSetCommand);
-            SecondGrossWeightSetCommand = new RelayCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);
-            TareWeightSetCommand = new RelayCommand(ExecuteTareWeightSetCommand, IsGrossWeightSet);
+            GrossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand);
+            SecondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);
+            TareWeightSetCommand = new MvxCommand(ExecuteTareWeightSetCommand, IsGrossWeightSet);
 
-            ContainerSetDownCommand = new RelayCommand(ExecuteContainerSetDownCommand);
-            ContainerLeftOnTruckCommand = new RelayCommand(ExecuteContainerLeftOnTruckCommand);
+            ContainerSetDownCommand = new MvxCommand(ExecuteContainerSetDownCommand);
+            ContainerLeftOnTruckCommand = new MvxCommand(ExecuteContainerLeftOnTruckCommand);
         }
 
         // Field bindings
@@ -39,7 +31,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _grossTime; }
             set
             {
-                Set(ref _grossTime, value);
+                SetProperty(ref _grossTime, value);
                 SecondGrossWeightSetCommand.RaiseCanExecuteChanged();
                 TareWeightSetCommand.RaiseCanExecuteChanged();
             }
@@ -49,22 +41,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public string SecondGrossTime
         {
             get { return _secondGrossTime; }
-            set { Set(ref _secondGrossTime, value); }
+            set { SetProperty(ref _secondGrossTime, value); }
         }
 
         private string _tareTime;
         public string TareTime
         {
             get { return _tareTime; }
-            set { Set(ref _tareTime, value); }
+            set { SetProperty(ref _tareTime, value); }
         }
 
         // Command bindings
-        public RelayCommand ContainerSetDownCommand { get; private set; }
-        public RelayCommand ContainerLeftOnTruckCommand { get; private set; }
-        public RelayCommand GrossWeightSetCommand { get; private set; }
-        public RelayCommand TareWeightSetCommand { get; private set; }
-        public RelayCommand SecondGrossWeightSetCommand { get; private set; }
+        public MvxCommand ContainerSetDownCommand { get; private set; }
+        public MvxCommand ContainerLeftOnTruckCommand { get; private set; }
+        public MvxCommand GrossWeightSetCommand { get; private set; }
+        public MvxCommand TareWeightSetCommand { get; private set; }
+        public MvxCommand SecondGrossWeightSetCommand { get; private set; }
 
         // Command impl
         public async void ExecuteContainerSetDownCommand()
@@ -74,8 +66,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var result = await UserDialogs.Instance.ConfirmAsync(AppResources.SetDownContainerMessage, AppResources.SetDown);
             if (result)
             {
-                // @TODO : Make sure these pages are removed from navigation stack
-                _navigationService.NavigateTo(Locator.RouteSummaryView);
+                Close(this);
             }
         }
 
@@ -86,8 +77,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var result = await UserDialogs.Instance.ConfirmAsync(AppResources.LeftOnTruckContainerMessage, AppResources.LeftOnTruck);
             if (result)
             {
-                // @TODO : Make sure these pages are removed from navigation stack
-                _navigationService.NavigateTo(Locator.RouteSummaryView);
+                Close(this);
             }
         }
 
@@ -126,6 +116,5 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 ContainerCommodityDesc = "#15 SHEARING IRON"
             };
         }
-
     }
 }

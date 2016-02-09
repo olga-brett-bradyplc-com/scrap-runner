@@ -48,7 +48,6 @@
     <Compile Include="Models\ContainerMasterModel.cs" />
     <Compile Include="Models\CustomerDirectionModel.cs" />
     <Compile Include="Models\EmployeeMasterModel.cs" />
-    <Compile Include="Models\Locator.cs" />
     <Compile Include="Models\PreferenceModel.cs" />
     <Compile Include="Models\SqliteRepository.cs" />
     <Compile Include="Models\Route.cs" />
@@ -70,7 +69,6 @@
     <Compile Include="Resources\TranslateExtension.cs" />
     <Compile Include="ScrapRunnerMapperProfile.cs" />
     <Compile Include="Services\DemoDataGenerator.cs" />
-    <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Triggers\LayoutToggleTriggerAction.cs" />
     <Compile Include="Triggers\ToggleTriggerAction.cs" />
     <Compile Include="Validators\OdometerRangeValidator.cs" />
@@ -89,38 +87,38 @@
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\SignInViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
-    <Compile Include="Views\ChangeLanguageView.xaml.cs">
-      <DependentUpon>ChangeLanguageView.xaml</DependentUpon>
+    <Compile Include="Pages\ChangeLanguagePage.xaml.cs">
+      <DependentUpon>ChangeLanguagePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RouteDirectionsView.xaml.cs">
-      <DependentUpon>RouteDirectionsView.xaml</DependentUpon>
+    <Compile Include="Pages\RouteDirectionsPage.xaml.cs">
+      <DependentUpon>RouteDirectionsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PowerUnitView.xaml.cs">
-      <DependentUpon>PowerUnitView.xaml</DependentUpon>
+    <Compile Include="Pages\PowerUnitPage.xaml.cs">
+      <DependentUpon>PowerUnitPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RouteDetailView.xaml.cs">
-      <DependentUpon>RouteDetailView.xaml</DependentUpon>
+    <Compile Include="Pages\RouteDetailPage.xaml.cs">
+      <DependentUpon>RouteDetailPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RouteSummaryView.xaml.cs">
-      <DependentUpon>RouteSummaryView.xaml</DependentUpon>
+    <Compile Include="Pages\RouteSummaryPage.xaml.cs">
+      <DependentUpon>RouteSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ScaleDetailView.xaml.cs">
-      <DependentUpon>ScaleDetailView.xaml</DependentUpon>
+    <Compile Include="Pages\ScaleDetailPage.xaml.cs">
+      <DependentUpon>ScaleDetailPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ScaleSummaryView.xaml.cs">
-      <DependentUpon>ScaleSummaryView.xaml</DependentUpon>
+    <Compile Include="Pages\ScaleSummaryPage.xaml.cs">
+      <DependentUpon>ScaleSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SettingsView.xaml.cs">
-      <DependentUpon>SettingsView.xaml</DependentUpon>
+    <Compile Include="Pages\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SignInView.xaml.cs">
-      <DependentUpon>SignInView.xaml</DependentUpon>
+    <Compile Include="Pages\SignInPage.xaml.cs">
+      <DependentUpon>SignInPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TransactionDetailView.xaml.cs">
-      <DependentUpon>TransactionDetailView.xaml</DependentUpon>
+    <Compile Include="Pages\TransactionDetailPage.xaml.cs">
+      <DependentUpon>TransactionDetailPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TransactionSummaryView.xaml.cs">
-      <DependentUpon>TransactionSummaryView.xaml</DependentUpon>
+    <Compile Include="Pages\TransactionSummaryPage.xaml.cs">
+      <DependentUpon>TransactionSummaryPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -128,7 +126,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Views\SignInView.xaml">
+    <EmbeddedResource Include="Pages\SignInPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -150,16 +148,16 @@
       <HintPath>..\..\..\packages\FluentValidation.6.1.0.0\lib\portable-net45+wp80+win8+wpa81\FluentValidation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GalaSoft.MvvmLight, Version=5.2.0.37222, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmLightLibs.5.2.0.0\lib\portable-net45+wp8+wpa81+netcore45+monoandroid1+xamarin.ios10\GalaSoft.MvvmLight.dll</HintPath>
+    <Reference Include="MvvmCross.Core, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\MvvmCross.Core.4.0.0\lib\portable-net45+win+wpa81+wp80\MvvmCross.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GalaSoft.MvvmLight.Extras, Version=5.2.0.37222, Culture=neutral, PublicKeyToken=669f0b5e8f868abf, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmLightLibs.5.2.0.0\lib\portable-net45+wp8+wpa81+netcore45+monoandroid1+xamarin.ios10\GalaSoft.MvvmLight.Extras.dll</HintPath>
+    <Reference Include="MvvmCross.Forms.Presenter.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\MvvmCross.Forms.Presenter.4.0.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid10+Xamarin.iOS10\MvvmCross.Forms.Presenter.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    <Reference Include="MvvmCross.Platform, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\MvvmCross.Platform.4.0.0\lib\portable-net45+win+wpa81+wp80\MvvmCross.Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
@@ -193,19 +191,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\PowerUnitView.xaml">
+    <EmbeddedResource Include="Pages\PowerUnitPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\RouteDetailView.xaml">
+    <EmbeddedResource Include="Pages\RouteDetailPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\RouteSummaryView.xaml">
+    <EmbeddedResource Include="Pages\RouteSummaryPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -217,43 +215,43 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\RouteDirectionsView.xaml">
+    <EmbeddedResource Include="Pages\RouteDirectionsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\TransactionSummaryView.xaml">
+    <EmbeddedResource Include="Pages\TransactionSummaryPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\SettingsView.xaml">
+    <EmbeddedResource Include="Pages\SettingsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\ChangeLanguageView.xaml">
+    <EmbeddedResource Include="Pages\ChangeLanguagePage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\TransactionDetailView.xaml">
+    <EmbeddedResource Include="Pages\TransactionDetailPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\ScaleDetailView.xaml">
+    <EmbeddedResource Include="Pages\ScaleDetailPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\ScaleSummaryView.xaml">
+    <EmbeddedResource Include="Pages\ScaleSummaryPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

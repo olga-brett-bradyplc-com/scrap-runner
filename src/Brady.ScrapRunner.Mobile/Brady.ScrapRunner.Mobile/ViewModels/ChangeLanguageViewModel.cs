@@ -2,33 +2,29 @@
 {
     using System.Collections.ObjectModel;
     using System.Globalization;
-    using GalaSoft.MvvmLight.Command;
-    using GalaSoft.MvvmLight.Views;
+    using MvvmCross.Core.ViewModels;
     using Resources;
 
     public class ChangeLanguageViewModel : BaseViewModel
     {
-        private readonly INavigationService _navigationService;
-
-        public ChangeLanguageViewModel(INavigationService navigationService)
+        public ChangeLanguageViewModel()
         {
-            _navigationService = navigationService;
-            ChangeLanguageCommand = new RelayCommand<CultureInfo>(ExecuteChangeLanguageCommand);
+            ChangeLanguageCommand = new MvxCommand<CultureInfo>(ExecuteChangeLanguageCommand);
         }
 
         private ObservableCollection<CultureInfo> _languages = new ObservableCollection<CultureInfo>();
         public ObservableCollection<CultureInfo> Languages
         {
             get { return _languages; }
-            set { Set(ref _languages, value); }
+            set { SetProperty(ref _languages, value); }
         }
 
         private void ExecuteChangeLanguageCommand(CultureInfo cultureInfo)
         {
             AppResources.Culture = cultureInfo;
-            _navigationService.GoBack();
+            Close(this);
         }
 
-        public RelayCommand<CultureInfo> ChangeLanguageCommand { get; private set; }
+        public MvxCommand<CultureInfo> ChangeLanguageCommand { get; private set; }
     }
 }

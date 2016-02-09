@@ -2,20 +2,15 @@
 {
     using System.Linq;
     using Acr.UserDialogs;
-    using GalaSoft.MvvmLight.Command;
-    using GalaSoft.MvvmLight.Views;
-    using Models;
+    using MvvmCross.Core.ViewModels;
     using Validators;
 
     public class PowerUnitViewModel : BaseViewModel
     {
-        private readonly INavigationService _navigationService;
-
-        public PowerUnitViewModel(INavigationService navigationService)
+        public PowerUnitViewModel()
         {
-            _navigationService = navigationService;
             Title = "Power Unit ID and Odometer Reading";
-            PowerUnitIdCommand = new RelayCommand(ExecutePowerUnitIdCommand, CanExecutePowerUnitIdCommand);
+            PowerUnitIdCommand = new MvxCommand(ExecutePowerUnitIdCommand, CanExecutePowerUnitIdCommand);
         }
 
         private string _truckId;
@@ -26,7 +21,7 @@
             get { return _truckId; }
             set
             {
-                Set(ref _truckId, value);
+                SetProperty(ref _truckId, value);
                 PowerUnitIdCommand.RaiseCanExecuteChanged();
             }
         }
@@ -36,12 +31,12 @@
             get { return _odometer; }
             set
             {
-                Set(ref _odometer, value);
+                SetProperty(ref _odometer, value);
                 PowerUnitIdCommand.RaiseCanExecuteChanged();
             }
         }
 
-        public RelayCommand PowerUnitIdCommand { get; protected set; }
+        public MvxCommand PowerUnitIdCommand { get; protected set; }
 
         protected void ExecutePowerUnitIdCommand()
         {
@@ -57,8 +52,8 @@
                 UserDialogs.Instance.Alert(odometerResults.Errors.First().ErrorMessage);
                 return;
             }
-            // @TODO: Validate odometer using BWF Client Library here.
-            _navigationService.NavigateTo(Locator.RouteSummaryView);
+            Close(this);
+            ShowViewModel<RouteSummaryViewModel>();
         }
 
         protected bool CanExecutePowerUnitIdCommand()
