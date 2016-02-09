@@ -11,4 +11,8 @@
   <style name="ScrapRunnerTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
     <item name="android:textColor">@android:color/white</item>
   </style>
+  <style name="Theme.Splash" parent="android:Theme">
+    <item name="android:windowBackground">@color/material_gray_900</item>
+    <item name="android:windowNoTitle">true</item>
+  </style>  
 </resources>

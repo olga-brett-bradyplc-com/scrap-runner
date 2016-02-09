@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:converters="clr-namespace:Brady.ScrapRunner.Mobile.Converters;assembly=Brady.ScrapRunner.Mobile"
              xmlns:behaviors="clr-namespace:Brady.ScrapRunner.Mobile.Behaviors;assembly=Brady.ScrapRunner.Mobile"
-             x:Class="Brady.ScrapRunner.Mobile.Views.TransactionSummaryView"
+             x:Class="Brady.ScrapRunner.Mobile.Pages.ScaleSummaryPage"
              Title="{Binding Title}">
   <ContentPage.Resources>
     <ResourceDictionary>
@@ -13,37 +13,26 @@
   <ContentPage.Content>
     <StackLayout Orientation="Vertical"
                  Spacing="0"
-                 VerticalOptions="Fill">
+                 VerticalOptions="StartAndExpand">
 
-      <!-- Fill-in for where the camera would be located -->
-      <BoxView
-        WidthRequest="800"
-        HeightRequest="260"
-        Color="Black"/>
+      <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" Spacing="1" BackgroundColor="#d8d8d8" Padding="15, 10, 15, 15">
+        <Label Text="Kaman Aerospace (1)" FontSize="18"/>
+        <Label Text="Trip 90009 - KAMAN450" FontSize="18"/>
+        <StackLayout Padding="0, 10, 0, 0">
+          <Label Text="Special 30 character notes go here."/>
+        </StackLayout>
+      </StackLayout>
 
-      <ListView x:Name="TransactionListView"
-                ItemsSource="{Binding TransactionList}"
-                IsGroupingEnabled="True"
-                GroupDisplayBinding="{Binding Key}"
-                SelectedItem="{Binding TransactionSelected, Mode=TwoWay}"
-                HasUnevenRows="True">
+      <ListView
+        HasUnevenRows="True"
+        ItemsSource="{Binding ItemList}"
+        SelectedItem="{Binding ContainerSelected, Mode=TwoWay}">
         <ListView.Behaviors>
           <behaviors:EventToCommandBehavior
             EventName="ItemTapped"
-            Command="{Binding TransactionSelectedCommand}"
+            Command="{Binding ContainerSelectedCommand}"
             EventArgsConverter="{StaticResource ItemTappedConverter}" />
         </ListView.Behaviors>
-        <ListView.GroupHeaderTemplate>
-          <DataTemplate>
-            <ViewCell Height="45">
-              <StackLayout VerticalOptions="CenterAndExpand"
-                           Padding="10"
-                           BackgroundColor="Gray">
-                <Label FontSize="17" Text="{Binding Key}" TextColor="White" VerticalOptions="Center" />
-              </StackLayout>
-            </ViewCell>
-          </DataTemplate>
-        </ListView.GroupHeaderTemplate>
         <ListView.ItemTemplate>
           <DataTemplate>
             <ViewCell>
@@ -56,9 +45,9 @@
                   <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackLayout VerticalOptions="Center" Grid.Row="0" Grid.Column="0" Padding="10, 15, 0, 10" Spacing="1">
-                  <Label Text="{Binding Id}"/>
-                  <Label Text="{Binding Location}" />
-                  <Label Text="{Binding MaterialType}" />
+                  <Label Text="{Binding ContainerFullDescription}"/>
+                  <Label Text="{Binding ContainerLocation}" />
+                  <Label Text="{Binding ContainerCommodityDesc}" />
                 </StackLayout>
                 <StackLayout VerticalOptions="Center" Grid.Row="0" Grid.Column="1" Padding="10, 15, 15, 10" Spacing="1">
                   <Image Source="ic_keyboard_arrow_right_black_24dp.png" />
@@ -68,7 +57,7 @@
           </DataTemplate>
         </ListView.ItemTemplate>
       </ListView>
-
-    </StackLayout>
+    </StackLayout>    
   </ContentPage.Content>
+
 </ContentPage>

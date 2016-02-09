@@ -4,7 +4,7 @@
              xmlns:custom="clr-namespace:Brady.ScrapRunner.Mobile.Renderers;assembly=Brady.ScrapRunner.Mobile"
              xmlns:resources="clr-namespace:Brady.ScrapRunner.Mobile.Resources;assembly=Brady.ScrapRunner.Mobile"
              xmlns:converters="clr-namespace:Brady.ScrapRunner.Mobile.Converters;assembly=Brady.ScrapRunner.Mobile"
-             x:Class="Brady.ScrapRunner.Mobile.Views.PowerUnitView"
+             x:Class="Brady.ScrapRunner.Mobile.Pages.PowerUnitPage"
              BackgroundImage="loginsplash800x1280.jpg">
   <ContentPage.Resources>
     <ResourceDictionary>
