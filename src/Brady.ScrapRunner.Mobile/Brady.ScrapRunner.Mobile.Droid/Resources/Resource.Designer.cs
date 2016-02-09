@@ -63,8 +63,6 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahText = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahText;
 			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahTextColor = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahTextColor;
 			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahTextSize = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahTextSize;
-			global::GalaSoft.MvvmLight.Resource.String.ApplicationName = global::Brady.ScrapRunner.Mobile.Droid.Resource.String.ApplicationName;
-			global::GalaSoft.MvvmLight.Resource.String.Hello = global::Brady.ScrapRunner.Mobile.Droid.Resource.String.Hello;
 			global::MvvmCross.Binding.Droid.Resource.Attribute.MvxBind = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxBind;
 			global::MvvmCross.Binding.Droid.Resource.Attribute.MvxDropDownItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxDropDownItemTemplate;
 			global::MvvmCross.Binding.Droid.Resource.Attribute.MvxGroupItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxGroupItemTemplate;
