@@ -1,30 +1,32 @@
 ﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System.Collections.ObjectModel;
-    using System.Threading.Tasks;
-    using GalaSoft.MvvmLight.Command;
-    using GalaSoft.MvvmLight.Views;
     using Interfaces;
     using Models;
+    using MvvmCross.Core.ViewModels;
 
     public class RouteDirectionsViewModel : BaseViewModel
     {
-        private readonly INavigationService _navigationService;
+        private string _custHostCode;
         private readonly IRepository<CustomerDirectionModel> _repository; 
 
         public RouteDirectionsViewModel(
-            INavigationService navigationService, 
             IRepository<CustomerDirectionModel> repository
             )
         {
-            _navigationService = navigationService;
             _repository = repository;
-            BackCommand = new RelayCommand(ExecuteBackCommand);
+            BackCommand = new MvxCommand(ExecuteBackCommand);
         }
 
-        public async Task LoadAsync(string customerHostCode)
+        public void Init(string custHostCode)
         {
-            var directions = await _repository.ToListAsync(cd => cd.CustHostCode == customerHostCode);
+            _custHostCode = custHostCode;
+        }
+
+        public override async void Start()
+        {
+            base.Start();
+            var directions = await _repository.ToListAsync(cd => cd.CustHostCode == _custHostCode);
             Directions = new ObservableCollection<CustomerDirectionModel>(directions);
         }
 
@@ -32,14 +34,14 @@
         public ObservableCollection<CustomerDirectionModel> Directions
         {
             get { return _directions; }
-            set { Set(ref _directions, value); }
+            set { SetProperty(ref _directions, value); }
         }
 
-        public RelayCommand BackCommand { get; private set; }
+        public MvxCommand BackCommand { get; private set; }
 
         private void ExecuteBackCommand()
         {
-            _navigationService.GoBack();
+            Close(this);
         }
     }
 }

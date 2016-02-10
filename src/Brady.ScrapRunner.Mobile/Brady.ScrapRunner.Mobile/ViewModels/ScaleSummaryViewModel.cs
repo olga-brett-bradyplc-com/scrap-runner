@@ -1,45 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Brady.ScrapRunner.Mobile.Models;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Views;
-
-namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using System.Collections.ObjectModel;
+    using Models;
+    using MvvmCross.Core.ViewModels;
+
     public class ScaleSummaryViewModel : BaseViewModel
     {
-        private readonly INavigationService _navigationService;
-
-        public ScaleSummaryViewModel(INavigationService navigationService)
+        public ScaleSummaryViewModel()
         {
-            _navigationService = navigationService;
             Title = "Yard/Scale";
             ItemList = CreateDummyData();
-            ContainerSelectedCommand = new RelayCommand(ExecuteContainerSelectedCommand);
+            ContainerSelectedCommand = new MvxCommand(ExecuteContainerSelectedCommand);
         }
 
         // Listview bindings
         public ObservableCollection<ContainerMasterModel> ItemList { get; private set; }
 
         // Command bindings
-        public RelayCommand ContainerSelectedCommand { get; private set; }
+        public MvxCommand ContainerSelectedCommand { get; private set; }
 
         // Field bindings
         private ContainerMasterModel _containerSelected;
         public ContainerMasterModel ContainerSelected
         {
             get { return _containerSelected; }
-            set { Set(ref _containerSelected, value); }
+            set { SetProperty(ref _containerSelected, value); }
         }
 
         // Command impl
         public void ExecuteContainerSelectedCommand()
         {
-            _navigationService.NavigateTo(Locator.ScaleDetailView);
+            Close(this);
+            ShowViewModel<ScaleDetailViewModel>();
         }
 
         // @TODO : Refactor using repositories
@@ -60,7 +52,5 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
             };
         }
-        
-         
     }
 }

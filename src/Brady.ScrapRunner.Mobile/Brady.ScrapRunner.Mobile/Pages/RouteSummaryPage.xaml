@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:Brady.ScrapRunner.Mobile.Converters;assembly=Brady.ScrapRunner.Mobile"
+             xmlns:behaviors="clr-namespace:Brady.ScrapRunner.Mobile.Behaviors;assembly=Brady.ScrapRunner.Mobile"
+             x:Class="Brady.ScrapRunner.Mobile.Pages.RouteSummaryPage"
+             Title="{Binding Title}">
+  <ContentPage.Resources>
+    <ResourceDictionary>
+      <converters:ItemTappedEventArgsConverter x:Key="ItemTappedConverter" />
+      <converters:DateTimeConverter x:Key="DateTimeConverter" />
+    </ResourceDictionary>
+  </ContentPage.Resources>
+  <ContentPage.Content>
+    <StackLayout Orientation="Vertical" VerticalOptions="Fill">
+      <ListView x:Name="RouteSummaryListView"
+        HasUnevenRows="True"
+        ItemsSource="{Binding RouteSummaryList}"
+        SelectedItem="{Binding SelectedTrip, Mode=TwoWay}">
+        <ListView.Behaviors>
+          <behaviors:EventToCommandBehavior
+            EventName="ItemTapped"
+            Command="{Binding RouteSelectedCommand}"
+            EventArgsConverter="{StaticResource ItemTappedConverter}" />
+        </ListView.Behaviors>
+        <ListView.ItemTemplate>
+          <DataTemplate>
+            <ViewCell>
+              <Grid>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="*" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackLayout Grid.Row="0" Grid.Column="0" Padding="10, 15, 0, 10" Spacing="1">
+                  <Label Text="{Binding TripTypeDesc}" FontSize="Large" FontAttributes="Bold"/>
+                  <Label Text="{Binding TripCustOpenTime, Converter={StaticResource DateTimeConverter}, StringFormat='OPEN {0}'}"/>
+                  <Label Text="{Binding TripCustCloseTime, Converter={StaticResource DateTimeConverter}, StringFormat='CLOSE {0}'}"/>
+                </StackLayout>
+                <StackLayout Grid.Row="0" Grid.Column="1" Padding="0, 15, 10, 10" Spacing="1" >
+                  <Label Text="{Binding TripCustName}" />
+                  <Label Text="{Binding TripCustAddress1}"/>
+                  <Label Text="{Binding CityStateZipFormatted}"/>
+                </StackLayout>
+                <StackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Padding="10, 15, 10, 10" VerticalOptions="Fill">
+                  <Label Text="{Binding TripDriverInstructions}" FontSize="Small"/>
+                </StackLayout>
+              </Grid>
+            </ViewCell>
+          </DataTemplate>
+        </ListView.ItemTemplate>
+      </ListView>
+    </StackLayout>
+  </ContentPage.Content>
+</ContentPage>

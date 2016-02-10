@@ -2,9 +2,9 @@
 {
     using FluentValidation;
     using FluentValidation.Results;
-    using GalaSoft.MvvmLight;
+    using MvvmCross.Core.ViewModels;
 
-    public class BaseViewModel : ViewModelBase
+    public class BaseViewModel : MvxViewModel
     {
         public BaseViewModel()
         {
@@ -14,14 +14,21 @@
         public bool IsBusy
         {
             get { return _isBusy; }
-            set { Set(ref _isBusy, value); }
+            set { SetProperty(ref _isBusy, value); }
         }
 
         private string _title;
         public string Title
         {
             get { return _title; }
-            set { Set(ref _title, value); }
+            set { SetProperty(ref _title, value); }
+        }
+
+        private string _subTitle;
+        public string SubTitle
+        {
+            get { return _subTitle; }
+            set { SetProperty(ref _subTitle, value); }
         }
 
         protected ValidationResult Validate<TValidator, TType>(TType type) where TValidator : AbstractValidator<TType>, new()

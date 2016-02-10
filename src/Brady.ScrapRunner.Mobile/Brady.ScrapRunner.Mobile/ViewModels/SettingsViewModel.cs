@@ -1,17 +1,12 @@
 ﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using GalaSoft.MvvmLight.Command;
-    using GalaSoft.MvvmLight.Views;
-    using Models;
+    using MvvmCross.Core.ViewModels;
     using Resources;
 
     public class SettingsViewModel : BaseViewModel
     {
-        private readonly INavigationService _navigationService;
-
-        public SettingsViewModel(INavigationService navigationService)
+        public SettingsViewModel()
         {
-            _navigationService = navigationService;
             Title = AppResources.Settings;
         }
 
@@ -19,16 +14,16 @@
         public string CurrentLanguage
         {
             get { return _currentLanguage; }
-            set { Set(ref _currentLanguage, value); }
+            set { SetProperty(ref _currentLanguage, value); }
         }
 
-        private RelayCommand _changeLanguageCommand;
-        public RelayCommand ChangeLanguageCommand => _changeLanguageCommand ?? 
-            (_changeLanguageCommand = new RelayCommand(ExecuteChangeLanguageCommand));
+        private MvxCommand _changeLanguageCommand;
+        public MvxCommand ChangeLanguageCommand => _changeLanguageCommand ?? 
+            (_changeLanguageCommand = new MvxCommand(ExecuteChangeLanguageCommand));
 
         private void ExecuteChangeLanguageCommand()
         {
-            _navigationService.NavigateTo(Locator.ChangeLanguageView);
+            ShowViewModel<ChangeLanguageViewModel>();
         }
     }
 }
