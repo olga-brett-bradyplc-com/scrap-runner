@@ -11,6 +11,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
     {
         public SRMetadataBundle()
             : base(Constants.ScrapRunner
+                  , new AreaMasterMetadata() 
                   , new CodeTableMetadata()
                   , new CodeTableHdrMetadata()
                   , new CommodityMasterMetadata()

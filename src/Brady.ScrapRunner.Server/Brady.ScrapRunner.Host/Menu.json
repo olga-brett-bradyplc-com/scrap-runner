@@ -6,6 +6,10 @@
       "text": "SR Tables",
       "items": [
         {
+          "text": "AreaMaster",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/AreaMaster"
+        },
+        {
           "text": "CodeTable",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTable"
         },
