@@ -2,7 +2,7 @@ using Android.App;
 using Android.OS;
 using MvvmCross.Droid.Views;
 
-namespace Brady.ScrapRunner.Mobile.Droid.Views
+namespace $rootnamespace$.Views
 {
     [Activity(Label = "View for FirstViewModel")]
     public class FirstView : MvxActivity

@@ -1,6 +1,6 @@
 using MvvmCross.Core.ViewModels;
 
-namespace Brady.ScrapRunner.Mobile.ViewModels
+namespace $rootnamespace$.ViewModels
 {
     public class FirstViewModel 
         : MvxViewModel
