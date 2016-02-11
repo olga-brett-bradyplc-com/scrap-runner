@@ -173,6 +173,7 @@
     <Compile Include="Concrete\SRDataService.cs" />
     <Compile Include="Concrete\SRRepository.cs" />
     <Compile Include="Interfaces\ISRRepository.cs" />
+    <Compile Include="Mappings\AreaMasterMap.cs" />
     <Compile Include="Mappings\ErrorLogMap.cs" />
     <Compile Include="Mappings\EventLogMap.cs" />
     <Compile Include="Mappings\ContainerMasterMap.cs" />
@@ -199,6 +200,7 @@
     <Compile Include="Mappings\TripSegmentMap.cs" />
     <Compile Include="Mappings\PreferenceMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RecordTypes\AreaMasterRecordType.cs" />
     <Compile Include="RecordTypes\ErrorLogRecordType.cs" />
     <Compile Include="RecordTypes\EventLogRecordType.cs" />
     <Compile Include="RecordTypes\ContainerMasterRecordType.cs" />
@@ -223,6 +225,8 @@
     <Compile Include="RecordTypes\TripRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentMileageRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentRecordType.cs" />
+    <Compile Include="Validators\AreaMasterDeletionValidator.cs" />
+    <Compile Include="Validators\AreaMasterValidator.cs" />
     <Compile Include="Validators\ErrorLogDeletionValidator.cs" />
     <Compile Include="Validators\ErrorLogValidator.cs" />
     <Compile Include="Validators\EventLogValidator.cs" />
