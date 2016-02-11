@@ -1,11 +1,11 @@
-namespace Brady.ScrapRunner.Mobile.Droid
-{
-    using Android.App;
-    using Android.Content.PM;
-    using MvvmCross.Droid.Views;
+using Android.App;
+using Android.Content.PM;
+using MvvmCross.Droid.Views;
 
+namespace $rootnamespace$
+{
     [Activity(
-        Label = "ScrapRunner"
+        Label = "$rootnamespace$"
         , MainLauncher = true
         , Icon = "@drawable/icon"
         , Theme = "@style/Theme.Splash"

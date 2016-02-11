@@ -11,7 +11,6 @@
     using Resources;
     using Services;
     using Validators;
-    using Xamarin.Forms;
 
     public class SignInViewModel : BaseViewModel
     {
@@ -21,12 +20,13 @@
 
         public SignInViewModel(
             IRepository<EmployeeMasterModel> employeeMasterRepository, 
+            ISqliteDatabase sqliteDatabase,
             DemoDataGenerator demoDataGenerator
             )
         {
             _employeeMasterRepository = employeeMasterRepository;
             _demoDataGenerator = demoDataGenerator;
-            _sqliteDatabase = DependencyService.Get<ISqliteDatabase>();
+            _sqliteDatabase = sqliteDatabase;
             Title = AppResources.SignIn;
             SignInCommand = new MvxCommand(ExecuteSignInCommand, CanExecuteSignInCommand);
         }
