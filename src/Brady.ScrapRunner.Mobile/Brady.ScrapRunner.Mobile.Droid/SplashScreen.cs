@@ -2,6 +2,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
 {
     using Android.App;
     using Android.Content.PM;
+    using Android.OS;
     using MvvmCross.Droid.Views;
 
     [Activity(
@@ -14,8 +15,14 @@ namespace Brady.ScrapRunner.Mobile.Droid
     public class SplashScreen : MvxSplashScreenActivity
     {
         public SplashScreen()
-            : base(Resource.Layout.SplashScreen)
+            : base(Resource.Layout.activity_splash)
         {
+        }
+
+        protected override void OnCreate(Bundle bundle)
+        {
+            base.OnCreate(bundle);
+            Acr.UserDialogs.UserDialogs.Init(this);
         }
     }
 }

@@ -26,6 +26,43 @@ namespace Brady.ScrapRunner.Mobile.Droid
 		
 		public static void UpdateIdValues()
 		{
+			global::AndroidHUD.Resource.Attribute.ahBarColor = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahBarColor;
+			global::AndroidHUD.Resource.Attribute.ahBarLength = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahBarLength;
+			global::AndroidHUD.Resource.Attribute.ahBarWidth = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahBarWidth;
+			global::AndroidHUD.Resource.Attribute.ahCircleColor = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahCircleColor;
+			global::AndroidHUD.Resource.Attribute.ahDelayMillis = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahDelayMillis;
+			global::AndroidHUD.Resource.Attribute.ahRadius = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahRadius;
+			global::AndroidHUD.Resource.Attribute.ahRimColor = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahRimColor;
+			global::AndroidHUD.Resource.Attribute.ahRimWidth = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahRimWidth;
+			global::AndroidHUD.Resource.Attribute.ahSpinSpeed = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahSpinSpeed;
+			global::AndroidHUD.Resource.Attribute.ahText = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahText;
+			global::AndroidHUD.Resource.Attribute.ahTextColor = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahTextColor;
+			global::AndroidHUD.Resource.Attribute.ahTextSize = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.ahTextSize;
+			global::AndroidHUD.Resource.Drawable.ic_errorstatus = global::Brady.ScrapRunner.Mobile.Droid.Resource.Drawable.ic_errorstatus;
+			global::AndroidHUD.Resource.Drawable.ic_successstatus = global::Brady.ScrapRunner.Mobile.Droid.Resource.Drawable.ic_successstatus;
+			global::AndroidHUD.Resource.Drawable.roundedbg = global::Brady.ScrapRunner.Mobile.Droid.Resource.Drawable.roundedbg;
+			global::AndroidHUD.Resource.Drawable.roundedbgdark = global::Brady.ScrapRunner.Mobile.Droid.Resource.Drawable.roundedbgdark;
+			global::AndroidHUD.Resource.Id.loadingImage = global::Brady.ScrapRunner.Mobile.Droid.Resource.Id.loadingImage;
+			global::AndroidHUD.Resource.Id.loadingProgressBar = global::Brady.ScrapRunner.Mobile.Droid.Resource.Id.loadingProgressBar;
+			global::AndroidHUD.Resource.Id.loadingProgressWheel = global::Brady.ScrapRunner.Mobile.Droid.Resource.Id.loadingProgressWheel;
+			global::AndroidHUD.Resource.Id.textViewStatus = global::Brady.ScrapRunner.Mobile.Droid.Resource.Id.textViewStatus;
+			global::AndroidHUD.Resource.Layout.loading = global::Brady.ScrapRunner.Mobile.Droid.Resource.Layout.loading;
+			global::AndroidHUD.Resource.Layout.loadingimage = global::Brady.ScrapRunner.Mobile.Droid.Resource.Layout.loadingimage;
+			global::AndroidHUD.Resource.Layout.loadingprogress = global::Brady.ScrapRunner.Mobile.Droid.Resource.Layout.loadingprogress;
+			global::AndroidHUD.Resource.String.library_name = global::Brady.ScrapRunner.Mobile.Droid.Resource.String.library_name;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahBarColor = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahBarColor;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahBarLength = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahBarLength;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahBarWidth = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahBarWidth;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahCircleColor = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahCircleColor;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahDelayMillis = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahDelayMillis;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahRadius = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahRadius;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahRimColor = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahRimColor;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahRimWidth = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahRimWidth;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahSpinSpeed = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahSpinSpeed;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahText = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahText;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahTextColor = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahTextColor;
+			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahTextSize = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.ProgressWheel_ahTextSize;
 			global::MvvmCross.Binding.Droid.Resource.Attribute.MvxBind = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxBind;
 			global::MvvmCross.Binding.Droid.Resource.Attribute.MvxDropDownItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxDropDownItemTemplate;
 			global::MvvmCross.Binding.Droid.Resource.Attribute.MvxGroupItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxGroupItemTemplate;
@@ -255,6 +292,42 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			
 			// aapt resource value: 0x7f010089
 			public const int activityChooserViewStyle = 2130772105;
+			
+			// aapt resource value: 0x7f01011a
+			public const int ahBarColor = 2130772250;
+			
+			// aapt resource value: 0x7f010122
+			public const int ahBarLength = 2130772258;
+			
+			// aapt resource value: 0x7f010121
+			public const int ahBarWidth = 2130772257;
+			
+			// aapt resource value: 0x7f01011f
+			public const int ahCircleColor = 2130772255;
+			
+			// aapt resource value: 0x7f01011e
+			public const int ahDelayMillis = 2130772254;
+			
+			// aapt resource value: 0x7f010120
+			public const int ahRadius = 2130772256;
+			
+			// aapt resource value: 0x7f01011b
+			public const int ahRimColor = 2130772251;
+			
+			// aapt resource value: 0x7f01011c
+			public const int ahRimWidth = 2130772252;
+			
+			// aapt resource value: 0x7f01011d
+			public const int ahSpinSpeed = 2130772253;
+			
+			// aapt resource value: 0x7f010117
+			public const int ahText = 2130772247;
+			
+			// aapt resource value: 0x7f010118
+			public const int ahTextColor = 2130772248;
+			
+			// aapt resource value: 0x7f010119
+			public const int ahTextSize = 2130772249;
 			
 			// aapt resource value: 0x7f0100ac
 			public const int alertDialogButtonGroupStyle = 2130772140;
@@ -1020,32 +1093,32 @@ namespace Brady.ScrapRunner.Mobile.Droid
 		public partial class Color
 		{
 			
-			// aapt resource value: 0x7f0b0048
-			public const int abc_background_cache_hint_selector_material_dark = 2131427400;
+			// aapt resource value: 0x7f0b0056
+			public const int abc_background_cache_hint_selector_material_dark = 2131427414;
 			
-			// aapt resource value: 0x7f0b0049
-			public const int abc_background_cache_hint_selector_material_light = 2131427401;
+			// aapt resource value: 0x7f0b0057
+			public const int abc_background_cache_hint_selector_material_light = 2131427415;
 			
-			// aapt resource value: 0x7f0b004a
-			public const int abc_color_highlight_material = 2131427402;
+			// aapt resource value: 0x7f0b0058
+			public const int abc_color_highlight_material = 2131427416;
 			
 			// aapt resource value: 0x7f0b0000
 			public const int abc_input_method_navigation_guard = 2131427328;
 			
-			// aapt resource value: 0x7f0b004b
-			public const int abc_primary_text_disable_only_material_dark = 2131427403;
+			// aapt resource value: 0x7f0b0059
+			public const int abc_primary_text_disable_only_material_dark = 2131427417;
 			
-			// aapt resource value: 0x7f0b004c
-			public const int abc_primary_text_disable_only_material_light = 2131427404;
+			// aapt resource value: 0x7f0b005a
+			public const int abc_primary_text_disable_only_material_light = 2131427418;
 			
-			// aapt resource value: 0x7f0b004d
-			public const int abc_primary_text_material_dark = 2131427405;
+			// aapt resource value: 0x7f0b005b
+			public const int abc_primary_text_material_dark = 2131427419;
 			
-			// aapt resource value: 0x7f0b004e
-			public const int abc_primary_text_material_light = 2131427406;
+			// aapt resource value: 0x7f0b005c
+			public const int abc_primary_text_material_light = 2131427420;
 			
-			// aapt resource value: 0x7f0b004f
-			public const int abc_search_url_text = 2131427407;
+			// aapt resource value: 0x7f0b005d
+			public const int abc_search_url_text = 2131427421;
 			
 			// aapt resource value: 0x7f0b0001
 			public const int abc_search_url_text_normal = 2131427329;
@@ -1056,11 +1129,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0b0003
 			public const int abc_search_url_text_selected = 2131427331;
 			
-			// aapt resource value: 0x7f0b0050
-			public const int abc_secondary_text_material_dark = 2131427408;
+			// aapt resource value: 0x7f0b005e
+			public const int abc_secondary_text_material_dark = 2131427422;
 			
-			// aapt resource value: 0x7f0b0051
-			public const int abc_secondary_text_material_light = 2131427409;
+			// aapt resource value: 0x7f0b005f
+			public const int abc_secondary_text_material_light = 2131427423;
 			
 			// aapt resource value: 0x7f0b0047
 			public const int accent = 2131427399;
@@ -1164,6 +1237,48 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0b001b
 			public const int hint_foreground_material_light = 2131427355;
 			
+			// aapt resource value: 0x7f0b0049
+			public const int material_100 = 2131427401;
+			
+			// aapt resource value: 0x7f0b004a
+			public const int material_200 = 2131427402;
+			
+			// aapt resource value: 0x7f0b004b
+			public const int material_300 = 2131427403;
+			
+			// aapt resource value: 0x7f0b004c
+			public const int material_400 = 2131427404;
+			
+			// aapt resource value: 0x7f0b0048
+			public const int material_50 = 2131427400;
+			
+			// aapt resource value: 0x7f0b004d
+			public const int material_500 = 2131427405;
+			
+			// aapt resource value: 0x7f0b004e
+			public const int material_600 = 2131427406;
+			
+			// aapt resource value: 0x7f0b004f
+			public const int material_700 = 2131427407;
+			
+			// aapt resource value: 0x7f0b0050
+			public const int material_800 = 2131427408;
+			
+			// aapt resource value: 0x7f0b0051
+			public const int material_900 = 2131427409;
+			
+			// aapt resource value: 0x7f0b0052
+			public const int material_A100 = 2131427410;
+			
+			// aapt resource value: 0x7f0b0053
+			public const int material_A200 = 2131427411;
+			
+			// aapt resource value: 0x7f0b0054
+			public const int material_A400 = 2131427412;
+			
+			// aapt resource value: 0x7f0b0055
+			public const int material_A700 = 2131427413;
+			
 			// aapt resource value: 0x7f0b0045
 			public const int material_blue_500 = 2131427397;
 			
@@ -1260,11 +1375,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0b0037
 			public const int switch_thumb_disabled_material_light = 2131427383;
 			
-			// aapt resource value: 0x7f0b0052
-			public const int switch_thumb_material_dark = 2131427410;
+			// aapt resource value: 0x7f0b0060
+			public const int switch_thumb_material_dark = 2131427424;
 			
-			// aapt resource value: 0x7f0b0053
-			public const int switch_thumb_material_light = 2131427411;
+			// aapt resource value: 0x7f0b0061
+			public const int switch_thumb_material_light = 2131427425;
 			
 			// aapt resource value: 0x7f0b0038
 			public const int switch_thumb_normal_material_dark = 2131427384;
@@ -1486,6 +1601,21 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f050005
 			public const int abc_text_size_title_material_toolbar = 2131034117;
 			
+			// aapt resource value: 0x7f050068
+			public const int activity_horizontal_margin = 2131034216;
+			
+			// aapt resource value: 0x7f050072
+			public const int activity_margin_half = 2131034226;
+			
+			// aapt resource value: 0x7f050069
+			public const int activity_vertical_margin = 2131034217;
+			
+			// aapt resource value: 0x7f050071
+			public const int appbar_padding_top = 2131034225;
+			
+			// aapt resource value: 0x7f05006f
+			public const int cardview_toolbar_spacer = 2131034223;
+			
 			// aapt resource value: 0x7f050054
 			public const int design_appbar_elevation = 2131034196;
 			
@@ -1576,6 +1706,18 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f050045
 			public const int disabled_alpha_material_light = 2131034181;
 			
+			// aapt resource value: 0x7f05006a
+			public const int fab_elevation = 2131034218;
+			
+			// aapt resource value: 0x7f05006c
+			public const int fab_elevation_press = 2131034220;
+			
+			// aapt resource value: 0x7f05006b
+			public const int fab_margin = 2131034219;
+			
+			// aapt resource value: 0x7f05006d
+			public const int fab_size = 2131034221;
+			
 			// aapt resource value: 0x7f050046
 			public const int highlight_alpha_material_colored = 2131034182;
 			
@@ -1596,6 +1738,12 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			
 			// aapt resource value: 0x7f05004b
 			public const int notification_subtext_size = 2131034187;
+			
+			// aapt resource value: 0x7f05006e
+			public const int statusbar_size = 2131034222;
+			
+			// aapt resource value: 0x7f050070
+			public const int toolbar_double_height = 2131034224;
 			
 			static Dimension()
 			{
@@ -1845,40 +1993,52 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			public const int ic_directions_white_36dp = 2130837581;
 			
 			// aapt resource value: 0x7f02004e
-			public const int ic_keyboard_arrow_right_black_24dp = 2130837582;
+			public const int ic_errorstatus = 2130837582;
 			
 			// aapt resource value: 0x7f02004f
-			public const int ic_local_shipping_white_36dp = 2130837583;
+			public const int ic_keyboard_arrow_right_black_24dp = 2130837583;
 			
 			// aapt resource value: 0x7f020050
-			public const int ic_loupe_white_36dp = 2130837584;
+			public const int ic_local_shipping_white_36dp = 2130837584;
 			
 			// aapt resource value: 0x7f020051
-			public const int ic_place_white_36dp = 2130837585;
+			public const int ic_loupe_white_36dp = 2130837585;
 			
 			// aapt resource value: 0x7f020052
-			public const int ic_settings_white_36dp = 2130837586;
+			public const int ic_place_white_36dp = 2130837586;
 			
 			// aapt resource value: 0x7f020053
-			public const int ic_settings_white_48dp = 2130837587;
+			public const int ic_settings_white_36dp = 2130837587;
 			
 			// aapt resource value: 0x7f020054
-			public const int icon = 2130837588;
+			public const int ic_settings_white_48dp = 2130837588;
 			
 			// aapt resource value: 0x7f020055
-			public const int loginsplash800x1280 = 2130837589;
+			public const int ic_successstatus = 2130837589;
 			
 			// aapt resource value: 0x7f020056
-			public const int loginsplash800x1280_2 = 2130837590;
-			
-			// aapt resource value: 0x7f020059
-			public const int notification_template_icon_bg = 2130837593;
+			public const int icon = 2130837590;
 			
 			// aapt resource value: 0x7f020057
-			public const int scraprunnertemplogo = 2130837591;
+			public const int loginsplash800x1280 = 2130837591;
 			
 			// aapt resource value: 0x7f020058
-			public const int splash = 2130837592;
+			public const int loginsplash800x1280_2 = 2130837592;
+			
+			// aapt resource value: 0x7f02005d
+			public const int notification_template_icon_bg = 2130837597;
+			
+			// aapt resource value: 0x7f020059
+			public const int roundedbg = 2130837593;
+			
+			// aapt resource value: 0x7f02005a
+			public const int roundedbgdark = 2130837594;
+			
+			// aapt resource value: 0x7f02005b
+			public const int scraprunnertemplogo = 2130837595;
+			
+			// aapt resource value: 0x7f02005c
+			public const int splash = 2130837596;
 			
 			static Drawable()
 			{
@@ -1899,8 +2059,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06000c
 			public const int MvxBindingTagUnique = 2131099660;
 			
-			// aapt resource value: 0x7f060072
-			public const int action0 = 2131099762;
+			// aapt resource value: 0x7f060077
+			public const int action0 = 2131099767;
 			
 			// aapt resource value: 0x7f06005c
 			public const int action_bar = 2131099740;
@@ -1926,8 +2086,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06005d
 			public const int action_context_bar = 2131099741;
 			
-			// aapt resource value: 0x7f060076
-			public const int action_divider = 2131099766;
+			// aapt resource value: 0x7f06007b
+			public const int action_divider = 2131099771;
 			
 			// aapt resource value: 0x7f060003
 			public const int action_menu_divider = 2131099651;
@@ -1962,8 +2122,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060046
 			public const int buttonPanel = 2131099718;
 			
-			// aapt resource value: 0x7f060073
-			public const int cancel_action = 2131099763;
+			// aapt resource value: 0x7f060078
+			public const int cancel_action = 2131099768;
 			
 			// aapt resource value: 0x7f06002d
 			public const int center = 2131099693;
@@ -1971,14 +2131,17 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06002e
 			public const int center_horizontal = 2131099694;
 			
+			// aapt resource value: 0x7f06006b
+			public const int center_panel = 2131099755;
+			
 			// aapt resource value: 0x7f06002f
 			public const int center_vertical = 2131099695;
 			
 			// aapt resource value: 0x7f060054
 			public const int checkbox = 2131099732;
 			
-			// aapt resource value: 0x7f060079
-			public const int chronometer = 2131099769;
+			// aapt resource value: 0x7f06007e
+			public const int chronometer = 2131099774;
 			
 			// aapt resource value: 0x7f060035
 			public const int clip_horizontal = 2131099701;
@@ -2004,17 +2167,17 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060042
 			public const int default_activity_button = 2131099714;
 			
+			// aapt resource value: 0x7f060072
+			public const int design_menu_item_action_area = 2131099762;
+			
 			// aapt resource value: 0x7f060071
-			public const int design_menu_item_action_area = 2131099761;
+			public const int design_menu_item_action_area_stub = 2131099761;
 			
 			// aapt resource value: 0x7f060070
-			public const int design_menu_item_action_area_stub = 2131099760;
+			public const int design_menu_item_text = 2131099760;
 			
 			// aapt resource value: 0x7f06006f
-			public const int design_menu_item_text = 2131099759;
-			
-			// aapt resource value: 0x7f06006e
-			public const int design_navigation_view = 2131099758;
+			public const int design_navigation_view = 2131099759;
 			
 			// aapt resource value: 0x7f060010
 			public const int disableHome = 2131099664;
@@ -2025,8 +2188,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06001d
 			public const int end = 2131099677;
 			
-			// aapt resource value: 0x7f06007e
-			public const int end_padder = 2131099774;
+			// aapt resource value: 0x7f060083
+			public const int end_padder = 2131099779;
 			
 			// aapt resource value: 0x7f060025
 			public const int enterAlways = 2131099685;
@@ -2070,8 +2233,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060041
 			public const int image = 2131099713;
 			
-			// aapt resource value: 0x7f06007d
-			public const int info = 2131099773;
+			// aapt resource value: 0x7f060082
+			public const int info = 2131099778;
 			
 			// aapt resource value: 0x7f060000
 			public const int item_touch_helper_previous_elevation = 2131099648;
@@ -2079,11 +2242,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060031
 			public const int left = 2131099697;
 			
-			// aapt resource value: 0x7f060077
-			public const int line1 = 2131099767;
+			// aapt resource value: 0x7f06007c
+			public const int line1 = 2131099772;
 			
-			// aapt resource value: 0x7f06007b
-			public const int line3 = 2131099771;
+			// aapt resource value: 0x7f060080
+			public const int line3 = 2131099776;
 			
 			// aapt resource value: 0x7f06000d
 			public const int listMode = 2131099661;
@@ -2092,7 +2255,16 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			public const int list_item = 2131099715;
 			
 			// aapt resource value: 0x7f060075
-			public const int media_actions = 2131099765;
+			public const int loadingImage = 2131099765;
+			
+			// aapt resource value: 0x7f060073
+			public const int loadingProgressBar = 2131099763;
+			
+			// aapt resource value: 0x7f060076
+			public const int loadingProgressWheel = 2131099766;
+			
+			// aapt resource value: 0x7f06007a
+			public const int media_actions = 2131099770;
 			
 			// aapt resource value: 0x7f06001e
 			public const int middle = 2131099678;
@@ -2103,8 +2275,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060017
 			public const int multiply = 2131099671;
 			
-			// aapt resource value: 0x7f06006d
-			public const int navigation_header_container = 2131099757;
+			// aapt resource value: 0x7f06006e
+			public const int navigation_header_container = 2131099758;
 			
 			// aapt resource value: 0x7f060022
 			public const int never = 2131099682;
@@ -2199,11 +2371,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060015
 			public const int showTitle = 2131099669;
 			
-			// aapt resource value: 0x7f06006c
-			public const int snackbar_action = 2131099756;
+			// aapt resource value: 0x7f06006d
+			public const int snackbar_action = 2131099757;
 			
-			// aapt resource value: 0x7f06006b
-			public const int snackbar_text = 2131099755;
+			// aapt resource value: 0x7f06006c
+			public const int snackbar_text = 2131099756;
 			
 			// aapt resource value: 0x7f060029
 			public const int snap = 2131099689;
@@ -2226,8 +2398,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060033
 			public const int start = 2131099699;
 			
-			// aapt resource value: 0x7f060074
-			public const int status_bar_latest_event_content = 2131099764;
+			// aapt resource value: 0x7f060079
+			public const int status_bar_latest_event_content = 2131099769;
 			
 			// aapt resource value: 0x7f060067
 			public const int submit_area = 2131099751;
@@ -2235,23 +2407,29 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06000f
 			public const int tabMode = 2131099663;
 			
-			// aapt resource value: 0x7f06007c
-			public const int text = 2131099772;
+			// aapt resource value: 0x7f060081
+			public const int text = 2131099777;
 			
-			// aapt resource value: 0x7f06007a
-			public const int text2 = 2131099770;
+			// aapt resource value: 0x7f06007f
+			public const int text2 = 2131099775;
 			
 			// aapt resource value: 0x7f06004f
 			public const int textSpacerNoButtons = 2131099727;
 			
-			// aapt resource value: 0x7f060078
-			public const int time = 2131099768;
+			// aapt resource value: 0x7f060074
+			public const int textViewStatus = 2131099764;
+			
+			// aapt resource value: 0x7f06007d
+			public const int time = 2131099773;
 			
 			// aapt resource value: 0x7f060045
 			public const int title = 2131099717;
 			
 			// aapt resource value: 0x7f06004a
 			public const int title_template = 2131099722;
+			
+			// aapt resource value: 0x7f060084
+			public const int toolbar = 2131099780;
 			
 			// aapt resource value: 0x7f060034
 			public const int top = 2131099700;
@@ -2397,76 +2575,88 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			public const int activity_signin = 2130903065;
 			
 			// aapt resource value: 0x7f03001a
-			public const int design_layout_snackbar = 2130903066;
+			public const int activity_splash = 2130903066;
 			
 			// aapt resource value: 0x7f03001b
-			public const int design_layout_snackbar_include = 2130903067;
+			public const int design_layout_snackbar = 2130903067;
 			
 			// aapt resource value: 0x7f03001c
-			public const int design_layout_tab_icon = 2130903068;
+			public const int design_layout_snackbar_include = 2130903068;
 			
 			// aapt resource value: 0x7f03001d
-			public const int design_layout_tab_text = 2130903069;
+			public const int design_layout_tab_icon = 2130903069;
 			
 			// aapt resource value: 0x7f03001e
-			public const int design_menu_item_action_area = 2130903070;
+			public const int design_layout_tab_text = 2130903070;
 			
 			// aapt resource value: 0x7f03001f
-			public const int design_navigation_item = 2130903071;
+			public const int design_menu_item_action_area = 2130903071;
 			
 			// aapt resource value: 0x7f030020
-			public const int design_navigation_item_header = 2130903072;
+			public const int design_navigation_item = 2130903072;
 			
 			// aapt resource value: 0x7f030021
-			public const int design_navigation_item_separator = 2130903073;
+			public const int design_navigation_item_header = 2130903073;
 			
 			// aapt resource value: 0x7f030022
-			public const int design_navigation_item_subheader = 2130903074;
+			public const int design_navigation_item_separator = 2130903074;
 			
 			// aapt resource value: 0x7f030023
-			public const int design_navigation_menu = 2130903075;
+			public const int design_navigation_item_subheader = 2130903075;
 			
 			// aapt resource value: 0x7f030024
-			public const int design_navigation_menu_item = 2130903076;
+			public const int design_navigation_menu = 2130903076;
 			
 			// aapt resource value: 0x7f030025
-			public const int notification_media_action = 2130903077;
+			public const int design_navigation_menu_item = 2130903077;
 			
 			// aapt resource value: 0x7f030026
-			public const int notification_media_cancel_action = 2130903078;
+			public const int loading = 2130903078;
 			
 			// aapt resource value: 0x7f030027
-			public const int notification_template_big_media = 2130903079;
+			public const int loadingimage = 2130903079;
 			
 			// aapt resource value: 0x7f030028
-			public const int notification_template_big_media_narrow = 2130903080;
+			public const int loadingprogress = 2130903080;
 			
 			// aapt resource value: 0x7f030029
-			public const int notification_template_lines = 2130903081;
+			public const int notification_media_action = 2130903081;
 			
 			// aapt resource value: 0x7f03002a
-			public const int notification_template_media = 2130903082;
+			public const int notification_media_cancel_action = 2130903082;
 			
 			// aapt resource value: 0x7f03002b
-			public const int notification_template_part_chronometer = 2130903083;
+			public const int notification_template_big_media = 2130903083;
 			
 			// aapt resource value: 0x7f03002c
-			public const int notification_template_part_time = 2130903084;
+			public const int notification_template_big_media_narrow = 2130903084;
 			
 			// aapt resource value: 0x7f03002d
-			public const int select_dialog_item_material = 2130903085;
+			public const int notification_template_lines = 2130903085;
 			
 			// aapt resource value: 0x7f03002e
-			public const int select_dialog_multichoice_material = 2130903086;
+			public const int notification_template_media = 2130903086;
 			
 			// aapt resource value: 0x7f03002f
-			public const int select_dialog_singlechoice_material = 2130903087;
+			public const int notification_template_part_chronometer = 2130903087;
 			
 			// aapt resource value: 0x7f030030
-			public const int SplashScreen = 2130903088;
+			public const int notification_template_part_time = 2130903088;
 			
 			// aapt resource value: 0x7f030031
-			public const int support_simple_spinner_dropdown_item = 2130903089;
+			public const int select_dialog_item_material = 2130903089;
+			
+			// aapt resource value: 0x7f030032
+			public const int select_dialog_multichoice_material = 2130903090;
+			
+			// aapt resource value: 0x7f030033
+			public const int select_dialog_singlechoice_material = 2130903091;
+			
+			// aapt resource value: 0x7f030034
+			public const int support_simple_spinner_dropdown_item = 2130903092;
+			
+			// aapt resource value: 0x7f030035
+			public const int toolbar = 2130903093;
 			
 			static Layout()
 			{
@@ -2553,11 +2743,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f070018
 			public const int library_name = 2131165208;
 			
+			// aapt resource value: 0x7f07001b
+			public const int log_in = 2131165211;
+			
 			// aapt resource value: 0x7f07001a
 			public const int password = 2131165210;
-			
-			// aapt resource value: 0x7f07001b
-			public const int sign_in = 2131165211;
 			
 			// aapt resource value: 0x7f070013
 			public const int status_bar_notification_info_overflow = 2131165203;
@@ -3085,8 +3275,14 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f09002e
 			public const int RtlUnderlay_Widget_AppCompat_ActionButton_Overflow = 2131296302;
 			
+			// aapt resource value: 0x7f090144
+			public const int ScrapRunnerTheme = 2131296580;
+			
 			// aapt resource value: 0x7f090145
-			public const int ScrapRunnerTheme = 2131296581;
+			public const int ScrapRunnerTheme_Base = 2131296581;
+			
+			// aapt resource value: 0x7f090146
+			public const int ScrapRunnerTheme_SignIn = 2131296582;
 			
 			// aapt resource value: 0x7f0900ad
 			public const int TextAppearance_AppCompat = 2131296429;
@@ -3307,8 +3503,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0900e9
 			public const int Theme_AppCompat_NoActionBar = 2131296489;
 			
-			// aapt resource value: 0x7f090144
-			public const int Theme_Splash = 2131296580;
+			// aapt resource value: 0x7f090147
+			public const int Theme_Splash = 2131296583;
 			
 			// aapt resource value: 0x7f0900ea
 			public const int ThemeOverlay_AppCompat = 2131296490;
@@ -4278,6 +4474,56 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			
 			// aapt resource value: 0
 			public const int PopupWindowBackgroundState_state_above_anchor = 0;
+			
+			public static int[] ProgressWheel = new int[] {
+					2130772247,
+					2130772248,
+					2130772249,
+					2130772250,
+					2130772251,
+					2130772252,
+					2130772253,
+					2130772254,
+					2130772255,
+					2130772256,
+					2130772257,
+					2130772258};
+			
+			// aapt resource value: 3
+			public const int ProgressWheel_ahBarColor = 3;
+			
+			// aapt resource value: 11
+			public const int ProgressWheel_ahBarLength = 11;
+			
+			// aapt resource value: 10
+			public const int ProgressWheel_ahBarWidth = 10;
+			
+			// aapt resource value: 8
+			public const int ProgressWheel_ahCircleColor = 8;
+			
+			// aapt resource value: 7
+			public const int ProgressWheel_ahDelayMillis = 7;
+			
+			// aapt resource value: 9
+			public const int ProgressWheel_ahRadius = 9;
+			
+			// aapt resource value: 4
+			public const int ProgressWheel_ahRimColor = 4;
+			
+			// aapt resource value: 5
+			public const int ProgressWheel_ahRimWidth = 5;
+			
+			// aapt resource value: 6
+			public const int ProgressWheel_ahSpinSpeed = 6;
+			
+			// aapt resource value: 0
+			public const int ProgressWheel_ahText = 0;
+			
+			// aapt resource value: 1
+			public const int ProgressWheel_ahTextColor = 1;
+			
+			// aapt resource value: 2
+			public const int ProgressWheel_ahTextSize = 2;
 			
 			public static int[] RecyclerView = new int[] {
 					16842948,

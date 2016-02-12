@@ -1,8 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <resources>
+  <!-- You can generate a material palette from: http://mcg.mbitson.com/#/ -->
   <color name="material_gray_700">#515151</color>
   <color name="material_gray_900">#2f2f2f</color>
   <color name="material_blue_500">#2196F3</color>
   <color name="material_blue_700">#1976D2</color>
   <color name="accent">#FFC107</color>
+
+  <color name="material_50">#b4b4b4</color>
+  <color name="material_100">#8d8d8d</color>
+  <color name="material_200">#717171</color>
+  <color name="material_300">#4e4e4e</color>
+  <color name="material_400">#3e3e3e</color>
+  <color name="material_500">#2f2f2f</color>
+  <color name="material_600">#202020</color>
+  <color name="material_700">#101010</color>
+  <color name="material_800">#010101</color>
+  <color name="material_900">#000000</color>
+  <color name="material_A100">#b4b4b4</color>
+  <color name="material_A200">#8d8d8d</color>
+  <color name="material_A400">#3e3e3e</color>
+  <color name="material_A700">#101010</color>
+
 </resources>
