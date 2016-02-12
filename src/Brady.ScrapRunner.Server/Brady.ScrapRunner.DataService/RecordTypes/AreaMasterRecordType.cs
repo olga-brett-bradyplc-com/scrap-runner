@@ -19,7 +19,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("AreaMaster")]
     [DeleteAction("AreaMaster")]
     public class AreaMasterRecordType :
-        ChangeableRecordType<AreaMaster,long,string,AreaMasterValidator,AreaMasterDeletionValidator>
+        ChangeableRecordType<AreaMaster,string,AreaMasterValidator,AreaMasterDeletionValidator>
     {
         public override void ConfigureMapper()
         {

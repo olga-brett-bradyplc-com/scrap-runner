@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("ErrorLog")]
     [DeleteAction("ErrorLog")]
     public class ErrorLogRecordType :
-        ChangeableRecordType<ErrorLog, long, string, ErrorLogValidator, ErrorLogDeletionValidator>
+        ChangeableRecordType<ErrorLog, string, ErrorLogValidator, ErrorLogDeletionValidator>
     {
         public override void ConfigureMapper()
         {

@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("CustomerLocation")]
     [DeleteAction("CustomerLocation")]
     public class CustomerLocationRecordType :
-        ChangeableRecordType<CustomerLocation, long, string, CustomerLocationValidator, CustomerLocationDeletionValidator>
+        ChangeableRecordType<CustomerLocation, string, CustomerLocationValidator, CustomerLocationDeletionValidator>
     {
         public override void ConfigureMapper()
         {
