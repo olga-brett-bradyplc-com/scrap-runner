@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("PowerMaster")]
     [DeleteAction("PowerMaster")]
     public class PowerMasterRecordType :
-        ChangeableRecordType<PowerMaster, long, string, PowerMasterValidator, PowerMasterDeletionValidator>
+        ChangeableRecordType<PowerMaster, string, PowerMasterValidator, PowerMasterDeletionValidator>
     {
         public override void ConfigureMapper()
         {

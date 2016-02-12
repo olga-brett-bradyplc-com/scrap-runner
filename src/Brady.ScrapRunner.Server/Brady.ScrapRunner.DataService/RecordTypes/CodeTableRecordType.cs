@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("CodeTable")]
     [DeleteAction("CodeTable")]
     public class CodeTableRecordType :
-        ChangeableRecordType<CodeTable, long, string, CodeTableValidator, CodeTableDeletionValidator>
+        ChangeableRecordType<CodeTable, string, CodeTableValidator, CodeTableDeletionValidator>
     {
         public override void ConfigureMapper()
         {

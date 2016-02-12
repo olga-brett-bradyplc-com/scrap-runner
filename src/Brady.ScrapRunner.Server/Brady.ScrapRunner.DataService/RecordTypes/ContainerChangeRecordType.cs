@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("ContainerChange")]
     [DeleteAction("ContainerChange")]
     public class ContainerChangeRecordType :
-        ChangeableRecordType<ContainerChange, long, string, ContainerChangeValidator, ContainerChangeDeletionValidator>
+        ChangeableRecordType<ContainerChange, string, ContainerChangeValidator, ContainerChangeDeletionValidator>
     {
         public override void ConfigureMapper()
         {

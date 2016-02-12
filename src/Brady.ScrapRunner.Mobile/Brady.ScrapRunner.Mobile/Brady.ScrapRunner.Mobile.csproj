@@ -66,6 +66,11 @@
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\ILocalize.cs" />
+    <Compile Include="Resources\AppResources.es.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AppResources.es.resx</DependentUpon>
+    </Compile>
     <Compile Include="Resources\TranslateExtension.cs" />
     <Compile Include="ScrapRunnerMapperProfile.cs" />
     <Compile Include="Services\DemoDataGenerator.cs" />
@@ -122,6 +127,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\AppResources.es.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AppResources.es.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\AppResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
