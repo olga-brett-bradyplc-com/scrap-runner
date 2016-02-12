@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("TerminalChange")]
     [DeleteAction("TerminalChange")]
     public class TerminalChangeRecordType :
-        ChangeableRecordType<TerminalChange, long, string, TerminalChangeValidator, TerminalChangeDeletionValidator>
+        ChangeableRecordType<TerminalChange, string, TerminalChangeValidator, TerminalChangeDeletionValidator>
     {
         public override void ConfigureMapper()
         {

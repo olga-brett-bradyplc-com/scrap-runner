@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("CustomerCommodity")]
     [DeleteAction("CustomerCommodity")]
     public class CustomerCommodityRecordType :
-        ChangeableRecordType<CustomerCommodity, long, string, CustomerCommodityValidator, CustomerCommodityDeletionValidator>
+        ChangeableRecordType<CustomerCommodity, string, CustomerCommodityValidator, CustomerCommodityDeletionValidator>
     {
         public override void ConfigureMapper()
         {

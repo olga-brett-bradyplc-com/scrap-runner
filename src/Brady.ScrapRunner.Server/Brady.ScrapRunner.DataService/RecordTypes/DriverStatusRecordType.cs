@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("DriverStatus")]
     [DeleteAction("DriverStatus")]
     public class DriverStatusRecordType :
-        ChangeableRecordType<DriverStatus, long, string, DriverStatusValidator, DriverStatusDeletionValidator>
+        ChangeableRecordType<DriverStatus, string, DriverStatusValidator, DriverStatusDeletionValidator>
     {
         public override void ConfigureMapper()
         {

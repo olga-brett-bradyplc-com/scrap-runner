@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("TripSegmentMileage")]
     [DeleteAction("TripSegmentMileage")]
     public class TripSegmentMileageRecordType :
-        ChangeableRecordType<TripSegmentMileage, long, string, TripSegmentMileageValidator, TripSegmentMileageDeletionValidator>
+        ChangeableRecordType<TripSegmentMileage, string, TripSegmentMileageValidator, TripSegmentMileageDeletionValidator>
     {
         public override void ConfigureMapper()
         {

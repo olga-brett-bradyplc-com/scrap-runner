@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("TripTypeBasic")]
     [DeleteAction("TripTypeBasic")]
     public class TripTypeBasicRecordType :
-        ChangeableRecordType<TripTypeBasic, long, string, TripTypeBasicValidator, TripTypeBasicDeletionValidator>
+        ChangeableRecordType<TripTypeBasic, string, TripTypeBasicValidator, TripTypeBasicDeletionValidator>
     {
         public override void ConfigureMapper()
         {
