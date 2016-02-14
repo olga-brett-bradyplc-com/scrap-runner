@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/center_panel"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_centerInParent="true">
+        <EditText
+            android:background="@drawable/rounded_edittext_top_states"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:hint="@string/truck_id"
+            local:MvxBind="Text TruckId" />
+        <EditText
+            android:background="@drawable/rounded_edittext_bottom_states"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:layout_marginTop="2dp"
+            android:hint="@string/odometer_reading"
+            local:MvxBind="Text Odometer" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/continue_text"
+            local:MvxBind="Click PowerUnitIdCommand" />
+    </LinearLayout>
+</RelativeLayout>
