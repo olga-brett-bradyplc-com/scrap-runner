@@ -16,6 +16,16 @@
     <item name="android:windowBackground">@drawable/loginsplash800x1280</item>
   </style>
 
+  <style name="RoundedEditTextTop" parent="Base.Widget.AppCompat.EditText">
+    <item name="android:background">@drawable/rounded_edittext_top_states</item>
+    <item name="android:padding">4dp</item>
+  </style>
+
+  <style name="RoundedEditTextBottom" parent="Base.Widget.AppCompat.EditText">
+    <item name="android:background">@drawable/rounded_edittext_bottom_states</item>
+    <item name="android:padding">4dp</item>
+  </style>
+
   <style name="Theme.Splash" parent="android:Theme">
     <item name="android:windowBackground">@color/material_gray_900</item>
     <item name="android:windowNoTitle">true</item>
