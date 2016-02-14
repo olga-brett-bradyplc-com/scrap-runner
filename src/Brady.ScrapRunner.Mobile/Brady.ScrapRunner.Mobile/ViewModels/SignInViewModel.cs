@@ -96,10 +96,10 @@
 
         private async Task<bool> SignInAsync()
         {
+            await _demoDataGenerator.GenerateDemoDataAsync();
             var employeeMaster = await GetEmployeeMasterAsync();
             if (employeeMaster == null) return false;
             await SaveEmployeeAsync(employeeMaster);
-            await _demoDataGenerator.GenerateDemoDataAsync();
             return true;
         }
 

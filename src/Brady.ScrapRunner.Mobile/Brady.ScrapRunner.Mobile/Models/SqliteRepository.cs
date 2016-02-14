@@ -14,8 +14,7 @@
 
         public SqliteRepository(IMvxSqliteConnectionFactory sqliteConnectionFactory)
         {
-            const string databaseName = "scraprunner.sqlite";
-            _connection = sqliteConnectionFactory.GetAsyncConnection(databaseName);
+            _connection = sqliteConnectionFactory.GetAsyncConnection("scraprunner");
         }
 
         public Task<List<T>> AllAsync()
