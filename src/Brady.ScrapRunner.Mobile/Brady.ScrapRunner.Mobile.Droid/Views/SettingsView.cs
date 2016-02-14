@@ -4,16 +4,13 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
     using Android.OS;
     using ViewModels;
 
-    [Activity(
-        Name = "com.bradyplc.scraprunner.SignInView",
-        Label = "Sign In",
-        Theme = "@style/ScrapRunnerTheme.SignIn")]
-    public class SignInView : BaseActivity<SignInViewModel>
+    [Activity(Label = "Settings")]
+    public class SettingsView : BaseActivity<SettingsViewModel>
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_signin);
+            SetContentView(Resource.Layout.activity_settings);
         }
     }
 }

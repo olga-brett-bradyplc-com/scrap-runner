@@ -201,6 +201,7 @@
     <Compile Include="Setup.cs" />
     <Compile Include="SplashScreen.cs" />
     <Compile Include="Views\BaseActivity.cs" />
+    <Compile Include="Views\SettingsView.cs" />
     <Compile Include="Views\SignInView.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +216,9 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\toolbar.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\activity_settings.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
   </ItemGroup>
