@@ -60,3 +60,4 @@ BackUp/
 src/Brady.ScrapRunner/.vs/config/applicationhost.config
 src/Brady.ScrapRunner.Mobile/.vs/config/applicationhost.config
 *.tss
+/DatabaseScripts/BWFUpdates
