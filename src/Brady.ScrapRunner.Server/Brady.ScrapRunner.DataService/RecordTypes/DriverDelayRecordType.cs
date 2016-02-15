@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("DriverDelay")]
     [DeleteAction("DriverDelay")]
     public class DriverDelayRecordType :
-        ChangeableRecordType<DriverDelay, long, string, DriverDelayValidator, DriverDelayDeletionValidator>
+        ChangeableRecordType<DriverDelay, string, DriverDelayValidator, DriverDelayDeletionValidator>
     {
         public override void ConfigureMapper()
         {

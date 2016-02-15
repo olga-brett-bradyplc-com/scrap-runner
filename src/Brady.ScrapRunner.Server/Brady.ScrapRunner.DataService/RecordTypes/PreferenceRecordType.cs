@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("Preference")]
     [DeleteAction("Preference")]
     public class PreferenceRecordType :
-        ChangeableRecordType<Preference, long, string, PreferenceValidator, PreferenceDeletionValidator>
+        ChangeableRecordType<Preference, string, PreferenceValidator, PreferenceDeletionValidator>
     {
         public override void ConfigureMapper()
         {

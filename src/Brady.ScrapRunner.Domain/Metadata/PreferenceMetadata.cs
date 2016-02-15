@@ -12,6 +12,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
     {
         public PreferenceMetadata()
         {
+            AutoUpdatesByDefault();
+
             StringProperty(x => x.Id)
                 .IsHiddenInEditor()
                 .IsNotEditableInGrid();
