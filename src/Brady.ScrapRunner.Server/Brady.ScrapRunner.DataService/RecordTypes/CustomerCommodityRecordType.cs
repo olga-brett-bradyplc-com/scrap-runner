@@ -32,22 +32,22 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
             return new CustomerCommodity
             {
-                CustHostCode = identityValues[0], 
-                CustCommodityCode = identityValues[1]
+                CustCommodityCode = identityValues[0],
+                CustHostCode = identityValues[1]
             };
         }
 
         public override Expression<Func<CustomerCommodity, bool>> GetIdentityPredicate(CustomerCommodity item)
         {
-            return x => x.CustHostCode == item.CustHostCode &&
-                        x.CustCommodityCode == item.CustCommodityCode;
+            return x => x.CustCommodityCode == item.CustCommodityCode &&
+                        x.CustHostCode == item.CustHostCode;
         }
     
         public override Expression<Func<CustomerCommodity, bool>> GetIdentityPredicate(string id)
         {
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return x => x.CustHostCode == identityValues[0] &&
-                        x.CustCommodityCode == identityValues[1];
+            return x => x.CustCommodityCode == identityValues[0] &&
+                        x.CustHostCode == identityValues[1];
         }
 
     }

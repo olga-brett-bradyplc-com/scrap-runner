@@ -3,6 +3,9 @@
 --The new primary key will be the new int field
 --Included in the comments is code to revert the primary key back the original
 
+use [ScrapRunner]
+go 
+
 if not exists (select 1 from syscolumns,sysobjects where syscolumns.id = sysobjects.id 
 and sysobjects.name = 'eventlog'
 and syscolumns.name = 'EventId')
@@ -20,12 +23,14 @@ ADD CONSTRAINT [PK_EventLog] PRIMARY KEY CLUSTERED
 	EventId ASC 
 )ON [PRIMARY]
 GO
+
 CREATE NONCLUSTERED INDEX [IX_EventLog] ON eventlog
 (
 	EventDateTime ASC,
 	EventSeqNo ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 90) ON [PRIMARY]
 GO
+
 --To revert, run the following
 --DROP INDEX [IX_EventLog] ON [dbo].[EventLog]
 --GO
@@ -66,6 +71,7 @@ CREATE NONCLUSTERED INDEX [IX_ErrorLog] ON errorlog
 	ErrorSeqNo ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 90) ON [PRIMARY]
 GO
+
 --To revert, run the following
 --DROP INDEX [IX_ErrorLog] ON [dbo].[ErrorLog]
 --GO

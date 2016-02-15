@@ -31,32 +31,32 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         {
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
             //int parsedDriverSeqNumber;
-            //int.TryParse(identityValues[2], out parsedDelaySeqNumber); 
+            //int.TryParse(identityValues[0], out parsedDriverSeqNumber); 
 
             return new DriverHistory
             {
-                EmployeeId = identityValues[0],
-                TripNumber = identityValues[1],
-                DriverSeqNumber = int.Parse(identityValues[2]), 
+                DriverSeqNumber = int.Parse(identityValues[0]),
+                EmployeeId = identityValues[1],
+                TripNumber = identityValues[2]
             };
         }
 
         public override Expression<Func<DriverHistory, bool>> GetIdentityPredicate(DriverHistory item)
         {
-            return x => x.EmployeeId == item.EmployeeId &&
-                        x.TripNumber == item.TripNumber &&
-                        x.DriverSeqNumber == item.DriverSeqNumber;
+            return x => x.DriverSeqNumber == item.DriverSeqNumber &&
+                        x.EmployeeId == item.EmployeeId &&
+                        x.TripNumber == item.TripNumber ;
         }
 
         public override Expression<Func<DriverHistory, bool>> GetIdentityPredicate(string id)
         {
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
             //int parsedDriverSeqNumber;
-            //int.TryParse(identityValues[2], out parsedDelaySeqNumber); 
+            //int.TryParse(identityValues[0], out parsedDriverSeqNumber); 
 
-            return x => x.EmployeeId == identityValues[0] &&
-                        x.TripNumber == identityValues[1] &&
-                        x.DriverSeqNumber == int.Parse(identityValues[2]);
+            return x => x.DriverSeqNumber == int.Parse(identityValues[0]) &&
+                        x.EmployeeId == identityValues[1] &&
+                        x.TripNumber == identityValues[2] ;
         }
 
     }

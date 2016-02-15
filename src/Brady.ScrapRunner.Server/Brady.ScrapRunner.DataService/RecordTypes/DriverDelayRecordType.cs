@@ -31,32 +31,32 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         {
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
             //int parsedDelaySeqNumber;
-            //int.TryParse(identityValues[1], out parsedDelaySeqNumber); 
+            //int.TryParse(identityValues[0], out parsedDelaySeqNumber); 
 
             return new DriverDelay
             {
-                DriverId = identityValues[0],
-                DelaySeqNumber = int.Parse(identityValues[1]), 
+                DelaySeqNumber = int.Parse(identityValues[0]),
+                DriverId = identityValues[1],
                 TripNumber = identityValues[2]
             };
         }
 
         public override Expression<Func<DriverDelay, bool>> GetIdentityPredicate(DriverDelay item)
         {
-            return x => x.DriverId == item.DriverId &&
-                        x.DelaySeqNumber == item.DelaySeqNumber &&
-                        x.TripNumber == item.TripNumber;
+            return x => x.DelaySeqNumber == item.DelaySeqNumber && 
+                        x.DriverId == item.DriverId &&                      
+                        x.TripNumber == item.TripNumber ;
         }
 
         public override Expression<Func<DriverDelay, bool>> GetIdentityPredicate(string id)
         {
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
             //int parsedDelaySeqNumber;
-            //int.TryParse(identityValues[1], out parsedDelaySeqNumber);
+            //int.TryParse(identityValues[0], out parsedDelaySeqNumber);
 
-            return x => x.DriverId == identityValues[0] &&
-                        x.DelaySeqNumber == int.Parse(identityValues[1]) &&
-                        x.TripNumber == identityValues[2];
+            return x => x.DelaySeqNumber == int.Parse(identityValues[0]) && 
+                        x.DriverId == identityValues[1] &&
+                        x.TripNumber == identityValues[2] ;
         }
 
     }

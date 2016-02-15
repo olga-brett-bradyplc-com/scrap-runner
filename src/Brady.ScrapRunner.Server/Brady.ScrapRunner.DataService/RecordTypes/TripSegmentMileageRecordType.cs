@@ -33,24 +33,24 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             return new TripSegmentMileage
             {
                 TripNumber = identityValues[0],
-                TripSegNumber = identityValues[1], 
-                TripSegMileageSeqNumber = int.Parse(identityValues[2])
+                TripSegMileageSeqNumber = int.Parse(identityValues[1]), 
+                TripSegNumber = identityValues[2] 
             };
         }
 
         public override Expression<Func<TripSegmentMileage, bool>> GetIdentityPredicate(TripSegmentMileage item)
         {
             return x => x.TripNumber == item.TripNumber &&
-                        x.TripSegNumber == item.TripSegNumber &&
-                        x.TripSegMileageSeqNumber == item.TripSegMileageSeqNumber ;
+                        x.TripSegMileageSeqNumber == item.TripSegMileageSeqNumber &&
+                        x.TripSegNumber == item.TripSegNumber;
         }
 
         public override Expression<Func<TripSegmentMileage, bool>> GetIdentityPredicate(string id)
         {
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
             return x => x.TripNumber == identityValues[0] &&
-                        x.TripSegNumber == identityValues[1] &&
-                        x.TripSegMileageSeqNumber == int.Parse(identityValues[2]) ;
+                        x.TripSegMileageSeqNumber == int.Parse(identityValues[1]) &&
+                        x.TripSegNumber == identityValues[2] ;
         }
     }
 }

@@ -28,11 +28,8 @@ namespace Brady.ScrapRunner.Domain.Models
 
         public virtual bool Equals(Preference other)
         {
-            return string.Equals(TerminalId, other.TerminalId)
-                   && string.Equals(Parameter, other.Parameter) ;
-            //&& string.Equals(ParameterValue, other.ParameterValue) 
-            //&& string.Equals(Description, other.Description) 
-            //&& string.Equals(Id, other.Id);
+            return string.Equals(Parameter, other.Parameter)
+                   && string.Equals(TerminalId, other.TerminalId);
         }
 
         public override bool Equals(object obj)
@@ -47,11 +44,8 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             unchecked
             {
-                var hashCode = (TerminalId != null ? TerminalId.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Parameter?.GetHashCode() ?? 0);
-                //hashCode = (hashCode * 397) ^ (ParameterValue != null ? ParameterValue.GetHashCode() : 0);
-                //hashCode = (hashCode * 397) ^ (Description?.GetHashCode() ?? 0);
-                //hashCode = (hashCode * 397) ^ (Id?.GetHashCode() ?? 0);
+                var hashCode = (Parameter != null ? Parameter.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (TerminalId != null ? TerminalId.GetHashCode() : 0);
                 return hashCode;
             }
         }
