@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/center_panel"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_centerInParent="true">
+        <EditText
+            android:background="@drawable/rounded_edittext_top_states"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:hint="@string/username"
+            local:MvxBind="Text UserName" />
+        <EditText
+            android:background="@drawable/rounded_edittext_bottom_states"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:layout_marginTop="2dp"
+            android:inputType="textPassword"
+            android:hint="@string/password"
+            local:MvxBind="Text Password" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/log_in"
+            local:MvxBind="Click SignInCommand" />
+    </LinearLayout>
+    <ImageView
+        android:layout_above="@id/center_panel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:src="@drawable/scraprunnertemplogo" />
+    <ImageButton
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:background="@drawable/ic_settings_white_48dp"
+        local:MvxBind="Click SettingsCommand" />
+</RelativeLayout>

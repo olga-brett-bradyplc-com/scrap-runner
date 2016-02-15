@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("CommodityMaster")]
     [DeleteAction("CommodityMaster")]
     public class CommodityMasterRecordType :
-        ChangeableRecordType<CommodityMaster, long, string, CommodityMasterValidator, CommodityMasterDeletionValidator>
+        ChangeableRecordType<CommodityMaster, string, CommodityMasterValidator, CommodityMasterDeletionValidator>
     {
         public override void ConfigureMapper()
         {

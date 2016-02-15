@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("PowerHistory")]
     [DeleteAction("PowerHistory")]
     public class PowerHistoryRecordType :
-        ChangeableRecordType<PowerHistory, long, string, PowerHistoryValidator, PowerHistoryDeletionValidator>
+        ChangeableRecordType<PowerHistory, string, PowerHistoryValidator, PowerHistoryDeletionValidator>
     {
         public override void ConfigureMapper()
         {

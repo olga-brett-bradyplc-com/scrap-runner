@@ -26,6 +26,7 @@ namespace Brady.ScrapRunner.Domain.Models
 
             }
         }
+
         public virtual bool Equals(AreaMaster other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -33,6 +34,7 @@ namespace Brady.ScrapRunner.Domain.Models
             return string.Equals(AreaId, other.AreaId)
                 && string.Equals(TerminalId,other.TerminalId);
         }
+
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -40,13 +42,16 @@ namespace Brady.ScrapRunner.Domain.Models
             if (obj.GetType() != this.GetType()) return false;
             return Equals((AreaMaster)obj);
         }
+
         public override int GetHashCode()
         {
             unchecked
             {
                 var hashCode = (AreaId != null ? AreaId.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (TerminalId != null ? TerminalId.GetHashCode() : 0);
                 return hashCode;
             }
         }
+
     }
 }

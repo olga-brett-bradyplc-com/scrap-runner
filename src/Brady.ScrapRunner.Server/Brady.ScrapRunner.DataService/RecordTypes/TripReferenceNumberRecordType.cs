@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("TripReferenceNumber")]
     [DeleteAction("TripReferenceNumber")]
     public class TripReferenceNumberRecordType :
-        ChangeableRecordType<TripReferenceNumber, long, string, TripReferenceNumberValidator, TripReferenceNumberDeletionValidator>
+        ChangeableRecordType<TripReferenceNumber, string, TripReferenceNumberValidator, TripReferenceNumberDeletionValidator>
     {
         public override void ConfigureMapper()
         {
