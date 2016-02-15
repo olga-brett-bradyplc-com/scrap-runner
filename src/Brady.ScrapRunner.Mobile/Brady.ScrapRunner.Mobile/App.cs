@@ -1,11 +1,10 @@
-﻿namespace Brady.ScrapRunner.Mobile
+using MvvmCross.Platform.IoC;
+
+namespace Brady.ScrapRunner.Mobile
 {
+    using Acr.UserDialogs;
     using AutoMapper;
     using Interfaces;
-    using Resources;
-    using Xamarin.Forms;
-    using MvvmCross.Platform.IoC;
-    using Acr.UserDialogs;
     using Models;
     using MvvmCross.Platform;
     using Services;
@@ -21,7 +20,8 @@
 
             Mvx.RegisterSingleton(() => UserDialogs.Instance);
 
-            Mvx.RegisterType<IRepository<ContainerMasterModel>, 
+            // @TODO: Implement a factory to avoid this (http://stackoverflow.com/a/20691906)
+            Mvx.RegisterType<IRepository<ContainerMasterModel>,
                 SqliteRepository<ContainerMasterModel>>();
             Mvx.RegisterType<IRepository<CustomerDirectionModel>,
                 SqliteRepository<CustomerDirectionModel>>();
@@ -35,9 +35,6 @@
                 SqliteRepository<TripSegmentContainerModel>>();
 
             Mvx.RegisterSingleton(Mvx.IocConstruct<DemoDataGenerator>);
-
-            if (Device.OS != TargetPlatform.WinPhone)
-                AppResources.Culture = DependencyService.Get<ILocalize>().GetCurrentCultureInfo();
 
             Mapper.Initialize(cfg =>
             {

@@ -4,14 +4,17 @@
     using System.Threading.Tasks;
     using Interfaces;
     using Models;
+    using MvvmCross.Plugins.Sqlite;
 
     public class DemoDataGenerator
     {
+        private readonly IMvxSqliteConnectionFactory _sqliteConnectionFactory;
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
 
         public DemoDataGenerator(
+            IMvxSqliteConnectionFactory sqliteConnectionFactory,
             IRepository<TripModel> tripRepository, 
             IRepository<TripSegmentModel> tripSegmentRepository, 
             IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
@@ -19,10 +22,27 @@
             _tripRepository = tripRepository;
             _tripSegmentRepository = tripSegmentRepository;
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
+            _sqliteConnectionFactory = sqliteConnectionFactory;
         }
 
         public async Task GenerateDemoDataAsync()
         {
+            var asyncConnection = _sqliteConnectionFactory.GetAsyncConnection("scraprunner");
+            await asyncConnection.CreateTableAsync<ContainerMasterModel>();
+            await asyncConnection.CreateTableAsync<CustomerDirectionModel>();
+            await asyncConnection.CreateTableAsync<EmployeeMasterModel>();
+            await asyncConnection.CreateTableAsync<PreferenceModel>();
+            await asyncConnection.CreateTableAsync<TripModel>();
+            await asyncConnection.CreateTableAsync<TripSegmentModel>();
+            await asyncConnection.CreateTableAsync<TripSegmentContainerModel>();
+
+            await asyncConnection.DeleteAllAsync<ContainerMasterModel>();
+            await asyncConnection.DeleteAllAsync<CustomerDirectionModel>();
+            await asyncConnection.DeleteAllAsync<EmployeeMasterModel>();
+            await asyncConnection.DeleteAllAsync<PreferenceModel>();
+            await asyncConnection.DeleteAllAsync<TripModel>();
+            await asyncConnection.DeleteAllAsync<TripSegmentModel>();
+            await asyncConnection.DeleteAllAsync<TripSegmentContainerModel>();
             await GenerateDemoTripDataAsync();
         }
 

@@ -1,10 +1,9 @@
 namespace Brady.ScrapRunner.Mobile.Droid
 {
-    using Acr.UserDialogs;
     using Android.App;
     using Android.Content.PM;
+    using Android.OS;
     using MvvmCross.Droid.Views;
-    using Xamarin.Forms;
 
     [Activity(
         Label = "ScrapRunner"
@@ -13,39 +12,17 @@ namespace Brady.ScrapRunner.Mobile.Droid
         , Theme = "@style/Theme.Splash"
         , NoHistory = true
         , ScreenOrientation = ScreenOrientation.Portrait)]
-    public class SplashScreen
-        : MvxSplashScreenActivity
+    public class SplashScreen : MvxSplashScreenActivity
     {
         public SplashScreen()
-            : base(Resource.Layout.SplashScreen)
+            : base(Resource.Layout.activity_splash)
         {
         }
 
-        private bool isInitializationComplete = false;
-        public override void InitializationComplete()
+        protected override void OnCreate(Bundle bundle)
         {
-            if (!isInitializationComplete)
-            {
-                isInitializationComplete = true;
-                StartActivity(typeof(MvxFormsApplicationActivity));
-            }
-        }
-
-        protected override void OnCreate(Android.OS.Bundle bundle)
-        {
-            Forms.Init(this, bundle);
-
-            UserDialogs.Init(this);
-
-            // Leverage controls' StyleId attrib. to Xamarin.UITest
-            Forms.ViewInitialized += (object sender, ViewInitializedEventArgs e) => {
-                if (!string.IsNullOrWhiteSpace(e.View.StyleId))
-                {
-                    e.NativeView.ContentDescription = e.View.StyleId;
-                }
-            };
-
             base.OnCreate(bundle);
+            Acr.UserDialogs.UserDialogs.Init(this);
         }
     }
 }

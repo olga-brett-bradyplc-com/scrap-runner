@@ -5,17 +5,16 @@
     using System.Linq.Expressions;
     using System.Threading.Tasks;
     using Interfaces;
+    using MvvmCross.Plugins.Sqlite;
     using SQLite.Net.Async;
-    using Xamarin.Forms;
 
     public class SqliteRepository<T> : IRepository<T> where T : class, new()
     {
         private readonly SQLiteAsyncConnection _connection;
 
-        public SqliteRepository()
+        public SqliteRepository(IMvxSqliteConnectionFactory sqliteConnectionFactory)
         {
-            var database = DependencyService.Get<ISqliteDatabase>();
-            _connection = database.Connection;
+            _connection = sqliteConnectionFactory.GetAsyncConnection("scraprunner");
         }
 
         public Task<List<T>> AllAsync()

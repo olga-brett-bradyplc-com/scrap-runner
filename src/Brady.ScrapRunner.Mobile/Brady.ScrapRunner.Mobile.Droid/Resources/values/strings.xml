@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+  <string name="username">Enter your username</string>
+  <string name="password">Enter your password</string>
+  <string name="log_in">Log In</string>
+  <string name="truck_id">Truck ID</string>
+  <string name="odometer_reading">Odometer Reading</string>
+  <string name="continue_text">Continue</string>
+</resources>
