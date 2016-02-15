@@ -64,6 +64,7 @@
     <Compile Include="Metadata\PreferenceMetadata.cs" />
     <Compile Include="Metadata\SRMetadataBundle.cs" />
     <Compile Include="Metadata\TripReferenceNumberMetadata.cs" />
+    <Compile Include="Metadata\TripSegmentContainerMetadata.cs" />
     <Compile Include="Metadata\TripTypeBasicMetadata.cs" />
     <Compile Include="Metadata\TripMetadata.cs" />
     <Compile Include="Metadata\TripSegmentMileageMetadata.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Models\PowerMaster.cs" />
     <Compile Include="Models\Preference.cs" />
     <Compile Include="Models\TripReferenceNumber.cs" />
+    <Compile Include="Models\TripSegmentContainer.cs" />
     <Compile Include="Models\TripTypeBasic.cs" />
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\TripSegmentMileage.cs" />

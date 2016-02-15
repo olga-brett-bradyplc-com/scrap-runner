@@ -194,6 +194,7 @@
     <Compile Include="Mappings\EmployeeMasterMap.cs" />
     <Compile Include="Mappings\PowerMasterMap.cs" />
     <Compile Include="Mappings\TripReferenceNumberMap.cs" />
+    <Compile Include="Mappings\TripSegmentContainerMap.cs" />
     <Compile Include="Mappings\TripTypeBasicMap.cs" />
     <Compile Include="Mappings\TripMap.cs" />
     <Compile Include="Mappings\TripSegmentMileageMap.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="RecordTypes\EmployeeMasterRecordType.cs" />
     <Compile Include="RecordTypes\PowerMasterRecordType.cs" />
     <Compile Include="RecordTypes\TripReferenceNumberRecordType.cs" />
+    <Compile Include="RecordTypes\TripSegmentContainerRecordType.cs" />
     <Compile Include="RecordTypes\TripTypeBasicRecordType.cs" />
     <Compile Include="RecordTypes\TripRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentMileageRecordType.cs" />
@@ -267,6 +269,8 @@
     <Compile Include="Validators\EmployeeMasterDeletionValidator.cs" />
     <Compile Include="Validators\EmployeeMasterValidator.cs" />
     <Compile Include="Validators\TripReferenceNumberDeletionValidator.cs" />
+    <Compile Include="Validators\TripSegmentContainerDeletionValidator.cs" />
+    <Compile Include="Validators\TripSegmentContainerValidator.cs" />
     <Compile Include="Validators\TripTypeBasicDeletionValidator.cs" />
     <Compile Include="Validators\TripDeletionValidator.cs" />
     <Compile Include="Validators\TripSegmentMileageDeletionValidator.cs" />

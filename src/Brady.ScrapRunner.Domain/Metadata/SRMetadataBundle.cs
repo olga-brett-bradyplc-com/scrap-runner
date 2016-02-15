@@ -37,6 +37,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new TripSegmentMetadata()
                   , new TripSegmentMileageMetadata() 
                   , new TripTypeBasicMetadata()
+                  , new TripSegmentContainerMetadata()
             )
         {
             
