@@ -32,21 +32,21 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
             return new Preference
             {
-                Parameter = identityValues[0],
-                TerminalId = identityValues[1]
+                TerminalId = identityValues[0],
+                Parameter = identityValues[1]
             };
         }
 
         public override Expression<Func<Preference, bool>> GetIdentityPredicate(Preference item)
         {
-            return x => x.Parameter == item.Parameter &&
-                x.TerminalId == item.TerminalId;
+            return x => x.TerminalId == item.TerminalId && 
+                x.Parameter == item.Parameter;
         }
         public override Expression<Func<Preference, bool>> GetIdentityPredicate(string id)
         {
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return x => x.Parameter == identityValues[0] &&
-                        x.TerminalId == identityValues[1];
+            return x => x.TerminalId == identityValues[0] &&
+                        x.Parameter == identityValues[1];
         }
     }
 }

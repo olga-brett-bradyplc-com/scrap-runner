@@ -18,7 +18,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0};{1}", Parameter, TerminalId);
+                return string.Format("{0};{1}", TerminalId, Parameter);
             }
             set
             {
