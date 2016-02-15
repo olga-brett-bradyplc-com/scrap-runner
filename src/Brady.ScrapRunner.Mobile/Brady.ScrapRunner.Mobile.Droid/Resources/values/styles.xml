@@ -1,18 +1,44 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <resources>
-  <style name="ScrapRunnerTheme.Base" parent="@android:style/Theme.Holo.Light.DarkActionBar"> </style>
+  
   <style name="ScrapRunnerTheme" parent="ScrapRunnerTheme.Base">
-    <item name="android:actionBarStyle">@style/ScrapRunnerTheme.ActionBarStyle</item>
   </style>
-  <style name="ScrapRunnerTheme.ActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar">
-    <item name="android:titleTextStyle">@style/ScrapRunnerTheme.ActionBar.TitleTextStyle</item>
-    <item name="android:background">@color/material_gray_900</item>
+    
+  <style name="ScrapRunnerTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+    <item name="windowNoTitle">true</item>
+    <item name="windowActionBar">false</item>
+    <item name="colorPrimary">@color/material_500</item>
+    <item name="colorPrimaryDark">@color/material_900</item>
+    <item name="colorAccent">@color/material_100</item>
   </style>
-  <style name="ScrapRunnerTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
-    <item name="android:textColor">@android:color/white</item>
+
+  <style name="ScrapRunnerTheme.SignIn" parent="ScrapRunnerTheme.Base">
+    <item name="android:windowBackground">@drawable/loginsplash800x1280</item>
   </style>
+
+  <style name="RoundedEditTextTop" parent="Base.Widget.AppCompat.EditText">
+    <item name="android:background">@drawable/rounded_edittext_top_states</item>
+    <item name="android:padding">4dp</item>
+  </style>
+
+  <style name="RoundedEditTextBottom" parent="Base.Widget.AppCompat.EditText">
+    <item name="android:background">@drawable/rounded_edittext_bottom_states</item>
+    <item name="android:padding">4dp</item>
+  </style>
+
   <style name="Theme.Splash" parent="android:Theme">
     <item name="android:windowBackground">@color/material_gray_900</item>
     <item name="android:windowNoTitle">true</item>
-  </style>  
+  </style>
+  
+  
+  <!-- @TODO: These go in values-v21/styles.xml to enable Android L transitions -->
+  <!--
+  <item name="windowContentTransitions">true</item>
+  <item name="windowAllowEnterTransitionOverlap">true</item>
+  <item name="windowAllowReturnTransitionOverlap">true</item>
+  <item name="windowSharedElementEnterTransition">@android:transition/move</item>
+  <item name="windowSharedElementExitTransition">@android:transition/move</item>
+  -->
+
 </resources>

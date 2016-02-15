@@ -8,25 +8,25 @@
     using Interfaces;
     using Models;
     using MvvmCross.Core.ViewModels;
+    using MvvmCross.Plugins.Sqlite;
     using Resources;
     using Services;
     using Validators;
-    using Xamarin.Forms;
 
     public class SignInViewModel : BaseViewModel
     {
-        private readonly ISqliteDatabase _sqliteDatabase;
+        private readonly IMvxSqliteConnectionFactory _sqliteConnectionFactory;
         private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository;
         private readonly DemoDataGenerator _demoDataGenerator;
 
         public SignInViewModel(
             IRepository<EmployeeMasterModel> employeeMasterRepository, 
-            DemoDataGenerator demoDataGenerator
-            )
+            DemoDataGenerator demoDataGenerator, 
+            IMvxSqliteConnectionFactory sqliteConnectionFactory1)
         {
             _employeeMasterRepository = employeeMasterRepository;
             _demoDataGenerator = demoDataGenerator;
-            _sqliteDatabase = DependencyService.Get<ISqliteDatabase>();
+            _sqliteConnectionFactory = sqliteConnectionFactory1;
             Title = AppResources.SignIn;
             SignInCommand = new MvxCommand(ExecuteSignInCommand, CanExecuteSignInCommand);
         }
@@ -96,11 +96,10 @@
 
         private async Task<bool> SignInAsync()
         {
-            await _sqliteDatabase.InitializeAsync();
+            await _demoDataGenerator.GenerateDemoDataAsync();
             var employeeMaster = await GetEmployeeMasterAsync();
             if (employeeMaster == null) return false;
             await SaveEmployeeAsync(employeeMaster);
-            await _demoDataGenerator.GenerateDemoDataAsync();
             return true;
         }
 
