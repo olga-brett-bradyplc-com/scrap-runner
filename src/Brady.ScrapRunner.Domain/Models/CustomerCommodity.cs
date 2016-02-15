@@ -28,7 +28,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0};{1}", CustHostCode, CustCommodityCode) ;
+                return string.Format("{0};{1}", CustCommodityCode, CustHostCode) ;
             }
             set
             {
@@ -40,8 +40,8 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(CustHostCode, other.CustHostCode) &&
-                   string.Equals(CustCommodityCode, other.CustCommodityCode) ;
+            return string.Equals(CustCommodityCode, other.CustCommodityCode) &&
+                   string.Equals(CustHostCode, other.CustHostCode) ;
         }
 
         public override bool Equals(object obj)
@@ -56,8 +56,8 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             unchecked
             {
-                var hashCode = (CustHostCode != null ? CustHostCode.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (CustCommodityCode != null ? CustCommodityCode.GetHashCode() : 0);
+                var hashCode = (CustCommodityCode != null ? CustCommodityCode.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (CustHostCode != null ? CustHostCode.GetHashCode() : 0);
                 return hashCode;
             }
         }

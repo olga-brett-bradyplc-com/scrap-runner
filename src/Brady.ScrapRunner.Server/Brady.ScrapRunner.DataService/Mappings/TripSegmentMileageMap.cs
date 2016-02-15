@@ -19,13 +19,13 @@ namespace Brady.ScrapRunner.DataService.Mappings
             ComposedId(map =>
             {
                 map.Property(y => y.TripNumber, m => m.Generated(PropertyGeneration.Never));
-                map.Property(y => y.TripSegNumber, m => m.Generated(PropertyGeneration.Never));
                 map.Property(y => y.TripSegMileageSeqNumber, m => m.Generated(PropertyGeneration.Never));
+                map.Property(y => y.TripSegNumber, m => m.Generated(PropertyGeneration.Never));
             });
 
             Property(x => x.Id, m =>
             {
-                m.Formula("concat(TripNumber, ';', TripSegNumber, ';', TripSegMileageSeqNumber)");
+                m.Formula("concat(TripNumber, ';', TripSegMileageSeqNumber, ';', TripSegNumber)");
                 m.Insert(false);
                 m.Update(false);
             });
