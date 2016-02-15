@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/trip_type_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_margin_half"
+        local:MvxBind="Text TripTypeDesc"
+        tools:text="Switch" />
+    <TextView
+        android:id="@+id/cust_open_time"
+        android:layout_below="@id/trip_type_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        local:MvxBind="Text 'OPEN: ' + TripCustOpenTime; Visibility(Visibility TripCustOpenTime);"
+        tools:text="OPEN: 0900" />
+    <TextView
+        android:id="@+id/cust_close_time"
+        android:layout_below="@id/cust_open_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_margin_half"
+        local:MvxBind="Text 'CLOSE: ' + TripCustCloseTime; Visibility(Visibility TripCustCloseTime);"
+        tools:text="CLOSE: 1500" />
+    <TextView
+        android:id="@+id/cust_name"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_margin_half"
+        local:MvxBind="Text TripCustName"
+        tools:text="Kaman Aerospace" />
+    <TextView
+        android:id="@+id/cust_address"
+        android:layout_below="@id/cust_name"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        local:MvxBind="Text TripCustAddress1 + TripCustAddress2;"
+        tools:text="123 Main Street" />
+    <TextView
+        android:id="@+id/cust_city_state_zip"
+        android:layout_below="@id/cust_address"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_margin_half"
+        local:MvxBind="Text TripCustCity + ', ' + TripCustState + ' ' + TripCustZip"
+        tools:text="Jacksonville, FL 32233" />
+    <TextView
+        android:id="@+id/trip_comments"
+        android:layout_below="@id/cust_close_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_margin_half"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:singleLine="false"
+        local:MvxBind="Text TripDriverInstructions"
+        tools:text="WWWWWWWWWWWWWWWWWWWWWMMMMMMMMMMMMMMMMMWWWWWWWWWWWWWXXXXXXXXXXXXXXMWWWWWWWWXXXXXXXXXXXXXZZZZZZZZZZZZZZ" />
+</RelativeLayout>

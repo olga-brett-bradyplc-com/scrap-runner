@@ -4,13 +4,13 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
     using Android.OS;
     using ViewModels;
 
-    [Activity(Label = "Power Unit", Theme = "@style/ScrapRunnerTheme.SignIn")]
-    public class PowerUnitView : BaseActivity<PowerUnitViewModel>
+    [Activity(Label = "Route Summary")]
+    public class RouteSummaryView : BaseActivity<RouteSummaryViewModel>
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_powerunit);
+            SetContentView(Resource.Layout.activity_routesummary);
         }
     }
 }
