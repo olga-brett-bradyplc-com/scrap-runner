@@ -10,8 +10,10 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A EventLog record.
     /// </summary>
-    public class EventLog : IHaveCompositeId, IEquatable<EventLog>
+    public class EventLog : IHaveId<int>, IEquatable<EventLog>
     {
+        // The new key populated by autoincrement column
+        public virtual int EventId { get; set;}
         public virtual DateTime EventDateTime { get; set; }
         public virtual int EventSeqNo { get; set; }
         public virtual string EventTerminalId { get; set; }
@@ -24,13 +26,11 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string EventAction { get; set; }
         public virtual string EventComment { get; set; }
 
-        public virtual string Id
+        public virtual int Id
         {
             get
             {
-                //return string.Format("{0};{1}", EventDateTime, EventSeqNo);
-                // "s" is sortable --> 2009-06-15T13:45:30
-                return EventDateTime.ToString("s") + ";" + EventSeqNo;
+                return EventId;
             }
             set
             {
@@ -42,8 +42,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return DateTime.Equals(EventDateTime, other.EventDateTime) 
-                && string.Equals(EventSeqNo, other.EventSeqNo);
+            return EventId == other.EventId;
         }
 
         public override bool Equals(object obj)
@@ -58,8 +57,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             unchecked
             {
-                var hashCode =  (EventDateTime != null ? EventDateTime.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ EventSeqNo.GetHashCode() ;
+                var hashCode = EventId.GetHashCode() ;
                 return hashCode;
             }
         }
