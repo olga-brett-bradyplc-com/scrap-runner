@@ -32,8 +32,8 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             return new TripSegmentContainer
             {
                 TripNumber = identityValues[0],
-                TripSegNumber = identityValues[1],
-                TripSegContainerSeqNumber = int.Parse(identityValues[2]),
+                TripSegContainerSeqNumber = int.Parse(identityValues[1]),
+                TripSegNumber = identityValues[2]
             };
  
         }
@@ -41,8 +41,8 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         public override Expression<Func<TripSegmentContainer, bool >> GetIdentityPredicate(TripSegmentContainer item)
         {
             return x => x.TripNumber == item.TripNumber &&
-                        x.TripSegNumber == item.TripSegNumber &&
-                        x.TripSegContainerSeqNumber == item.TripSegContainerSeqNumber;
+                        x.TripSegContainerSeqNumber == item.TripSegContainerSeqNumber &&
+                        x.TripSegNumber == item.TripSegNumber;
         }
 
         public override Expression<Func<TripSegmentContainer, bool>> GetIdentityPredicate(string id)
@@ -50,8 +50,8 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
 
             return x => x.TripNumber == identityValues[0] &&
-                        x.TripSegNumber == identityValues[1] &&
-                        x.TripSegContainerSeqNumber == int.Parse(identityValues[2]);
+                        x.TripSegContainerSeqNumber == int.Parse(identityValues[1]) &&
+            x.TripSegNumber == identityValues[2];
 
         }
     }
