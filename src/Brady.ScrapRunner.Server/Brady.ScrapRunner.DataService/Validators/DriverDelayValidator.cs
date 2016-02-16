@@ -14,7 +14,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         public DriverDelayValidator()
         {
             RuleFor(x => x.DriverId).NotEmpty();
-            RuleFor(x => x.DelaySeqNumber).NotEmpty();
+            RuleFor(x => x.DelaySeqNumber).GreaterThanOrEqualTo(0);
             RuleFor(x => x.TripNumber).NotEmpty();
         }
 
