@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("EventLog")]
     [DeleteAction("EventLog")]
     public class EventLogRecordType :
-        ChangeableRecordType<EventLog, string, EventLogValidator, EventLogDeletionValidator>
+        ChangeableRecordType<EventLog, int, EventLogValidator, EventLogDeletionValidator>
     {
         public override void ConfigureMapper()
         {
@@ -32,22 +32,19 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
             return new EventLog
             {
-                EventDateTime = DateTime.Parse(identityValues[0]),
-                EventSeqNo = int.Parse(identityValues[1])
+                EventId = int.Parse(identityValues[0])
             };
         }
 
         public override Expression<Func<EventLog, bool>> GetIdentityPredicate(EventLog item)
         {
-            return x => x.EventDateTime == item.EventDateTime &&
-                        x.EventSeqNo == item.EventSeqNo;
+            return x => x.EventId == item.EventId;
         }
 
         public override Expression<Func<EventLog, bool>> GetIdentityPredicate(string id)
         {
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return x => x.EventDateTime == DateTime.Parse(identityValues[0]) &&
-                        x.EventSeqNo == int.Parse(identityValues[1]);
+            return x => x.EventId == int.Parse(identityValues[0]);
         }
 
     }

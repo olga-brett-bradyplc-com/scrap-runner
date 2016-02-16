@@ -15,19 +15,26 @@ namespace Brady.ScrapRunner.DataService.Mappings
         {
             Table("ErrorLog");
 
+            // Mapping suggested by:
+            // http://stackoverflow.com/questions/20925197/using-nhibernate-to-insert-a-new-object-to-sql-server-gives-error-about-identity
+            // http://stackoverflow.com/questions/7279473/using-nhibernate-mapping-by-code-cannot-insert-explicit-value-for-identity-colu
+
+            Id(x => x.ErrorId, m =>
+            {
+                m.UnsavedValue(0);
+                m.Generator(Generators.Identity);
+            });
+
             Property(x => x.Id, m =>
             {
-                m.Formula("CONCAT(CONVERT(VARCHAR(33), ErrorDateTime, 126), ';', ErrorSeqNo)");
+                m.Formula("ErrorId");
                 m.Insert(false);
                 m.Update(false);
+                m.Generated(PropertyGeneration.Never);
             });
 
-            ComposedId(map =>
-            {
-                map.Property(y => y.ErrorDateTime, m => m.Generated(PropertyGeneration.Never));
-                map.Property(y => y.ErrorSeqNo, m => m.Generated(PropertyGeneration.Never));
-            });
-
+            Property(x => x.ErrorDateTime);
+            Property(x => x.ErrorSeqNo);
             Property(x => x.ErrorType);
             Property(x => x.ErrorDescription);
             Property(x => x.ErrorTerminalId);
