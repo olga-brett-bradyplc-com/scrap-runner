@@ -42,6 +42,8 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="Metadata\AreaMasterMetadata.cs" />
+    <Compile Include="Metadata\ContainerHistoryMetadata.cs" />
+    <Compile Include="Metadata\CustomerDirectionsMetadata.cs" />
     <Compile Include="Metadata\ErrorLogMetadata.cs" />
     <Compile Include="Metadata\EventLogMetadata.cs" />
     <Compile Include="Metadata\ContainerMasterMetadata.cs" />
@@ -70,6 +72,8 @@
     <Compile Include="Metadata\TripSegmentMileageMetadata.cs" />
     <Compile Include="Metadata\TripSegmentMetadata.cs" />
     <Compile Include="Models\AreaMaster.cs" />
+    <Compile Include="Models\ContainerHistory.cs" />
+    <Compile Include="Models\CustomerDirections.cs" />
     <Compile Include="Models\ErrorLog.cs" />
     <Compile Include="Models\EventLog.cs" />
     <Compile Include="Models\CodeTable.cs" />

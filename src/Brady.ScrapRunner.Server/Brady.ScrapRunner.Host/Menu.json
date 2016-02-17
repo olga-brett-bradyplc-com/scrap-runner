@@ -29,6 +29,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChange"
             },
             {
+              "text": "ContainerHistory",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerHistory"
+            },
+            {
               "text": "ContainerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerMaster"
             }
@@ -40,6 +44,10 @@
             {
               "text": "CustomerCommodity",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CustomerCommodity"
+            },
+            {
+              "text": "CustomerDirections",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CustomerDirections"
             },
             {
               "text": "CustomerLocation",
