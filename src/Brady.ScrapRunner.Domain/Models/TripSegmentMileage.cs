@@ -26,7 +26,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0};{1};{2}", TripNumber, TripSegNumber, TripSegMileageSeqNumber );
+                return string.Format("{0};{1};{2}", TripNumber, TripSegMileageSeqNumber, TripSegNumber );
             }
             set
             {
@@ -39,8 +39,8 @@ namespace Brady.ScrapRunner.Domain.Models
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return string.Equals(TripNumber, other.TripNumber) 
-                && string.Equals(TripSegNumber, other.TripSegNumber)
-                && TripSegMileageSeqNumber == other.TripSegMileageSeqNumber;
+                && TripSegMileageSeqNumber == other.TripSegMileageSeqNumber
+                && string.Equals(TripSegNumber, other.TripSegNumber);
         }
 
         public override bool Equals(object obj)
@@ -56,8 +56,8 @@ namespace Brady.ScrapRunner.Domain.Models
             unchecked
             {
                 var hashCode = (TripNumber != null ? TripNumber.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (TripSegNumber != null ? TripSegNumber.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ TripSegMileageSeqNumber.GetHashCode();
+                hashCode = (hashCode * 397) ^ (TripSegNumber != null ? TripSegNumber.GetHashCode() : 0);
                 return hashCode;
             }
         }

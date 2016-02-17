@@ -13,7 +13,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         public TripReferenceNumberDeletionValidator()
         {
             RuleFor(x => x.TripNumber).NotEmpty();
-            RuleFor(x => x.TripSeqNumber).NotEmpty();
+            RuleFor(x => x.TripSeqNumber).GreaterThanOrEqualTo(0);
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)

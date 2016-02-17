@@ -53,7 +53,8 @@ namespace Brady.ScrapRunner.DataService.Tests
             string queryString = codeTableQuery.GetQuery();
             QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
 
-            Assert.AreEqual(100, queryResult.TotalCount, queryString);
+            Assert.AreEqual(100, queryResult.Records.Count);
+            Assert.AreEqual(501, queryResult.TotalCount, queryString);
         }
 
         [TestMethod]

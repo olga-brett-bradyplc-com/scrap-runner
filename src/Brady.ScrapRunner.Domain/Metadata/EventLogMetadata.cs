@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
+using BWF.DataServices.Metadata.Fluent.Enums;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
@@ -15,18 +16,17 @@ namespace Brady.ScrapRunner.Domain.Metadata
 
             AutoUpdatesByDefault();
             
-            StringProperty(x => x.Id)
+            IntegerProperty(x => x.Id)
                 .IsHiddenInEditor()
                 .IsNotEditableInGrid();
 
-            StringProperty(x => x.EventDateTime)
+            IntegerProperty(x => x.EventId)
                 .IsId()
-                .DisplayName("Event DateTime");
+                .IsNotEditableInGrid()
+                .DisplayName("Event Id");
 
-            IntegerProperty(x => x.EventSeqNo)
-                .IsId()
-                .DisplayName("Event SeqNo");
-
+            StringProperty(x => x.EventDateTime);
+            IntegerProperty(x => x.EventSeqNo);
             StringProperty(x => x.EventTerminalId);
             StringProperty(x => x.EventRegionId);
             StringProperty(x => x.EventEmployeeId);
@@ -38,6 +38,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.EventComment);
 
             ViewDefaults()
+                .Property(x => x.EventId)
                 .Property(x => x.EventDateTime)
                 .Property(x => x.EventSeqNo)
                 .Property(x => x.EventTerminalId)
@@ -50,8 +51,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.EventAction)
                 .Property(x => x.EventComment)
 
-                .OrderBy(x => x.EventDateTime)
-                .OrderBy(x => x.EventSeqNo);
+                .OrderBy(x => x.EventId, Direction.Descending);
         }
     }
 }

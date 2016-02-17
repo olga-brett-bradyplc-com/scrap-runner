@@ -135,6 +135,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegment"
             },
             {
+              "text": "TripSegmentContainer",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentContainer"
+            },
+            {
               "text": "TripSegmentMileage",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentMileage"
             },

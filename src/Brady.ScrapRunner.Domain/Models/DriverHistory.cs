@@ -56,7 +56,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0};{1};{2}", EmployeeId, TripNumber, DriverSeqNumber);
+                return string.Format("{0};{1};{2}", DriverSeqNumber, EmployeeId, TripNumber);
             }
             set
             {
@@ -68,9 +68,9 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(EmployeeId, other.EmployeeId)
-                && string.Equals(TripNumber, other.TripNumber)
-                && DriverSeqNumber == other.DriverSeqNumber;
+            return DriverSeqNumber == other.DriverSeqNumber
+                && string.Equals(EmployeeId, other.EmployeeId)
+                && string.Equals(TripNumber, other.TripNumber) ;
         }
 
         public override bool Equals(object obj)
@@ -85,9 +85,9 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             unchecked
             {
-                var hashCode = EmployeeId.GetHashCode();
-                hashCode = (hashCode*397) ^ TripNumber.GetHashCode();
-                hashCode = (hashCode*397) ^ DriverSeqNumber;
+                var hashCode = DriverSeqNumber;
+                hashCode = (hashCode * 397) ^ EmployeeId.GetHashCode();
+                hashCode = (hashCode * 397) ^ TripNumber.GetHashCode();
                 return hashCode;
             }
         }

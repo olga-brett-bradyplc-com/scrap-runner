@@ -32,7 +32,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0};{1};{2}", DriverId, DelaySeqNumber, TripNumber);
+                return string.Format("{0};{1};{2}", DelaySeqNumber, DriverId, TripNumber);
             }
             set
             {
@@ -44,8 +44,8 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(DriverId, other.DriverId) 
-                && DelaySeqNumber == other.DelaySeqNumber 
+            return DelaySeqNumber == other.DelaySeqNumber 
+                && string.Equals(DriverId, other.DriverId)
                 && string.Equals(TripNumber, other.TripNumber);
         }
 
@@ -61,8 +61,8 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             unchecked
             {
-                var hashCode = (DriverId != null ? DriverId.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ DelaySeqNumber.GetHashCode();
+                var hashCode = DelaySeqNumber.GetHashCode();
+                hashCode = (hashCode*397) ^ (DriverId != null ? DriverId.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ (TripNumber != null ? TripNumber.GetHashCode() : 0);
                 return hashCode;
             }

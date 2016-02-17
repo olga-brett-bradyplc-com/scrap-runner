@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
+using BWF.DataServices.Metadata.Fluent.Enums;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
@@ -14,19 +15,18 @@ namespace Brady.ScrapRunner.Domain.Metadata
         {
 
             AutoUpdatesByDefault();
-            
-            StringProperty(x => x.Id)
+
+            IntegerProperty(x => x.Id)
                 .IsHiddenInEditor()
                 .IsNotEditableInGrid();
 
-            StringProperty(x => x.ErrorDateTime)
+            IntegerProperty(x => x.ErrorId)
                 .IsId()
-                .DisplayName("Error DateTime");
+                .IsNotEditableInGrid()
+                .DisplayName("Error Id");
 
-            IntegerProperty(x => x.ErrorSeqNo)
-                .IsId()
-                .DisplayName("Error SeqNo");
-
+            StringProperty(x => x.ErrorDateTime);
+            IntegerProperty(x => x.ErrorSeqNo);
             StringProperty(x => x.ErrorTerminalId);
             StringProperty(x => x.ErrorRegionId);
             StringProperty(x => x.ErrorType);
@@ -38,6 +38,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.ErrorTripNumber);
 
             ViewDefaults()
+                .Property(x => x.ErrorId)
                 .Property(x => x.ErrorDateTime)
                 .Property(x => x.ErrorSeqNo)
                 .Property(x => x.ErrorType)
@@ -48,8 +49,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.ErrorContainerNumber)
                 .Property(x => x.ErrorTripNumber)
 
-                .OrderBy(x => x.ErrorDateTime)
-                .OrderBy(x => x.ErrorSeqNo);
+                .OrderBy(x => x.ErrorId, Direction.Descending);
         }
     }
 }

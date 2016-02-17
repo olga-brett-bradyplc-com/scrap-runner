@@ -12,8 +12,9 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public ErrorLogDeletionValidator()
         {
-            RuleFor(x => x.ErrorDateTime).NotEmpty();
-            RuleFor(x => x.ErrorSeqNo).NotEmpty();
+            RuleFor(x => x.ErrorId).NotEmpty();
+            //RuleFor(x => x.ErrorDateTime).NotEmpty();
+            //RuleFor(x => x.ErrorSeqNo).GreaterThanOrEqualTo(0);
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)
