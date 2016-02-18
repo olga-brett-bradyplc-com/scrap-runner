@@ -15,7 +15,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         {
             RuleFor(x => x.EmployeeId).NotEmpty();
             RuleFor(x => x.TripNumber).NotEmpty();
-            RuleFor(x => x.DriverSeqNumber).NotEmpty();
+            RuleFor(x => x.DriverSeqNumber).GreaterThanOrEqualTo(0);
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)

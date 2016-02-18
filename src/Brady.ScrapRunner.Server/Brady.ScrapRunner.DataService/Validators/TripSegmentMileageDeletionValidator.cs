@@ -14,7 +14,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         {
             RuleFor(x => x.TripNumber).NotEmpty();
             RuleFor(x => x.TripSegNumber).NotEmpty();
-            RuleFor(x => x.TripSegMileageSeqNumber).NotEmpty();
+            RuleFor(x => x.TripSegMileageSeqNumber).GreaterThanOrEqualTo(0);
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)

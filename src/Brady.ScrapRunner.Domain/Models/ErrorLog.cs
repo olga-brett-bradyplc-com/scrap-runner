@@ -10,8 +10,9 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A ErrorLog record.
     /// </summary>
-    public class ErrorLog : IHaveCompositeId, IEquatable<ErrorLog>
+    public class ErrorLog : IHaveId<int>, IEquatable<ErrorLog>
     {
+        public virtual int ErrorId { get; set; }
         public virtual DateTime ErrorDateTime { get; set; }
         public virtual int ErrorSeqNo { get; set; }
         public virtual string ErrorType { get; set; }
@@ -22,12 +23,11 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string ErrorContainerNumber { get; set; }
         public virtual string ErrorTripNumber { get; set; }
 
-        public virtual string Id
+        public virtual int Id
         {
             get
             {
-                // "s" is sortable --> 2009-06-15T13:45:30
-                return ErrorDateTime.ToString("s") + ";" + ErrorSeqNo;
+                return ErrorId;
             }
             set
             {
@@ -39,8 +39,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return DateTime.Equals(ErrorDateTime, other.ErrorDateTime) 
-                && string.Equals(ErrorSeqNo, other.ErrorSeqNo);
+            return ErrorId == other.ErrorId;
         }
 
         public override bool Equals(object obj)
@@ -55,8 +54,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             unchecked
             {
-                var hashCode =  (ErrorDateTime != null ? ErrorDateTime.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ ErrorSeqNo.GetHashCode() ;
+                var hashCode = ErrorId.GetHashCode() ;
                 return hashCode;
             }
         }

@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("ErrorLog")]
     [DeleteAction("ErrorLog")]
     public class ErrorLogRecordType :
-        ChangeableRecordType<ErrorLog, string, ErrorLogValidator, ErrorLogDeletionValidator>
+        ChangeableRecordType<ErrorLog, int, ErrorLogValidator, ErrorLogDeletionValidator>
     {
         public override void ConfigureMapper()
         {
@@ -32,22 +32,19 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
             return new ErrorLog
             {
-                ErrorDateTime = DateTime.Parse(identityValues[0]),
-                ErrorSeqNo = int.Parse(identityValues[1])
+                ErrorId = int.Parse(identityValues[0])
             };
         }
 
         public override Expression<Func<ErrorLog, bool>> GetIdentityPredicate(ErrorLog item)
         {
-            return x => x.ErrorDateTime == item.ErrorDateTime &&
-                        x.ErrorSeqNo == item.ErrorSeqNo;
+            return x => x.ErrorId == item.ErrorId;
         }
 
         public override Expression<Func<ErrorLog, bool>> GetIdentityPredicate(string id)
         {
             var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return x => x.ErrorDateTime == DateTime.Parse(identityValues[0]) &&
-                        x.ErrorSeqNo == int.Parse(identityValues[1]);
+            return x => x.ErrorId == int.Parse(identityValues[0]);
         }
 
     }

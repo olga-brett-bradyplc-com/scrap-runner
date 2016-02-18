@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NHibernate.Cfg.MappingSchema;
 
 namespace Brady.ScrapRunner.DataService.Mappings
 {
@@ -15,19 +16,26 @@ namespace Brady.ScrapRunner.DataService.Mappings
         {
             Table("EventLog");
 
+            // Mapping suggested by
+            // http://stackoverflow.com/questions/20925197/using-nhibernate-to-insert-a-new-object-to-sql-server-gives-error-about-identity
+            // http://stackoverflow.com/questions/7279473/using-nhibernate-mapping-by-code-cannot-insert-explicit-value-for-identity-colu
+
+            Id(x => x.EventId, m =>
+            {
+                m.UnsavedValue(0);
+                m.Generator(Generators.Identity);
+            });
+
             Property(x => x.Id, m =>
             {
-                m.Formula("CONCAT(CONVERT(VARCHAR(33), EventDateTime, 126), ';', EventSeqNo)");
+                m.Formula("EventId");
                 m.Insert(false);
                 m.Update(false);
+                m.Generated(PropertyGeneration.Never);
             });
 
-            ComposedId(map =>
-            {
-                map.Property(y => y.EventDateTime, m => m.Generated(PropertyGeneration.Never));
-                map.Property(y => y.EventSeqNo, m => m.Generated(PropertyGeneration.Never));
-            });
-
+            Property(x => x.EventDateTime);
+            Property(x => x.EventSeqNo);
             Property(x => x.EventTerminalId);
             Property(x => x.EventRegionId);
             Property(x => x.EventEmployeeId);

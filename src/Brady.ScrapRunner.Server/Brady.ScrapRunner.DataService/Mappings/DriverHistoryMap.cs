@@ -17,16 +17,16 @@ namespace Brady.ScrapRunner.DataService.Mappings
 
             Property(x => x.Id, m =>
             {
-                m.Formula("concat(EmployeeId, ';', TripNumber, ';', DriverSeqNumber)");
+                m.Formula("concat(DriverSeqNumber, ';', EmployeeId, ';', TripNumber)");
                 m.Insert(false);
                 m.Update(false);
             });
 
             ComposedId(map =>
             {
+                map.Property(y => y.DriverSeqNumber, m => m.Generated(PropertyGeneration.Never));
                 map.Property(y => y.EmployeeId, m => m.Generated(PropertyGeneration.Never));
                 map.Property(y => y.TripNumber, m => m.Generated(PropertyGeneration.Never));
-                map.Property(y => y.DriverSeqNumber, m => m.Generated(PropertyGeneration.Never));
             });
 
             Property(x => x.TripSegNumber);
