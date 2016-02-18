@@ -17,7 +17,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         public PowerHistoryDeletionValidator()
         {
             RuleFor(x => x.PowerId).NotEmpty();
-            RuleFor(x => x.PowerSeqNumber).NotEmpty();
+            RuleFor(x => x.PowerSeqNumber).GreaterThanOrEqualTo(0);
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)
