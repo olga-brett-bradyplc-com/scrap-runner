@@ -69,6 +69,7 @@
     <Compile Include="Validators\UsernameValidator.cs" />
     <Compile Include="ViewModels\ScaleDetailViewModel.cs" />
     <Compile Include="ViewModels\ScaleSummaryViewModel.cs" />
+    <Compile Include="ViewModels\TransactionConfirmationViewModel.cs" />
     <Compile Include="ViewModels\TransactionDetailViewModel.cs" />
     <Compile Include="ViewModels\TransactionSummaryViewModel.cs" />
     <Compile Include="ViewModels\ChangeLanguageViewModel.cs" />
