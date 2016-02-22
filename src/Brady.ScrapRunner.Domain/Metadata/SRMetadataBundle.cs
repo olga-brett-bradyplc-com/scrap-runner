@@ -18,6 +18,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new ContainerChangeMetadata()
                   , new ContainerHistoryMetadata()
                   , new ContainerMasterMetadata()
+                  , new ContainerQuantityMetadata()
+                  , new ContainerQuantityHistoryMetadata()
                   , new CustomerCommodityMetadata()
                   , new CustomerDirectionsMetadata()
                   , new CustomerLocationMetadata()
@@ -26,6 +28,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new DriverEfficiencyMetadata()
                   , new DriverHistoryMetadata()
                   , new DriverStatusMetadata()
+                  , new EmployeeAreaMetadata()
                   , new EmployeeMasterMetadata()
                   , new ErrorLogMetadata()
                   , new EventLogMetadata()
@@ -39,9 +42,10 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new TripMetadata()
                   , new TripReferenceNumberMetadata()
                   , new TripSegmentMetadata()
+                  , new TripSegmentContainerMetadata()
                   , new TripSegmentMileageMetadata() 
                   , new TripTypeBasicMetadata()
-                  , new TripSegmentContainerMetadata()
+                  , new TripTypeMasterDescMetadata()
             )
         {
             

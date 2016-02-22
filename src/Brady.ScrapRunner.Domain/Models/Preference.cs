@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
+    /// <summary>
+    /// A Preference record.
+    /// </summary>
+
     public class Preference : IHaveCompositeId, IEquatable<Preference>
     {
         public virtual string TerminalId { get; set; }
