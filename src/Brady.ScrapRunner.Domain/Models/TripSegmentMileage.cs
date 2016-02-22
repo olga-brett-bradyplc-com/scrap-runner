@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
+    /// <summary>
+    /// A TripSegmentMileage record.
+    /// </summary>
     public class TripSegmentMileage : IHaveCompositeId, IEquatable<TripSegmentMileage>
     {
         public virtual string TripNumber { get; set; }
