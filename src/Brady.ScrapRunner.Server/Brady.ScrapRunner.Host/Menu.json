@@ -35,6 +35,14 @@
             {
               "text": "ContainerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerMaster"
+            },
+            {
+              "text": "ContainerQuantity",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerQuantity"
+            },
+            {
+              "text": "ContainerQuantityHistory",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerQuantityHistory"
             }
           ]
         },
@@ -81,8 +89,17 @@
           ]
         },
         {
-          "text": "EmployeeMaster",
-          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
+          "text": "Employee",
+          "items": [
+            {
+              "text": "EmployeeArea",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeArea"
+            },
+            {
+              "text": "EmployeeMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
+            }
+          ]
         },
         {
           "text": "Logs",
@@ -157,10 +174,19 @@
             {
               "text": "TripSegmentMileage",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentMileage"
-            },
+            }
+          ]
+        },
+        {
+          "text": "Trip Type",
+          "items": [
             {
               "text": "TripTypeBasic",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeBasic"
+            },
+            {
+              "text": "TripTypeMasterDesc",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeMasterDesc"
             }
           ]
         }

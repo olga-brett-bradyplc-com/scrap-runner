@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.DataService.Mappings
 {
+    /// <summary>
+    /// An TripSegmentContainer mapping to NHibernate.
+    /// </summary>
     public class TripSegmentContainerMap : ClassMapping<TripSegmentContainer>
     {
         public TripSegmentContainerMap()

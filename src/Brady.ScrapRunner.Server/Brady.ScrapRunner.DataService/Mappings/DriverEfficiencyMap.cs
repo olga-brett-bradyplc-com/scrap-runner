@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.DataService.Mappings
 {
+    /// <summary>
+    /// An DriverEfficiency mapping to NHibernate.
+    /// </summary>
     public class DriverEfficiencyMap : ClassMapping<DriverEfficiency>
     {
         public DriverEfficiencyMap()

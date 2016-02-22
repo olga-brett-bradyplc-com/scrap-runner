@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.DataService.Mappings
 {
+    /// <summary>
+    /// An DriverHistory mapping to NHibernate.
+    /// </summary>
     public class DriverHistoryMap : ClassMapping<DriverHistory>
     {
         public DriverHistoryMap()

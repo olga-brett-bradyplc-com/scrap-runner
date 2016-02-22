@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
+    /// <summary>
+    /// A TripReferenceNumber record.
+    /// </summary>
     public class TripReferenceNumber : IHaveCompositeId, IEquatable<TripReferenceNumber>
     {
         public virtual string TripNumber { get; set; }
