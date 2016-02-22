@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
+    /// <summary>
+    /// A PowerFuel record.
+    /// </summary>
+
     public class PowerFuel : IHaveCompositeId, IEquatable<PowerFuel>
     {
         public virtual string PowerId { get; set; }
