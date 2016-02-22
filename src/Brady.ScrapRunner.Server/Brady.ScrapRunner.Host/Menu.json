@@ -67,6 +67,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverDelay"
             },
             {
+              "text": "DriverEfficiency",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverEfficiency"
+            },
+            {
               "text": "DriverHistory",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverHistory"
             },
@@ -96,6 +100,10 @@
         {
           "text": "Power",
           "items": [
+            {
+              "text": "PowerFuel",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerFuel"
+            },
             {
               "text": "PowerHistory",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerHistory"
