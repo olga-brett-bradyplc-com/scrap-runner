@@ -7,6 +7,10 @@ using BWF.DataServices.Metadata.Interfaces;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
+    /// <summary>
+    /// A CustomerDirections record.
+    /// </summary>
+    
     public class CustomerDirections : IHaveCompositeId,IEquatable<CustomerDirections>
     {
         public virtual string CustHostCode { get; set; }

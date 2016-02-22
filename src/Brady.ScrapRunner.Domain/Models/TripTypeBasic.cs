@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
+    /// <summary>
+    /// A TripTypeBasic record.
+    /// </summary>
+
     public class TripTypeBasic : IHaveCompositeId, IEquatable<TripTypeBasic>
     {
         public virtual string TripTypeCode { get; set; }

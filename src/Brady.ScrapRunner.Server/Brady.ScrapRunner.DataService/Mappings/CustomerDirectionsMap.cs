@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.DataService.Mappings
 {
+    /// <summary>
+    /// An CustomerDirections mapping to NHibernate.
+    /// </summary>
     public class CustomerDirectionsMap : ClassMapping<CustomerDirections>
     {
         public CustomerDirectionsMap()

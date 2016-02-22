@@ -35,6 +35,14 @@
             {
               "text": "ContainerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerMaster"
+            },
+            {
+              "text": "ContainerQuantity",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerQuantity"
+            },
+            {
+              "text": "ContainerQuantityHistory",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerQuantityHistory"
             }
           ]
         },
@@ -67,6 +75,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverDelay"
             },
             {
+              "text": "DriverEfficiency",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverEfficiency"
+            },
+            {
               "text": "DriverHistory",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverHistory"
             },
@@ -77,8 +89,17 @@
           ]
         },
         {
-          "text": "EmployeeMaster",
-          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
+          "text": "Employee",
+          "items": [
+            {
+              "text": "EmployeeArea",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeArea"
+            },
+            {
+              "text": "EmployeeMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
+            }
+          ]
         },
         {
           "text": "Logs",
@@ -96,6 +117,10 @@
         {
           "text": "Power",
           "items": [
+            {
+              "text": "PowerFuel",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerFuel"
+            },
             {
               "text": "PowerHistory",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerHistory"
@@ -149,10 +174,19 @@
             {
               "text": "TripSegmentMileage",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentMileage"
-            },
+            }
+          ]
+        },
+        {
+          "text": "Trip Type",
+          "items": [
             {
               "text": "TripTypeBasic",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeBasic"
+            },
+            {
+              "text": "TripTypeMasterDesc",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeMasterDesc"
             }
           ]
         }
