@@ -1,10 +1,13 @@
+using Android.Content.PM;
+
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
     using Android.App;
     using Android.OS;
     using ViewModels;
 
-    [Activity(Label = "Power Unit", Theme = "@style/ScrapRunnerTheme.SignIn")]
+    [Activity(Label = "Power Unit", Theme = "@style/ScrapRunnerTheme.SignIn",
+        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
     public class PowerUnitView : BaseActivity<PowerUnitViewModel>
     {
         protected override void OnCreate(Bundle savedInstanceState)

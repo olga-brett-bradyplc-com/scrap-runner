@@ -1,3 +1,5 @@
+using Android.Content.PM;
+
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
     using Android.App;
@@ -7,7 +9,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
     [Activity(
         Name = "com.bradyplc.scraprunner.SignInView",
         Label = "Sign In",
-        Theme = "@style/ScrapRunnerTheme.SignIn")]
+        Theme = "@style/ScrapRunnerTheme.SignIn",
+        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
     public class SignInView : BaseActivity<SignInViewModel>
     {
         protected override void OnCreate(Bundle savedInstanceState)
