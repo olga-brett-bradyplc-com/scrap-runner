@@ -29,30 +29,28 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             SubTitle = $"Trip {tripNumber}";
         }
 
-        public override void Start()
+        public override async void Start()
         {
-            Task.Run(async () =>
+            var containersTrip = await _tripSegmentRepository.AsQueryable()
+                .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
+            var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
+            var groupedContainers = from details in containerSegments
+                orderby details.TripSegNumber
+                group details by new {details.TripNumber, details.TripSegNumber}
+                into detailsGroup
+                select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
+                    tsm =>
+                        (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber +
+                                                                    detailsGroup.Key.TripSegNumber)
+                    ), detailsGroup);
+            if (containersTrip.Any())
             {
-                var containersTrip = await _tripSegmentRepository.AsQueryable()
-                    .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
-                var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
-                    .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
-                var groupedContainers = from details in containerSegments
-                    orderby details.TripSegNumber
-                    group details by new {details.TripNumber, details.TripSegNumber}
-                    into detailsGroup
-                    select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
-                        tsm =>
-                            (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber +
-                                                                        detailsGroup.Key.TripSegNumber)
-                        ), detailsGroup);
-                if (containersTrip.Any())
-                {
-                    TransactionList =
-                        new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
-                            groupedContainers);
-                }
-            });
+                TransactionList =
+                    new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
+                        groupedContainers);
+            }
+            
             base.Start();
         }
 
