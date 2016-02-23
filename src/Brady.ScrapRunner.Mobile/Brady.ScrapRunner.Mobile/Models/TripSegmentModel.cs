@@ -16,5 +16,11 @@
         public string TripSegType { get; set; }
         [MaxLength(35)]
         public string TripSegTypeDesc { get; set; }
+        [MaxLength(30)]
+        public string TripSegComments { get; set; }
+        [MaxLength(35)]
+        public string TripSegOrigCustName { get; set; }
+        [MaxLength(10)]
+        public string TripSegOrigCustHostCode { get; set; }
     }
 }

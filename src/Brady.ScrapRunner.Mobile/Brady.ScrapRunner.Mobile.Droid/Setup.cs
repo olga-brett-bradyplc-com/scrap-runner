@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using Android.Views;
+using MvvmCross.Platform.IoC;
+
 namespace Brady.ScrapRunner.Mobile.Droid
 {
     using Android.Content;
@@ -13,6 +17,22 @@ namespace Brady.ScrapRunner.Mobile.Droid
         protected override IMvxApplication CreateApp()
         {
             return new App();
+        }
+
+        protected override IDictionary<string, string> ViewNamespaceAbbreviations
+        {
+            get
+            {
+                var abbreviations = base.ViewNamespaceAbbreviations;
+                abbreviations["MvxExt"] = "Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView";
+                return abbreviations;
+            }
+        }
+
+        protected override void FillViewTypes(IMvxTypeCache<View> cache)
+        {
+            base.FillViewTypes(cache);
+            cache.AddAssembly(typeof(Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView.BindableGroupListView).Assembly);
         }
     }
 }
