@@ -1,18 +1,18 @@
-﻿using BWF.DataServices.Metadata.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using BWF.DataServices.Metadata.Interfaces;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
     /// <summary>
-    /// A TripSegment record.
+    /// A HistTripSegment record.
     /// </summary>
-    public class TripSegment : IHaveCompositeId, IEquatable<TripSegment>
+    public class HistTripSegment : IHaveCompositeId, IEquatable<HistTripSegment>
     {
+        public virtual int HistSeqNo { get; set; }
         public virtual string TripNumber { get; set; }
         public virtual string TripSegNumber { get; set; }
         public virtual string TripSegStatus { get; set; }
@@ -84,7 +84,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0};{1}", TripNumber, TripSegNumber);
+                return string.Format("{0};{1};{2}", HistSeqNo, TripNumber, TripSegNumber);
             }
             set
             {
@@ -92,11 +92,12 @@ namespace Brady.ScrapRunner.Domain.Models
             }
         }
 
-        public virtual bool Equals(TripSegment other)
+        public virtual bool Equals(HistTripSegment other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(TripNumber, other.TripNumber) && 
+            return HistSeqNo == other.HistSeqNo && 
+                   string.Equals(TripNumber, other.TripNumber) && 
                    string.Equals(TripSegNumber, other.TripSegNumber);
         }
 
@@ -105,15 +106,16 @@ namespace Brady.ScrapRunner.Domain.Models
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((TripSegment) obj);
+            return Equals((HistTripSegment)obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                var hashCode = (TripNumber != null ? TripNumber.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (TripSegNumber != null ? TripSegNumber.GetHashCode() : 0);
+                var hashCode = HistSeqNo.GetHashCode();
+                hashCode = (hashCode * 397) ^ (TripNumber != null ? TripNumber.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (TripSegNumber != null ? TripSegNumber.GetHashCode() : 0);
                 return hashCode;
             }
         }

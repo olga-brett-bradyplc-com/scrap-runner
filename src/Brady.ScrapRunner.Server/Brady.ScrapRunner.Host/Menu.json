@@ -102,6 +102,31 @@
           ]
         },
         {
+          "text": "History",
+          "items": [
+            {
+              "text": "HistTrip",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/HistTrip"
+            },
+            {
+              "text": "HistTripReferenceNumber",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/HistTripReferenceNumber"
+            },
+            {
+              "text": "HistTripSegment",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/HistTripSegment"
+            },
+            {
+              "text": "HistTripSegmentContainer",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/HistTripSegmentContainer"
+            },
+            {
+              "text": "HistTripSegmentMileage",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/HistTripSegmentMileage"
+            }
+          ]
+        },
+        {
           "text": "Logs",
           "items": [
             {
