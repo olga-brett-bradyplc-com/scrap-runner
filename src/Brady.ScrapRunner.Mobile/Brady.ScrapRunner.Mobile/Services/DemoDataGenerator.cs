@@ -93,6 +93,16 @@
             await _tripSegmentContainerRepository.InsertAsync(new TripSegmentContainerModel
             {
                 TripNumber = "615112",
+                TripSegNumber = "01",
+                TripSegContainerNumber = string.Empty,
+                TripSegContainerType = "LU",
+                TripSegContainerSize = "20",
+                TripSegContainerCommodityDesc = "#20 TIN/ALUMINUM MIX",
+                TripSegContainerLocation = "DOCK DOOR 3"
+            });
+            await _tripSegmentContainerRepository.InsertAsync(new TripSegmentContainerModel
+            {
+                TripNumber = "615112",
                 TripSegNumber = "02",
                 TripSegContainerNumber = string.Empty,
                 TripSegContainerType = "LU",
@@ -123,7 +133,20 @@
                 TripNumber = "615113",
                 TripSegNumber = "01",
                 TripSegType = "RT",
-                TripSegTypeDesc = "RETURN TO YARD"
+                TripSegTypeDesc = "RETURN TO YARD",
+                TripSegComments = "Special Notes? Special Notes.",
+                TripSegOrigCustName = "Jay's Scrap Metal",
+                TripSegOrigCustHostCode = "JAY450"
+            });
+            await _tripSegmentContainerRepository.InsertAsync(new TripSegmentContainerModel
+            {
+                TripNumber = "615113",
+                TripSegNumber = "01",
+                TripSegContainerNumber = string.Empty,
+                TripSegContainerType = "LU",
+                TripSegContainerSize = "20",
+                TripSegContainerCommodityDesc = "3210 Tin/Iron Mix",
+                TripSegContainerLocation = "DOCK DOOR 20"
             });
             await _tripRepository.InsertAsync(new TripModel
             {
