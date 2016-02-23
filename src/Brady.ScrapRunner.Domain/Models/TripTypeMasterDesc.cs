@@ -53,7 +53,6 @@ namespace Brady.ScrapRunner.Domain.Models
             unchecked
             {
                 var hashCode = (TripTypeCode != null ? TripTypeCode.GetHashCode() : 0);
-                //hashCode = (hashCode*397) ^ (TripTypeBasicSegNumber != null ? TripTypeBasicSegNumber.GetHashCode() : 0);
                 return hashCode;
             }
         }

@@ -86,8 +86,8 @@ namespace Brady.ScrapRunner.Domain.Models
             unchecked
             {
                 var hashCode = DriverSeqNumber;
-                hashCode = (hashCode * 397) ^ EmployeeId.GetHashCode();
-                hashCode = (hashCode * 397) ^ TripNumber.GetHashCode();
+                hashCode = (hashCode * 397) ^ (EmployeeId != null ? EmployeeId.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (TripNumber != null ? TripNumber.GetHashCode() : 0);
                 return hashCode;
             }
         }

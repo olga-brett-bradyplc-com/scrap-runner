@@ -43,9 +43,9 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(PowerFuelSeqNumber, other.PowerFuelSeqNumber)
-                && PowerId == other.PowerId
-                && string.Equals(TripNumber, other.TripNumber);
+            return string.Equals(PowerId, other.PowerId) && 
+                   PowerFuelSeqNumber == other.PowerFuelSeqNumber &&         
+                   string.Equals(TripNumber, other.TripNumber);
         }
 
         public override bool Equals(object obj)

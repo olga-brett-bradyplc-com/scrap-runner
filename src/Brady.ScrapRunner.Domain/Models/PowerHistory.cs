@@ -67,7 +67,7 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual bool Equals(PowerHistory other)
         {
             return string.Equals(PowerId, other.PowerId) &&
-                    string.Equals(PowerSeqNumber, other.PowerSeqNumber);
+                    PowerSeqNumber == other.PowerSeqNumber;
         }
 
         public override bool Equals(object obj)
