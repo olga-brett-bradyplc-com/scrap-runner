@@ -1,4 +1,10 @@
-﻿namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Mobile.Helpers;
+using Brady.ScrapRunner.Mobile.Interfaces;
+
+namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System.Collections.ObjectModel;
     using Models;
@@ -6,20 +12,65 @@
 
     public class ScaleSummaryViewModel : BaseViewModel
     {
-        public ScaleSummaryViewModel()
+        private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
+        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
+          
+        public ScaleSummaryViewModel(
+            IRepository<TripSegmentModel> tripSegmentRepository,
+            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository )
         {
-            Title = "Yard/Scale";
-            ItemList = CreateDummyData();
-            ContainerSelectedCommand = new MvxCommand(ExecuteContainerSelectedCommand);
+            _tripSegmentRepository = tripSegmentRepository;
+            _tripSegmentContainerRepository = tripSegmentContainerRepository;
+
+            Title = "Yard/Scale Summary";
+
+            ContainerSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteContainerSelectedCommand);
+        }
+
+        public void Init(string tripNumber)
+        {
+            TripNumber = tripNumber;
+            SubTitle = $"Trip {TripNumber}";
+        }
+
+        public override async void Start()
+        {
+            var containersTrip = await _tripSegmentRepository.AsQueryable()
+                .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
+            var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
+            var groupedContainers = from details in containerSegments
+                orderby details.TripSegNumber
+                group details by new {details.TripNumber, details.TripSegNumber}
+                into detailsGroup
+                select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
+                    tsm =>
+                        (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber +
+                                                                    detailsGroup.Key.TripSegNumber)
+                    ), detailsGroup);
+            if (containersTrip.Any())
+            {
+                TransactionList =
+                    new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
+                        groupedContainers);
+            }
+
+            base.Start();
         }
 
         // Listview bindings
-        public ObservableCollection<ContainerMasterModel> ItemList { get; private set; }
+        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> TransactionList { get; private set; }
 
         // Command bindings
-        public MvxCommand ContainerSelectedCommand { get; private set; }
+        public MvxCommand<TripSegmentContainerModel> ContainerSelectedCommand { get; private set; }
 
         // Field bindings
+        private string _tripNumber;
+        public string TripNumber
+        {
+            get { return _tripNumber; }
+            set { SetProperty(ref _tripNumber, value); }
+        }
         private ContainerMasterModel _containerSelected;
         public ContainerMasterModel ContainerSelected
         {
@@ -28,29 +79,15 @@
         }
 
         // Command impl
-        public void ExecuteContainerSelectedCommand()
+        public void ExecuteContainerSelectedCommand(TripSegmentContainerModel selectedSegment)
         {
             Close(this);
-            ShowViewModel<ScaleDetailViewModel>();
-        }
-
-        // @TODO : Refactor using repositories
-        private ObservableCollection<ContainerMasterModel> CreateDummyData()
-        {
-            return new ObservableCollection<ContainerMasterModel>
+            ShowViewModel<ScaleDetailViewModel>(new
             {
-                new ContainerMasterModel
-                {
-                    ContainerNumber = "89999",
-                    ContainerType = "LUGGER",
-                    ContainerSize = "20",
-                    ContainerLocation = "DOCK DOOR 14",
-                    ContainerCustHostCode = "KAMAN450",
-                    ContainerStatus = "C",
-                    ContainerCommodityCode = "1234",
-                    ContainerCommodityDesc = "#15 SHEARING IRON"
-                }
-            };
+                tripNumber = selectedSegment.TripNumber,
+                tripSegNumber = selectedSegment.TripSegNumber,
+                tripSegContainerNumber = selectedSegment.TripSegContainerNumber
+            });
         }
     }
 }

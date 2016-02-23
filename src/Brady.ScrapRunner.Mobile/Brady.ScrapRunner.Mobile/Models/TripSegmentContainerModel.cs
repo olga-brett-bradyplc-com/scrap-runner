@@ -64,5 +64,23 @@
         public string TripSegContainerOnTruck { get; set; }
 
         public int? TripSegContainerLevel { get; set; }
+
+        // Convenience methods
+        [Ignore]
+        public string DefaultTripSegContainerSeqNumber
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(TripSegContainerNumber))
+                {
+                    return "<NO NUMBER>";
+                }
+                else
+                {
+                    return TripSegContainerNumber;
+                }
+                
+            }
+        }
     }
 }
