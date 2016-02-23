@@ -1,37 +1,34 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Models;
+using MvvmCross.Core.ViewModels;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using Helpers;
-    using Models;
-    using MvvmCross.Core.ViewModels;
-
-    public class TransactionSummaryViewModel : BaseViewModel
+    public class TransactionConfirmationViewModel : BaseViewModel
     {
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
-        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository; 
+        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
 
-        public TransactionSummaryViewModel(
+        public TransactionConfirmationViewModel(
             IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository )
+            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
         {
             _tripSegmentRepository = tripSegmentRepository;
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
-            Title = "Transactions";
+            Title = "Signature Receipt";
+            ConfirmTransactionsCommand = new MvxCommand(ExecuteConfirmTransactionsCommand);
         }
 
-        // Initialize parameter passed from Route Detail Screen
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
-            SubTitle = TripNumber;
-            ConfirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand);
+            SubTitle = $"Trip {tripNumber}";
         }
 
-        // Grab all relevant data
         public override async void Start()
         {
             var containersTrip = await _tripSegmentRepository.AsQueryable()
@@ -53,22 +50,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
                         groupedContainers);
             }
-
+            
             base.Start();
         }
-
-        // Listview bindings
-        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _transactionList;
-        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> TransactionList
-        {
-            get {  return _transactionList; }
-            set { SetProperty(ref _transactionList, value); }
-        }
-
-        // Command bindings
-        public MvxCommand TransactionSelectedCommand { get; private set; }
-        public MvxCommand TransactionScannedCommand { get; private set; }
-        public MvxCommand ConfirmationSelectedCommand { get; private set; }
 
         // Field bindings
         private string _tripNumber;
@@ -78,16 +62,27 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _tripNumber, value); }
         }
 
-        // Command impl
-        public void ExecuteTransactionSelectedCommand()
+        // Listview bindings
+        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _transactionList;
+        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> TransactionList
         {
-            ShowViewModel<TransactionDetailViewModel>();
+            get { return _transactionList; }
+            set { SetProperty(ref _transactionList, value); }
         }
 
-        public void ExecuteConfirmationSelectedCommand()
+
+        // Command bindings
+        public MvxCommand ConfirmTransactionsCommand { get; private set; }
+
+        // Command Impl
+        private void ExecuteConfirmTransactionsCommand()
         {
+            // @TODO : Impement TripMaster logic so we know what a particular trip is composed of
+            // @TODO : That is, Switch Trip => (Drop Empty, Pickup Full) then (Return To Yard)
+            // This is hardcoded until the above is resolved
             Close(this);
-            ShowViewModel<TransactionConfirmationViewModel>(new {tripNumber = TripNumber});
+            ShowViewModel<RouteDetailViewModel>(new {tripNumber = "615113"});
         }
+
     }
 }
