@@ -39,40 +39,37 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripNumber = tripNumber;
         }
 
-        public override void Start()
+        public override async void Start()
         {
-            Task.Run(async () =>
+            var trip = await _tripRepository.FindAsync(t => t.TripNumber == TripNumber);
+
+            if (trip != null)
             {
-                var trip = await _tripRepository.FindAsync(t => t.TripNumber == TripNumber);
+                _custHostCode = trip.TripCustHostCode;
+                Title = trip.TripTypeDesc;
+                SubTitle = $"Trip {trip.TripNumber}";
+                TripCustName = trip.TripCustName;
+                TripDriverInstructions = trip.TripDriverInstructions;
+                TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;
+                TripCustCityStateZip = $"{trip.TripCustCity}, {trip.TripCustState} {trip.TripCustZip}";
+                TripType = trip.TripType;
 
-                if (trip != null)
+                var containersTrip = await _tripSegmentRepository.AsQueryable()
+                    .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
+                var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
+                    .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
+                var groupedContainers = from details in containerSegments
+                                        orderby details.TripSegNumber
+                                        group details by new { details.TripNumber, details.TripSegNumber }
+                                        into detailsGroup
+                                        select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
+                                                tsm => (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber + detailsGroup.Key.TripSegNumber)
+                                            ), detailsGroup);
+                if (containersTrip.Any())
                 {
-                    _custHostCode = trip.TripCustHostCode;
-                    Title = trip.TripTypeDesc;
-                    SubTitle = $"Trip {trip.TripNumber}";
-                    TripCustName = trip.TripCustName;
-                    TripDriverInstructions = trip.TripDriverInstructions;
-                    TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;
-                    TripCustCityStateZip = $"{trip.TripCustCity}, {trip.TripCustState} {trip.TripCustZip}";
-                    TripType = trip.TripType;
-
-                    var containersTrip = await _tripSegmentRepository.AsQueryable()
-                        .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
-                    var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
-                        .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
-                    var groupedContainers = from details in containerSegments
-                                            orderby details.TripSegNumber
-                                            group details by new { details.TripNumber, details.TripSegNumber }
-                                            into detailsGroup
-                                            select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
-                                                    tsm => (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber + detailsGroup.Key.TripSegNumber)
-                                                ), detailsGroup);
-                    if (containersTrip.Any())
-                    {
-                        Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(groupedContainers);
-                    }
+                    Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(groupedContainers);
                 }
-            });
+            }
 
             base.Start();
         }
