@@ -9,7 +9,17 @@
     {
         public ChangeLanguageViewModel()
         {
-            ChangeLanguageCommand = new MvxCommand<CultureInfo>(ExecuteChangeLanguageCommand);
+            Title = AppResources.ChangeLanguage;
+            SelectLanguageCommand = new MvxCommand<CultureInfo>(ExecuteSelectLanguageCommand);
+            CultureInfo currentCulture = CultureInfo.CurrentCulture;
+            CultureInfo newCulture;
+            if (currentCulture.Name.Equals("es"))
+                newCulture = new CultureInfo("en-US");
+            else if (currentCulture.Name.Equals("en-US") || currentCulture.Name.Equals("en"))
+                newCulture = new CultureInfo("es");
+            else
+                newCulture = new CultureInfo("en-US");
+            Languages.Add(newCulture);
         }
 
         private ObservableCollection<CultureInfo> _languages = new ObservableCollection<CultureInfo>();
@@ -19,12 +29,19 @@
             set { SetProperty(ref _languages, value); }
         }
 
-        private void ExecuteChangeLanguageCommand(CultureInfo cultureInfo)
+        private CultureInfo _selectedLanguage;
+        public CultureInfo SelectedLanguage
+        {
+            get { return _selectedLanguage; }
+            set { SetProperty(ref _selectedLanguage, value); }
+        }
+        private void ExecuteSelectLanguageCommand(CultureInfo cultureInfo)
         {
             AppResources.Culture = cultureInfo;
+            SelectedLanguage = cultureInfo;
             Close(this);
         }
 
-        public MvxCommand<CultureInfo> ChangeLanguageCommand { get; private set; }
+        public MvxCommand<CultureInfo> SelectLanguageCommand { get; private set; }
     }
 }

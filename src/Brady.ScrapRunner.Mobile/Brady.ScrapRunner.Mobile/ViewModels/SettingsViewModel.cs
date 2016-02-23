@@ -23,7 +23,8 @@
 
         private void ExecuteChangeLanguageCommand()
         {
-            ShowViewModel<ChangeLanguageViewModel>();
+            if (ShowViewModel<ChangeLanguageViewModel>())
+                Close(this);
         }
     }
 }
