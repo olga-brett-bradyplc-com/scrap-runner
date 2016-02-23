@@ -236,4 +236,7 @@
     <value>Arriving</value>
     <comment>Transaction Detail View</comment>
   </data>
+  <data name="ChangeLanguage" xml:space="preserve">
+    <value>Change Language</value>
+  </data>
 </root>

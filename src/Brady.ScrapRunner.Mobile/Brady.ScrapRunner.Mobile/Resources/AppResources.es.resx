@@ -232,4 +232,7 @@
   <data name="ConfirmEnrouteTitle" xml:space="preserve">
     <value>Confirmar en ruta</value>
   </data>
+  <data name="ChangeLanguage" xml:space="preserve">
+    <value>Cambiar idioma</value>
+  </data>
 </root>
