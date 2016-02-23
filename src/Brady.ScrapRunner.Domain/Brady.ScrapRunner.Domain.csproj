@@ -54,6 +54,11 @@
     <Compile Include="Metadata\CustomerLocationMetadata.cs" />
     <Compile Include="Metadata\CommodityMasterMetadata.cs" />
     <Compile Include="Metadata\CustomerCommodityMetadata.cs" />
+    <Compile Include="Metadata\HistTripMetadata.cs" />
+    <Compile Include="Metadata\HistTripReferenceNumberMetadata.cs" />
+    <Compile Include="Metadata\HistTripSegmentContainerMetadata.cs" />
+    <Compile Include="Metadata\HistTripSegmentMetadata.cs" />
+    <Compile Include="Metadata\HistTripSegmentMileageMetadata.cs" />
     <Compile Include="Metadata\PowerFuelMetadata.cs" />
     <Compile Include="Metadata\TerminalChangeMetadata.cs" />
     <Compile Include="Metadata\ContainerChangeMetadata.cs" />
@@ -91,6 +96,11 @@
     <Compile Include="Models\CustomerLocation.cs" />
     <Compile Include="Models\CommodityMaster.cs" />
     <Compile Include="Models\CustomerCommodity.cs" />
+    <Compile Include="Models\HistTrip.cs" />
+    <Compile Include="Models\HistTripReferenceNumber.cs" />
+    <Compile Include="Models\HistTripSegment.cs" />
+    <Compile Include="Models\HistTripSegmentContainer.cs" />
+    <Compile Include="Models\HistTripSegmentMileage.cs" />
     <Compile Include="Models\PowerFuel.cs" />
     <Compile Include="Models\TerminalChange.cs" />
     <Compile Include="Models\ContainerChange.cs" />

@@ -93,7 +93,6 @@ namespace Brady.ScrapRunner.Domain.Models
             unchecked
             {
                 var hashCode = (EmployeeId != null ? EmployeeId.GetHashCode() : 0);
-                //hashCode = (hashCode * 397) ^ (Id?.GetHashCode() ?? 0);
                 return hashCode;
             }
         }

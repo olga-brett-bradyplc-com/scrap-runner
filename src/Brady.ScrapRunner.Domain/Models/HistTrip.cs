@@ -1,19 +1,20 @@
-﻿using BWF.DataServices.Metadata.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using BWF.DataServices.Metadata.Interfaces;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
     /// <summary>
-    /// A Trip record.
+    /// A HistTrip record.
     /// </summary>
 
-    public class Trip : IHaveCompositeId, IEquatable<Trip>
+    public class HistTrip : IHaveCompositeId, IEquatable<HistTrip>
     {
+        public virtual int HistSeqNo { get; set; }
+        public virtual string HistAction { get; set; }
         public virtual string TripNumber { get; set; }
         public virtual string TripStatus { get; set; }
         public virtual string TripStatusDesc { get; set; }
@@ -91,9 +92,9 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripScaleReferenceNumber { get; set; }
         public virtual string TripMultContainerFlag { get; set; }
         public virtual int? TripSendReseqFlag { get; set; }
-        public virtual string TripServerLocation { get; set; }
+        //public virtual string TripServerLocation { get; set; }
         public virtual string TripPowerAssetNumber { get; set; }
-        public virtual string TripStatusPrev { get; set; }
+        //public virtual string TripStatusPrev { get; set; }
         public virtual string TripHaulerHostCode { get; set; }
         public virtual string TripHaulerName { get; set; }
         public virtual string TripHaulerAddress1 { get; set; }
@@ -117,7 +118,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return TripNumber;
+                return string.Format("{0};{1}", HistSeqNo, TripNumber);
             }
             set
             {
@@ -125,11 +126,12 @@ namespace Brady.ScrapRunner.Domain.Models
             }
         }
 
-        public virtual bool Equals(Trip other)
+        public virtual bool Equals(HistTrip other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(TripNumber, other.TripNumber);
+            return HistSeqNo == other.HistSeqNo && 
+                   string.Equals(TripNumber, other.TripNumber);
         }
 
         public override bool Equals(object obj)
@@ -137,14 +139,15 @@ namespace Brady.ScrapRunner.Domain.Models
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Trip) obj);
+            return Equals((HistTrip)obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                var hashCode = (TripNumber != null ? TripNumber.GetHashCode() : 0);
+                var hashCode = HistSeqNo.GetHashCode();
+                hashCode = (hashCode * 397) ^ (TripNumber != null ? TripNumber.GetHashCode() : 0);
                 return hashCode;
             }
         }

@@ -8,15 +8,19 @@ using BWF.DataServices.Metadata.Fluent.Abstract;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
-    public class TripSegmentContainerMetadata :TypeMetadataProvider<TripSegmentContainer>
+    public class HistTripSegmentContainerMetadata : TypeMetadataProvider<HistTripSegmentContainer>
     {
-        public TripSegmentContainerMetadata()
+        public HistTripSegmentContainerMetadata()
         {
             AutoUpdatesByDefault();
 
             StringProperty(x => x.Id)
                 .IsHiddenInEditor()
                 .IsNotEditableInGrid();
+
+            IntegerProperty(x => x.HistSeqNo)
+               .IsId()
+               .DisplayName("History Seq Number");
 
             StringProperty(x => x.TripNumber)
                 .IsId()
@@ -59,6 +63,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripSegContainerComplete);
 
             ViewDefaults()
+                .Property(x => x.HistSeqNo)
                 .Property(x => x.TripNumber)
                 .Property(x => x.TripSegNumber)
                 .Property(x => x.TripSegContainerSeqNumber)
@@ -90,6 +95,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.TripSegContainerComplete)
 
                 .OrderBy(x => x.TripNumber)
+                .OrderBy(x => x.HistSeqNo)
                 .OrderBy(x => x.TripSegNumber)
                 .OrderBy(x => x.TripSegContainerSeqNumber);
 
