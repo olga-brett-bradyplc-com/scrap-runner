@@ -77,7 +77,7 @@ namespace Brady.ScrapRunner.Domain.Models
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return string.Equals(ContainerNumber, other.ContainerNumber) &&
-                   string.Equals(ContainerSeqNumber, other.ContainerSeqNumber);
+                   ContainerSeqNumber == other.ContainerSeqNumber;
         }
 
         public override bool Equals(object obj)
