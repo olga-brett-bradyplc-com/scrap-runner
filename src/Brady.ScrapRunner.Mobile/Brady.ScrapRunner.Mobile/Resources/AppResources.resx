@@ -239,4 +239,13 @@
   <data name="ChangeLanguage" xml:space="preserve">
     <value>Change Language</value>
   </data>
+  <data name="Continue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="English_UnitedStates" xml:space="preserve">
+    <value>English (United States)</value>
+  </data>
 </root>
