@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿using MvvmCross.Localization;
+
+namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using MvvmCross.Core.ViewModels;
     using Resources;
@@ -15,6 +17,10 @@
         {
             get { return _currentLanguage; }
             set { SetProperty(ref _currentLanguage, value); }
+        }
+        public IMvxLanguageBinder TextSource
+        {
+            get { return new MvxLanguageBinder("", GetType().Name); }
         }
 
         private MvxCommand _changeLanguageCommand;

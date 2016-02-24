@@ -63,15 +63,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Acr.UserDialogs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acr.UserDialogs.4.2.1\lib\MonoAndroid10\Acr.UserDialogs.dll</HintPath>
+      <HintPath>..\..\..\packages\Acr.UserDialogs.4.3.0\lib\MonoAndroid10\Acr.UserDialogs.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Acr.UserDialogs.Interface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acr.UserDialogs.4.2.1\lib\MonoAndroid10\Acr.UserDialogs.Interface.dll</HintPath>
+      <HintPath>..\..\..\packages\Acr.UserDialogs.4.3.0\lib\MonoAndroid10\Acr.UserDialogs.Interface.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AndHUD, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acr.UserDialogs.4.2.1\lib\MonoAndroid10\AndHUD.dll</HintPath>
+      <HintPath>..\..\..\packages\Acr.UserDialogs.4.3.0\lib\MonoAndroid10\AndHUD.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Mono.Android" />
@@ -102,7 +102,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.V7.AppCompat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.AppCompat.4.0.1\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.AppCompat.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.AppCompat.4.0.2\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.AppCompat.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.V7.Fragging, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

@@ -1,5 +1,9 @@
 using System.Collections.Generic;
 using Android.Views;
+using MvvmCross.Binding.Parse.Binding.Lang;
+using MvvmCross.Localization;
+using MvvmCross.Platform;
+using MvvmCross.Platform.Converters;
 using MvvmCross.Platform.IoC;
 
 namespace Brady.ScrapRunner.Mobile.Droid
@@ -13,7 +17,12 @@ namespace Brady.ScrapRunner.Mobile.Droid
         public Setup(Context applicationContext) : base(applicationContext)
         {
         }
+        protected override void InitializeIoC()
+        {
+            base.InitializeIoC();
 
+            Mvx.RegisterType<IMvxLanguageBindingParser, CustomLanguageBindingParser>();
+        }
         protected override IMvxApplication CreateApp()
         {
             return new App();
@@ -33,6 +42,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
         {
             base.FillViewTypes(cache);
             cache.AddAssembly(typeof(Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView.BindableGroupListView).Assembly);
+        }
+        protected override void FillValueConverters(IMvxValueConverterRegistry registry)
+        {
+            base.FillValueConverters(registry);
+            registry.AddOrOverwrite("Language", new MvxLanguageConverter());
         }
     }
 }

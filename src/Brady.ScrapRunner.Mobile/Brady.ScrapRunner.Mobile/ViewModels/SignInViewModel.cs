@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿using MvvmCross.Localization;
+
+namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System;
     using System.Linq;
@@ -130,5 +132,10 @@
         {
             ShowViewModel<SettingsViewModel>();
         }
+        public IMvxLanguageBinder TextSource
+        {
+            get { return new MvxLanguageBinder("", GetType().Name); }
+        }
+
     }
 }
