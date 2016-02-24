@@ -235,4 +235,13 @@
   <data name="ChangeLanguage" xml:space="preserve">
     <value>Cambiar idioma</value>
   </data>
+  <data name="Continue" xml:space="preserve">
+    <value>Continuar</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>Inglés</value>
+  </data>
+  <data name="English_UnitedStates" xml:space="preserve">
+    <value>Inglés (Estados Unidos)</value>
+  </data>
 </root>

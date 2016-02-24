@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿using MvvmCross.Localization;
+
+namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System.Linq;
     using Acr.UserDialogs;
@@ -54,6 +56,10 @@
             }
             Close(this);
             ShowViewModel<RouteSummaryViewModel>();
+        }
+        public IMvxLanguageBinder TextSource
+        {
+            get { return new MvxLanguageBinder("", GetType().Name); }
         }
 
         protected bool CanExecutePowerUnitIdCommand()

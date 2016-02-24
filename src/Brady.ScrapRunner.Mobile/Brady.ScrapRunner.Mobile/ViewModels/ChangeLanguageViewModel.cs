@@ -1,4 +1,8 @@
-﻿namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿using MvvmCross.Binding.BindingContext;
+using MvvmCross.Binding.ExtensionMethods;
+using MvvmCross.Localization;
+
+namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System.Collections.ObjectModel;
     using System.Globalization;
@@ -29,19 +33,16 @@
             set { SetProperty(ref _languages, value); }
         }
 
-        private CultureInfo _selectedLanguage;
-        public CultureInfo SelectedLanguage
-        {
-            get { return _selectedLanguage; }
-            set { SetProperty(ref _selectedLanguage, value); }
-        }
         private void ExecuteSelectLanguageCommand(CultureInfo cultureInfo)
         {
             AppResources.Culture = cultureInfo;
-            _selectedLanguage = cultureInfo;
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             Close(this);
         }
-
-        public MvxCommand<CultureInfo> SelectLanguageCommand { get; private set; }
+         public MvxCommand<CultureInfo> SelectLanguageCommand { get; private set; }
+        public IMvxLanguageBinder TextSource
+        {
+            get { return new MvxLanguageBinder("", GetType().Name); }
+        }
     }
 }

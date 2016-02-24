@@ -12,5 +12,6 @@
       android:layout_marginLeft="@dimen/activity_horizontal_margin"
       android:layout_marginTop="@dimen/activity_margin_half"
       local:MvxBind="Text DisplayName"
+      local:MvxLang="TextSource DisplayName"
       />
 </RelativeLayout>

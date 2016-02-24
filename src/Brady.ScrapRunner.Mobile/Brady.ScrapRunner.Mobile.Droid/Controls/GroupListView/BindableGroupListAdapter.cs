@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 using System.Text;
 
 using Android.App;
@@ -13,6 +12,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using MvvmCross.Binding.Droid.Views;
+
 
 namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
 {    
