@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿using MvvmCross.Localization;
+
+namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using FluentValidation;
     using FluentValidation.Results;

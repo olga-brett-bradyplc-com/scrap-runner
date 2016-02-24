@@ -1,3 +1,5 @@
+using Brady.ScrapRunner.Mobile.Resources;
+using Microsoft.VisualBasic;
 using MvvmCross.Platform.IoC;
 
 namespace Brady.ScrapRunner.Mobile

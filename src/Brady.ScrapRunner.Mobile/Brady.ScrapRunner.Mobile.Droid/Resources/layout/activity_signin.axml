@@ -32,7 +32,8 @@
             android:layout_height="48dp"
             android:layout_marginTop="4dp"
             android:text="@string/log_in"
-            local:MvxBind="Click SignInCommand" />
+            local:MvxBind="Click SignInCommand" 
+            local:MvxLang="Text SignIn"/>
     </LinearLayout>
     <ImageView
         android:layout_above="@id/center_panel"

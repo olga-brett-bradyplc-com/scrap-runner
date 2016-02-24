@@ -38,7 +38,7 @@
         private void ExecuteSelectLanguageCommand(CultureInfo cultureInfo)
         {
             AppResources.Culture = cultureInfo;
-            SelectedLanguage = cultureInfo;
+            _selectedLanguage = cultureInfo;
             Close(this);
         }
 
