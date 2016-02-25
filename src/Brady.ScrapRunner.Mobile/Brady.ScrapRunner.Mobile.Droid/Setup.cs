@@ -8,6 +8,8 @@ using MvvmCross.Platform.IoC;
 
 namespace Brady.ScrapRunner.Mobile.Droid
 {
+    using System.Net;
+    using System.Reflection;
     using Android.Content;
     using MvvmCross.Core.ViewModels;
     using MvvmCross.Droid.Platform;
@@ -47,6 +49,22 @@ namespace Brady.ScrapRunner.Mobile.Droid
         {
             base.FillValueConverters(registry);
             registry.AddOrOverwrite("Language", new MvxLanguageConverter());
+        }
+        protected override IEnumerable<Assembly> AndroidViewAssemblies => new List<Assembly>(base.AndroidViewAssemblies)
+        {
+            typeof(Android.Support.V7.Widget.Toolbar).Assembly,
+            typeof(Android.Support.V7.Widget.RecyclerView).Assembly,
+            typeof(Android.Support.V4.Widget.DrawerLayout).Assembly,
+            typeof(Android.Support.V4.View.ViewPager).Assembly,
+            typeof(Android.Support.Design.Widget.FloatingActionButton).Assembly
+        };
+        protected override void InitializeLastChance()
+        {
+            base.InitializeLastChance();
+#if DEBUG
+            // Ignore SSL certificate errors while debugging.
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+#endif
         }
     }
 }
