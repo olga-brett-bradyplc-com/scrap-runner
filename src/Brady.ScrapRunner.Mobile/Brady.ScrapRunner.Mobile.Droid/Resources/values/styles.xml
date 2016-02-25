@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
   
   <style name="ScrapRunnerTheme" parent="ScrapRunnerTheme.Base">
   </style>
@@ -10,6 +10,7 @@
     <item name="colorPrimary">@color/material_500</item>
     <item name="colorPrimaryDark">@color/material_900</item>
     <item name="colorAccent">@color/material_100</item>
+    <item name="android:navigationBarColor" tools:targetApi="21">@color/material_900</item>
   </style>
 
   <style name="ScrapRunnerTheme.SignIn" parent="ScrapRunnerTheme.Base">
