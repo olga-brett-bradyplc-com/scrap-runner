@@ -8,6 +8,7 @@ using MvvmCross.Platform.IoC;
 
 namespace Brady.ScrapRunner.Mobile.Droid
 {
+    using System.Net;
     using System.Reflection;
     using Android.Content;
     using MvvmCross.Core.ViewModels;
@@ -57,5 +58,13 @@ namespace Brady.ScrapRunner.Mobile.Droid
             typeof(Android.Support.V4.View.ViewPager).Assembly,
             typeof(Android.Support.Design.Widget.FloatingActionButton).Assembly
         };
+        protected override void InitializeLastChance()
+        {
+            base.InitializeLastChance();
+#if DEBUG
+            // Ignore SSL certificate errors while debugging.
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+#endif
+        }
     }
 }
