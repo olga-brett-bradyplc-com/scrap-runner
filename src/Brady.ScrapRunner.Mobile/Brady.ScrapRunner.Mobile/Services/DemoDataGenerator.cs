@@ -30,7 +30,9 @@
             var asyncConnection = _sqliteConnectionFactory.GetAsyncConnection("scraprunner");
             await asyncConnection.CreateTableAsync<ContainerMasterModel>();
             await asyncConnection.CreateTableAsync<CustomerDirectionModel>();
+            await asyncConnection.CreateTableAsync<DriverStatusModel>();
             await asyncConnection.CreateTableAsync<EmployeeMasterModel>();
+            await asyncConnection.CreateTableAsync<PowerMasterModel>();
             await asyncConnection.CreateTableAsync<PreferenceModel>();
             await asyncConnection.CreateTableAsync<TripModel>();
             await asyncConnection.CreateTableAsync<TripSegmentModel>();
@@ -38,12 +40,14 @@
 
             await asyncConnection.DeleteAllAsync<ContainerMasterModel>();
             await asyncConnection.DeleteAllAsync<CustomerDirectionModel>();
+            await asyncConnection.DeleteAllAsync<DriverStatusModel>();
             await asyncConnection.DeleteAllAsync<EmployeeMasterModel>();
+            await asyncConnection.DeleteAllAsync<PowerMasterModel>();
             await asyncConnection.DeleteAllAsync<PreferenceModel>();
             await asyncConnection.DeleteAllAsync<TripModel>();
             await asyncConnection.DeleteAllAsync<TripSegmentModel>();
             await asyncConnection.DeleteAllAsync<TripSegmentContainerModel>();
-            await GenerateDemoTripDataAsync();
+//            await GenerateDemoTripDataAsync();
         }
 
         private async Task GenerateDemoTripDataAsync()

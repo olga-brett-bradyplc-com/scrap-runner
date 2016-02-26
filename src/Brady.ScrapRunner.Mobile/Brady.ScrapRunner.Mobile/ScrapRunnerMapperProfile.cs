@@ -9,7 +9,10 @@
         protected override void Configure()
         {
             base.Configure();
+            CreateMap<DriverStatus, DriverStatusModel>();
             CreateMap<EmployeeMaster, EmployeeMasterModel>();
+            CreateMap<Preference, PreferenceModel>();
+            CreateMap<PowerMaster, PowerMasterModel>();
             CreateMap<Trip, TripModel>();
         }
     }

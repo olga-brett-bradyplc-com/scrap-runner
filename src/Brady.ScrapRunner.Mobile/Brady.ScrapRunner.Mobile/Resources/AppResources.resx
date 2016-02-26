@@ -248,4 +248,8 @@
   <data name="English_UnitedStates" xml:space="preserve">
     <value>English (United States)</value>
   </data>
+  <data name="TruckIdNotFound" xml:space="preserve">
+    <value>Truck Id was not found</value>
+    <comment>Power Unit View Model</comment>
+  </data>
 </root>
