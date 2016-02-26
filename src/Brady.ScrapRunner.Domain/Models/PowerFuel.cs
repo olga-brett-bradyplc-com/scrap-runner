@@ -53,7 +53,7 @@ namespace Brady.ScrapRunner.Domain.Models
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((TripSegmentMileage)obj);
+            return Equals((PowerFuel)obj);
         }
 
         public override int GetHashCode()

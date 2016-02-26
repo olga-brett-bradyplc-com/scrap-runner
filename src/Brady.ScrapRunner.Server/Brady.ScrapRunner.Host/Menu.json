@@ -172,6 +172,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerHistory"
             },
             {
+              "text": "PowerLimits",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerLimits"
+            },
+            {
               "text": "PowerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerMaster"
             }
@@ -184,6 +188,10 @@
         {
           "text": "RegionMaster",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/RegionMaster"
+        },
+        {
+          "text": "SecurityMaster",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/SecurityMaster"
         },
         {
           "text": "Terminal",
@@ -230,9 +238,21 @@
               "text": "TripTypeBasic",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeBasic"
             },
+            //{
+            //  "text": "TripTypeBasicDetails",
+            //  "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeBasicDetails"
+            //},
+            {
+              "text": "TripTypeMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeMaster"
+            },
             {
               "text": "TripTypeMasterDesc",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeMasterDesc"
+            },
+            {
+              "text": "TripTypeMasterDetails",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeMasterDetails"
             }
           ]
         }
