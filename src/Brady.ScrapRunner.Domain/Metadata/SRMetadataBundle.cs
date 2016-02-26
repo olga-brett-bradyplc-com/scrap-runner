@@ -43,9 +43,11 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new HistTripSegmentMileageMetadata()
                   , new PowerFuelMetadata()
                   , new PowerHistoryMetadata()
+                  , new PowerLimitsMetadata()
                   , new PowerMasterMetadata()
                   , new PreferenceMetadata()
                   , new RegionMasterMetadata()
+                  , new SecurityMasterMetadata()
                   , new TerminalChangeMetadata()
                   , new TerminalMasterMetadata()
                   , new TripMetadata()
@@ -54,8 +56,11 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new TripSegmentContainerMetadata()
                   , new TripSegmentMileageMetadata() 
                   , new TripTypeBasicMetadata()
+                  , new TripTypeBasicDetailsMetadata()
+                  , new TripTypeMasterMetadata()
                   , new TripTypeMasterDescMetadata()
-            )
+                  , new TripTypeMasterDetailsMetadata()
+           )
         {
             
         }

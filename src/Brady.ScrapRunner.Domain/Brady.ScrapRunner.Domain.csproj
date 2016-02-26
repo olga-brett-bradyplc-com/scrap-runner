@@ -64,6 +64,8 @@
     <Compile Include="Metadata\HistTripSegmentMetadata.cs" />
     <Compile Include="Metadata\HistTripSegmentMileageMetadata.cs" />
     <Compile Include="Metadata\PowerFuelMetadata.cs" />
+    <Compile Include="Metadata\PowerLimitsMetadata.cs" />
+    <Compile Include="Metadata\SecurityMasterMetadata.cs" />
     <Compile Include="Metadata\TerminalChangeMetadata.cs" />
     <Compile Include="Metadata\ContainerChangeMetadata.cs" />
     <Compile Include="Metadata\CustomerMasterMetadata.cs" />
@@ -81,11 +83,14 @@
     <Compile Include="Metadata\SRMetadataBundle.cs" />
     <Compile Include="Metadata\TripReferenceNumberMetadata.cs" />
     <Compile Include="Metadata\TripSegmentContainerMetadata.cs" />
+    <Compile Include="Metadata\TripTypeBasicDetailsMetadata.cs" />
     <Compile Include="Metadata\TripTypeBasicMetadata.cs" />
     <Compile Include="Metadata\TripMetadata.cs" />
     <Compile Include="Metadata\TripSegmentMileageMetadata.cs" />
     <Compile Include="Metadata\TripSegmentMetadata.cs" />
     <Compile Include="Metadata\TripTypeMasterDescMetadata.cs" />
+    <Compile Include="Metadata\TripTypeMasterDetailsMetadata.cs" />
+    <Compile Include="Metadata\TripTypeMasterMetadata.cs" />
     <Compile Include="Models\AreaMaster.cs" />
     <Compile Include="Models\CommodityMasterDest.cs" />
     <Compile Include="Models\ContainerHistory.cs" />
@@ -110,6 +115,8 @@
     <Compile Include="Models\HistTripSegmentContainer.cs" />
     <Compile Include="Models\HistTripSegmentMileage.cs" />
     <Compile Include="Models\PowerFuel.cs" />
+    <Compile Include="Models\PowerLimits.cs" />
+    <Compile Include="Models\SecurityMaster.cs" />
     <Compile Include="Models\TerminalChange.cs" />
     <Compile Include="Models\ContainerChange.cs" />
     <Compile Include="Models\CustomerMaster.cs" />
@@ -129,7 +136,10 @@
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\TripSegmentMileage.cs" />
     <Compile Include="Models\TripSegment.cs" />
+    <Compile Include="Models\TripTypeBasicDetails.cs" />
+    <Compile Include="Models\TripTypeMaster.cs" />
     <Compile Include="Models\TripTypeMasterDesc.cs" />
+    <Compile Include="Models\TripTypeMasterDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
