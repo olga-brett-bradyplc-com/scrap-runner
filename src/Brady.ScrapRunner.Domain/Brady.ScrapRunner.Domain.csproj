@@ -81,8 +81,13 @@
     <Compile Include="Metadata\PowerMasterMetadata.cs" />
     <Compile Include="Metadata\PreferenceMetadata.cs" />
     <Compile Include="Metadata\SRMetadataBundle.cs" />
+    <Compile Include="Metadata\TripPointsMetadata.cs" />
     <Compile Include="Metadata\TripReferenceNumberMetadata.cs" />
     <Compile Include="Metadata\TripSegmentContainerMetadata.cs" />
+    <Compile Include="Metadata\TripSegmentContainerTimeMetadata.cs" />
+    <Compile Include="Metadata\TripSegmentImageMetadata.cs" />
+    <Compile Include="Metadata\TripSegmentTimeMetadata.cs" />
+    <Compile Include="Metadata\TripTypeAllowCustTypeMetadata.cs" />
     <Compile Include="Metadata\TripTypeBasicDetailsMetadata.cs" />
     <Compile Include="Metadata\TripTypeBasicMetadata.cs" />
     <Compile Include="Metadata\TripMetadata.cs" />
@@ -130,8 +135,13 @@
     <Compile Include="Models\EmployeeMaster.cs" />
     <Compile Include="Models\PowerMaster.cs" />
     <Compile Include="Models\Preference.cs" />
+    <Compile Include="Models\TripPoints.cs" />
     <Compile Include="Models\TripReferenceNumber.cs" />
     <Compile Include="Models\TripSegmentContainer.cs" />
+    <Compile Include="Models\TripSegmentContainerTime.cs" />
+    <Compile Include="Models\TripSegmentImage.cs" />
+    <Compile Include="Models\TripSegmentTime.cs" />
+    <Compile Include="Models\TripTypeAllowCustType.cs" />
     <Compile Include="Models\TripTypeBasic.cs" />
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\TripSegmentMileage.cs" />

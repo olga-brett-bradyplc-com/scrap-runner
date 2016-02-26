@@ -214,6 +214,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Trip"
             },
             {
+              "text": "TripPoints",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripPoints"
+            },
+            {
               "text": "TripReferenceNumber",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripReferenceNumber"
             },
@@ -226,8 +230,20 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentContainer"
             },
             {
+              "text": "TripSegmentContainerTime",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentContainerTime"
+            },
+            {
+              "text": "TripSegmentImage",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentImage"
+            },
+            {
               "text": "TripSegmentMileage",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentMileage"
+            },
+            {
+              "text": "TripSegmentTime",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripSegmentTime"
             }
           ]
         },
@@ -245,6 +261,10 @@
             {
               "text": "TripTypeMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeMaster"
+            },
+            {
+              "text": "TripTypeAllowCustType",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeAllowCustType"
             },
             {
               "text": "TripTypeMasterDesc",
