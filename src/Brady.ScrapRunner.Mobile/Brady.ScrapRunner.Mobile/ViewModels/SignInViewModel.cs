@@ -117,7 +117,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             await _demoDataGenerator.GenerateDemoDataAsync();
 
             // Check username/password against BWF, and create session if valid
-            var session = _connection.CreateConnection("", "", "ScrapRunner");
+            var hostUrl = "https://maunb-stm10.bradyplc.com:7776";      //ConfigurationManager.AppSettings["ExplorerHostUrl"];
+            var hostUser = "admin";                                     //ConfigurationManager.AppSettings["ExplorerHostUsername"];
+            var hostPass = "mem_2014";                                  //ConfigurationManager.AppSettings["ExplorerHostPassword"];
+            var session = _connection.CreateConnection(hostUrl, hostUser, hostPass, "ScrapRunner");
 
             // 2. Validate that driver exists
             var userTask = await _connection.GetConnection().GetAsync<string, EmployeeMaster>(UserName);
