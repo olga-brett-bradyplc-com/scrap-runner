@@ -2,18 +2,18 @@
 using FluentValidation;
 using Brady.ScrapRunner.Domain.Models;
 
-
 namespace Brady.ScrapRunner.DataService.Validators
 {
-   
-    public class TripTypeMasterDeletionValidator :
-        AbstractValidator<TripTypeMaster>, IRequireCrudingDataServiceRepository
+ 
+    public class TripTypeAllowCustTypeValidator :
+         AbstractValidator<TripTypeAllowCustType>, IRequireCrudingDataServiceRepository
     {
         ICrudingDataServiceRepository _repository;
 
-        public TripTypeMasterDeletionValidator()
+        public TripTypeAllowCustTypeValidator()
         {
             RuleFor(x => x.TripTypeCode).NotEmpty();
+            RuleFor(x => x.TripTypeCustType).NotEmpty();
             RuleFor(x => x.TripTypeSeqNumber).GreaterThanOrEqualTo(0);
         }
 
