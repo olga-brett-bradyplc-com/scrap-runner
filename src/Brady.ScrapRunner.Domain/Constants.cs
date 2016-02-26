@@ -58,7 +58,7 @@
         public static readonly string Landfill    = "L";
         public static readonly string XferStation = "T";
     }
-    public static class DelayTypesConstants
+    public static class DelayTypeConstants
     {
         public static readonly string Customer   = "C";
         public static readonly string Yard       = "Y";
@@ -104,12 +104,27 @@
     public static class TripAssignStatusConstants
     {
         public static readonly string NotDispatched = "N";
-        public static readonly string Dispatched = "D";
-        public static readonly string Acked = "A";
-        public static readonly string Canceled = "X";
+        public static readonly string Dispatched    = "D";
+        public static readonly string Acked         = "A";
+        public static readonly string Canceled      = "X";
+    }
+    public static class TripSendFlagConstants
+    {
+        public static readonly int NotReady        = 0;  //Not Ready to be sent to driver
+        public static readonly int Ready           = 1;  //Ready to be sent to driver
+        public static readonly int SentToDevice    = 2;  //Sent to driver
+        public static readonly int NotSentToDevice = 3;  //Unable to be sent to driver
+        public static readonly int CanceledReady   = 4;  //Canceled trip, ready to be sent to driver
+        public static readonly int CanceledSent    = 5;  //Canceled trip, sent to driver
+        public static readonly int TripInReview    = 7;  //Completed trip in review (set down or left on truck full)
+        public static readonly int TripException   = 8;  //Completed trip as exception (unable to process)
+        public static readonly int TripDone        = 9;  //Completed trip normal
+        public static readonly int SentToHost      = 10; //Completed, sent to host accounting system
+        public static readonly int SentToHostError = 11; //Completed, error in sending to host accounting system
+        public static readonly int NotSentToHost   = 12; //Completed, not sent to host accounting system
     }
 
-        public static class TripStatusConstants
+    public static class TripStatusConstants
     {
         public static readonly string Done = "D";
         public static readonly string Pending = "P";

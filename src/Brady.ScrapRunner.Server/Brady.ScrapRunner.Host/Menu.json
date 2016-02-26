@@ -18,8 +18,17 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTableHdr"
         },
         {
-          "text": "CommodityMaster",
-          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CommodityMaster"
+          "text": "Commodity",
+          "items": [
+            {
+              "text": "CommodityMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CommodityMaster"
+            },
+            {
+              "text": "CommodityMasterDest",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CommodityMasterDest"
+            }
+          ]
         },
         {
           "text": "Container",
@@ -45,6 +54,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerQuantityHistory"
             }
           ]
+        },
+        {
+          "text": "ControlNumberMaster",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ControlNumberMaster"
         },
         {
           "text": "Customer",
@@ -83,6 +96,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverHistory"
             },
             {
+              "text": "DriverMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverMaster"
+            },
+            {
               "text": "DriverStatus",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverStatus"
             }
@@ -94,6 +111,10 @@
             {
               "text": "EmployeeArea",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeArea"
+            },
+            {
+              "text": "EmployeeChange",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeChange"
             },
             {
               "text": "EmployeeMaster",
@@ -151,6 +172,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerHistory"
             },
             {
+              "text": "PowerLimits",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerLimits"
+            },
+            {
               "text": "PowerMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PowerMaster"
             }
@@ -163,6 +188,10 @@
         {
           "text": "RegionMaster",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/RegionMaster"
+        },
+        {
+          "text": "SecurityMaster",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/SecurityMaster"
         },
         {
           "text": "Terminal",
@@ -209,9 +238,21 @@
               "text": "TripTypeBasic",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeBasic"
             },
+            //{
+            //  "text": "TripTypeBasicDetails",
+            //  "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeBasicDetails"
+            //},
+            {
+              "text": "TripTypeMaster",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeMaster"
+            },
             {
               "text": "TripTypeMasterDesc",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeMasterDesc"
+            },
+            {
+              "text": "TripTypeMasterDetails",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeMasterDetails"
             }
           ]
         }
