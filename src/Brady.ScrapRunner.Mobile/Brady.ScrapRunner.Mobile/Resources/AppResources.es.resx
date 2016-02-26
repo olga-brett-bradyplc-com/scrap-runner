@@ -244,4 +244,7 @@
   <data name="English_UnitedStates" xml:space="preserve">
     <value>Inglés (Estados Unidos)</value>
   </data>
+  <data name="TruckIdNotFound" xml:space="preserve">
+    <value>Das Truck Id was haben nicht gefindet.</value>
+  </data>
 </root>
