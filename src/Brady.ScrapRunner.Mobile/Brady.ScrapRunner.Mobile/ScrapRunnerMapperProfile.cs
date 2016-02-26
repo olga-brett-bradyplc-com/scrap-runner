@@ -14,6 +14,8 @@
             CreateMap<Preference, PreferenceModel>();
             CreateMap<PowerMaster, PowerMasterModel>();
             CreateMap<Trip, TripModel>();
+            CreateMap<TripSegment, TripSegmentModel>();
+            CreateMap<TripSegmentContainer, TripSegmentContainerModel>();
         }
     }
 }

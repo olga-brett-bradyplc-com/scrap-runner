@@ -23,13 +23,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IRepository<PowerMasterModel> _powerMasterRepository;
         private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository;
         private readonly IRepository<DriverStatusModel> _driverStatusRepository;
-        private readonly IRepository<TripModel> _tripRepository; 
+        private readonly IRepository<TripModel> _tripRepository;
+        private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
+        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository; 
 
         public PowerUnitViewModel( 
             IConnectionService<DataServiceClient> connection,
             IRepository<PowerMasterModel> powerMasterRepository,
             IRepository<EmployeeMasterModel> employeeMasterRepository,
             IRepository<TripModel> tripRepository,
+            IRepository<TripSegmentModel> tripSegmentRepository,
+            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository,
             IRepository<DriverStatusModel> driverStatusRepository )
         {
             _connection = connection;
@@ -37,6 +41,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _employeeMasterRepository = employeeMasterRepository;
             _driverStatusRepository = driverStatusRepository;
             _tripRepository = tripRepository;
+            _tripSegmentRepository = tripSegmentRepository;
+            _tripSegmentContainerRepository = tripSegmentContainerRepository;
             Title = "Power Unit ID and Odometer Reading";
             PowerUnitIdCommand = new MvxCommand(ExecutePowerUnitIdCommand, CanExecutePowerUnitIdCommand);
         }
@@ -93,7 +99,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
             catch (Exception exception)
             {
-                var message = exception?.InnerException.Message ?? exception.Message;
+                var message = exception?.InnerException?.Message ?? exception.Message;
                 await UserDialogs.Instance.AlertAsync(
                     message, AppResources.Error, AppResources.OK);
             }
@@ -149,9 +155,24 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             // Grab avaliable trips for Driver
             var tripsTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<Trip>()
-                .Filter(y => y.Property(x => x.TripDriverId).EqualTo(currentEmployeeId)));
+                .Filter(y => y.Property(x => x.TripDriverId).EqualTo(currentEmployeeId)
+                    .And().Property(z => z.TripStatus).NotIn("X", "D")));
             if (tripsTask == null) return false;
             await SaveTripsAsync(tripsTask.Records);
+
+            // Grab trip segments for each trip brought back
+            var tripNumbers = tripsTask.Records.Select(x => x.TripNumber).ToArray();
+            var tripSegmentTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<TripSegment>()
+                .Filter(y => y.Property(x => x.TripNumber).In(tripNumbers)));
+            if (tripSegmentTask == null) return false;
+            await SaveTripSegmentsAsync(tripSegmentTask.Records);
+
+            // Grab all containers for each trip segment
+            var tripSegmentContainerTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<TripSegmentContainer>()
+                    .Filter(y => y.Property(x => x.TripNumber).In(tripNumbers)));
+            if (tripSegmentContainerTask == null) return false;
+            await SaveTripSegmentContainersAsync(tripSegmentContainerTask.Records);
+
 
             return true;
         }
@@ -174,6 +195,28 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 var mapped = AutoMapper.Mapper.Map<Trip, TripModel>(trip);
                 _tripRepository.InsertAsync(mapped);
+            }
+
+            return Task.FromResult(1);
+        }
+
+        private Task SaveTripSegmentsAsync(List<TripSegment> tripSegments)
+        {
+            foreach (TripSegment tripSegment in tripSegments)
+            {
+                var mapped = AutoMapper.Mapper.Map<TripSegment, TripSegmentModel>(tripSegment);
+                _tripSegmentRepository.InsertAsync(mapped);
+            }
+
+            return Task.FromResult(1);
+        }
+
+        private Task SaveTripSegmentContainersAsync(List<TripSegmentContainer> containers)
+        {
+            foreach (TripSegmentContainer container in containers)
+            {
+                var mapped = AutoMapper.Mapper.Map<TripSegmentContainer, TripSegmentContainerModel>(container);
+                _tripSegmentContainerRepository.InsertAsync(mapped);
             }
 
             return Task.FromResult(1);
