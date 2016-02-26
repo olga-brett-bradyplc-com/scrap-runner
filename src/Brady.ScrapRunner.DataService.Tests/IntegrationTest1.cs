@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Runtime.CompilerServices;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
@@ -28,12 +29,14 @@ namespace Brady.ScrapRunner.DataService.Tests
         {
             _testContext = testContextInstance;
 
+            var hostUrl = ConfigurationManager.AppSettings["ExplorerHostUrl"];
+
             // Note since self-signed, we set server certificate validation callback to not complain.
             System.Net.ServicePointManager.ServerCertificateValidationCallback =
                 new System.Net.Security.RemoteCertificateValidationCallback(delegate { return true; });
 
             // The client implements IDisposable, so if not using a single instance remember to dispose your instances.
-            _client = new DataServiceClient("https://localhost:7776", "admin", "mem_2014", Constants.ScrapRunner);
+            _client = new DataServiceClient(hostUrl, "admin", "mem_2014", Constants.ScrapRunner);
         }
 
         [ClassCleanup]
