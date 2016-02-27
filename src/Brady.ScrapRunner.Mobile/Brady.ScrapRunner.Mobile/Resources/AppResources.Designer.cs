@@ -368,6 +368,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Truck Id was not found.
+        /// </summary>
+        public static string TruckIdNotFound {
+            get {
+                return ResourceManager.GetString("TruckIdNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Truck Id must be less than {0} characters..
         /// </summary>
         public static string TruckIdOutOfRange {

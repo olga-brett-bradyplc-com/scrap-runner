@@ -22,5 +22,7 @@
         public string TripSegOrigCustName { get; set; }
         [MaxLength(10)]
         public string TripSegOrigCustHostCode { get; set; }
+        [MaxLength(10)]
+        public string TripSegDestCustHostCode { get; set; }
     }
 }

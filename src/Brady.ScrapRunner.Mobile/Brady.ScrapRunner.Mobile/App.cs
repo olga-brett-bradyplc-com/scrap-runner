@@ -27,6 +27,8 @@ namespace Brady.ScrapRunner.Mobile
                 SqliteRepository<ContainerMasterModel>>();
             Mvx.RegisterType<IRepository<CustomerDirectionModel>,
                 SqliteRepository<CustomerDirectionModel>>();
+            Mvx.RegisterType<IRepository<DriverStatusModel>,
+                SqliteRepository<DriverStatusModel>>();
             Mvx.RegisterType<IRepository<EmployeeMasterModel>,
                 SqliteRepository<EmployeeMasterModel>>();
             Mvx.RegisterType<IRepository<TripModel>,
@@ -35,6 +37,10 @@ namespace Brady.ScrapRunner.Mobile
                 SqliteRepository<TripSegmentModel>>();
             Mvx.RegisterType<IRepository<TripSegmentContainerModel>,
                 SqliteRepository<TripSegmentContainerModel>>();
+            Mvx.RegisterType<IRepository<PreferenceModel>,
+                SqliteRepository<PreferenceModel>>();
+            Mvx.RegisterType<IRepository<PowerMasterModel>,
+                SqliteRepository<PowerMasterModel>>();
 
             Mvx.RegisterSingleton(Mvx.IocConstruct<DemoDataGenerator>);
 
