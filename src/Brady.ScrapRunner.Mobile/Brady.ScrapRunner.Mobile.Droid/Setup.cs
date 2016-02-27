@@ -18,11 +18,6 @@ namespace Brady.ScrapRunner.Mobile.Droid
     {
         public Setup(Context applicationContext) : base(applicationContext)
         {
-            #if DEBUG
-            // Note since self-signed, we set server certificate validation callback to not complain.
-            System.Net.ServicePointManager.ServerCertificateValidationCallback =
-                new System.Net.Security.RemoteCertificateValidationCallback(delegate { return true; });
-            #endif
         }
         protected override void InitializeIoC()
         {
