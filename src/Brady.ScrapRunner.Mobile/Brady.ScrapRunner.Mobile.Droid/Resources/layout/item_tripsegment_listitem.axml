@@ -8,14 +8,17 @@
     android:padding="15dp"
     android:layout_marginTop="30dp">
     <TextView
+        android:id="@+id/TripSegmentContainerTypeText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         local:MvxBind="Text TripSegContainerType" />
     <TextView
+        android:id="@+id/TripSegmentContainerCommodityDescText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         local:MvxBind="Text TripSegContainerCommodityDesc" />
     <TextView
+        android:id="@+id/TripSegmentContianerLocationText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         local:MvxBind="Text TripSegContainerLocation" />

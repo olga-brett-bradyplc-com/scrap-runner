@@ -54,18 +54,29 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 TripCustCityStateZip = $"{trip.TripCustCity}, {trip.TripCustState} {trip.TripCustZip}";
                 TripType = trip.TripType;
 
-                var containersTrip = await _tripSegmentRepository.AsQueryable()
-                    .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
-                var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
+                // @TODO : This seems a bit clunky to determine which segments to show for each leg of the trip. Better way?
+                // Grab the first avaliable segment in order to get TripSegDestCustHostCode
+                // Then grab all trip segments that contain the first avaliable TripSegDestCustHostCode
+                var firstAvaliableTripSegment = await _tripSegmentRepository.AsQueryable()
+                    .Where(ts => ts.TripNumber == TripNumber).OrderBy(x => x.TripSegNumber).FirstAsync();
+
+                var tripSegments = await _tripSegmentRepository.AsQueryable()
+                    .Where(ts => ts.TripNumber == TripNumber && ts.TripSegDestCustHostCode == firstAvaliableTripSegment.TripSegDestCustHostCode).ToListAsync();
+                var tripSegmentNumbers = tripSegments.Select(x => x.TripSegNumber).ToArray();
+                var tripSegmentContainers = await _tripSegmentContainerRepository.AsQueryable()
                     .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
-                var groupedContainers = from details in containerSegments
+                // Filter out containers where no trip segment number is found from the avaliable trip segments
+                var filteredTripSegmentContainers =
+                    tripSegmentContainers.FindAll(
+                        x => tripSegments.Select(y => y.TripSegNumber).ToArray().Contains(x.TripSegNumber)).OrderBy(x => x.TripSegNumber);
+                var groupedContainers = from details in filteredTripSegmentContainers
                                         orderby details.TripSegNumber
                                         group details by new { details.TripNumber, details.TripSegNumber }
                                         into detailsGroup
-                                        select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
+                                        select new Grouping<TripSegmentModel, TripSegmentContainerModel>(tripSegments.Find(
                                                 tsm => (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber + detailsGroup.Key.TripSegNumber)
                                             ), detailsGroup);
-                if (containersTrip.Any())
+                if (tripSegments.Any())
                 {
                     Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(groupedContainers);
                 }
@@ -178,12 +189,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private void ExecuteNextStageCommand()
         {
-            if (TripType.Equals("SW"))
+            if (Containers.First().Key.TripSegType.Equals("DE"))
             {
                 Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
-            else if (TripType.Equals("RT"))
+            else if (Containers.First().Key.TripSegType.Equals("RT"))
             {
                 Close(this);
                 ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
