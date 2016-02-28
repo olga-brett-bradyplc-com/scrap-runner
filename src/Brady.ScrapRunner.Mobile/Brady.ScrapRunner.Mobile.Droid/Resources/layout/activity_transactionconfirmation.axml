@@ -8,14 +8,13 @@
     <include
         layout="@layout/toolbar" />
     <MvxExt.BindableGroupListView
-        android:id="@+id/TransactionListView"
+        android:id="@+id/TransactionConfirmationListView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_marginTop="56dp"
         android:orientation="vertical"
         local:MvxItemTemplate="@layout/item_tripconfirmation_listitem"
-        local:GroupItemTemplate="@layout/item_transactions"
-        local:MvxBind="ItemsSource TransactionList" />
+        local:GroupItemTemplate="@layout/item_transactions" />
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="50dp"

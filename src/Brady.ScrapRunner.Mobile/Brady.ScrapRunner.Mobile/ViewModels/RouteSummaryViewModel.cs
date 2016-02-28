@@ -45,6 +45,7 @@
 
         public void ExecuteRouteSelectedCommand(TripModel selectedTrip)
         {
+            Close(this);
             ShowViewModel<RouteDetailViewModel>(new {tripNumber = selectedTrip.TripNumber});
             SelectedTrip = null;
         }

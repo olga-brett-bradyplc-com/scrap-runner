@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Brady.ScrapRunner.Mobile.Helpers;
 
@@ -45,41 +46,30 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (trip != null)
             {
-                _custHostCode = trip.TripCustHostCode;
-                Title = trip.TripTypeDesc;
-                SubTitle = $"Trip {trip.TripNumber}";
-                TripCustName = trip.TripCustName;
-                TripDriverInstructions = trip.TripDriverInstructions;
-                TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;
-                TripCustCityStateZip = $"{trip.TripCustCity}, {trip.TripCustState} {trip.TripCustZip}";
-                TripType = trip.TripType;
-
-                // @TODO : This seems a bit clunky to determine which segments to show for each leg of the trip. Better way?
-                // Grab the first avaliable segment in order to get TripSegDestCustHostCode
-                // Then grab all trip segments that contain the first avaliable TripSegDestCustHostCode
-                var firstAvaliableTripSegment = await _tripSegmentRepository.AsQueryable()
-                    .Where(ts => ts.TripNumber == TripNumber).OrderBy(x => x.TripSegNumber).FirstAsync();
-
-                var tripSegments = await _tripSegmentRepository.AsQueryable()
-                    .Where(ts => ts.TripNumber == TripNumber && ts.TripSegDestCustHostCode == firstAvaliableTripSegment.TripSegDestCustHostCode).ToListAsync();
-                var tripSegmentNumbers = tripSegments.Select(x => x.TripSegNumber).ToArray();
-                var tripSegmentContainers = await _tripSegmentContainerRepository.AsQueryable()
-                    .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
-                // Filter out containers where no trip segment number is found from the avaliable trip segments
-                var filteredTripSegmentContainers =
-                    tripSegmentContainers.FindAll(
-                        x => tripSegments.Select(y => y.TripSegNumber).ToArray().Contains(x.TripSegNumber)).OrderBy(x => x.TripSegNumber);
-                var groupedContainers = from details in filteredTripSegmentContainers
-                                        orderby details.TripSegNumber
-                                        group details by new { details.TripNumber, details.TripSegNumber }
-                                        into detailsGroup
-                                        select new Grouping<TripSegmentModel, TripSegmentContainerModel>(tripSegments.Find(
-                                                tsm => (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber + detailsGroup.Key.TripSegNumber)
-                                            ), detailsGroup);
-                if (tripSegments.Any())
+                using (var tripDataLoad = UserDialogs.Instance.Loading("Loading Trip Data", maskType: MaskType.Clear))
                 {
-                    Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(groupedContainers);
+
+                    var containersForSegment = await ContainerHelper.ContainersForSegment(TripNumber, _tripSegmentRepository,
+                        _tripSegmentContainerRepository);
+
+                    _custHostCode = trip.TripCustHostCode;
+                    Title = trip.TripTypeDesc;
+                    SubTitle = $"Trip {trip.TripNumber}";
+                    TripFor = trip.TripCustName;
+                    TripCustName = containersForSegment.First().Key.TripSegDestCustName;
+                    TripDriverInstructions = trip.TripDriverInstructions;
+                    TripCustAddress = containersForSegment.First().Key.TripSegDestCustAddress1 +
+                                      containersForSegment.First().Key.TripSegDestCustAddress2;
+                    TripCustCityStateZip = $"{containersForSegment.First().Key.TripSegDestCustCity}, {containersForSegment.First().Key.TripSegDestCustState} {containersForSegment.First().Key.TripSegDestCustZip}";
+                    
+                    TripType = trip.TripType;
+
+                    if (containersForSegment.Any())
+                    {
+                        Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(containersForSegment);
+                    }
                 }
+
             }
 
             base.Start();
@@ -98,6 +88,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             get { return _tripType; }
             set { SetProperty(ref _tripType, value); }
+        }
+
+        private string _tripFor;
+        public string TripFor
+        {
+            get { return _tripFor; }
+            set { SetProperty(ref _tripFor, value); }
         }
 
         private string _tripDriverInstructions;
@@ -182,8 +179,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (confirm)
             {
                 CurrentStatus = "AR"; //DriverStatusConstants.Arrive;
-                //@TODO : REMOVE
-                ExecuteNextStageCommand();
             }
         }
 

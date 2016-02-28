@@ -15,14 +15,13 @@
         android:layout_height="200dp"
         android:background="#000000" />
     <MvxExt.BindableGroupListView
-        android:id="@+id/TransactionListView"
+        android:id="@+id/TransactionSummaryListView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
         android:layout_below="@id/CameraView"
         local:MvxItemTemplate="@layout/item_transactions_listitem"
-        local:GroupItemTemplate="@layout/item_transactions"
-        local:MvxBind="ItemsSource TransactionList" />
+        local:GroupItemTemplate="@layout/item_transactions" />
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="50dp"

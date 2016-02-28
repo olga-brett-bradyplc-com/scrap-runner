@@ -34,35 +34,24 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // Grab all relevant data
         public override async void Start()
         {
-            var containersTrip = await _tripSegmentRepository.AsQueryable()
-                .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
-            var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
-                .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
-            var groupedContainers = from details in containerSegments
-                orderby details.TripSegNumber
-                group details by new {details.TripNumber, details.TripSegNumber}
-                into detailsGroup
-                select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
-                    tsm =>
-                        (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber +
-                                                                    detailsGroup.Key.TripSegNumber)
-                    ), detailsGroup);
-            if (containersTrip.Any())
+            var containersForSegment = await ContainerHelper.ContainersForSegment(TripNumber, _tripSegmentRepository,
+                _tripSegmentContainerRepository);
+            if (containersForSegment.Any())
             {
-                TransactionList =
+                Containers =
                     new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
-                        groupedContainers);
+                        containersForSegment);
             }
 
             base.Start();
         }
 
         // Listview bindings
-        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _transactionList;
-        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> TransactionList
+        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
+        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
         {
-            get {  return _transactionList; }
-            set { SetProperty(ref _transactionList, value); }
+            get { return _containers; }
+            set { SetProperty(ref _containers, value); }
         }
 
         // Command bindings

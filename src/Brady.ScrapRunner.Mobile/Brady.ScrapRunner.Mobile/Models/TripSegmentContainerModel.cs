@@ -6,8 +6,10 @@
     [Table("TripSegmentContainer")]
     public class TripSegmentContainerModel
     {
-        [PrimaryKey]
-        public string CompositeKey => TripNumber + ';' + TripSegNumber + ';' + TripSegContainerNumber;
+        [PrimaryKey, AutoIncrement]
+        public int Tid { get; set; }
+        // @TODO : Creating the primary key this way is actually creating the table without a pk, which prevents us from deleting the row
+        // public string CompositeKey => TripNumber + ';' + TripSegNumber + ';' + TripSegContainerNumber + (new Random().Next(1,50));
 
         [MaxLength(10)]
         public string TripNumber { get; set; }

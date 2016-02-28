@@ -99,7 +99,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
             catch (Exception exception)
             {
-                var message = exception.InnerException.Message ?? exception.Message;
+                var message = exception?.InnerException?.Message ?? exception.Message;
                 await UserDialogs.Instance.AlertAsync(
                     message, AppResources.Error, AppResources.OK);
             }

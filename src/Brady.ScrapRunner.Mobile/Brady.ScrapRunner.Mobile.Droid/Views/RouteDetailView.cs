@@ -71,6 +71,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             var directionsButton = FindViewById<Button>(Resource.Id.DirectionsButton);
             var enrouteButton = FindViewById<Button>(Resource.Id.EnrouteButton);
             var arriveButton = FindViewById<Button>(Resource.Id.ArriveButton);
+            var buttonLayout = FindViewById<LinearLayout>(Resource.Id.transactionButtonLayout);
 
             // @TODO: Add animations, etc., 
             switch (ViewModel.CurrentStatus)
@@ -86,6 +87,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
                     toolbar.SetBackgroundColor(Color.ParseColor("#b51717"));
                     arriveButton.Visibility = ViewStates.Invisible;
                     directionsButton.SetX(directionsButton.GetX() + 135);
+                    buttonLayout.Visibility = ViewStates.Visible;
                     break;
             }
         }
