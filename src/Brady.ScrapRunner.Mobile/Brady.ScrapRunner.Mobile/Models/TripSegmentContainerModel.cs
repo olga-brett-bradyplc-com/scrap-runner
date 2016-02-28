@@ -43,19 +43,19 @@
 
         public DateTime? WeightGrossDateTime { get; set; }
 
-        public int? TripSegContainerWeightGross { get; set; }
+        public long? TripSegContainerWeightGross { get; set; }
 
         public DateTime? WeightGross2ndDateTime { get; set; }
 
-        public int? TripSegContainerWeightGross2nd { get; set; }
+        public long? TripSegContainerWeightGross2nd { get; set; }
 
         public DateTime? WeightTareDateTime { get; set; }
 
-        public int? TripSegContainerWeightTare { get; set; }
+        public long? TripSegContainerWeightTare { get; set; }
 
-        public int? TripSegContainerLatitude { get; set; }
+        public long? TripSegContainerLatitude { get; set; }
 
-        public int? TripSegContainerLongitude { get; set; }
+        public long? TripSegContainerLongitude { get; set; }
 
         [MaxLength(1)]
         public string TripSegContainerLoaded { get; set; }
