@@ -17,7 +17,7 @@
         local:GroupItemTemplate="@layout/item_transactions" />
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="50dp"
+        android:layout_height="65dp"
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
         <Button
