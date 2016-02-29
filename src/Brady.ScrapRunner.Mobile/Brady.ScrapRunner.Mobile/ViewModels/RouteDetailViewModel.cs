@@ -16,19 +16,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     // This is still a work in progress
     public class RouteDetailViewModel : BaseViewModel
     {
-        private readonly IRepository<TripModel> _tripRepository;
-        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
-        private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
+        private readonly ITripService _tripService;
         private string _custHostCode;
 
-        public RouteDetailViewModel(
-            IRepository<TripModel> tripRepository,
-            IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
+        public RouteDetailViewModel(ITripService tripService)
         {
-            _tripRepository = tripRepository;
-            _tripSegmentRepository = tripSegmentRepository;
-            _tripSegmentContainerRepository = tripSegmentContainerRepository;
+            _tripService = tripService;
             DirectionsCommand = new MvxCommand(ExecuteDrivingDirectionsCommand);
             EnRouteCommand = new MvxCommand(ExecuteEnRouteCommand);
             ArriveCommand = new MvxCommand(ExecuteArriveCommand);
@@ -42,31 +35,37 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var trip = await _tripRepository.FindAsync(t => t.TripNumber == TripNumber);
+            var trip = await _tripService.FindTripAsync(TripNumber);
 
             if (trip != null)
             {
                 using (var tripDataLoad = UserDialogs.Instance.Loading("Loading Trip Data", maskType: MaskType.Clear))
                 {
+                    var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+                    var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
-                    var containersForSegment = await ContainerHelper.ContainersForSegment(TripNumber, _tripSegmentRepository,
-                        _tripSegmentContainerRepository);
+                    foreach (var tsm in segments)
+                    {
+                        var containers =
+                            await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+                        var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
+                        list.Add(grouping);
+                    }
 
                     _custHostCode = trip.TripCustHostCode;
                     Title = trip.TripTypeDesc;
                     SubTitle = $"Trip {trip.TripNumber}";
-                    TripFor = trip.TripCustName;
-                    TripCustName = containersForSegment.First().Key.TripSegDestCustName;
-                    TripDriverInstructions = trip.TripDriverInstructions;
-                    TripCustAddress = containersForSegment.First().Key.TripSegDestCustAddress1 +
-                                      containersForSegment.First().Key.TripSegDestCustAddress2;
-                    TripCustCityStateZip = $"{containersForSegment.First().Key.TripSegDestCustCity}, {containersForSegment.First().Key.TripSegDestCustState} {containersForSegment.First().Key.TripSegDestCustZip}";
-                    
                     TripType = trip.TripType;
+                    TripFor = trip.TripCustName;
 
-                    if (containersForSegment.Any())
+                    if (list.Any())
                     {
-                        Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(containersForSegment);
+                        Containers = list;
+                        TripCustName = list.First().Key.TripSegDestCustName;
+                        TripDriverInstructions = trip.TripDriverInstructions;
+                        TripCustAddress = list.First().Key.TripSegDestCustAddress1 +
+                                          list.First().Key.TripSegDestCustAddress2;
+                        TripCustCityStateZip = $"{list.First().Key.TripSegDestCustCity}, {list.First().Key.TripSegDestCustState} {list.First().Key.TripSegDestCustZip}";
                     }
                 }
 

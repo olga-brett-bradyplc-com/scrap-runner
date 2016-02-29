@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.Services
+﻿using Brady.ScrapRunner.Mobile.Helpers;
+
+namespace Brady.ScrapRunner.Mobile.Services
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -13,21 +15,29 @@
         private readonly IRepository<PreferenceModel> _preferenceRepository;
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
+        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository; 
 
         public TripService(
             IRepository<PreferenceModel> preferenceRepository, 
             IRepository<TripModel> tripRepository, 
-            IRepository<TripSegmentModel> tripSegmentRepository)
+            IRepository<TripSegmentModel> tripSegmentRepository,
+            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository )
         {
             _preferenceRepository = preferenceRepository;
             _tripRepository = tripRepository;
             _tripSegmentRepository = tripSegmentRepository;
+            _tripSegmentContainerRepository = tripSegmentContainerRepository;
         }
 
         public async Task<bool> IsTripSequenceEnforcedAsync()
         {
             var preference = await _preferenceRepository.FindAsync(p => p.Parameter == "DEFEnforceSeqProcess");
             return preference != null && preference.ParameterValue == Constants.Yes;
+        }
+
+        public async Task<TripModel> FindTripAsync(string tripNumber)
+        {
+            return await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
         }
 
         public async Task<TripModel> FindNextTripAsync()
@@ -54,6 +64,19 @@
             }
             var firstCustomer = segments.First().TripSegDestCustHostCode;
             return segments.TakeWhile(ts => ts.TripSegDestCustHostCode == firstCustomer).ToList();
+        }
+
+        public async Task<List<TripSegmentContainerModel>> FindNextTripSegmentContainersAsync(string tripNumber, string tripSegNo)
+        {
+            var containers = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(tscm => tscm.TripNumber == tripNumber
+                               && tscm.TripSegNumber == tripSegNo).ToListAsync();
+            if (!containers.Any())
+            {
+                Mvx.TaggedError(Constants.ScrapRunner, $"Couldn't find next containers for trip {tripNumber}.");
+                return Enumerable.Empty<TripSegmentContainerModel>().ToList();
+            }
+            return containers;
         }
     }
 }
