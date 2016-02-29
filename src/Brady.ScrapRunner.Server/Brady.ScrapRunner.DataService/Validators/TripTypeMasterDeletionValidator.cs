@@ -1,5 +1,4 @@
-﻿using System;
-using BWF.DataServices.Support.NHibernate.Interfaces;
+﻿using BWF.DataServices.Support.NHibernate.Interfaces;
 using FluentValidation;
 using Brady.ScrapRunner.Domain.Models;
 

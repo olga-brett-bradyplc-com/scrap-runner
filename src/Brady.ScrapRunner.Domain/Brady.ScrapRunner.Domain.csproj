@@ -81,8 +81,13 @@
     <Compile Include="Metadata\PowerMasterMetadata.cs" />
     <Compile Include="Metadata\PreferenceMetadata.cs" />
     <Compile Include="Metadata\SRMetadataBundle.cs" />
+    <Compile Include="Metadata\TripPointsMetadata.cs" />
     <Compile Include="Metadata\TripReferenceNumberMetadata.cs" />
     <Compile Include="Metadata\TripSegmentContainerMetadata.cs" />
+    <Compile Include="Metadata\TripSegmentContainerTimeMetadata.cs" />
+    <Compile Include="Metadata\TripSegmentImageMetadata.cs" />
+    <Compile Include="Metadata\TripSegmentTimeMetadata.cs" />
+    <Compile Include="Metadata\TripTypeAllowCustTypeMetadata.cs" />
     <Compile Include="Metadata\TripTypeBasicDetailsMetadata.cs" />
     <Compile Include="Metadata\TripTypeBasicMetadata.cs" />
     <Compile Include="Metadata\TripMetadata.cs" />
@@ -130,8 +135,13 @@
     <Compile Include="Models\EmployeeMaster.cs" />
     <Compile Include="Models\PowerMaster.cs" />
     <Compile Include="Models\Preference.cs" />
+    <Compile Include="Models\TripPoints.cs" />
     <Compile Include="Models\TripReferenceNumber.cs" />
     <Compile Include="Models\TripSegmentContainer.cs" />
+    <Compile Include="Models\TripSegmentContainerTime.cs" />
+    <Compile Include="Models\TripSegmentImage.cs" />
+    <Compile Include="Models\TripSegmentTime.cs" />
+    <Compile Include="Models\TripTypeAllowCustType.cs" />
     <Compile Include="Models\TripTypeBasic.cs" />
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\TripSegmentMileage.cs" />
@@ -147,16 +157,16 @@
       <HintPath>..\..\packages\AutoMapper.4.1.1\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="BWF.DataServices.Metadata, Version=2016.1.113.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\bwf.dataservices.metadata.2016.1.113-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.Metadata.dll</HintPath>
+    <Reference Include="BWF.DataServices.Metadata, Version=2016.1.121.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\bwf.dataservices.metadata.2016.1.121-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.Metadata.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="BWF.Enums, Version=2016.1.113.0, Culture=neutral, PublicKeyToken=3bc3db66488aec07, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\bwf.enums.2016.1.113-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.Enums.dll</HintPath>
+    <Reference Include="BWF.Enums, Version=2016.1.121.0, Culture=neutral, PublicKeyToken=3bc3db66488aec07, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\bwf.enums.2016.1.121-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.Enums.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.8.0.2\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
