@@ -2,19 +2,18 @@
 using FluentValidation;
 using Brady.ScrapRunner.Domain.Models;
 
-
 namespace Brady.ScrapRunner.DataService.Validators
 {
-   
-    public class TripTypeMasterDeletionValidator :
-        AbstractValidator<TripTypeMaster>, IRequireCrudingDataServiceRepository
+
+    public class TripPointsValidator :
+         AbstractValidator<TripPoints>, IRequireCrudingDataServiceRepository
     {
         ICrudingDataServiceRepository _repository;
 
-        public TripTypeMasterDeletionValidator()
+        public TripPointsValidator()
         {
-            RuleFor(x => x.TripTypeCode).NotEmpty();
-            RuleFor(x => x.TripTypeSeqNumber).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.TripPointsHostCode1).NotEmpty();
+            RuleFor(x => x.TripPointsHostCode2).NotEmpty();
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)

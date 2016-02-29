@@ -14,6 +14,8 @@
         public string TripNumber { get; set; }
         [MaxLength(2)]
         public string TripSegNumber { get; set; }
+        [MaxLength(1)]
+        public string TripSegStatus { get; set; }
         [MaxLength(4)]
         public string TripSegType { get; set; }
         [MaxLength(35)]
@@ -38,5 +40,6 @@
         public string TripSegDestCustState { get; set; }
         [MaxLength(10)]
         public string TripSegDestCustZip { get; set; }
+        public int? TripSegContainerQty { get; set; }
     }
 }
