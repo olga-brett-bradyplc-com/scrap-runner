@@ -123,6 +123,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
                     android:layout_marginTop="43dp"
+                    android:paddingRight="10dp"
                     android:layout_marginBottom="@dimen/cardview_toolbar_spacer"
                     local:MvxBind="Text TripDriverInstructions" />
             </android.support.v7.widget.CardView>

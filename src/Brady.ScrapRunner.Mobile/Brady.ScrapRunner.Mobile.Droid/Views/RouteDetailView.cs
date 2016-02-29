@@ -106,27 +106,21 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
 
                 // We'd use a listview for this usually, but since we're mocking our collapsable lists ( not implemented in prototype ),
                 // only show the first TripSegmentContainer for each TripSegment
-                //var firstTripSegmentContainer = element.First();
+                var firstTripSegmentContainer = element.First();
 
-                //var tempListView =
-                //    inflatorService.Inflate(Resource.Layout.item_tripsegment_listitem, null) as
-                //        LinearLayout;
+                var tempType = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerTypeText);
+                tempType.Text = firstTripSegmentContainer.DefaultTripSegContainerSeqNumber +
+                    " " + firstTripSegmentContainer.TripSegContainerType +
+                    "-" + firstTripSegmentContainer.TripSegContainerSize;
+                tempType.Id = 2;
 
-                //tripSegmentLayout.AddView(tempListView);
+                var tempCommodity = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerCommodityDescText);
+                tempCommodity.Text = firstTripSegmentContainer.TripSegContainerCommodityDesc;
+                tempCommodity.Id = 3;
 
-                //var tempType = tempListView.FindViewById<TextView>(Resource.Id.TripSegmentContainerTypeText);
-                //tempType.Text = firstTripSegmentContainer.DefaultTripSegContainerSeqNumber + 
-                //    " " + firstTripSegmentContainer.TripSegContainerType + 
-                //    "-" + firstTripSegmentContainer.TripSegContainerSize;
-                //tempType.Id = 2;
-
-                //var tempCommodity = tempListView.FindViewById<TextView>(Resource.Id.TripSegmentContainerCommodityDescText);
-                //tempCommodity.Text = firstTripSegmentContainer.TripSegContainerCommodityDesc;
-                //tempCommodity.Id = 3;
-
-                //var tempLocation = tempListView.FindViewById<TextView>(Resource.Id.TripSegmentContianerLocationText);
-                //tempLocation.Text = firstTripSegmentContainer.TripSegContainerLocation;
-                //tempLocation.Id = 4;
+                var tempLocation = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContianerLocationText);
+                tempLocation.Text = firstTripSegmentContainer.TripSegContainerLocation;
+                tempLocation.Id = 4;
             }
         }
     }

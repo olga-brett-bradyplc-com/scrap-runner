@@ -2,9 +2,9 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="20dp"
-    android:background="@color/material_white"
-    android:layout_height="wrap_content">
+    android:background="@color/material_white">
     <TextView
         android:id="@+id/cardViewTitle"
         android:layout_width="match_parent"
@@ -14,4 +14,30 @@
         android:layout_marginBottom="10dp"
         android:textSize="20dp"
         android:textColor="@color/material_200" />
+    <TextView
+        android:id="@+id/TripSegmentContainerTypeText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="45dp"
+        android:layout_marginBottom="10dp"
+        android:textSize="11dp"
+        local:MvxBind="Text TripSegContainerType" />
+    <TextView
+        android:id="@+id/TripSegmentContainerCommodityDescText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="65dp"
+        android:layout_marginBottom="10dp"
+        android:textSize="11dp"
+        local:MvxBind="Text TripSegContainerCommodityDesc" />
+    <TextView
+        android:id="@+id/TripSegmentContianerLocationText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_margin_half"
+        android:textSize="11dp"
+        local:MvxBind="Text TripSegContainerLocation" />
 </android.support.v7.widget.CardView>
