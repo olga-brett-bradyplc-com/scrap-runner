@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Acr.UserDialogs;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
@@ -31,24 +32,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var containersTrip = await _tripSegmentRepository.AsQueryable()
-                .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
-            var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
-                .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
-            var groupedContainers = from details in containerSegments
-                orderby details.TripSegNumber
-                group details by new {details.TripNumber, details.TripSegNumber}
-                into detailsGroup
-                select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
-                    tsm =>
-                        (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber +
-                                                                    detailsGroup.Key.TripSegNumber)
-                    ), detailsGroup);
-            if (containersTrip.Any())
+            var containersForSegment = await ContainerHelper.ContainersForSegment(TripNumber, _tripSegmentRepository,
+                _tripSegmentContainerRepository);
+            if (containersForSegment.Any())
             {
-                TransactionList =
+                Containers =
                     new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
-                        groupedContainers);
+                        containersForSegment);
             }
             
             base.Start();
@@ -63,11 +53,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Listview bindings
-        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _transactionList;
-        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> TransactionList
+        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
+        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
         {
-            get { return _transactionList; }
-            set { SetProperty(ref _transactionList, value); }
+            get { return _containers; }
+            set { SetProperty(ref _containers, value); }
         }
 
 
@@ -75,13 +65,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public MvxCommand ConfirmTransactionsCommand { get; private set; }
 
         // Command Impl
-        private void ExecuteConfirmTransactionsCommand()
+        private async void ExecuteConfirmTransactionsCommand()
         {
-            // @TODO : Impement TripMaster logic so we know what a particular trip is composed of
-            // @TODO : That is, Switch Trip => (Drop Empty, Pickup Full) then (Return To Yard)
-            // This is hardcoded until the above is resolved
+            using (var completeTripSegment = UserDialogs.Instance.Loading("Completing Trip Segment", maskType: MaskType.Clear))
+            {
+                foreach (Grouping<TripSegmentModel, TripSegmentContainerModel> grouping in Containers)
+                {
+                    foreach (TripSegmentContainerModel tscm in grouping)
+                    {
+                        await _tripSegmentContainerRepository.DeleteAsync(tscm);
+                    }
+
+                    await _tripSegmentRepository.DeleteAsync(grouping.Key);
+                }
+            }
             Close(this);
-            ShowViewModel<RouteDetailViewModel>(new {tripNumber = "615113"});
+            ShowViewModel<RouteDetailViewModel>(new {tripNumber = TripNumber});
         }
 
     }

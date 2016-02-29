@@ -6,8 +6,10 @@
     [Table("TripSegmentContainer")]
     public class TripSegmentContainerModel
     {
-        [PrimaryKey]
-        public string CompositeKey => TripNumber + ';' + TripSegNumber + ';' + TripSegContainerNumber;
+        [PrimaryKey, AutoIncrement]
+        public int Tid { get; set; }
+        // @TODO : Creating the primary key this way is actually creating the table without a pk, which prevents us from deleting the row
+        // public string CompositeKey => TripNumber + ';' + TripSegNumber + ';' + TripSegContainerNumber + (new Random().Next(1,50));
 
         [MaxLength(10)]
         public string TripNumber { get; set; }
@@ -43,19 +45,19 @@
 
         public DateTime? WeightGrossDateTime { get; set; }
 
-        public int? TripSegContainerWeightGross { get; set; }
+        public long? TripSegContainerWeightGross { get; set; }
 
         public DateTime? WeightGross2ndDateTime { get; set; }
 
-        public int? TripSegContainerWeightGross2nd { get; set; }
+        public long? TripSegContainerWeightGross2nd { get; set; }
 
         public DateTime? WeightTareDateTime { get; set; }
 
-        public int? TripSegContainerWeightTare { get; set; }
+        public long? TripSegContainerWeightTare { get; set; }
 
-        public int? TripSegContainerLatitude { get; set; }
+        public long? TripSegContainerLatitude { get; set; }
 
-        public int? TripSegContainerLongitude { get; set; }
+        public long? TripSegContainerLongitude { get; set; }
 
         [MaxLength(1)]
         public string TripSegContainerLoaded { get; set; }

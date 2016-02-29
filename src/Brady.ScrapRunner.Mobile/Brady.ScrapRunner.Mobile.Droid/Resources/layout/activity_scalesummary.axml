@@ -13,5 +13,5 @@
         android:orientation="vertical"
         local:MvxItemTemplate="@layout/item_scalesummary_listitem"
         local:GroupItemTemplate="@layout/item_scalesummary"
-        local:MvxBind="ItemsSource TransactionList; ItemClick ContainerSelectedCommand" />
+        local:MvxBind="ItemClick ContainerSelectedCommand" />
 </LinearLayout>
