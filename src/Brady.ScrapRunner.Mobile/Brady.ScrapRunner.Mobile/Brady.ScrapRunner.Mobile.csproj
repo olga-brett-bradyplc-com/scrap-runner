@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Converters\DateTimeValueConverter.cs" />
     <Compile Include="CustomLanguageBindingParser.cs" />
     <Compile Include="Helpers\ContainerHelper.cs" />
     <Compile Include="Helpers\Grouping.cs" />
