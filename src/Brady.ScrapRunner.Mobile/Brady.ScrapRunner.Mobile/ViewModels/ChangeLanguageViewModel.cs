@@ -38,11 +38,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             AppResources.Culture = cultureInfo;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             Close(this);
+            ShowViewModel<SignInViewModel>();
         }
-         public MvxCommand<CultureInfo> SelectLanguageCommand { get; private set; }
-        public IMvxLanguageBinder TextSource
-        {
-            get { return new MvxLanguageBinder("", GetType().Name); }
-        }
-    }
+        public MvxCommand<CultureInfo> SelectLanguageCommand { get; private set; }
+     }
 }

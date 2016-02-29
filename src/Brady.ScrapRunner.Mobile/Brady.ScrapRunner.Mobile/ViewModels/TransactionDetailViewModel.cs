@@ -1,10 +1,12 @@
-﻿namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿using Brady.ScrapRunner.Mobile.Resources;
+
+namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     public class TransactionDetailViewModel : BaseViewModel
     {
         public TransactionDetailViewModel()
         {
-            Title = "Pickup Full";
+            Title = AppResources.PickupFull;
             //Subtitle = "Trip 615112";
         }
 

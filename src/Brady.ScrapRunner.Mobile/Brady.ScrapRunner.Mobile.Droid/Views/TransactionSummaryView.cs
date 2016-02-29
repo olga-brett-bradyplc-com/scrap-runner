@@ -15,8 +15,7 @@ using MvvmCross.Platform.WeakSubscription;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
-    [Activity(Label = "Transaction Summary View",
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
+    [Activity(Label = "Transaction Summary View")]
     public class TransactionSummaryView : BaseActivity<TransactionSummaryViewModel>
     {
         protected override void OnCreate(Bundle savedInstanceState)

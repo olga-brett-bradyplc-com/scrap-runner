@@ -11,29 +11,28 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_centerInParent="true">
-        <EditText
+      <EditText
+            android:id="@+id/UsernameTextEdit"
             android:background="@drawable/rounded_edittext_top_states"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:padding="4dp"
-            android:hint="@string/username"
             local:MvxBind="Text UserName" />
-        <EditText
-            android:background="@drawable/rounded_edittext_bottom_states"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:padding="4dp"
-            android:layout_marginTop="2dp"
-            android:inputType="textPassword"
-            android:hint="@string/password"
-            local:MvxBind="Text Password" />
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:text="@string/log_in"
-            local:MvxBind="Click SignInCommand" 
-            local:MvxLang="Text SignIn"/>
+      <EditText
+          android:id="@+id/PasswordTextEdit"
+          android:background="@drawable/rounded_edittext_bottom_states"
+          android:layout_width="match_parent"
+          android:layout_height="48dp"
+          android:padding="4dp"
+          android:layout_marginTop="2dp"
+          android:inputType="textPassword"
+          local:MvxBind="Text Password" />
+      <Button
+          android:id="@+id/SignInButton"
+          android:layout_width="match_parent"
+          android:layout_height="48dp"
+          android:layout_marginTop="4dp"
+          local:MvxBind="Click SignInCommand" />
     </LinearLayout>
     <ImageView
         android:layout_above="@id/center_panel"

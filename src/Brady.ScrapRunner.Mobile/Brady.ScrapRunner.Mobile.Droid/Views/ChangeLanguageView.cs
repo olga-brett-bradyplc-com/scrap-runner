@@ -6,8 +6,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
     using Android.OS;
     using ViewModels;
 
-    [Activity(Label = "Change Language",
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
+    [Activity(Label = "Change Language")]
     public class ChangeLanguageView : BaseActivity<ChangeLanguageViewModel>
     {
         protected override void OnCreate(Bundle savedInstanceState)

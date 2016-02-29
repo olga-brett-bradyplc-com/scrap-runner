@@ -47,7 +47,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 _custHostCode = trip.TripCustHostCode;
                 Title = trip.TripTypeDesc;
-                SubTitle = $"Trip {trip.TripNumber}";
+                SubTitle = AppResources.Trip + $" {trip.TripNumber}";
                 TripCustName = trip.TripCustName;
                 TripDriverInstructions = trip.TripDriverInstructions;
                 TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;

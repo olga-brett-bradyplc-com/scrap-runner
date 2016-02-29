@@ -132,10 +132,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             ShowViewModel<SettingsViewModel>();
         }
-        public IMvxLanguageBinder TextSource
-        {
-            get { return new MvxLanguageBinder("", GetType().Name); }
-        }
 
     }
 }

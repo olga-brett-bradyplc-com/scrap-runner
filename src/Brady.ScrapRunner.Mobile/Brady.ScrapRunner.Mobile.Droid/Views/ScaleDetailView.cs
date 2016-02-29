@@ -14,8 +14,7 @@ using Brady.ScrapRunner.Mobile.ViewModels;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
-    [Activity(Label = "ScaleDetailView",
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
+    [Activity(Label = "ScaleDetailView")]
     public class ScaleDetailView : BaseActivity<ScaleDetailViewModel>
     {
         protected override void OnCreate(Bundle savedInstanceState)

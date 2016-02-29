@@ -411,5 +411,113 @@ namespace Brady.ScrapRunner.Mobile.Resources {
                 return ResourceManager.GetString("UserNameOutOfRange", resourceCulture);
             }
         }
+        /// <summary>
+        ///   Looks up a localized string similar to Enter your password.
+        /// </summary>
+        public static string PasswordHint
+        {
+            get
+            {
+                return ResourceManager.GetString("PasswordHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Pickup Full.
+        /// </summary>
+        public static string PickupFull
+        {
+            get
+            {
+                return ResourceManager.GetString("PickupFull", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Power Unit ID and Odometer Reading.
+        /// </summary>
+        public static string PowerUnitViewTitle
+        {
+            get
+            {
+                return ResourceManager.GetString("PowerUnitViewTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Route Summary.
+        /// </summary>
+        public static string RouteSummary
+        {
+            get
+            {
+                return ResourceManager.GetString("RouteSummary", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Signature Receipt.
+        /// </summary>
+        public static string SignatureReceipt
+        {
+            get
+            {
+                return ResourceManager.GetString("SignatureReceipt", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Transactions.
+        /// </summary>
+        public static string Transactions
+        {
+            get
+            {
+                return ResourceManager.GetString("Transactions", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Trip.
+        /// </summary>
+        public static string Trip
+        {
+            get
+            {
+                return ResourceManager.GetString("Trip", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Enter you username.
+        /// </summary>
+        public static string UserNameHint
+        {
+            get
+            {
+                return ResourceManager.GetString("UserNameHint", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Yard/Scale Detail.
+        /// </summary>
+        public static string YardScaleDetail
+        {
+            get
+            {
+                return ResourceManager.GetString("YardScaleDetail", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Yard/Scale Summary.
+        /// </summary>
+        public static string YardScaleSummary
+        {
+            get
+            {
+                return ResourceManager.GetString("YardScaleSummary", resourceCulture);
+            }
+        }
     }
 }

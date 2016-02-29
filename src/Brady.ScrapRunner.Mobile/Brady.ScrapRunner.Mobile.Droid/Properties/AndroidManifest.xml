@@ -3,4 +3,11 @@
 	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="23" />
 	<application android:label="ScrapRunner" android:theme="@style/ScrapRunnerTheme"></application>
   <uses-permission android:name="android.permission.INTERNET" />
+  <Resources>
+    <Resource Language="x-generate" />
+    <Resource Language="es-ES" />
+    <Resource Language="es" />
+    <Resource Language="en-US" />
+    <Resource Language="en"/>
+  </Resources>
 </manifest>

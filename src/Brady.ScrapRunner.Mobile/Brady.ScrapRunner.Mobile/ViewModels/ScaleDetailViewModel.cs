@@ -24,7 +24,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _tripSegmentRepository = tripSegmentRepository;
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
 
-            Title = "Yard/Scale Detail";
+            Title = AppResources.RouteSummary;
 
             GrossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand);
             SecondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);

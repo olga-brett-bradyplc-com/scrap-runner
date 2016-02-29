@@ -13,8 +13,7 @@ using Android.Widget;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
-    [Activity(Label = "TransactionDetailView",
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
+    [Activity(Label = "TransactionDetailView")]
     public class TransactionDetailView : Activity
     {
         protected override void OnCreate(Bundle savedInstanceState)
