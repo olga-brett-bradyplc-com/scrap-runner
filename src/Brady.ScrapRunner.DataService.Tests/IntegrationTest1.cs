@@ -29,7 +29,7 @@ namespace Brady.ScrapRunner.DataService.Tests
         {
             _testContext = testContextInstance;
 
-            var hostUrl = ConfigurationManager.AppSettings["ExplorerHostUrl"];
+            var hostUrl      = ConfigurationManager.AppSettings["ExplorerHostUrl"];
             var hostUsername = ConfigurationManager.AppSettings["ExplorerHostUsername"];
             var hostPassword = ConfigurationManager.AppSettings["ExplorerHostPassword"];
 
