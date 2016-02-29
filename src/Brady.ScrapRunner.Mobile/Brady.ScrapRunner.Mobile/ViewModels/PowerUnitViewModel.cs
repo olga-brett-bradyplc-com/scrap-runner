@@ -57,10 +57,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Close(this);
             ShowViewModel<RouteSummaryViewModel>();
         }
-        public IMvxLanguageBinder TextSource
-        {
-            get { return new MvxLanguageBinder("", GetType().Name); }
-        }
 
         protected bool CanExecutePowerUnitIdCommand()
         {

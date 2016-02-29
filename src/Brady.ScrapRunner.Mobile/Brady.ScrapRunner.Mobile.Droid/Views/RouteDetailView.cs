@@ -19,8 +19,7 @@ using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
-    [Activity(Label = "Route Detail",
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
+    [Activity(Label = "Route Detail")]
     public class RouteDetailView : BaseActivity<RouteDetailViewModel>
     {
 

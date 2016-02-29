@@ -1,4 +1,6 @@
 ﻿using MvvmCross.Localization;
+using System.ComponentModel;
+
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -37,6 +39,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             var validator = new TValidator();
             return validator.Validate(type);
+        }
+        public IMvxLanguageBinder TextSource
+        {
+            get { return new MvxLanguageBinder("", GetType().Name); }
         }
     }
 }

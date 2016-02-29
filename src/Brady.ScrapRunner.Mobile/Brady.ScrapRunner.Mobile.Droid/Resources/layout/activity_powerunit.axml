@@ -26,12 +26,11 @@
             android:layout_marginTop="2dp"
             android:hint="@string/odometer_reading"
             local:MvxBind="Text Odometer" />
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:text="@string/continue_text"
-            local:MvxBind="Click PowerUnitIdCommand" 
-            local:MvxLang="Text Continue"/>
+      <Button
+          android:layout_width="match_parent"
+          android:layout_height="48dp"
+          android:layout_marginTop="4dp"
+          local:MvxBind="Click PowerUnitIdCommand"
+          local:MvxLang="Text Continue"/>
     </LinearLayout>
 </RelativeLayout>

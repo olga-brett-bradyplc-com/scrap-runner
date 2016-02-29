@@ -18,10 +18,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _currentLanguage; }
             set { SetProperty(ref _currentLanguage, value); }
         }
-        public IMvxLanguageBinder TextSource
-        {
-            get { return new MvxLanguageBinder("", GetType().Name); }
-        }
 
         private MvxCommand _changeLanguageCommand;
         public MvxCommand ChangeLanguageCommand => _changeLanguageCommand ?? 

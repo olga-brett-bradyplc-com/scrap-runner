@@ -14,8 +14,7 @@ using Brady.ScrapRunner.Mobile.ViewModels;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
-    [Activity(Label = "TransactionConfirmationView",
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
+    [Activity(Label = "TransactionConfirmationView")]
     public class TransactionConfirmationView : BaseActivity<TransactionConfirmationViewModel>
     {
         protected override void OnCreate(Bundle savedInstanceState)

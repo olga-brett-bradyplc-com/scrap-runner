@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
+using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
@@ -19,14 +20,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             _tripSegmentRepository = tripSegmentRepository;
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
-            Title = "Signature Receipt";
+            Title = AppResources.SignatureReceipt;
             ConfirmTransactionsCommand = new MvxCommand(ExecuteConfirmTransactionsCommand);
         }
 
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
-            SubTitle = $"Trip {tripNumber}";
+            SubTitle = AppResources.Trip + $" {TripNumber}";
         }
 
         public override async void Start()
