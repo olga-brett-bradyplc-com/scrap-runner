@@ -14,19 +14,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class ScaleDetailViewModel : BaseViewModel
     {
-        private readonly IRepository<TripModel> _tripRepository;
-        private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
-        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
+        private readonly ITripService _tripService;
 
-        public ScaleDetailViewModel(
-            IRepository<TripModel> tripRepository,
-            IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
+        public ScaleDetailViewModel(ITripService tripService)
         {
-            _tripRepository = tripRepository;
-            _tripSegmentRepository = tripSegmentRepository;
-            _tripSegmentContainerRepository = tripSegmentContainerRepository;
-
+            _tripService = tripService;
             Title = "Yard/Scale Detail";
 
             GrossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand);
@@ -47,23 +39,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var trip = await _tripRepository.FindAsync(t => t.TripNumber == TripNumber);
+            var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
-            if (trip != null)
+            foreach (var tsm in segments)
             {
-                using (var tripDataLoad = UserDialogs.Instance.Loading("Loading Trip Data", maskType: MaskType.Clear))
-                {
-                    var containersForSegment =
-                        await ContainerHelper.ContainersForSegment(TripNumber, _tripSegmentRepository,
-                            _tripSegmentContainerRepository);
-                    if (containersForSegment.Any())
-                    {
-                        Containers =
-                            new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
-                                containersForSegment);
-                    }
-                }
+                var containers =
+                    await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+                var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
+                list.Add(grouping);
             }
+
+            if (list.Any())
+                Containers = list;
 
             base.Start();
         }
@@ -134,28 +122,23 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // Command impl
         public async void ExecuteContainerSetDownCommand()
         {
+            // @TODO : Determine if this is last leg of trip, and then give warning that this action will complete said trip
             var result = await UserDialogs.Instance.ConfirmAsync(AppResources.SetDownContainerMessage, AppResources.SetDown);
             if (result)
             {
                 foreach (var grouping in Containers)
                 {
-                    foreach (var tscm in grouping)
-                    {
-                        await _tripSegmentContainerRepository.DeleteAsync(tscm);
-                    }
-                    await _tripSegmentRepository.DeleteAsync(grouping.Key);
+                    await _tripService.CompleteTripSegmentAsync(TripNumber, grouping.Key.TripSegNumber);
                 }
                 // Check to see if any containers/segments exists
                 // If not, delete the trip and return to route summary
                 // Otherwise, we'd go to the next point in the trip
-                var trip = await _tripRepository.FindAsync(t => t.TripNumber == TripNumber);
-                var tripContainersExist = await ContainerHelper.ContainersExist(TripNumber, _tripSegmentRepository,
-                    _tripSegmentContainerRepository);
+                var trip = await _tripService.FindNextTripSegmentsAsync(TripNumber);
 
                 // @TODO : Implement logic to determine where to go from each trip
-                if (!tripContainersExist)
+                if (!trip.Any())
                 {
-                    await _tripRepository.DeleteAsync(trip);
+                    await _tripService.CompleteTripAsync(TripNumber);
                     Close(this);
                     ShowViewModel<RouteSummaryViewModel>();
                 }

@@ -78,5 +78,32 @@ namespace Brady.ScrapRunner.Mobile.Services
             }
             return containers;
         }
+
+        public async Task<int> CompleteTripAsync(string tripNumber)
+        {
+            var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
+            await _tripRepository.DeleteAsync(trip);
+
+            return await Task.FromResult(1);
+        }
+
+        public async Task<int> CompleteTripSegmentAsync(string tripNumber, string tripSegNumber)
+        {
+            var tripSegment =
+                await _tripSegmentRepository.FindAsync(
+                        ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
+            var tripSegmentContainers = _tripSegmentContainerRepository.AsQueryable()
+                .Where(tscm => tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNumber)
+                .ToListAsync();
+
+            await _tripSegmentRepository.DeleteAsync(tripSegment);
+            foreach( var container in tripSegmentContainers.Result)
+            {
+                await _tripSegmentContainerRepository.DeleteAsync(container);
+            }
+
+            // @TODO : Fix this ...
+            return await Task.FromResult(1);
+        }
     }
 }

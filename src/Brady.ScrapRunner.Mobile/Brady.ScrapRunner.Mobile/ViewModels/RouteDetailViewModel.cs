@@ -68,7 +68,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         TripCustCityStateZip = $"{list.First().Key.TripSegDestCustCity}, {list.First().Key.TripSegDestCustState} {list.First().Key.TripSegDestCustZip}";
                     }
                 }
-
             }
 
             base.Start();

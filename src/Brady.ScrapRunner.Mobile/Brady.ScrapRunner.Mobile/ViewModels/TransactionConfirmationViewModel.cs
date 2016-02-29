@@ -11,15 +11,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     public class TransactionConfirmationViewModel : BaseViewModel
     {
-        private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
-        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
+        private readonly ITripService _tripService;
 
-        public TransactionConfirmationViewModel(
-            IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
+        public TransactionConfirmationViewModel(ITripService tripService)
         {
-            _tripSegmentRepository = tripSegmentRepository;
-            _tripSegmentContainerRepository = tripSegmentContainerRepository;
+            _tripService = tripService;
             Title = "Signature Receipt";
             ConfirmTransactionsCommand = new MvxCommand(ExecuteConfirmTransactionsCommand);
         }
@@ -32,15 +28,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var containersForSegment = await ContainerHelper.ContainersForSegment(TripNumber, _tripSegmentRepository,
-                _tripSegmentContainerRepository);
-            if (containersForSegment.Any())
+            var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
+
+            foreach (var tsm in segments)
             {
-                Containers =
-                    new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
-                        containersForSegment);
+                var containers =
+                    await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+                var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
+                list.Add(grouping);
             }
-            
+
+            if (list.Any())
+                Containers = list;
+
             base.Start();
         }
 
@@ -71,12 +72,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 foreach (Grouping<TripSegmentModel, TripSegmentContainerModel> grouping in Containers)
                 {
-                    foreach (TripSegmentContainerModel tscm in grouping)
-                    {
-                        await _tripSegmentContainerRepository.DeleteAsync(tscm);
-                    }
-
-                    await _tripSegmentRepository.DeleteAsync(grouping.Key);
+                    await _tripService.CompleteTripSegmentAsync(TripNumber, grouping.Key.TripSegNumber);
                 }
             }
             Close(this);
