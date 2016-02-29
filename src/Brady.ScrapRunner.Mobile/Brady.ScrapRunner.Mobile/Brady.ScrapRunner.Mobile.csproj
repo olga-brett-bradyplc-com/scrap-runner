@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="CustomLanguageBindingParser.cs" />
+    <Compile Include="Helpers\ContainerHelper.cs" />
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\IConnectionService.cs" />

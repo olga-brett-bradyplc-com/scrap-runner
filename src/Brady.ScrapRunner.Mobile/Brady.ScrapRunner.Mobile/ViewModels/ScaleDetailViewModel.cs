@@ -14,13 +14,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class ScaleDetailViewModel : BaseViewModel
     {
+        private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
 
         public ScaleDetailViewModel(
+            IRepository<TripModel> tripRepository,
             IRepository<TripSegmentModel> tripSegmentRepository,
             IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
         {
+            _tripRepository = tripRepository;
             _tripSegmentRepository = tripSegmentRepository;
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
 
@@ -44,34 +47,34 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var containersTrip = await _tripSegmentRepository.AsQueryable()
-                .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
-            var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
-                .Where(
-                    tsc =>
-                        tsc.TripNumber == TripNumber && tsc.TripSegNumber == TripSegNumber &&
-                        tsc.TripSegContainerNumber == TripSegContainerNumber).ToListAsync();
-            var groupedContainers = from details in containerSegments
-                orderby details.TripSegNumber
-                group details by new {details.TripNumber, details.TripSegNumber}
-                into detailsGroup
-                select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
-                    tsm =>
-                        (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber +
-                                                                    detailsGroup.Key.TripSegNumber)
-                    ), detailsGroup);
-            if (containersTrip.Any())
+            var trip = await _tripRepository.FindAsync(t => t.TripNumber == TripNumber);
+
+            if (trip != null)
             {
-                TransactionList =
-                    new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
-                        groupedContainers);
+                using (var tripDataLoad = UserDialogs.Instance.Loading("Loading Trip Data", maskType: MaskType.Clear))
+                {
+                    var containersForSegment =
+                        await ContainerHelper.ContainersForSegment(TripNumber, _tripSegmentRepository,
+                            _tripSegmentContainerRepository);
+                    if (containersForSegment.Any())
+                    {
+                        Containers =
+                            new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
+                                containersForSegment);
+                    }
+                }
             }
-            
+
             base.Start();
         }
 
         // Listview bindings
-        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> TransactionList { get; private set; }
+        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
+        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
+        {
+            get { return _containers; }
+            set { SetProperty(ref _containers, value); }
+        }
 
         // Field bindings
         private string _tripNumber;
@@ -131,12 +134,31 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // Command impl
         public async void ExecuteContainerSetDownCommand()
         {
-            // @TODO : Determine if this is the last set of containers for trip, then either navigate back to scale summary
-            // @TODO : or finish route and navigate to route summary screen
             var result = await UserDialogs.Instance.ConfirmAsync(AppResources.SetDownContainerMessage, AppResources.SetDown);
             if (result)
             {
-                Close(this);
+                foreach (var grouping in Containers)
+                {
+                    foreach (var tscm in grouping)
+                    {
+                        await _tripSegmentContainerRepository.DeleteAsync(tscm);
+                    }
+                    await _tripSegmentRepository.DeleteAsync(grouping.Key);
+                }
+                // Check to see if any containers/segments exists
+                // If not, delete the trip and return to route summary
+                // Otherwise, we'd go to the next point in the trip
+                var trip = await _tripRepository.FindAsync(t => t.TripNumber == TripNumber);
+                var tripContainersExist = await ContainerHelper.ContainersExist(TripNumber, _tripSegmentRepository,
+                    _tripSegmentContainerRepository);
+
+                // @TODO : Implement logic to determine where to go from each trip
+                if (!tripContainersExist)
+                {
+                    await _tripRepository.DeleteAsync(trip);
+                    Close(this);
+                    ShowViewModel<RouteSummaryViewModel>();
+                }
             }
         }
 
