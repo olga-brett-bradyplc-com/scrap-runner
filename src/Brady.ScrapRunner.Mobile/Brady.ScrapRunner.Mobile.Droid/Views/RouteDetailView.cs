@@ -1,11 +1,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.Animations;
 using Android.Widget;
@@ -68,6 +70,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             var directionsButton = FindViewById<Button>(Resource.Id.DirectionsButton);
             var enrouteButton = FindViewById<Button>(Resource.Id.EnrouteButton);
             var arriveButton = FindViewById<Button>(Resource.Id.ArriveButton);
+            var buttonLayout = FindViewById<LinearLayout>(Resource.Id.transactionButtonLayout);
 
             // @TODO: Add animations, etc., 
             switch (ViewModel.CurrentStatus)
@@ -83,6 +86,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
                     toolbar.SetBackgroundColor(Color.ParseColor("#b51717"));
                     arriveButton.Visibility = ViewStates.Invisible;
                     directionsButton.SetX(directionsButton.GetX() + 135);
+                    buttonLayout.Visibility = ViewStates.Visible;
                     break;
             }
         }
@@ -93,10 +97,29 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             {
                 var mainLayout = FindViewById<LinearLayout>(Resource.Id.content_layout);
                 LayoutInflater inflatorService = (LayoutInflater)this.GetSystemService(Context.LayoutInflaterService);
-                var tempLayout = inflatorService.Inflate(Resource.Layout.item_tripsegment, mainLayout) as LinearLayout;
-                var tempTitle = tempLayout.FindViewById<TextView>(Resource.Id.cardViewTitle);
+                var tripSegmentLayout = inflatorService.Inflate(Resource.Layout.item_tripsegment, mainLayout) as LinearLayout;
+
+                var tempTitle = tripSegmentLayout.FindViewById<TextView>(Resource.Id.cardViewTitle);
                 tempTitle.Text = element.Key.TripSegTypeDesc;
                 tempTitle.Id = 1; // Kind of a hacky way to do this.
+
+                // We'd use a listview for this usually, but since we're mocking our collapsable lists ( not implemented in prototype ),
+                // only show the first TripSegmentContainer for each TripSegment
+                var firstTripSegmentContainer = element.First();
+
+                var tempType = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerTypeText);
+                tempType.Text = firstTripSegmentContainer.DefaultTripSegContainerSeqNumber +
+                    " " + firstTripSegmentContainer.TripSegContainerType +
+                    "-" + firstTripSegmentContainer.TripSegContainerSize;
+                tempType.Id = 2;
+
+                var tempCommodity = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerCommodityDescText);
+                tempCommodity.Text = firstTripSegmentContainer.TripSegContainerCommodityDesc;
+                tempCommodity.Id = 3;
+
+                var tempLocation = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContianerLocationText);
+                tempLocation.Text = firstTripSegmentContainer.TripSegContainerLocation;
+                tempLocation.Id = 4;
             }
         }
     }
