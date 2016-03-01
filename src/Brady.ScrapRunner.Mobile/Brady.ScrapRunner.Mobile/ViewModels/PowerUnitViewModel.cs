@@ -110,69 +110,74 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task<bool> TruckAndOdometerAsync()
         {
-            // Validate Power ID;
-            var powerIdTask = await _connection.GetConnection().GetAsync<string, PowerMaster>(TruckId);
-            if (powerIdTask == null) return false;
-            await SavePowerMasterAsync(powerIdTask);
 
-            //  Check for duplicate login; Possibly no longer needed?
-            // @TODO : Implement; This may no longer be needed?
-
-            // Determine current trip number, segment, and driver status;
-            // If driver status record doesn't exist, write out a new remote record with initial values
-            // and then write it to local SQLite DB
-            var currentEmployeeTask = await _employeeMasterRepository.AllAsync();
-            var currentEmployeeId = currentEmployeeTask?.First().EmployeeId;
-            if (string.IsNullOrWhiteSpace(currentEmployeeId))
-                return false;
-            var driverStatusTask = await _connection.GetConnection().GetAsync<string, DriverStatus>(currentEmployeeId);
-            if (driverStatusTask == null)
+            using (var powerunitData = UserDialogs.Instance.Loading("Loading Trip Information", maskType: MaskType.Clear))
             {
-                var driverStatusObj = new DriverStatus
+                // Validate Power ID;
+                var powerIdTask = await _connection.GetConnection().GetAsync<string, PowerMaster>(TruckId);
+                if (powerIdTask == null) return false;
+                await SavePowerMasterAsync(powerIdTask);
+
+                //  Check for duplicate login; Possibly no longer needed?
+                // @TODO : Implement; This may no longer be needed?
+
+                // Determine current trip number, segment, and driver status;
+                // If driver status record doesn't exist, write out a new remote record with initial values
+                // and then write it to local SQLite DB
+                var currentEmployeeTask = await _employeeMasterRepository.AllAsync();
+                var currentEmployeeId = currentEmployeeTask?.First().EmployeeId;
+                if (string.IsNullOrWhiteSpace(currentEmployeeId))
+                    return false;
+                var driverStatusTask =
+                    await _connection.GetConnection().GetAsync<string, DriverStatus>(currentEmployeeId);
+                if (driverStatusTask == null)
                 {
-                    EmployeeId = currentEmployeeId,
-                    Status = "L",
-                    TerminalId = currentEmployeeId,
-                    RegionId = currentEmployeeId,
-                    PowerId = TruckId,
-                    LoginDateTime = DateTime.Now,
-                    ActionDateTime = DateTime.Now,
-                    Odometer = Odometer,
-                    SendHHLogoffFlag = 0
-                };
+                    var driverStatusObj = new DriverStatus
+                    {
+                        EmployeeId = currentEmployeeId,
+                        Status = "L",
+                        TerminalId = currentEmployeeId,
+                        RegionId = currentEmployeeId,
+                        PowerId = TruckId,
+                        LoginDateTime = DateTime.Now,
+                        ActionDateTime = DateTime.Now,
+                        Odometer = Odometer,
+                        SendHHLogoffFlag = 0
+                    };
 
-                var createDriverStatus = await _connection.GetConnection().UpdateAsync(driverStatusObj);
-                if (!createDriverStatus.WasSuccessful) return false;
-                await SaveDriverStatusAsync(driverStatusObj);
-            }
-            else
-            {
-                // @TODO : Update DriverStatus record values on remote db
-                await SaveDriverStatusAsync(driverStatusTask);
-            }
+                    var createDriverStatus = await _connection.GetConnection().UpdateAsync(driverStatusObj);
+                    if (!createDriverStatus.WasSuccessful) return false;
+                    await SaveDriverStatusAsync(driverStatusObj);
+                }
+                else
+                {
+                    // @TODO : Update DriverStatus record values on remote db
+                    await SaveDriverStatusAsync(driverStatusTask);
+                }
 
-            // @TODO : If trip is in progress, update Trip In Progress Flag in TripTable
+                // @TODO : If trip is in progress, update Trip In Progress Flag in TripTable
 
-            // Grab avaliable trips for Driver
-            var tripsTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<Trip>()
-                .Filter(y => y.Property(x => x.TripDriverId).EqualTo(currentEmployeeId)
-                    .And().Property(z => z.TripStatus).NotIn("X", "D")));
-            if (tripsTask == null) return false;
-            await SaveTripsAsync(tripsTask.Records);
+                // Grab avaliable trips for Driver
+                var tripsTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<Trip>()
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(currentEmployeeId)
+                        .And().Property(z => z.TripStatus).NotIn("X", "D")));
+                if (tripsTask == null) return false;
+                await SaveTripsAsync(tripsTask.Records);
 
-            // Grab trip segments for each trip brought back
-            var tripNumbers = tripsTask.Records.Select(x => x.TripNumber).ToArray();
-            var tripSegmentTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<TripSegment>()
-                .Filter(y => y.Property(x => x.TripNumber).In(tripNumbers)));
-            if (tripSegmentTask == null) return false;
-            await SaveTripSegmentsAsync(tripSegmentTask.Records);
-
-            // Grab all containers for each trip segment
-            var tripSegmentContainerTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<TripSegmentContainer>()
+                // Grab trip segments for each trip brought back
+                var tripNumbers = tripsTask.Records.Select(x => x.TripNumber).ToArray();
+                var tripSegmentTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<TripSegment>()
                     .Filter(y => y.Property(x => x.TripNumber).In(tripNumbers)));
-            if (tripSegmentContainerTask == null) return false;
-            await SaveTripSegmentContainersAsync(tripSegmentContainerTask.Records);
+                if (tripSegmentTask == null) return false;
+                await SaveTripSegmentsAsync(tripSegmentTask.Records);
 
+                // Grab all containers for each trip segment
+                var tripSegmentContainerTask =
+                    await _connection.GetConnection().QueryAsync(new QueryBuilder<TripSegmentContainer>()
+                        .Filter(y => y.Property(x => x.TripNumber).In(tripNumbers)));
+                if (tripSegmentContainerTask == null) return false;
+                await SaveTripSegmentContainersAsync(tripSegmentContainerTask.Records);
+            }
 
             return true;
         }

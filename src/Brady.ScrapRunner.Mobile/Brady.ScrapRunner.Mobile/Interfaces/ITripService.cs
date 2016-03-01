@@ -10,6 +10,8 @@
 
         Task<TripModel> FindTripAsync(string tripNumber);
 
+        Task<List<TripModel>> FindTripsAsync();
+
         Task<TripModel> FindNextTripAsync();
 
         Task<List<TripSegmentModel>> FindNextTripSegmentsAsync(string tripNumber);

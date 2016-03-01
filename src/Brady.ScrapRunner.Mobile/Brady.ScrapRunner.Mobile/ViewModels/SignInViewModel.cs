@@ -113,26 +113,29 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task<bool> SignInAsync()
         {
-            // Using this to create/delete the tables for now
-            // @TODO : Refactor this
-            await _demoDataGenerator.GenerateDemoDataAsync();
+            using (var loginData = UserDialogs.Instance.Loading("Logging In", maskType: MaskType.Clear))
+            {
+                // Using this to create/delete the tables for now
+                // @TODO : Refactor this
+                await _demoDataGenerator.GenerateDemoDataAsync();
 
-            // Check username/password against BWF, and create session if valid
-            IClientSettings clientSettings = new DemoClientSettings();
-            var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(), clientSettings.UserName, clientSettings.Password, "ScrapRunner");
+                // Check username/password against BWF, and create session if valid
+                IClientSettings clientSettings = new DemoClientSettings();
+                var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
+                    clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
-            // 2. Validate that driver exists
-            // @TODO : Move to specialized employee service
-            var userTask = await _connection.GetConnection().GetAsync<string, EmployeeMaster>(UserName);
-            if (userTask == null) return false;
-            await SaveEmployeeAsync(userTask);
+                // 2. Validate that driver exists
+                // @TODO : Move to specialized employee service
+                var userTask = await _connection.GetConnection().GetAsync<string, EmployeeMaster>(UserName);
+                if (userTask == null) return false;
+                await SaveEmployeeAsync(userTask);
 
-            // 3. Lookup preferences
-            // @TODO : Move to specialized preferences service
-            var preferenceTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<Preference>()
-                .Filter( y => y.Property(x => x.TerminalId).EqualTo(userTask.TerminalId)));
-            await SavePreferencesAsync(preferenceTask.Records);
-
+                // 3. Lookup preferences
+                // @TODO : Move to specialized preferences service
+                var preferenceTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<Preference>()
+                    .Filter(y => y.Property(x => x.TerminalId).EqualTo(userTask.TerminalId)));
+                await SavePreferencesAsync(preferenceTask.Records);
+            }
             return true;
         }
 

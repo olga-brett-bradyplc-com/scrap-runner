@@ -10,23 +10,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class RouteSummaryViewModel : BaseViewModel
     {
-        private readonly IRepository<TripModel> _tripRepository; 
+        private readonly ITripService _tripService; 
 
         public RouteSummaryViewModel(
-            IRepository<TripModel> tripRepository)
+            ITripService tripService)
         {
-            _tripRepository = tripRepository;
-            SubTitle = AppResources.Trip + $" {SelectedTrip.TripNumber}";
+            _tripService = tripService;
+            Title = "Route Summary";
             RouteSelectedCommand = new MvxCommand<TripModel>(ExecuteRouteSelectedCommand);
         }
 
         public override async void Start()
         {
-            base.Start();
-            var trips = await _tripRepository.AsQueryable()
-                .Where(t => t.TripStatus == TripStatusConstants.Pending)
-                .OrderBy(t => t.TripSequenceNumber).ToListAsync();
+            var trips = await _tripService.FindTripsAsync();
             RouteSummaryList = new ObservableCollection<TripModel>(trips);
+
+            base.Start();
         }
 
         private ObservableCollection<TripModel> _routeSummaryList;
@@ -47,7 +46,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public void ExecuteRouteSelectedCommand(TripModel selectedTrip)
         {
-            Close(this);
             ShowViewModel<RouteDetailViewModel>(new {tripNumber = selectedTrip.TripNumber});
             SelectedTrip = null;
         }
