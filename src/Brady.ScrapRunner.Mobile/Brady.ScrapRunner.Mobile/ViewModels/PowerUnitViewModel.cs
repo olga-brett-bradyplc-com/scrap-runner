@@ -151,7 +151,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
                 else
                 {
-                    // @TODO : Update DriverStatus record values on remote db
+                    driverStatusTask.ActionDateTime = DateTime.Now;
+                    driverStatusTask.LoginDateTime = DateTime.Now;
+                    var updateDriverStatus = await _connection.GetConnection().UpdateAsync(driverStatusTask);
                     await SaveDriverStatusAsync(driverStatusTask);
                 }
 
