@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:textColor="#000000"
-        local:MvxBind="Text TripCustAddress1 + TripCustAddress2;"
+        local:MvxBind="Text TripCustAddress1"
         tools:text="123 Main Street" />
     <TextView
         android:id="@+id/cust_city_state_zip"

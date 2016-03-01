@@ -22,6 +22,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
     public class ScaleDetailView : BaseActivity<ScaleDetailViewModel>
     {
         private IDisposable _containersToken;
+        private IDisposable _grossTimeToken;
+        private IDisposable _tareTimeToken;
+        private IDisposable _secondGrossTimeToken;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -33,6 +36,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
                 listGrouping.ItemsSource = ViewModel.Containers;
 
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
+            _grossTimeToken = ViewModel.WeakSubscribe(() => ViewModel.GrossTime, OnGrossTimeChanged);
+            _tareTimeToken = ViewModel.WeakSubscribe(() => ViewModel.TareTime, OnTareTimeChanged);
+            _secondGrossTimeToken = ViewModel.WeakSubscribe(() => ViewModel.SecondGrossTime, OnSecondGrossTimeChanged);
         }
 
         public override void OnDetachedFromWindow()
@@ -40,6 +46,18 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             if (_containersToken == null) return;
             _containersToken.Dispose();
             _containersToken = null;
+
+            if (_grossTimeToken == null) return;
+            _grossTimeToken.Dispose();
+            _grossTimeToken = null;
+
+            if (_tareTimeToken == null) return;
+            _tareTimeToken.Dispose();
+            _tareTimeToken = null;
+
+            if (_secondGrossTimeToken == null) return;
+            _secondGrossTimeToken.Dispose();
+            _secondGrossTimeToken = null;
         }
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
@@ -47,6 +65,24 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             var listGrouping = FindViewById<MvxListView>(Resource.Id.ScaleDetailListView);
             if (ViewModel.Containers != null)
                 listGrouping.ItemsSource = ViewModel.Containers;
+        }
+
+        private void OnGrossTimeChanged(object sender, PropertyChangedEventArgs args)
+        {
+            var button = FindViewById<Button>(Resource.Id.grossButton);
+            button.Text = "Gross : " + ViewModel.GrossTime;
+        }
+
+        private void OnTareTimeChanged(object sender, PropertyChangedEventArgs args)
+        {
+            var button = FindViewById<Button>(Resource.Id.grossButton);
+            button.Text = "Tare : " + ViewModel.GrossTime;
+        }
+
+        private void OnSecondGrossTimeChanged(object sender, PropertyChangedEventArgs args)
+        {
+            var button = FindViewById<Button>(Resource.Id.grossButton);
+            button.Text = "Second Gross : " + ViewModel.GrossTime;
         }
     }
 }

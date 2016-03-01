@@ -8,48 +8,60 @@
         layout="@layout/toolbar" />
     <MvxExt.BindableGroupListView
         android:id="@+id/ScaleDetailListView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginTop="56dp"
         local:MvxItemTemplate="@layout/item_scaledetail_listitem"
         local:GroupItemTemplate="@layout/item_scalesummary" />
-    <LinearLayout
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/buttonTitle"
+        android:layout_width="match_parent"
         android:layout_below="@id/ScaleDetailListView"
-        android:layout_alignParentBottom="true">
-        <TextView
-            android:id="@+id/buttonTitle"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:background="#ffffff"
-            android:textColor="@color/material_gray_900"
-            android:text="Weights" />
-        <Button
-            android:id="@+id/grossButton"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_below="@id/buttonTitle"
-            android:text="Gross" />
-        <Button
-            android:id="@+id/secondGrossButton"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_below="@id/grossButton"
-            android:text="Second Gross" />
-        <Button
-            android:id="@+id/tareButton"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:text="Tare" />
-    </LinearLayout>
+        android:layout_height="30dp"
+        android:background="#ffffff"
+        android:textColor="@color/material_gray_900"
+        android:paddingLeft="10dp"
+        android:gravity="left|center_vertical"
+        android:text="Weights" />
+    <Button
+        android:id="@+id/grossButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/buttonTitle"
+        android:gravity="left|center_vertical"
+        android:textColor="@color/material_gray_900"
+        android:paddingLeft="10dp"
+        android:background="#ffffff"
+        local:MvxBind="Click GrossWeightSetCommand"
+        android:text="Gross" />
+    <Button
+        android:id="@+id/secondGrossButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/grossButton"
+        android:gravity="left|center_vertical"
+        android:textColor="@color/material_gray_900"
+        android:paddingLeft="10dp"
+        android:background="#ffffff"
+        local:MvxBind="Click SecondGrossWeightSetCommand"
+        android:text="Second Gross" />
+    <Button
+        android:id="@+id/tareButton"
+        android:layout_width="match_parent"
+        android:layout_below="@id/secondGrossButton"
+        android:gravity="left|center_vertical"
+        android:layout_height="50dp"
+        android:textColor="@color/material_gray_900"
+        android:background="#ffffff"
+        local:MvxBind="Click TareWeightSetCommand"
+        android:text="Tare" />
     <LinearLayout
         android:layout_height="65dp"
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true">
         <Button
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:textColor="#ffffff"
             local:MvxBind="Click ContainerSetDownCommand"

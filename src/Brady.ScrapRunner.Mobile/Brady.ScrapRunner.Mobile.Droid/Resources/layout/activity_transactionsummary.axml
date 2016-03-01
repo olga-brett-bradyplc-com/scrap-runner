@@ -8,7 +8,7 @@
     <include
         layout="@layout/toolbar" />
 <!-- Place holder for camera view -->
-    <LinearLayout
+    <Button
         android:id="@+id/CameraView"
         android:layout_marginTop="56dp"
         android:layout_width="match_parent"
