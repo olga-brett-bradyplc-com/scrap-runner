@@ -36,10 +36,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Converters\DateTimeValueConverter.cs" />
     <Compile Include="CustomLanguageBindingParser.cs" />
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
+    <Compile Include="Interfaces\IConnectionService.cs" />
+    <Compile Include="Interfaces\IClientSettings.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
+    <Compile Include="Interfaces\ITripService.cs" />
+    <Compile Include="Models\DriverStatusModel.cs" />
+    <Compile Include="Models\PowerMasterModel.cs" />
     <Compile Include="Models\ContainerMasterModel.cs" />
     <Compile Include="Models\CustomerDirectionModel.cs" />
     <Compile Include="Models\EmployeeMasterModel.cs" />
@@ -59,6 +65,9 @@
     <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="ScrapRunnerMapperProfile.cs" />
     <Compile Include="Services\DemoDataGenerator.cs" />
+    <Compile Include="Services\ConnectionService.cs" />
+    <Compile Include="Services\DemoClientSettings.cs" />
+    <Compile Include="Services\TripService.cs" />
     <Compile Include="StringResourceConverter.cs" />
     <Compile Include="Validators\OdometerRangeValidator.cs" />
     <Compile Include="Validators\PasswordValidator.cs" />
@@ -98,8 +107,28 @@
       <HintPath>..\..\..\packages\AutoMapper.4.1.1\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="BWF.DataServices.Domain, Version=2016.1.121.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\bwf.dataservices.domain.2016.1.121-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.Domain.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="BWF.DataServices.Metadata, Version=2016.1.121.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\bwf.dataservices.metadata.2016.1.121-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.Metadata.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="BWF.DataServices.PortableClients, Version=2016.1.121.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\bwf.dataservices.portableclients.2016.1.121-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.PortableClients.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="BWF.Enums, Version=2016.1.121.0, Culture=neutral, PublicKeyToken=3bc3db66488aec07, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\bwf.enums.2016.1.121-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.Enums.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FluentValidation, Version=6.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\FluentValidation.6.2.1-beta1\lib\portable-net45+wp80+win8+wpa81\FluentValidation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Client, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\bwf-signalr-client.2016.1.0.6\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\Microsoft.AspNet.SignalR.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Binding, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -154,6 +183,14 @@
       <HintPath>..\..\..\packages\SQLite.Net.Async-PCL.3.1.1\lib\portable-win8+net45+wp8+wpa81+MonoAndroid1+MonoTouch1\SQLite.Net.Async.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\portable-net45+win8\System.Net.Http.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\portable-net45+win8\System.Net.Http.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -168,6 +205,13 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

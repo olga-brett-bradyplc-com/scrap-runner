@@ -14,17 +14,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class ScaleDetailViewModel : BaseViewModel
     {
-        private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
-        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
+        private readonly ITripService _tripService;
 
-        public ScaleDetailViewModel(
-            IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
+        public ScaleDetailViewModel(ITripService tripService)
         {
-            _tripSegmentRepository = tripSegmentRepository;
-            _tripSegmentContainerRepository = tripSegmentContainerRepository;
-
-            Title = AppResources.RouteSummary;
+            _tripService = tripService;
+            Title = "Yard/Scale Detail";
 
             GrossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand);
             SecondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);
@@ -44,34 +39,30 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var containersTrip = await _tripSegmentRepository.AsQueryable()
-                .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
-            var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
-                .Where(
-                    tsc =>
-                        tsc.TripNumber == TripNumber && tsc.TripSegNumber == TripSegNumber &&
-                        tsc.TripSegContainerNumber == TripSegContainerNumber).ToListAsync();
-            var groupedContainers = from details in containerSegments
-                orderby details.TripSegNumber
-                group details by new {details.TripNumber, details.TripSegNumber}
-                into detailsGroup
-                select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
-                    tsm =>
-                        (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber +
-                                                                    detailsGroup.Key.TripSegNumber)
-                    ), detailsGroup);
-            if (containersTrip.Any())
+            var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
+
+            foreach (var tsm in segments)
             {
-                TransactionList =
-                    new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
-                        groupedContainers);
+                var containers =
+                    await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+                var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
+                list.Add(grouping);
             }
-            
+
+            if (list.Any())
+                Containers = list;
+
             base.Start();
         }
 
         // Listview bindings
-        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> TransactionList { get; private set; }
+        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
+        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
+        {
+            get { return _containers; }
+            set { SetProperty(ref _containers, value); }
+        }
 
         // Field bindings
         private string _tripNumber;
@@ -131,12 +122,26 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // Command impl
         public async void ExecuteContainerSetDownCommand()
         {
-            // @TODO : Determine if this is the last set of containers for trip, then either navigate back to scale summary
-            // @TODO : or finish route and navigate to route summary screen
+            // @TODO : Determine if this is last leg of trip, and then give warning that this action will complete said trip
             var result = await UserDialogs.Instance.ConfirmAsync(AppResources.SetDownContainerMessage, AppResources.SetDown);
             if (result)
             {
-                Close(this);
+                foreach (var grouping in Containers)
+                {
+                    await _tripService.CompleteTripSegmentAsync(TripNumber, grouping.Key.TripSegNumber);
+                }
+                // Check to see if any containers/segments exists
+                // If not, delete the trip and return to route summary
+                // Otherwise, we'd go to the next point in the trip
+                var trip = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+
+                // @TODO : Implement logic to determine where to go from each trip
+                if (!trip.Any())
+                {
+                    await _tripService.CompleteTripAsync(TripNumber);
+                    Close(this);
+                    ShowViewModel<RouteSummaryViewModel>();
+                }
             }
         }
 

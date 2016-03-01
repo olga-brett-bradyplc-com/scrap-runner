@@ -244,34 +244,4 @@
   <data name="English_UnitedStates" xml:space="preserve">
     <value>Inglés (Estados Unidos)</value>
   </data>
-  <data name="PickupFull" xml:space="preserve">
-    <value>Recoger completa</value>
-  </data>
-  <data name="RouteSummary" xml:space="preserve">
-    <value>Resumen de la ruta</value>
-  </data>
-  <data name="SignatureReceipt" xml:space="preserve">
-    <value>Recibo de la firma</value>
-  </data>
-  <data name="Transactions" xml:space="preserve">
-    <value>Actas</value>
-  </data>
-  <data name="YardScaleDetail" xml:space="preserve">
-    <value>Jardin / Detalle Escala</value>
-  </data>
-  <data name="YardScaleSummary" xml:space="preserve">
-    <value>Jardin / Resumen Escala</value>
-  </data>
-  <data name="Trip" xml:space="preserve">
-    <value>Viaje</value>
-  </data>
-  <data name="Power Unit ID and Odometer Reading" xml:space="preserve">
-    <value>ID de unidad de potencia y la lectura del odómetro</value>
-  </data>
-  <data name="PasswordHint" xml:space="preserve">
-    <value>Introduzca su contraseña</value>
-  </data>
-  <data name="UserNameHint" xml:space="preserve">
-    <value>Ingrese su nombre de usuario</value>
-  </data>
 </root>

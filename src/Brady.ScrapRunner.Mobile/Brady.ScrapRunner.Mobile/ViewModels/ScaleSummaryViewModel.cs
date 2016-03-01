@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
@@ -13,15 +14,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class ScaleSummaryViewModel : BaseViewModel
     {
-        private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
-        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
-          
-        public ScaleSummaryViewModel(
-            IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository )
+        private readonly ITripService _tripService;
+
+        public ScaleSummaryViewModel(ITripService tripService)
         {
-            _tripSegmentRepository = tripSegmentRepository;
-            _tripSegmentContainerRepository = tripSegmentContainerRepository;
+            _tripService = tripService;
 
             Title = AppResources.YardScaleSummary;
 
@@ -36,31 +33,33 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var containersTrip = await _tripSegmentRepository.AsQueryable()
-                .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
-            var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
-                .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
-            var groupedContainers = from details in containerSegments
-                orderby details.TripSegNumber
-                group details by new {details.TripNumber, details.TripSegNumber}
-                into detailsGroup
-                select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
-                    tsm =>
-                        (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber +
-                                                                    detailsGroup.Key.TripSegNumber)
-                    ), detailsGroup);
-            if (containersTrip.Any())
+            using (var tripDataLoad = UserDialogs.Instance.Loading("Loading Trip Data", maskType: MaskType.Clear))
             {
-                TransactionList =
-                    new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(
-                        groupedContainers);
+                var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+                var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
+
+                foreach (var tsm in segments)
+                {
+                    var containers =
+                        await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+                    var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
+                    list.Add(grouping);
+                }
+
+                if (list.Any())
+                    Containers = list;
             }
 
             base.Start();
         }
 
         // Listview bindings
-        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> TransactionList { get; private set; }
+        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
+        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
+        {
+            get { return _containers; }
+            set { SetProperty(ref _containers, value); }
+        }
 
         // Command bindings
         public MvxCommand<TripSegmentContainerModel> ContainerSelectedCommand { get; private set; }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Brady.ScrapRunner.Mobile.Helpers;
 
@@ -15,19 +16,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     // This is still a work in progress
     public class RouteDetailViewModel : BaseViewModel
     {
-        private readonly IRepository<TripModel> _tripRepository;
-        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
-        private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
+        private readonly ITripService _tripService;
         private string _custHostCode;
 
-        public RouteDetailViewModel(
-            IRepository<TripModel> tripRepository,
-            IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
+        public RouteDetailViewModel(ITripService tripService)
         {
-            _tripRepository = tripRepository;
-            _tripSegmentRepository = tripSegmentRepository;
-            _tripSegmentContainerRepository = tripSegmentContainerRepository;
+            _tripService = tripService;
             DirectionsCommand = new MvxCommand(ExecuteDrivingDirectionsCommand);
             EnRouteCommand = new MvxCommand(ExecuteEnRouteCommand);
             ArriveCommand = new MvxCommand(ExecuteArriveCommand);
@@ -41,33 +35,38 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var trip = await _tripRepository.FindAsync(t => t.TripNumber == TripNumber);
+            var trip = await _tripService.FindTripAsync(TripNumber);
 
             if (trip != null)
             {
-                _custHostCode = trip.TripCustHostCode;
-                Title = trip.TripTypeDesc;
-                SubTitle = AppResources.Trip + $" {trip.TripNumber}";
-                TripCustName = trip.TripCustName;
-                TripDriverInstructions = trip.TripDriverInstructions;
-                TripCustAddress = trip.TripCustAddress1 + trip.TripCustAddress2;
-                TripCustCityStateZip = $"{trip.TripCustCity}, {trip.TripCustState} {trip.TripCustZip}";
-                TripType = trip.TripType;
-
-                var containersTrip = await _tripSegmentRepository.AsQueryable()
-                    .Where(ts => ts.TripNumber == TripNumber).ToListAsync();
-                var containerSegments = await _tripSegmentContainerRepository.AsQueryable()
-                    .Where(tsc => tsc.TripNumber == TripNumber).ToListAsync();
-                var groupedContainers = from details in containerSegments
-                                        orderby details.TripSegNumber
-                                        group details by new { details.TripNumber, details.TripSegNumber }
-                                        into detailsGroup
-                                        select new Grouping<TripSegmentModel, TripSegmentContainerModel>(containersTrip.Find(
-                                                tsm => (tsm.TripNumber + tsm.TripSegNumber).Equals(detailsGroup.Key.TripNumber + detailsGroup.Key.TripSegNumber)
-                                            ), detailsGroup);
-                if (containersTrip.Any())
+                using (var tripDataLoad = UserDialogs.Instance.Loading("Loading Trip Data", maskType: MaskType.Clear))
                 {
-                    Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>(groupedContainers);
+                    var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+                    var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
+
+                    foreach (var tsm in segments)
+                    {
+                        var containers =
+                            await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+                        var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
+                        list.Add(grouping);
+                    }
+
+                    _custHostCode = trip.TripCustHostCode;
+                    Title = trip.TripTypeDesc;
+                    SubTitle = $"Trip {trip.TripNumber}";
+                    TripType = trip.TripType;
+                    TripFor = trip.TripCustName;
+
+                    if (list.Any())
+                    {
+                        Containers = list;
+                        TripCustName = list.First().Key.TripSegDestCustName;
+                        TripDriverInstructions = trip.TripDriverInstructions;
+                        TripCustAddress = list.First().Key.TripSegDestCustAddress1 +
+                                          list.First().Key.TripSegDestCustAddress2;
+                        TripCustCityStateZip = $"{list.First().Key.TripSegDestCustCity}, {list.First().Key.TripSegDestCustState} {list.First().Key.TripSegDestCustZip}";
+                    }
                 }
             }
 
@@ -87,6 +86,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             get { return _tripType; }
             set { SetProperty(ref _tripType, value); }
+        }
+
+        private string _tripFor;
+        public string TripFor
+        {
+            get { return _tripFor; }
+            set { SetProperty(ref _tripFor, value); }
         }
 
         private string _tripDriverInstructions;
@@ -171,19 +177,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (confirm)
             {
                 CurrentStatus = "AR"; //DriverStatusConstants.Arrive;
-                //@TODO : REMOVE
-                ExecuteNextStageCommand();
             }
         }
 
         private void ExecuteNextStageCommand()
         {
-            if (TripType.Equals("SW"))
+            if (Containers.First().Key.TripSegType.Equals("DE"))
             {
                 Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
-            else if (TripType.Equals("RT"))
+            else if (Containers.First().Key.TripSegType.Equals("RT"))
             {
                 Close(this);
                 ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
