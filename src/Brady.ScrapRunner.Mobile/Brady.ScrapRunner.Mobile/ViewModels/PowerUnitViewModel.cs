@@ -124,10 +124,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 // Determine current trip number, segment, and driver status;
                 // If driver status record doesn't exist, write out a new remote record with initial values
                 // and then write it to local SQLite DB
+                // @TODO : Create specialized employee service
                 var currentEmployeeTask = await _employeeMasterRepository.AllAsync();
                 var currentEmployeeId = currentEmployeeTask?.First().EmployeeId;
                 if (string.IsNullOrWhiteSpace(currentEmployeeId))
                     return false;
+
+                // @TODO : Create specialized driver status service?
                 var driverStatusTask =
                     await _connection.GetConnection().GetAsync<string, DriverStatus>(currentEmployeeId);
                 if (driverStatusTask == null)
