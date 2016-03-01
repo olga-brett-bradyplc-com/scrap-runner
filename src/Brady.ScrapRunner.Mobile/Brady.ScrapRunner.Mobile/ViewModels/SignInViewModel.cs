@@ -114,6 +114,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async Task<bool> SignInAsync()
         {
             // Using this to create/delete the tables for now
+            // @TODO : Refactor this
             await _demoDataGenerator.GenerateDemoDataAsync();
 
             // Check username/password against BWF, and create session if valid
@@ -121,40 +122,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(), clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
             // 2. Validate that driver exists
+            // @TODO : Move to specialized employee service
             var userTask = await _connection.GetConnection().GetAsync<string, EmployeeMaster>(UserName);
             if (userTask == null) return false;
             await SaveEmployeeAsync(userTask);
 
             // 3. Lookup preferences
+            // @TODO : Move to specialized preferences service
             var preferenceTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<Preference>()
                 .Filter( y => y.Property(x => x.TerminalId).EqualTo(userTask.TerminalId)));
             await SavePreferencesAsync(preferenceTask.Records);
 
             return true;
         }
-
-        //private async Task<bool> SignInDemoDataAsync()
-        //{
-        //    await _demoDataGenerator.GenerateDemoDataAsync();
-        //    var employeeMaster = await GetEmployeeMasterAsync();
-        //    if (employeeMaster == null) return false;
-        //    await SaveEmployeeAsync(employeeMaster);
-        //    return true;
-        //}
-
-        //private Task<EmployeeMaster> GetEmployeeMasterAsync()
-        //{
-        //    // @TODO: Get EmployeeMaster where EmployeeId = {Username} using BWF Client Library.
-        //    return Task.FromResult(new EmployeeMaster
-        //    {
-        //        EmployeeId = UserName,
-        //        AreaId = "ALL",
-        //        FirstName = "BRADY TEST",
-        //        LastName = "DRIVER",
-        //        RegionId = "SDF",
-        //        TerminalId = "F1"
-        //    });
-        //}
 
         private Task SaveEmployeeAsync(EmployeeMaster employeeMaster)
         {
