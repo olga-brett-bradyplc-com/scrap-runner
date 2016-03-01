@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿using Brady.ScrapRunner.Mobile.Resources;
+
+namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System.Collections.ObjectModel;
     using Domain;
@@ -14,7 +16,7 @@
             IRepository<TripModel> tripRepository)
         {
             _tripRepository = tripRepository;
-            Title = "Route Summary";
+            SubTitle = AppResources.Trip + $" {SelectedTrip.TripNumber}";
             RouteSelectedCommand = new MvxCommand<TripModel>(ExecuteRouteSelectedCommand);
         }
 

@@ -4,6 +4,7 @@ using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Resources;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -19,7 +20,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             _tripService = tripService;
 
-            Title = "Yard/Scale Summary";
+            Title = AppResources.YardScaleSummary;
 
             ContainerSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteContainerSelectedCommand);
         }
@@ -27,7 +28,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
-            SubTitle = $"Trip {TripNumber}";
+            SubTitle = AppResources.Trip + $" {TripNumber}";
         }
 
         public override async void Start()

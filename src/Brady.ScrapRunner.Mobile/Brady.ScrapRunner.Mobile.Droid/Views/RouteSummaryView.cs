@@ -6,8 +6,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
     using Android.OS;
     using ViewModels;
 
-    [Activity(Label = "Route Summary",
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
+    [Activity(Label = "Route Summary")]
     public class RouteSummaryView : BaseActivity<RouteSummaryViewModel>
     {
         protected override void OnCreate(Bundle savedInstanceState)

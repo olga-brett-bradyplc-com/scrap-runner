@@ -248,8 +248,34 @@
   <data name="English_UnitedStates" xml:space="preserve">
     <value>English (United States)</value>
   </data>
-  <data name="TruckIdNotFound" xml:space="preserve">
-    <value>Truck Id was not found</value>
-    <comment>Power Unit View Model</comment>
+  <data name="PickupFull" xml:space="preserve">
+    <value>Pickup Full</value>
+  </data>
+  <data name="RouteSummary" xml:space="preserve">
+    <value>Route Summary</value>
+  </data>
+  <data name="SignatureReceipt" xml:space="preserve">
+    <value>Signature Receipt</value>
+  </data>
+  <data name="Transactions" xml:space="preserve">
+    <value>Transactions</value>
+  </data>
+  <data name="YardScaleDetail" xml:space="preserve">
+    <value>Yard/Scale Detail</value>
+  </data>
+  <data name="YardScaleSummary" xml:space="preserve">
+    <value>Yard/Scale Summary</value>
+  </data>
+  <data name="Trip" xml:space="preserve">
+    <value>Trip</value>
+  </data>
+  <data name="PowerUnitViewTitle" xml:space="preserve">
+    <value>Power Unit ID and Odometer Reading</value>
+  </data>
+  <data name="PasswordHint" xml:space="preserve">
+    <value>Enter your password</value>
+  </data>
+  <data name="UserNameHint" xml:space="preserve">
+    <value>Enter you username</value>
   </data>
 </root>

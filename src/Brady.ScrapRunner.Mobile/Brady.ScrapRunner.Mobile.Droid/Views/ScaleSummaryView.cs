@@ -17,8 +17,7 @@ using MvvmCross.Platform.WeakSubscription;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
-    [Activity(Label = "ScaleSummaryView",
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
+    [Activity(Label = "ScaleSummaryView")]
     public class ScaleSummaryView : BaseActivity<ScaleSummaryViewModel>
     {
         private IDisposable _containersToken;

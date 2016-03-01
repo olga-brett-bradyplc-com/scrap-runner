@@ -17,8 +17,7 @@ using MvvmCross.Platform.WeakSubscription;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
-    [Activity(Label = "TransactionConfirmationView",
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Locale)]
+    [Activity(Label = "TransactionConfirmationView")]
     public class TransactionConfirmationView : BaseActivity<TransactionConfirmationViewModel>
     {
         private IDisposable _containersToken;
