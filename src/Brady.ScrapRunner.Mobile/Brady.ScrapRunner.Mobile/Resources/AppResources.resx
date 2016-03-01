@@ -276,6 +276,9 @@
     <value>Enter your password</value>
   </data>
   <data name="UserNameHint" xml:space="preserve">
-    <value>Enter you username</value>
+    <value>Enter your username</value>
+  </data>
+  <data name="TruckIdNotFound" xml:space="preserve">
+    <value>The specified power unit id was found found</value>
   </data>
 </root>
