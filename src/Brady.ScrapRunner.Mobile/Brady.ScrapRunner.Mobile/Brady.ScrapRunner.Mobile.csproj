@@ -41,6 +41,7 @@
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\IConnectionService.cs" />
+    <Compile Include="Interfaces\IClientSettings.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
     <Compile Include="Interfaces\ITripService.cs" />
     <Compile Include="Models\DriverStatusModel.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="ScrapRunnerMapperProfile.cs" />
     <Compile Include="Services\DemoDataGenerator.cs" />
     <Compile Include="Services\ConnectionService.cs" />
+    <Compile Include="Services\DemoClientSettings.cs" />
     <Compile Include="Services\TripService.cs" />
     <Compile Include="StringResourceConverter.cs" />
     <Compile Include="Validators\OdometerRangeValidator.cs" />

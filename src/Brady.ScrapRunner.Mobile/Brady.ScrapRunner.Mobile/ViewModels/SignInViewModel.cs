@@ -117,7 +117,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             await _demoDataGenerator.GenerateDemoDataAsync();
 
             // Check username/password against BWF, and create session if valid
-            var session = _connection.CreateConnection("", "", "ScrapRunner");
+            IClientSettings clientSettings = new DemoClientSettings();
+            var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(), clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
             // 2. Validate that driver exists
             var userTask = await _connection.GetConnection().GetAsync<string, EmployeeMaster>(UserName);
