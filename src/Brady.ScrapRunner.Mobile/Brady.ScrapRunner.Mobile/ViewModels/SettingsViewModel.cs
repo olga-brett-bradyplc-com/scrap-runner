@@ -28,5 +28,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (ShowViewModel<ChangeLanguageViewModel>())
                 Close(this);
         }
+
+        private string _changeLanguageLabel;
+
+        public string ChangeLanguageLabel
+        {
+            get { return _changeLanguageLabel; }
+            set { SetProperty(ref _changeLanguageLabel, value); }
+        }
+        public override async void Start()
+        {
+            ChangeLanguageLabel = AppResources.ChangeLanguage;
+
+            base.Start();
+        }
+
     }
 }

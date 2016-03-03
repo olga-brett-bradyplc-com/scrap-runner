@@ -19,7 +19,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public ScaleDetailViewModel(ITripService tripService)
         {
             _tripService = tripService;
-            Title = "Yard/Scale Detail";
+            Title = AppResources.YardScaleDetail;
 
             GrossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand);
             SecondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);

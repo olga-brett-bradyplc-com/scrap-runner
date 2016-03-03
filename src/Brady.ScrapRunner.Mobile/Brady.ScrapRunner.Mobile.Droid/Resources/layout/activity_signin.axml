@@ -12,27 +12,25 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_centerInParent="true">
       <EditText
-            android:id="@+id/UsernameTextEdit"
             android:background="@drawable/rounded_edittext_top_states"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:padding="4dp"
-            local:MvxBind="Text UserName" />
+            local:MvxBind="Text UserName; Hint UsernameHint" />
       <EditText
-          android:id="@+id/PasswordTextEdit"
           android:background="@drawable/rounded_edittext_bottom_states"
           android:layout_width="match_parent"
           android:layout_height="48dp"
           android:padding="4dp"
           android:layout_marginTop="2dp"
           android:inputType="textPassword"
-          local:MvxBind="Text Password" />
+          local:MvxBind="Text Password; Hint PasswordHint" />
       <Button
-          android:id="@+id/SignInButton"
+          local:MvxBind="Click SignInCommand; Text SignInLabel"
           android:layout_width="match_parent"
           android:layout_height="48dp"
           android:layout_marginTop="4dp"
-          local:MvxBind="Click SignInCommand" />
+          />
     </LinearLayout>
     <ImageView
         android:layout_above="@id/center_panel"

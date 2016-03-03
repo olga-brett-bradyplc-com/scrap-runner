@@ -66,6 +66,42 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 SignInCommand.RaiseCanExecuteChanged();
             }
         }
+        private string _usernameHint;
+        private string _passwordHint;
+        private string _signinLabel;
+
+        public string UsernameHint
+        {
+            get { return _usernameHint; }
+            set
+            {
+                SetProperty(ref _usernameHint, value);
+            }
+        }
+
+        public string PasswordHint
+        {
+            get { return _passwordHint; }
+            set
+            {
+                SetProperty(ref _passwordHint, value);
+            }
+        }
+
+        public string SignInLabel
+        {
+            get { return _signinLabel; }
+            set { SetProperty(ref _signinLabel, value); }
+        }
+        public override async void Start()
+        {
+            UsernameHint = AppResources.UserNameHint;
+            PasswordHint = AppResources.PasswordHint;
+            SignInLabel = AppResources.SignIn;
+
+            base.Start();
+        }
+
 
         public MvxCommand SignInCommand { get; protected set; }
 
@@ -113,7 +149,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task<bool> SignInAsync()
         {
-            using (var loginData = UserDialogs.Instance.Loading("Logging In", maskType: MaskType.Clear))
+            using (var loginData = UserDialogs.Instance.Loading(AppResources.LoggingIn, maskType: MaskType.Clear))
             {
                 // Using this to create/delete the tables for now
                 // @TODO : Refactor this
