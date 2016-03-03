@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Resources;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -16,7 +17,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public TransactionSummaryViewModel(ITripService tripService)
         {
             _tripService = tripService;
-            Title = "Transactions";
+            Title = AppResources.Transactions;
         }
 
         // Initialize parameter passed from Route Detail Screen

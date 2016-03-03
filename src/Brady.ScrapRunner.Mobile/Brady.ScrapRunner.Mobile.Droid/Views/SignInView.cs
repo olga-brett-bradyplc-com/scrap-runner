@@ -17,47 +17,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
         Theme = "@style/ScrapRunnerTheme.SignIn")]
     public class SignInView : BaseActivity<SignInViewModel>
     {
-        private Button _signInButton;
-        private EditText _usernameTextEdit;
-        private EditText _passwordTextEdit;
-
-        public Button SignInButton
-        {
-            get
-            {
-                return _signInButton ??
-                       (_signInButton = FindViewById<Button>(
-                           Resource.Id.SignInButton));
-            }
-        }
-
-        public EditText UsernameEditText
-        {
-            get
-            {
-                return _usernameTextEdit ??
-                       (_usernameTextEdit = FindViewById<EditText>(
-                           Resource.Id.UsernameTextEdit));
-            }
-        }
-
-        public EditText PasswordEditText
-        {
-            get
-            {
-                return _passwordTextEdit ??
-                       (_passwordTextEdit = FindViewById<EditText>(
-                           Resource.Id.PasswordTextEdit));
-            }
-        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_signin);
-            SignInButton.SetText(AppResources.SignIn, TextView.BufferType.Spannable);
-            UsernameEditText.SetHint(Resource.String.username);
-            PasswordEditText.SetHint(Resource.String.password);
         }
     }
 }

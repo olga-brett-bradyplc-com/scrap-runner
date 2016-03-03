@@ -5,6 +5,7 @@ using Acr.UserDialogs;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
+using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
@@ -16,7 +17,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public TransactionConfirmationViewModel(ITripService tripService)
         {
             _tripService = tripService;
-            Title = "Signature Receipt";
+            Title = AppResources.SignatureReceipt;
             ConfirmTransactionsCommand = new MvxCommand(ExecuteConfirmTransactionsCommand);
         }
 

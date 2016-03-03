@@ -43,12 +43,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _tripRepository = tripRepository;
             _tripSegmentRepository = tripSegmentRepository;
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
-            Title = "Power Unit ID and Odometer Reading";
+            Title = AppResources.PowerUnitViewTitle;
             PowerUnitIdCommand = new MvxCommand(ExecutePowerUnitIdCommand, CanExecutePowerUnitIdCommand);
         }
 
         private string _truckId;
         private int? _odometer;
+        private string _continueLabel;
 
         public string TruckId
         {
@@ -68,6 +69,18 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 SetProperty(ref _odometer, value);
                 PowerUnitIdCommand.RaiseCanExecuteChanged();
             }
+        }
+
+        public string ContinueLabel
+        {
+            get { return _continueLabel; }
+            set { SetProperty(ref _continueLabel, value); }
+        }
+        public override async void Start()
+        {
+            ContinueLabel = AppResources.Continue;
+
+            base.Start();
         }
 
         public MvxCommand PowerUnitIdCommand { get; protected set; }
@@ -230,11 +243,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
 
             return Task.FromResult(1);
-        }
-
-        public IMvxLanguageBinder TextSource
-        {
-            get { return new MvxLanguageBinder("", GetType().Name); }
         }
 
         protected bool CanExecutePowerUnitIdCommand()
