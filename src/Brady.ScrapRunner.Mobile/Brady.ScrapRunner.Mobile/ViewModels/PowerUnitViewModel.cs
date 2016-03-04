@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.Resources;
+using Brady.ScrapRunner.Domain.Enums;
 using BWF.DataServices.PortableClients;
 using MvvmCross.Localization;
 using MvvmCross.Plugins.Sqlite;
@@ -164,8 +166,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 // Grab avaliable trips for Driver
                 var tripsTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<Trip>()
-                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(currentEmployeeId)
-                        .And().Property(z => z.TripStatus).NotIn("X", "D")));
+                    .Filter(y => y.Property(x1 => x1.TripDriverId).EqualTo(currentEmployeeId)
+                    .And().Property(x2 => x2.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
+                    .And().Property(x3 => x3.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
+                    .And().Property(x4 => x4.TripSendFlag).In(TripSendFlagValue.Ready, TripSendFlagValue.SentToDriver)));
+
                 if (tripsTask == null) return false;
                 await SaveTripsAsync(tripsTask.Records);
 
