@@ -179,11 +179,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 // Grab avaliable trips for Driver
                 var tripsTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<Trip>()
-                    .Filter(y => y.Property(x1 => x1.TripDriverId).EqualTo(currentEmployeeId)
-                    .And().Property(x2 => x2.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
-                    .And().Property(x3 => x3.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
-                    .And().Property(x4 => x4.TripSendFlag).In(TripSendFlagValue.Ready, TripSendFlagValue.SentToDriver)));
-
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(currentEmployeeId)
+                    .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
+                    .And().Property(x => x.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
+                    .And().Property(x => x.TripSendFlag).In(TripSendFlagValue.Ready, TripSendFlagValue.SentToDriver))
+                    .OrderBy(x => x.TripSequenceNumber));
+                   
                 if (tripsTask == null) return false;
                 await SaveTripsAsync(tripsTask.Records);
 

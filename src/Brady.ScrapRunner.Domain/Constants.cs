@@ -132,6 +132,19 @@
         public static readonly int ReseqSent = 3;    //Set when the Reseq Message is sent
     }
 
+    public static class TripSegStatusConstants
+    {
+        public static readonly string Done = "D";
+        public static readonly string Pending = "P";
+        public static readonly string Canceled = "X";
+        public static readonly string Missed = "M";
+        public static readonly string Hold = "H";
+        public static readonly string Future = "F";
+        public static readonly string Review = "R";
+        public static readonly string Exception = "E";
+        public static readonly string ErrorQueue = "Q";
+    }
+
     public static class TripStatusConstants
     {
         public static readonly string Done = "D";
