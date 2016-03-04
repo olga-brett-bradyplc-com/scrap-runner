@@ -16,7 +16,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ITripService tripService)
         {
             _tripService = tripService;
-            Title = "Route Summary";
+            Title = AppResources.RouteSummary;
             RouteSelectedCommand = new MvxCommand<TripModel>(ExecuteRouteSelectedCommand);
         }
 

@@ -19,12 +19,6 @@ namespace Brady.ScrapRunner.Mobile.Droid
         public Setup(Context applicationContext) : base(applicationContext)
         {
         }
-        protected override void InitializeIoC()
-        {
-            base.InitializeIoC();
-
-            Mvx.RegisterType<IMvxLanguageBindingParser, CustomLanguageBindingParser>();
-        }
         protected override IMvxApplication CreateApp()
         {
             return new App();

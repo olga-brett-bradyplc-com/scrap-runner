@@ -244,4 +244,13 @@
   <data name="English_UnitedStates" xml:space="preserve">
     <value>Inglés (Estados Unidos)</value>
   </data>
+  <data name="PasswordHint" xml:space="preserve">
+    <value>Introduzca su contraseña</value>
+  </data>
+  <data name="UserNameHint" xml:space="preserve">
+    <value>Ingrese su nombre de usuario</value>
+  </data>
+  <data name="LoggingIn" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
 </root>
