@@ -3,6 +3,15 @@
   "link": "{{appSetting-ExplorerHostUrl}}/view/#default/explorer/View",
   "items": [
     {
+      "text": "SR Processes",
+      "items": [
+        {
+          "text": "DriverLoginProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLoginProcess"
+        }
+      ]
+    },
+    {
       "text": "SR Tables",
       "items": [
         {
