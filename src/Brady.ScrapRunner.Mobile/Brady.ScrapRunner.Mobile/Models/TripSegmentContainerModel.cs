@@ -15,13 +15,12 @@
             set { /* NO-OP SETTER */ }
         }
 
-        [PrimaryKey, MaxLength(10)]
+        [MaxLength(10)]
         public string TripNumber { get; set; }
 
-        [PrimaryKey, MaxLength(2)]
+        [MaxLength(2)]
         public string TripSegNumber { get; set; }
-
-        [PrimaryKey]
+        
         public int? TripSegContainerSeqNumber { get; set; }
 
         [MaxLength(16)]
