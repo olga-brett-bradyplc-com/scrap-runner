@@ -30,7 +30,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripType);
             StringProperty(x => x.TripTypeDesc);
             IntegerProperty(x => x.TripSequenceNumber);
-            IntegerProperty(x => x.TripSendFlag);
+            EnumProperty(x => x.TripSendFlag);
             StringProperty(x => x.TripDriverId);
             StringProperty(x => x.TripDriverName);
             StringProperty(x => x.TripCustHostCode);

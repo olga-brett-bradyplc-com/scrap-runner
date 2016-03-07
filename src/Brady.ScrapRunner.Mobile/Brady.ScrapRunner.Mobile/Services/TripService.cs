@@ -43,7 +43,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         public async Task<List<TripModel>> FindTripsAsync()
         {
             var sortedTrips = await _tripRepository.AsQueryable()
-                .Where(t => t.TripStatus != "D" && t.TripStatus != "X")
+                .Where(t => t.TripStatus == TripStatusConstants.Pending || t.TripStatus == TripStatusConstants.Missed)
                 .OrderBy(t => t.TripSequenceNumber)
                 .ToListAsync();
             return sortedTrips;
@@ -52,7 +52,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         public async Task<TripModel> FindNextTripAsync()
         {
             var sortedTrips = await _tripRepository.AsQueryable()
-                .Where(t => t.TripStatus != "D" && t.TripStatus != "X")
+                .Where(t => t.TripStatus == TripStatusConstants.Pending || t.TripStatus == TripStatusConstants.Missed)
                 .OrderBy(t => t.TripSequenceNumber)
                 .ToListAsync();
             return sortedTrips.FirstOrDefault();
@@ -63,7 +63,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             var segments = await _tripSegmentRepository.AsQueryable()
                 .Where(ts =>
                     ts.TripNumber == tripNumber
-                    && ts.TripSegStatus != "D" && ts.TripSegStatus != "X")
+                    && (ts.TripSegStatus == TripSegStatusConstants.Pending || ts.TripSegStatus == TripSegStatusConstants.Missed))
                 .OrderBy(ts => ts.TripSegNumber)
                 .ToListAsync();
             if (!segments.Any())
