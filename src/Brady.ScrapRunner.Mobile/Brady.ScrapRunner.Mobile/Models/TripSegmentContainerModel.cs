@@ -6,17 +6,22 @@
     [Table("TripSegmentContainer")]
     public class TripSegmentContainerModel
     {
-        [PrimaryKey, AutoIncrement]
-        public int Tid { get; set; }
-        // @TODO : Creating the primary key this way is actually creating the table without a pk, which prevents us from deleting the row
-        // public string CompositeKey => TripNumber + ';' + TripSegNumber + ';' + TripSegContainerNumber;
+        // It seems SQLite.NET doesn't like it when we create a primary key without a setter,
+        // so for now we'll have a no-op setter just so the table gets created with a PK.
+        [PrimaryKey]
+        public string CompositeKey
+        {
+            get { return TripNumber + ";" + TripSegNumber + ";" + TripSegContainerNumber; }
+            set { /* NO-OP SETTER */ }
+        }
 
-        [MaxLength(10)]
+        [PrimaryKey, MaxLength(10)]
         public string TripNumber { get; set; }
 
-        [MaxLength(2)]
+        [PrimaryKey, MaxLength(2)]
         public string TripSegNumber { get; set; }
 
+        [PrimaryKey]
         public int? TripSegContainerSeqNumber { get; set; }
 
         [MaxLength(16)]
