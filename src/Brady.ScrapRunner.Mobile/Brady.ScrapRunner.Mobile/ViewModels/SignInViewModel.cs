@@ -183,13 +183,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private Task SavePreferencesAsync(List<Preference> preferences)
         {
-            foreach (Preference preference in preferences)
-            {
-                var mapped = AutoMapper.Mapper.Map<Preference, PreferenceModel>(preference);
-                _preferencRepository.InsertAsync(mapped);
-            }
-
-            return Task.FromResult(1);
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<Preference>, IEnumerable<PreferenceModel>>(preferences);
+            return _preferencRepository.InsertRangeAsync(mapped);
         }
 
         private MvxCommand _settingsCommand;
