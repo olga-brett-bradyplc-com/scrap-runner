@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NHibernate;
 
 namespace Brady.ScrapRunner.DataService.Interfaces
 {
     public interface ISRRepository : IDataServiceRepository, IDisposable, ICrudingDataServiceRepository
     {
+        ISession OpenSession();
     }
 }

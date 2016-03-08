@@ -37,10 +37,10 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <Folder Include="Enums\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Enums\TripSendFlagValue.cs" />
     <Compile Include="Metadata\AreaMasterMetadata.cs" />
     <Compile Include="Metadata\CommodityMasterDestMetadata.cs" />
     <Compile Include="Metadata\ContainerHistoryMetadata.cs" />
@@ -50,6 +50,7 @@
     <Compile Include="Metadata\CustomerDirectionsMetadata.cs" />
     <Compile Include="Metadata\DriverEfficiencyMetadata.cs" />
     <Compile Include="Metadata\DriverMasterMetadata.cs" />
+    <Compile Include="Metadata\DriverLoginProcessMetadata.cs" />
     <Compile Include="Metadata\EmployeeAreaMetadata.cs" />
     <Compile Include="Metadata\EmployeeChangeMetadata.cs" />
     <Compile Include="Metadata\ErrorLogMetadata.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Models\DriverMaster.cs" />
     <Compile Include="Models\EmployeeArea.cs" />
     <Compile Include="Models\EmployeeChange.cs" />
+    <Compile Include="Models\DriverLoginProcess.cs" />
     <Compile Include="Models\ErrorLog.cs" />
     <Compile Include="Models\EventLog.cs" />
     <Compile Include="Models\CodeTable.cs" />

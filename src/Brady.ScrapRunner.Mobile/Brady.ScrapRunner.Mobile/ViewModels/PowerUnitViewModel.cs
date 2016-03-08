@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.Resources;
+using Brady.ScrapRunner.Domain.Enums;
 using BWF.DataServices.PortableClients;
 using MvvmCross.Localization;
 using MvvmCross.Plugins.Sqlite;
@@ -178,7 +180,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 // Grab avaliable trips for Driver
                 var tripsTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<Trip>()
                     .Filter(y => y.Property(x => x.TripDriverId).EqualTo(currentEmployeeId)
-                        .And().Property(z => z.TripStatus).NotIn("X", "D")));
+                    .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
+                    .And().Property(x => x.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
+                    .And().Property(x => x.TripSendFlag).In(TripSendFlagValue.Ready, TripSendFlagValue.SentToDriver))
+                    .OrderBy(x => x.TripSequenceNumber));
+                   
                 if (tripsTask == null) return false;
                 await SaveTripsAsync(tripsTask.Records);
 
@@ -214,35 +220,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private Task SaveTripsAsync(List<Trip> trips)
         {
-            foreach( Trip trip in trips)
-            {
-                var mapped = AutoMapper.Mapper.Map<Trip, TripModel>(trip);
-                _tripRepository.InsertAsync(mapped);
-            }
-
-            return Task.FromResult(1);
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(trips);
+            return _tripRepository.InsertRangeAsync(mapped);
         }
 
         private Task SaveTripSegmentsAsync(List<TripSegment> tripSegments)
         {
-            foreach (TripSegment tripSegment in tripSegments)
-            {
-                var mapped = AutoMapper.Mapper.Map<TripSegment, TripSegmentModel>(tripSegment);
-                _tripSegmentRepository.InsertAsync(mapped);
-            }
-
-            return Task.FromResult(1);
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegment>, IEnumerable<TripSegmentModel>>(tripSegments);
+            return _tripSegmentRepository.InsertRangeAsync(mapped);
         }
 
         private Task SaveTripSegmentContainersAsync(List<TripSegmentContainer> containers)
         {
-            foreach (TripSegmentContainer container in containers)
-            {
-                var mapped = AutoMapper.Mapper.Map<TripSegmentContainer, TripSegmentContainerModel>(container);
-                _tripSegmentContainerRepository.InsertAsync(mapped);
-            }
-
-            return Task.FromResult(1);
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegmentContainer>, IEnumerable<TripSegmentContainerModel>>(containers);
+            return _tripSegmentContainerRepository.InsertRangeAsync(mapped);
         }
 
         protected bool CanExecutePowerUnitIdCommand()

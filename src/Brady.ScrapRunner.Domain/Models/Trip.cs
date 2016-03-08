@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Brady.ScrapRunner.Domain.Enums;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
@@ -22,7 +22,7 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripType { get; set; }
         public virtual string TripTypeDesc { get; set; }
         public virtual int? TripSequenceNumber { get; set; }
-        public virtual int? TripSendFlag { get; set; }
+        public virtual TripSendFlagValue TripSendFlag { get; set; }
         public virtual string TripDriverId { get; set; }
         public virtual string TripDriverName { get; set; }
         public virtual string TripCustHostCode { get; set; }
