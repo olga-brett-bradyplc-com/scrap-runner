@@ -91,7 +91,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="CodeTableTests.cs" />
+    <Compile Include="ContainerTests.cs" />
     <Compile Include="IntegrationTest1.cs" />
+    <Compile Include="TripTests.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
