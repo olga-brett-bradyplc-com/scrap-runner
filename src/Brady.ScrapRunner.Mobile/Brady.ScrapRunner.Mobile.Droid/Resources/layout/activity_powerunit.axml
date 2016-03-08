@@ -17,7 +17,7 @@
             android:layout_height="48dp"
             android:padding="4dp"
             android:hint="@string/truck_id"
-            local:MvxBind="Text TruckId" />
+            local:MvxBind="Text TruckId; Hint TruckIdHint" />
         <EditText
             android:background="@drawable/rounded_edittext_bottom_states"
             android:layout_width="match_parent"
@@ -25,7 +25,7 @@
             android:padding="4dp"
             android:layout_marginTop="2dp"
             android:hint="@string/odometer_reading"
-            local:MvxBind="Text Odometer" />
+            local:MvxBind="Text Odometer; Hint OdometerReadingHint" />
       <Button
           android:layout_width="match_parent"
           android:layout_height="48dp"
