@@ -16,6 +16,32 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         private readonly ITripService _tripService;
 
+        private string _grossWeightLabel;
+        private string _secondGrossWeightLabel;
+        private string _tareWeightLabel;
+        private string _containerSetDownLabel;
+
+        public string GrossWeightLabel
+        {
+            get { return _grossWeightLabel; }
+            set { SetProperty(ref _grossWeightLabel, value); }
+        }
+        public string SecondGrossWeightLabel
+        {
+            get { return _secondGrossWeightLabel; }
+            set { SetProperty(ref _secondGrossWeightLabel, value); }
+        }
+        public string TareWeightLabel
+        {
+            get { return _tareWeightLabel; }
+            set { SetProperty(ref _tareWeightLabel, value); }
+        }
+        public string ContainerSetDownLabel
+        {
+            get { return _containerSetDownLabel; }
+            set { SetProperty(ref _containerSetDownLabel, value); }
+        }
+
         public ScaleDetailViewModel(ITripService tripService)
         {
             _tripService = tripService;
@@ -39,10 +65,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
+            ContainerSetDownLabel = AppResources.SetDown;
+            GrossWeightLabel = AppResources.GrossWeight;
+            SecondGrossWeightLabel = AppResources.SecondGrossWeight;
+            TareWeightLabel = AppResources.TareWeight;
+
             var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
-            foreach (var tsm in segments)
+            foreach (var tsm in segments) 
             {
                 var containers =
                     await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);

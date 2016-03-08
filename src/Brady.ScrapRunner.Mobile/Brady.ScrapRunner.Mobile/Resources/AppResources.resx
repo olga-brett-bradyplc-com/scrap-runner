@@ -284,4 +284,37 @@
   <data name="LoggingIn" xml:space="preserve">
     <value>Logging In</value>
   </data>
+  <data name="ArriveLabel" xml:space="preserve">
+    <value>Arrive</value>
+  </data>
+  <data name="DrivingDirectionsLabel" xml:space="preserve">
+    <value>Driving Directions</value>
+  </data>
+  <data name="EnrouteButtonLabel" xml:space="preserve">
+    <value>Enroute</value>
+  </data>
+  <data name="FinishLabel" xml:space="preserve">
+    <value>Finish</value>
+  </data>
+  <data name="GrossWeight" xml:space="preserve">
+    <value>Gross</value>
+  </data>
+  <data name="LoadingTripData" xml:space="preserve">
+    <value>Loading Trip Data</value>
+  </data>
+  <data name="NextStageLabel" xml:space="preserve">
+    <value>Next Stage</value>
+  </data>
+  <data name="OdometerReadingHint" xml:space="preserve">
+    <value>Odometer Reading</value>
+  </data>
+  <data name="SecondGrossWeight" xml:space="preserve">
+    <value>Second Gross</value>
+  </data>
+  <data name="TareWeight" xml:space="preserve">
+    <value>Tare</value>
+  </data>
+  <data name="TruckIdHint" xml:space="preserve">
+    <value>Truck ID</value>
+  </data>
 </root>

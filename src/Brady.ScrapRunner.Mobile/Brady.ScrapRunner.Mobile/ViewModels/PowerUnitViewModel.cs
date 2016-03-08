@@ -52,6 +52,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private string _truckId;
         private int? _odometer;
         private string _continueLabel;
+        private string _truckIdHint;
+        private string _odometerReadingHint;
 
         public string TruckId
         {
@@ -78,9 +80,24 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _continueLabel; }
             set { SetProperty(ref _continueLabel, value); }
         }
+
+        public string TruckIdHint
+        {
+            get { return _truckIdHint; }
+            set { SetProperty(ref _truckIdHint, value); }
+        }
+
+        public string OdometerReadingHint
+        {
+            get { return _odometerReadingHint; }
+            set { SetProperty(ref _odometerReadingHint, value); }
+        }
+
         public override async void Start()
         {
             ContinueLabel = AppResources.Continue;
+            TruckIdHint = AppResources.TruckIdHint;
+            OdometerReadingHint = AppResources.OdometerReadingHint;
 
             base.Start();
         }

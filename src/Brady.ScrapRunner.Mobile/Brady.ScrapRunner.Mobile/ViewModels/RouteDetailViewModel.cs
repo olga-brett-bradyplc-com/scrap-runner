@@ -18,6 +18,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         private readonly ITripService _tripService;
         private string _custHostCode;
+        private string _enrouteLabel;
+        private string _arriveLabel;
 
         public RouteDetailViewModel(ITripService tripService)
         {
@@ -32,14 +34,27 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             TripNumber = tripNumber;
         }
-
+        public string EnrouteLabel
+        {
+            get { return _enrouteLabel; }
+            set { SetProperty(ref _enrouteLabel, value); }
+        }
+        public string ArriveLabel
+        {
+            get { return _arriveLabel; }
+            set { SetProperty(ref _arriveLabel, value); }
+        }
+ 
         public override async void Start()
         {
+            EnrouteLabel = AppResources.EnrouteButtonLabel;
+            ArriveLabel = AppResources.ArriveLabel;
+
             var trip = await _tripService.FindTripAsync(TripNumber);
 
             if (trip != null)
             {
-                using (var tripDataLoad = UserDialogs.Instance.Loading("Loading Trip Data", maskType: MaskType.Clear))
+                using (var tripDataLoad = UserDialogs.Instance.Loading(AppResources.LoadingTripData, maskType: MaskType.Clear))
                 {
                     var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
                     var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
@@ -54,7 +69,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     _custHostCode = trip.TripCustHostCode;
                     Title = trip.TripTypeDesc;
-                    SubTitle = $"Trip {trip.TripNumber}";
+                    SubTitle = AppResources.Trip + $" {trip.TripNumber}";
                     TripType = trip.TripType;
                     TripFor = trip.TripCustName;
 
