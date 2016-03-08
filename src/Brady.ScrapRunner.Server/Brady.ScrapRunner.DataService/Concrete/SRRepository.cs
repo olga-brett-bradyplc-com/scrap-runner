@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NHibernate;
 
 namespace Brady.ScrapRunner.DataService.Concrete
 {
@@ -28,5 +29,11 @@ namespace Brady.ScrapRunner.DataService.Concrete
             Constants.ScrapRunner, "dbo")
         {
         }
+
+        public ISession OpenSession()
+        {
+            return sessionFactory.OpenSession();
+        }
+
     }
 }

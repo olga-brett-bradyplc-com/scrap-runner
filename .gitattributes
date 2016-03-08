@@ -1,3 +1,3 @@
-# Turn of line ending normalisation
+# Turn on line ending normalisation
 
-* -text
+* text=auto
