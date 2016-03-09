@@ -52,6 +52,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private string _truckId;
         private int? _odometer;
         private string _continueLabel;
+        private string _truckIdHint;
+        private string _odometerReadingHint;
 
         public string TruckId
         {
@@ -78,9 +80,24 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _continueLabel; }
             set { SetProperty(ref _continueLabel, value); }
         }
+
+        public string TruckIdHint
+        {
+            get { return _truckIdHint; }
+            set { SetProperty(ref _truckIdHint, value); }
+        }
+
+        public string OdometerReadingHint
+        {
+            get { return _odometerReadingHint; }
+            set { SetProperty(ref _odometerReadingHint, value); }
+        }
+
         public override async void Start()
         {
             ContinueLabel = AppResources.Continue;
+            TruckIdHint = AppResources.TruckIdHint;
+            OdometerReadingHint = AppResources.OdometerReadingHint;
 
             base.Start();
         }
@@ -220,35 +237,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private Task SaveTripsAsync(List<Trip> trips)
         {
-            foreach( Trip trip in trips)
-            {
-                var mapped = AutoMapper.Mapper.Map<Trip, TripModel>(trip);
-                _tripRepository.InsertAsync(mapped);
-            }
-
-            return Task.FromResult(1);
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(trips);
+            return _tripRepository.InsertRangeAsync(mapped);
         }
 
         private Task SaveTripSegmentsAsync(List<TripSegment> tripSegments)
         {
-            foreach (TripSegment tripSegment in tripSegments)
-            {
-                var mapped = AutoMapper.Mapper.Map<TripSegment, TripSegmentModel>(tripSegment);
-                _tripSegmentRepository.InsertAsync(mapped);
-            }
-
-            return Task.FromResult(1);
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegment>, IEnumerable<TripSegmentModel>>(tripSegments);
+            return _tripSegmentRepository.InsertRangeAsync(mapped);
         }
 
         private Task SaveTripSegmentContainersAsync(List<TripSegmentContainer> containers)
         {
-            foreach (TripSegmentContainer container in containers)
-            {
-                var mapped = AutoMapper.Mapper.Map<TripSegmentContainer, TripSegmentContainerModel>(container);
-                _tripSegmentContainerRepository.InsertAsync(mapped);
-            }
-
-            return Task.FromResult(1);
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegmentContainer>, IEnumerable<TripSegmentContainerModel>>(containers);
+            return _tripSegmentContainerRepository.InsertRangeAsync(mapped);
         }
 
         protected bool CanExecutePowerUnitIdCommand()

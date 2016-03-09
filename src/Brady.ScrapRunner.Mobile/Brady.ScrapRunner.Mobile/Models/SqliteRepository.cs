@@ -55,9 +55,19 @@
             return _connection.InsertAsync(entity);
         }
 
+        public Task<int> InsertRangeAsync(IEnumerable<T> entities)
+        {
+            return _connection.InsertAllAsync(entities);
+        }
+
         public Task<int> InsertOrReplaceAsync(T entity)
         {
             return _connection.InsertOrReplaceAsync(entity);
+        }
+
+        public Task<int> InsertOrReplaceRangeAsync(IEnumerable<T> entities)
+        {
+            return _connection.InsertOrReplaceAllAsync(entities);
         }
 
         public Task<int> UpdateAsync(T entity)

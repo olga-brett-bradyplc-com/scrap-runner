@@ -71,6 +71,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Arrive.
+        /// </summary>
+        public static string ArriveLabel {
+            get {
+                return ResourceManager.GetString("ArriveLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string Cancel {
@@ -161,6 +170,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Driving Directions.
+        /// </summary>
+        public static string DrivingDirectionsLabel {
+            get {
+                return ResourceManager.GetString("DrivingDirectionsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to English.
         /// </summary>
         public static string English {
@@ -179,11 +197,38 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enroute.
+        /// </summary>
+        public static string EnrouteButtonLabel {
+            get {
+                return ResourceManager.GetString("EnrouteButtonLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finish.
+        /// </summary>
+        public static string FinishLabel {
+            get {
+                return ResourceManager.GetString("FinishLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gross.
+        /// </summary>
+        public static string GrossWeight {
+            get {
+                return ResourceManager.GetString("GrossWeight", resourceCulture);
             }
         }
         
@@ -215,11 +260,29 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loading Trip Data.
+        /// </summary>
+        public static string LoadingTripData {
+            get {
+                return ResourceManager.GetString("LoadingTripData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Logging In.
         /// </summary>
         public static string LoggingIn {
             get {
                 return ResourceManager.GetString("LoggingIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next Stage.
+        /// </summary>
+        public static string NextStageLabel {
+            get {
+                return ResourceManager.GetString("NextStageLabel", resourceCulture);
             }
         }
         
@@ -256,6 +319,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string OdometerOutOfRange {
             get {
                 return ResourceManager.GetString("OdometerOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Odometer Reading.
+        /// </summary>
+        public static string OdometerReadingHint {
+            get {
+                return ResourceManager.GetString("OdometerReadingHint", resourceCulture);
             }
         }
         
@@ -350,6 +422,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Second Gross.
+        /// </summary>
+        public static string SecondGrossWeight {
+            get {
+                return ResourceManager.GetString("SecondGrossWeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Set Down.
         /// </summary>
         public static string SetDown {
@@ -413,6 +494,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tare.
+        /// </summary>
+        public static string TareWeight {
+            get {
+                return ResourceManager.GetString("TareWeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Transactions.
         /// </summary>
         public static string Transactions {
@@ -436,6 +526,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string TruckId {
             get {
                 return ResourceManager.GetString("TruckId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Truck ID.
+        /// </summary>
+        public static string TruckIdHint {
+            get {
+                return ResourceManager.GetString("TruckIdHint", resourceCulture);
             }
         }
         
