@@ -20,6 +20,7 @@ using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using BWF.DataServices.Support.NHibernate.Interfaces;
+using Microsoft.FSharp.Core;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Util;
@@ -87,9 +88,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             // from a reretrieve or the sparse mapping?
             ChangeSetResult<string> changeSetResult = base.ProcessChangeSet(dataService, changeSet, settings);
 
-            // TODO: Trap for DataServiceFault all around
-            DataServiceFault fault = null;
-
             // If no problems, we are free to process.
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() && !changeSetResult.FailedDeletions.Any())
             { 
@@ -101,11 +99,14 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
                     string userCulture = "en-GB";
                     IEnumerable<long> userRoleIds = Enumerable.Empty<long>();
+                    DataServiceFault fault = null;
+                    string msgKey = key;
 
                     // It appers I must backfill user input values that were clobbered by the call to the base process method.
                     DriverLoginProcess backfillDriverLoginProcess = new DriverLoginProcess();
                     if (changeSet.Update.TryGetValue(key, out backfillDriverLoginProcess))
                     {
+                        // TODO: Use a mapper?
                         driverLoginProcess.CodeListVersion = backfillDriverLoginProcess.CodeListVersion;
                         driverLoginProcess.LastContainerMasterUpdate = backfillDriverLoginProcess.LastContainerMasterUpdate;
                         driverLoginProcess.LastTerminalMasterUpdate = backfillDriverLoginProcess.LastTerminalMasterUpdate;
@@ -121,49 +122,287 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         // login error?
                     }
 
-                    // 1) Process information form handheld
-                    // We might want to validate somethign like Locale against configured dialects rather than ahardcoded list in validator
-                    // Assume OK for now.
-
-
+                    //
+                    // 1) Process information from handheld
+                    // NOTE: We might want to validate (or backfill) something like Locale against configured dialects rather than a hardcoded list in validator
+                    //
 
                     // 2) Validate driver id:  Get the EmployeeMaster - an inefficient, client side filtering sample
                     // Query query = new Query(){CurrentQuery = "EmployeeMasters"};
                     // var employeeMasters = dataService.Query(query, settings.Username, Enumerable.Empty<long>(), "en-GB", settings.Token, out fault);
                     // var employeeMaster = employeeMasters.Records.Cast<EmployeeMaster>().Where(x => x.EmployeeId == driverLoginProcess.EmployeeId).First();
 
+                    //
                     // 2) Validate driver id
-                    string queryStr = string.Format("EmployeeMasters?$filter= EmployeeId='{0}'", driverLoginProcess.EmployeeId);
-                    Query query = new Query() { CurrentQuery = queryStr };
+                    //
+                    Query query = new Query() { CurrentQuery = string.Format("EmployeeMasters?$filter= EmployeeId='{0}'", driverLoginProcess.EmployeeId) };
                     var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                        break;
+                    }
                     var employeeMaster = (EmployeeMaster) queryResult.Records.Cast<EmployeeMaster>().FirstOrNull();
                     if (employeeMaster == null)
                     {
                         // Trap for invalid driver id
-                        changeSetResult.FailedUpdates.Add(driverLoginProcess.EmployeeId, new MessageSet("Invalid Driver ID."));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Driver ID " + driverLoginProcess.EmployeeId));
                         break;
                     }
 
+                    //
                     // 3) Lookup preferences
-                    queryStr = string.Format("Preferences?$filter= TerminalId='{0}'", employeeMaster.TerminalId);
-                    query.CurrentQuery = queryStr;
+                    //
+                    query.CurrentQuery = string.Format("Preferences?$filter= TerminalId='{0}'", employeeMaster.TerminalId);
                     queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                        break;
+                    }
                     var preferences = queryResult.Records.Cast<Preference>();
                     driverLoginProcess.Preferences = new List<Preference>(preferences.ToArray());
 
-                    // 4) Validate PowerId
-                    queryStr = string.Format("PowerMasters?$filter= PowerId='{0}'", driverLoginProcess.PowerId);
-                    query.CurrentQuery = queryStr;
+                    //
+                    // 4a) Validate PowerId
+                    //
+                    query.CurrentQuery = string.Format("PowerMasters?$filter= PowerId='{0}'", driverLoginProcess.PowerId);
                     queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                        break;
+                    }
                     var powerMaster = (PowerMaster)queryResult.Records.Cast<PowerMaster>().FirstOrNull();
                     if (powerMaster == null)
                     {
                         // Trap for invalid driver id
-                        changeSetResult.FailedUpdates.Add(driverLoginProcess.PowerId, new MessageSet("Invalid Power ID."));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Power ID " + driverLoginProcess.PowerId));
                         break;
                     }
 
-                    // 4) more to do here....
+                    // 4b) Check system pref "DEFAllowAnyPowerUnit".  If not found or "N" then check company ownership.
+                    query.CurrentQuery = "Preferences?$filter= TerminalId='0000' and Parameter='DEFAllowAnyPowerUnit'" ;
+                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                        break;
+                    }
+                    var preference = (Preference)queryResult.Records.Cast<Preference>().FirstOrNull();
+                    if (preference == null || preference.ParameterValue == "N")
+                    {
+                        // TODO:  Can it be and what if employeeMaster.RegionId is null? 
+                        if (powerMaster.PowerRegionId != null && powerMaster.PowerRegionId != employeeMaster.RegionId)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Power ID " + driverLoginProcess.PowerId));
+                            break;
+                        }
+                    }
+
+                    // 4c) Check power unit status.  Scheduled for the shop?  PS_SHOP = "S"
+                    if (powerMaster.PowerStatus == "S")
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(string.Format("Do not use Power unit {0}.  It is scheduled for the shop. ", driverLoginProcess.PowerId)));
+                        break;
+                    }
+
+                    // 4d) Is unit in use by another driver? PS_INUSE = "I"
+                    if (powerMaster.PowerStatus == "I" && powerMaster.PowerDriverId != employeeMaster.EmployeeId)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(string.Format("Power unit {0} in use by another driver.  Change Power Unit Number or call Dispatch.", driverLoginProcess.PowerId)));
+                        break;
+                    }
+
+                    // 4e) If no odometer record for this unit, accept as sent by the handheld.  
+                    // 4f) overrride flag = "Y", accept as sent by the handheld.  
+                    if (powerMaster.PowerOdometer == null || driverLoginProcess.OverrideFlag == "Y")
+                    {
+                        powerMaster.PowerOdometer = driverLoginProcess.Odometer;
+
+                        // Update PowerMaster 
+                        var powerMasterRecordType = (PowerMasterRecordType) dataService.RecordTypes.Single(x => x.TypeName == "PowerMaster");
+                        var powerMasterChangeSet = (ChangeSet<String, PowerMaster>) powerMasterRecordType.GetNewChangeSet();
+                        powerMasterChangeSet.AddUpdate(powerMaster.Id, powerMaster);
+                        var powerMasterChangeSetResult = powerMasterRecordType.ProcessChangeSet(dataService, powerMasterChangeSet, settings);
+                        if (powerMasterChangeSetResult.FailedCreates.Any() ||
+                            powerMasterChangeSetResult.FailedUpdates.Any() ||
+                            powerMasterChangeSetResult.FailedDeletions.Any())
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(string.Format("Could not update master for Power Unit {0}.", driverLoginProcess.PowerId)));
+                            break;
+                        }
+
+                        // Add PowerHistory
+                        // i) Next Sequential for PowerNumber
+                        int powerSeqNo = 1;
+                        query.CurrentQuery = string.Format("PowerHistorys?$filter= PowerId='{0}'&$orderby=PowerSeqNo desc", driverLoginProcess.PowerId);
+                        queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            break;
+                        }
+                        var powerHistoryMax = (PowerHistory) queryResult.Records.Cast<PowerHistory>().FirstOrNull();
+                        if (powerHistoryMax == null)
+                        {
+                            powerSeqNo = 1;
+                        }
+                        else
+                        {
+                            powerSeqNo = 1 + powerHistoryMax.PowerSeqNumber;
+                        }
+
+                        // ii) Power Cust Type Desc
+                        string powerCustTypeDesc = null;
+                        query.CurrentQuery = string.Format("CodeTables?$filter= CodeName='CUSTOMERTYPE' and CodeValue='{0}'", powerMaster.PowerCustType);
+                        queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            break;
+                        }
+                        var codeTableCustomerType = (CodeTable)queryResult.Records.Cast<CodeTable>().FirstOrNull();
+                        if (null != codeTableCustomerType)
+                        {
+                            powerCustTypeDesc = codeTableCustomerType.CodeDisp1;
+                        }
+
+                        // iii) Terminal Master
+                        string powerTerminalName = null;
+                        query.CurrentQuery = string.Format("TerminalMasters?$filter= TerminalId='{0}'", powerMaster.PowerTerminalId);
+                        queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            break;
+                        }
+                        var terminalMaster = (TerminalMaster)queryResult.Records.Cast<TerminalMaster>().FirstOrNull();
+                        if (null != terminalMaster)
+                        {
+                            powerTerminalName = terminalMaster.TerminalName;
+                        }
+
+                        // iv) Region Master
+                        string powerRegionName = null;
+                        query.CurrentQuery = string.Format("RegionMasters?$filter= RegionId='{0}'", powerMaster.PowerRegionId);
+                        queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            break;
+                        }
+                        var regionMaster = (RegionMaster)queryResult.Records.Cast<RegionMaster>().FirstOrNull();
+                        if (null != regionMaster)
+                        {
+                            powerRegionName = regionMaster.RegionName;
+                        }
+
+                        // v) Power Status Desc 
+                        string powerStatusDesc = null;
+                        query.CurrentQuery = string.Format("CodeTables?$filter= CodeName='POWERUNITSTATUS' and CodeValue='{0}'", powerMaster.PowerStatus);
+                        queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            break;
+                        }
+                        var codeTablePowerStatus = (CodeTable)queryResult.Records.Cast<CodeTable>().FirstOrNull();
+                        if (null != codeTablePowerStatus)
+                        {
+                            powerStatusDesc = codeTablePowerStatus.CodeDisp1;
+                        }
+
+                        // vi) Customer Master
+                        CustomerMaster customerMaster = null;
+                        query.CurrentQuery = string.Format("CustomerMasters?$filter= CustHostCode='{0}'", powerMaster.PowerCustHostCode);
+                        queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            break;
+                        }
+                        customerMaster = (CustomerMaster) queryResult.Records.Cast<CustomerMaster>().FirstOrNull();
+
+                        // vii) Basic Trip Type
+                        string tripTypeBasicDesc = null;
+                        query.CurrentQuery = string.Format("TripTypeBasics?$filter= TripTypeCode='{0}'", powerMaster.PowerCurrentTripSegType);
+                        queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            break;
+                        }
+                        var TripTypeBasic = (TripTypeBasic) queryResult.Records.Cast<TripTypeBasic>().FirstOrNull();
+                        if (TripTypeBasic != null)
+                        {
+                            tripTypeBasicDesc = TripTypeBasic.TripTypeDesc;
+                        }
+
+                        // TODO: Use a mapper?
+                        PowerHistory powerHistory = new PowerHistory();
+                        powerHistory.PowerId = powerMaster.PowerId;
+                        powerHistory.PowerSeqNumber = powerSeqNo;
+                        powerHistory.PowerType = powerMaster.PowerType;
+                        powerHistory.PowerDesc = powerMaster.PowerDesc;
+                        powerHistory.PowerSize = powerMaster.PowerSize;
+                        powerHistory.PowerLength = powerMaster.PowerLength;
+                        powerHistory.PowerTareWeight = powerMaster.PowerTareWeight;
+                        powerHistory.PowerCustType = powerMaster.PowerCustType;
+                        powerHistory.PowerCustTypeDesc = powerCustTypeDesc;
+                        powerHistory.PowerTerminalId = powerMaster.PowerTerminalId;
+                        powerHistory.PowerTerminalName = powerTerminalName;
+                        powerHistory.PowerRegionId = powerMaster.PowerRegionId;
+                        powerHistory.PowerRegionName = powerRegionName;
+                        powerHistory.PowerLocation = powerMaster.PowerLocation;
+                        powerHistory.PowerStatus = powerMaster.PowerStatus;
+                        powerHistory.PowerDateOutOfService = powerMaster.PowerDateOutOfService;
+                        powerHistory.PowerDateInService = powerMaster.PowerDateInService;
+                        powerHistory.PowerDriverId = powerMaster.PowerDriverId;
+                        powerHistory.PowerDriverName  = string.Format("{0}, {1}", employeeMaster?.LastName, employeeMaster?.FirstName);
+                        powerHistory.PowerOdometer = powerMaster.PowerOdometer;
+                        powerHistory.PowerComments = powerMaster.PowerComments;
+                        powerHistory.MdtId = powerMaster.MdtId;
+                        powerHistory.PrimaryPowerType = null;
+                        powerHistory.PowerCustHostCode = powerMaster.PowerCustHostCode;
+                        powerHistory.PowerCustName = customerMaster?.CustName;
+                        powerHistory.PowerCustAddress1 = customerMaster?.CustAddress1;
+                        powerHistory.PowerCustAddress2 = customerMaster?.CustAddress2;
+                        powerHistory.PowerCustCity = customerMaster?.CustCity;
+                        powerHistory.PowerCustState = customerMaster?.CustState;
+                        powerHistory.PowerCustZip = customerMaster?.CustZip;
+                        powerHistory.PowerCustCountry = customerMaster?.CustCountry;
+                        powerHistory.PowerCustCounty = customerMaster?.CustCounty;
+                        powerHistory.PowerCustTownship = customerMaster?.CustTownship;
+                        powerHistory.PowerCustPhone1 = customerMaster?.CustPhone1;
+                        powerHistory.PowerLastActionDateTime = powerMaster.PowerLastActionDateTime;
+                        powerHistory.PowerStatusDesc = powerStatusDesc;
+                        powerHistory.PowerCurrentTripNumber = powerMaster.PowerCurrentTripNumber;
+                        powerHistory.PowerCurrentTripSegNumber = powerMaster.PowerCurrentTripSegNumber;
+                        powerHistory.PowerCurrentTripSegType = powerMaster.PowerCurrentTripSegType;
+                        powerHistory.PowerCurrentTripSegTypeDesc = tripTypeBasicDesc;
+
+                        // Insert PowerHistory 
+                        var powerHistoryRecordType = (PowerHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "PowerHistory");
+                        var powerHistoryChangeSet = (ChangeSet<string, PowerHistory>)powerHistoryRecordType.GetNewChangeSet();
+                        long whatIsThisReference = 0;
+                        powerHistoryChangeSet.AddCreate(whatIsThisReference, powerHistory, userRoleIds, userRoleIds);
+                        var powerHistoryChangeSetResult = powerHistoryRecordType.ProcessChangeSet(dataService, powerHistoryChangeSet, settings);
+                        if (powerHistoryChangeSetResult.FailedCreates.Any() ||
+                            powerHistoryChangeSetResult.FailedUpdates.Any() ||
+                            powerHistoryChangeSetResult.FailedDeletions.Any())
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(string.Format("Could not insert power history for Power Unit {0}.", driverLoginProcess.PowerId)));
+                            break;
+                        }
+
+                    }
+
+                    // 4g) Odometer tolerance checks.
+
+
+
+
 
                     // 5) Validate Duplicate login?
 
@@ -184,6 +423,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     // 13) Add record for PowerHistory table
 
                     // 14) Send container master updates
+
                 }
 
             }
@@ -210,7 +450,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             transaction.Dispose();
             session.Dispose();
             settings.Session = null;
-      
+
             return changeSetResult;
         }
 
