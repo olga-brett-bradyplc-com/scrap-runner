@@ -253,4 +253,40 @@
   <data name="LoggingIn" xml:space="preserve">
     <value>Iniciar sesión</value>
   </data>
+  <data name="Trip" xml:space="preserve">
+    <value>Viaje</value>
+  </data>
+  <data name="ArriveLabel" xml:space="preserve">
+    <value>Llegar</value>
+  </data>
+  <data name="DrivingDirectionsLabel" xml:space="preserve">
+    <value>Indicaciones de viaje</value>
+  </data>
+  <data name="EnrouteButtonLabel" xml:space="preserve">
+    <value>En camino</value>
+  </data>
+  <data name="FinishLabel" xml:space="preserve">
+    <value>Terminar</value>
+  </data>
+  <data name="GrossWeight" xml:space="preserve">
+    <value>Bruto</value>
+  </data>
+  <data name="LoadingTripData" xml:space="preserve">
+    <value>Cargar datos de viaje</value>
+  </data>
+  <data name="NextStageLabel" xml:space="preserve">
+    <value>Siguiente etapa</value>
+  </data>
+  <data name="OdometerReadingHint" xml:space="preserve">
+    <value>La lectura del odómetro</value>
+  </data>
+  <data name="SecondGrossWeight" xml:space="preserve">
+    <value>Segundo bruto</value>
+  </data>
+  <data name="TareWeight" xml:space="preserve">
+    <value>Tara</value>
+  </data>
+  <data name="TruckIdHint" xml:space="preserve">
+    <value>Identificación de camiones</value>
+  </data>
 </root>

@@ -11,19 +11,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class ChangeLanguageViewModel : BaseViewModel
     {
+        private static readonly string[] supportedCultureTags = { "en-US", "es" };
         public ChangeLanguageViewModel()
         {
             Title = AppResources.ChangeLanguage;
             SelectLanguageCommand = new MvxCommand<CultureInfo>(ExecuteSelectLanguageCommand);
+        }
+        public override async void Start()
+        { 
             CultureInfo currentCulture = CultureInfo.CurrentCulture;
-            CultureInfo newCulture;
-            if (currentCulture.Name.Equals("es"))
-                newCulture = new CultureInfo("en-US");
-            else if (currentCulture.Name.Equals("en-US") || currentCulture.Name.Equals("en"))
-                newCulture = new CultureInfo("es");
-            else
-                newCulture = new CultureInfo("en-US");
-            Languages.Add(newCulture);
+            foreach (var supportedCulture in supportedCultureTags)
+            {
+                if (!currentCulture.Name.Equals(supportedCulture))
+                {
+                    CultureInfo newCulture = new CultureInfo(supportedCulture);
+                    Languages.Add(newCulture);
+                }
+            }
+
+            base.Start();
         }
 
         private ObservableCollection<CultureInfo> _languages = new ObservableCollection<CultureInfo>();

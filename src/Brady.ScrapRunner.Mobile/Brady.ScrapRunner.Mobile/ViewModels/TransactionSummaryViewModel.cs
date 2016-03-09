@@ -13,6 +13,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class TransactionSummaryViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
+        private string _cameraViewLabel;
+        private string _finishLabel;
+
+        public string CameraViewLabel
+        {
+            get { return _cameraViewLabel; }
+            set { SetProperty(ref _cameraViewLabel, value); }
+        }
+
+        public string FinishLabel
+        {
+            get { return _finishLabel; }
+            set { SetProperty(ref _finishLabel, value); }
+        }
 
         public TransactionSummaryViewModel(ITripService tripService)
         {
@@ -31,6 +45,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // Grab all relevant data
         public override async void Start()
         {
+            FinishLabel = AppResources.FinishLabel;
+
             var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
