@@ -32,7 +32,7 @@
             android:layout_height="match_parent"
             android:textColor="#ffffff"
             android:background="@color/material_gray_900"
-            local:MvxBind="Click ConfirmationSelectedCommand"
-            android:text="Finish" />
+            local:MvxBind="Click ConfirmationSelectedCommand; Text FinishLabel"
+            />
     </LinearLayout>
 </RelativeLayout>
