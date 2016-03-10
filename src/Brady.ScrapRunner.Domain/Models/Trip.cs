@@ -90,7 +90,7 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripDispatcherInstructions { get; set; }
         public virtual string TripScaleReferenceNumber { get; set; }
         public virtual string TripMultContainerFlag { get; set; }
-        public virtual int? TripSendReseqFlag { get; set; }
+        public virtual TripSendReseqFlagValue TripSendReseqFlag { get; set; }
         public virtual string TripServerLocation { get; set; }
         public virtual string TripPowerAssetNumber { get; set; }
         public virtual string TripStatusPrev { get; set; }
