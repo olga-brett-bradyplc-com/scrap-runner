@@ -48,6 +48,37 @@ namespace Brady.ScrapRunner.DataService.Tests
         }
 
         /// <summary>
+        /// Code to retrieve containers updated since a particular date from the ContainerChange table
+        /// </summary>
+        [TestMethod]
+        public void RetrieveContainerChangeUpdates()
+        {
+            DateTime dt  = new DateTime(2016, 01, 01);
+            var containerTableQuery = new QueryBuilder<ContainerChange>()
+                //.Filter(y => y.Property(x => x.ActionDate).GreaterThan(dt))
+                .OrderBy(x => x.ContainerNumber);
+            string queryString = containerTableQuery.GetQuery();
+            QueryResult<ContainerChange> queryResult = _client.QueryAsync(containerTableQuery).Result;
+
+            foreach (ContainerChange containerTableInstance in queryResult.Records)
+            {
+                Assert.AreEqual(new DateTime(2016, 01, 01), dt);
+                //Assert.IsTrue(containerTableInstance.ActionDate > dt);
+            }
+
+            foreach (ContainerChange containerTableInstance in queryResult.Records)
+            {
+                Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                                                 containerTableInstance.TerminalId,
+                                                 containerTableInstance.ContainerNumber,
+                                                 containerTableInstance.ContainerType,
+                                                 containerTableInstance.ContainerSize,
+                                                 containerTableInstance.ActionDate,
+                                                 containerTableInstance.ContainerBarCodeNo));
+            }
+        }
+
+        /// <summary>
         /// Code to retrieve all containers from the ContainerMaster
         /// </summary>
         [TestMethod]
@@ -60,7 +91,7 @@ namespace Brady.ScrapRunner.DataService.Tests
 
             foreach (ContainerMaster containerTableInstance in queryResult.Records)
             {
-                //Assert.AreEqual(ContainerMaster.ContainerType, ContainerMaster.ContainerType, queryString);
+                //Assert.AreEqual(containerTableInstance.ContainerNumber, containerTableInstance.ContainerNumber, queryString);
             }
 
             foreach (ContainerMaster containerTableInstance in queryResult.Records)
@@ -71,6 +102,35 @@ namespace Brady.ScrapRunner.DataService.Tests
                                                  containerTableInstance.ContainerType,
                                                  containerTableInstance.ContainerSize,
                                                  containerTableInstance.ContainerBarCodeNo));
+            }
+        }
+
+        /// <summary>
+        /// Code to retrieve containers that are currently on a particular truck
+        /// </summary>
+        [TestMethod]
+        public void RetrieveContainersOnTruck()
+        {
+            string powerid = "601";
+            var containerTableQuery = new QueryBuilder<ContainerMaster>()
+                .Filter(y => y.Property(x => x.ContainerPowerId).EqualTo(powerid))
+                .OrderBy(x => x.ContainerNumber);
+            string queryString = containerTableQuery.GetQuery();
+            QueryResult<ContainerMaster> queryResult = _client.QueryAsync(containerTableQuery).Result;
+
+            foreach (ContainerMaster containerTableInstance in queryResult.Records)
+            {
+                Assert.AreEqual(containerTableInstance.ContainerPowerId, powerid, queryString);
+            }
+
+            foreach (ContainerMaster containerTableInstance in queryResult.Records)
+            {
+                Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}",
+                                                 containerTableInstance.ContainerTerminalId,
+                                                 containerTableInstance.ContainerNumber,
+                                                 containerTableInstance.ContainerType,
+                                                 containerTableInstance.ContainerSize,
+                                                 containerTableInstance.ContainerContents));
             }
         }
     }

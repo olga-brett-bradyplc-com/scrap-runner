@@ -89,7 +89,31 @@ namespace Brady.ScrapRunner.DataService.Tests
             {
                 Console.WriteLine(string.Format("{0}\t{1}", codeTableInstance.CodeValue, codeTableInstance.CodeDisp1));
             }
-        }       
+        }
+        /// <summary>
+        /// Code to retrieve container types and sizes from the CodeTable
+        /// Both type and size info is in the CONTAINERSIZE CodeTable
+        /// </summary>
+        [TestMethod]
+        public void RetrieveContainerTypeSize()
+        {
+            var codeTableQuery = new QueryBuilder<CodeTable>()
+                .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerSize))
+                .OrderBy(x => x.CodeDisp1)
+                .OrderBy(x => x.CodeDisp2);
+            string queryString = codeTableQuery.GetQuery();
+            QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
+
+            foreach (CodeTable codeTableInstance in queryResult.Records)
+            {
+                Assert.AreEqual(CodeTableNameConstants.ContainerSize, codeTableInstance.CodeName, queryString);
+            }
+
+            foreach (CodeTable codeTableInstance in queryResult.Records)
+            {
+                Console.WriteLine(string.Format("{0}\t\t{1}\t{2}", codeTableInstance.CodeValue, codeTableInstance.CodeDisp1, codeTableInstance.CodeDisp2));
+            }
+        } 
         /// <summary>
         /// Code to retrieve all delay codes from the CodeTable
         /// </summary>
@@ -204,13 +228,15 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
         }
         /// <summary>
-        /// Code to retrieve all exception codes from the CodeTable
+        /// Code to retrieve all review reason codes from the CodeTable
+        /// Except for NOTAVLSCALREFNO which is defined as SR# (Scale Reference Number)
         /// </summary>
         [TestMethod]
         public void RetrieveReasonCodes()
         {
             var codeTableQuery = new QueryBuilder<CodeTable>()
-                .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ReasonCodes))
+                .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ReasonCodes)
+                .And().Property(x => x.CodeValue).NotEqualTo(Constants.NOTAVLSCALREFNO))
                 .OrderBy(x => x.CodeValue);
             string queryString = codeTableQuery.GetQuery();
             QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
