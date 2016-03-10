@@ -5,6 +5,10 @@
         public static readonly string ScrapRunner = "ScrapRunner";
         public static readonly string Yes = "Y";
         public static readonly string No = "N";
+
+        //REASONCODES SR# is Scale Reference Number
+        //Useage: To prevent this reason code from being sent to the driver
+        public static readonly string NOTAVLSCALREFNO = "SR#";
     }
     public static class BasicTripTypeConstants
     {

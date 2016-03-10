@@ -99,8 +99,10 @@ namespace Brady.ScrapRunner.DataService.Tests
         ///         and(TripSendFlag = 1)
         ///         order by TripSequenceNumber ASC    
         ///   After it is sent, TripSendFlag is set to 2 (SentToDriver)
+        ///   For a New Trip, Mobile Device displays "New Trip (%s):\n%s",TripNumber, TripSegDestCustName
+        ///   For a Modified Trip, Mobile Device displays "Trip Modified (%s):\n%s",TripNumber, TripSegDestCustName
         /// </summary>
-        
+
         [TestMethod]
         public void RetrieveTripsAfterLogin()
         {
@@ -140,6 +142,8 @@ namespace Brady.ScrapRunner.DataService.Tests
         ///      and(TripSendFlag = 4)
         ///      order by TripSequenceNumber ASC        
         ///After it is sent, TripSendFlag is set to 5  (CanceledSent)
+        ///For Cancels, Mobile Device displays "Trip canceled by DISPATCH:\n%s",TripSegDestCustName
+        ///For Holds, Mobile Device displays "Trip placed on hold by DISPATCH:\n%s",TripSegDestCustName
         ///</summary>
 
         [TestMethod]
@@ -180,6 +184,7 @@ namespace Brady.ScrapRunner.DataService.Tests
         ///		AND (TripStatusPrev != 'F'  OR TripStatusPrev IS NULL)
         ///		AND (TripStatus = 'P' OR TripStatus = 'M' OR TripStatusPrev = 'P' or TripStatusPrev = 'M')        
         ///After reassign message is sent, TripDriverIdPrev is set to null
+        ///Mobile Device displays "Trip canceled by DISPATCH:\n%s",TripSegDestCustName
         ///</summary>
 
         [TestMethod]
@@ -220,6 +225,7 @@ namespace Brady.ScrapRunner.DataService.Tests
         ///       AND TripDriverIdPrev IS NOT NULL
         ///       AND(TripStatus = 'D' OR TripStatus = 'R' OR TripStatus = 'E' OR TripStatus = 'Q')        
         ///After mark done message is sent, TripDriverIdPrev is set to null
+        ///Mobile Device displays "Trip marked done by DISPATCH:\n%s",TripSegDestCustName
         ///</summary>
 
         [TestMethod]
@@ -257,6 +263,7 @@ namespace Brady.ScrapRunner.DataService.Tests
         ///		AND (TripSendReseqFlag= 1  OR TripSendReseqFlag = 2)
         ///		order by TripSequenceNumber ASC        
         ///After resquenced message is sent TripSendReseqFlag is set to 3 (ReseqSent)
+        ///For mannually resequenced trips, Mobile Device displays ""TRIPS RESEQUENCED"
         ///</summary>
 
         [TestMethod]
