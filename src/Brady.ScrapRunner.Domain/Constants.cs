@@ -22,6 +22,39 @@
         public static readonly string Unload = "UL";
         public static readonly string YardWork = "YD";
     }
+    public static class CodeTableNameConstants
+    {
+        public static readonly string AccessorialCodes = "ACCESSORIALCODES";
+        public static readonly string CannedMessages = "CANNEDMSG";
+        public static readonly string ContainerGroup = "CONTAINERGROUP";
+        public static readonly string ContainerLevel = "CONTAINERLEVEL";
+        public static readonly string ContainerSize = "CONTAINERSIZE";
+        public static readonly string ContainerStatus = "CONTAINERSTATUS";
+        public static readonly string ContainerType = "CONTAINERTYPE";
+        public static readonly string ContentStatus = "CONTENTSSTATUS";
+        public static readonly string Control = "CONTROL";
+        public static readonly string Countries = "COUNTRIES";
+        public static readonly string CustomerType = "CUSTOMERTYPE";
+        public static readonly string DelayCodes = "DELAYCODES";
+        public static readonly string DriverStatus = "DRIVERSTATUS";
+        public static readonly string ExceptionCodes = "EXCEPTIONCODES";
+        public static readonly string ExceptionSubCodes = "EXCEPTIONSUBCODES";
+        public static readonly string ExtensionCodes = "EXTENSIONCODES";
+        public static readonly string PowerUnitStatus = "POWERUNITSTATUS";
+        public static readonly string PowerUnitType = "POWERUNITTYPE";
+        public static readonly string ReasonCodes = "REASONCODES";
+        public static readonly string ReceiptComments = "RECEIPTCOMMENTS";
+        public static readonly string RegularRuns = "REGULARRUNS";
+        public static readonly string SecurityAccess = "SECURITYACCESS";
+        public static readonly string StatesCanada = "STATESCAN";
+        public static readonly string StatesMexico = "STATESMEX";
+        public static readonly string StatesUSA = "STATESUSA";
+        public static readonly string TripAssignStatus = "TRIPASSIGNSTATUS";
+        public static readonly string TripSegStatus = "TRIPSEGSTATUS";
+        public static readonly string TripStatus = "TRIPSTATUS";
+        public static readonly string Version = "VERSION";
+
+    }
     public static class CodeTableTypeConstants
     {
         public static readonly string System = "S";
@@ -124,13 +157,13 @@
     //    public static readonly int SentToHostError = 11; //Completed, error in sending to host accounting system
     //    public static readonly int NotSentToHost   = 12; //Completed, not sent to host accounting system
     //}
-    public static class TripSendReseqFlagConstants
-    {
-        public static readonly int NotReseq = 0;     //Not Sequenced
-        public static readonly int AutoReseq = 1;    //Set when trip is entered or modified
-        public static readonly int ManualReseq = 2;  //Set when trips are actually resequenced by dispatcher
-        public static readonly int ReseqSent = 3;    //Set when the Reseq Message is sent
-    }
+    //public static class TripSendReseqFlagConstants
+    //{
+    //    public static readonly int NotReseq = 0;     //Not Sequenced
+    //    public static readonly int AutoReseq = 1;    //Set when trip is entered or modified
+    //    public static readonly int ManualReseq = 2;  //Set when trips are actually resequenced by dispatcher
+    //    public static readonly int ReseqSent = 3;    //Set when the Reseq Message is sent
+    //}
 
     public static class TripSegStatusConstants
     {
