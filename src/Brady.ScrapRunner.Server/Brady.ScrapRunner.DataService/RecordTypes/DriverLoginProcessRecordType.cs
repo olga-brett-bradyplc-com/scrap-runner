@@ -1,17 +1,12 @@
 ﻿using AutoMapper;
 using Brady.ScrapRunner.Domain.Models;
-using BWF.DataServices.Core.Abstract;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq.Expressions;
 using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
@@ -19,10 +14,7 @@ using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
-using BWF.DataServices.Support.NHibernate.Interfaces;
-using Microsoft.FSharp.Core;
 using NHibernate;
-using NHibernate.Criterion;
 using NHibernate.Util;
 
 namespace Brady.ScrapRunner.DataService.RecordTypes
@@ -34,7 +26,8 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     {
         public override void ConfigureMapper()
         {
-            var mapping = Mapper.CreateMap<DriverLoginProcess, DriverLoginProcess>();
+            // Why?  THis is never persisteted anywhere?
+            //var mapping = Mapper.CreateMap<DriverLoginProcess, DriverLoginProcess>();
         }
 
         public override DriverLoginProcess GetIdentityObject(string id)
@@ -76,7 +69,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             // then open a new session
             if (settings.Session == null && settings.PersistChanges)
             {
-                var srRepository = (ISRRepository) base.repository;
+                var srRepository = (ISRRepository) repository;
                 session = srRepository.OpenSession();
                 transaction = session.BeginTransaction();
                 settings.Session = session;
@@ -98,15 +91,17 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     DriverLoginProcess driverLoginProcess = (DriverLoginProcess)changeSetResult.GetSuccessfulUpdateForId(key);
 
                     string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>();
-                    DataServiceFault fault = null;
+                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
+                    DataServiceFault fault;
                     string msgKey = key;
 
                     // It appers I must backfill user input values that were clobbered by the call to the base process method.
-                    DriverLoginProcess backfillDriverLoginProcess = new DriverLoginProcess();
+                    DriverLoginProcess backfillDriverLoginProcess;
                     if (changeSet.Update.TryGetValue(key, out backfillDriverLoginProcess))
                     {
                         // TODO: Use a mapper?
+                        var mapping = Mapper.CreateMap<DriverLoginProcess, DriverLoginProcess>();
+
                         driverLoginProcess.CodeListVersion = backfillDriverLoginProcess.CodeListVersion;
                         driverLoginProcess.LastContainerMasterUpdate = backfillDriverLoginProcess.LastContainerMasterUpdate;
                         driverLoginProcess.LastTerminalMasterUpdate = backfillDriverLoginProcess.LastTerminalMasterUpdate;
