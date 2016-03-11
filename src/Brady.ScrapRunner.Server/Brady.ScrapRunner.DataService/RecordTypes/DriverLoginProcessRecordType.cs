@@ -26,8 +26,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     {
         public override void ConfigureMapper()
         {
-            // Why?  THis is never persisteted anywhere?
-            //var mapping = Mapper.CreateMap<DriverLoginProcess, DriverLoginProcess>();
+            Mapper.CreateMap<DriverLoginProcess, DriverLoginProcess>();
         }
 
         public override DriverLoginProcess GetIdentityObject(string id)
@@ -99,18 +98,18 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     DriverLoginProcess backfillDriverLoginProcess;
                     if (changeSet.Update.TryGetValue(key, out backfillDriverLoginProcess))
                     {
-                        // TODO: Use a mapper?
-                        var mapping = Mapper.CreateMap<DriverLoginProcess, DriverLoginProcess>();
+                        // Use a mapper?
+                        driverLoginProcess = Mapper.Map<DriverLoginProcess, DriverLoginProcess>(backfillDriverLoginProcess);
 
-                        driverLoginProcess.CodeListVersion = backfillDriverLoginProcess.CodeListVersion;
-                        driverLoginProcess.LastContainerMasterUpdate = backfillDriverLoginProcess.LastContainerMasterUpdate;
-                        driverLoginProcess.LastTerminalMasterUpdate = backfillDriverLoginProcess.LastTerminalMasterUpdate;
-                        driverLoginProcess.LocaleCode = backfillDriverLoginProcess.LocaleCode;
-                        driverLoginProcess.Mdtid = backfillDriverLoginProcess.Mdtid;
-                        driverLoginProcess.Odometer = backfillDriverLoginProcess.Odometer;
-                        driverLoginProcess.OverrideFlag = backfillDriverLoginProcess.OverrideFlag;
-                        driverLoginProcess.PndVer = backfillDriverLoginProcess.PndVer;
-                        driverLoginProcess.PowerId = backfillDriverLoginProcess.PowerId;
+                        //driverLoginProcess.CodeListVersion = backfillDriverLoginProcess.CodeListVersion;
+                        //driverLoginProcess.LastContainerMasterUpdate = backfillDriverLoginProcess.LastContainerMasterUpdate;
+                        //driverLoginProcess.LastTerminalMasterUpdate = backfillDriverLoginProcess.LastTerminalMasterUpdate;
+                        //driverLoginProcess.LocaleCode = backfillDriverLoginProcess.LocaleCode;
+                        //driverLoginProcess.Mdtid = backfillDriverLoginProcess.Mdtid;
+                        //driverLoginProcess.Odometer = backfillDriverLoginProcess.Odometer;
+                        //driverLoginProcess.OverrideFlag = backfillDriverLoginProcess.OverrideFlag;
+                        //driverLoginProcess.PndVer = backfillDriverLoginProcess.PndVer;
+                        //driverLoginProcess.PowerId = backfillDriverLoginProcess.PowerId;
                     }
                     else
                     {
@@ -134,7 +133,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                     if (null != fault)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                         break;
                     }
                     var employeeMaster = (EmployeeMaster) queryResult.Records.Cast<EmployeeMaster>().FirstOrNull();
@@ -152,7 +151,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                     if (null != fault)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                         break;
                     }
                     var preferences = queryResult.Records.Cast<Preference>();
@@ -165,7 +164,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                     if (null != fault)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                         break;
                     }
                     var powerMaster = (PowerMaster)queryResult.Records.Cast<PowerMaster>().FirstOrNull();
@@ -177,11 +176,11 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     }
 
                     // 4b) Check system pref "DEFAllowAnyPowerUnit".  If not found or "N" then check company ownership.
-                    query.CurrentQuery = "Preferences?$filter= TerminalId='0000' and Parameter='DEFAllowAnyPowerUnit'" ;
+                    query.CurrentQuery = string.Format("Preferences?$filter= TerminalId='0000' and Parameter='{0}'", "DEFAllowAnyPowerUnit") ;
                     queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                     if (null != fault)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                         break;
                     }
                     var preference = (Preference)queryResult.Records.Cast<Preference>().FirstOrNull();
@@ -230,12 +229,12 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
                         // Add PowerHistory
                         // i) Next Sequential for PowerNumber
-                        int powerSeqNo = 1;
+                        int powerSeqNo;
                         query.CurrentQuery = string.Format("PowerHistorys?$filter= PowerId='{0}'&$orderby=PowerSeqNo desc", driverLoginProcess.PowerId);
                         queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                         if (null != fault)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                             break;
                         }
                         var powerHistoryMax = (PowerHistory) queryResult.Records.Cast<PowerHistory>().FirstOrNull();
@@ -249,90 +248,69 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         }
 
                         // ii) Power Cust Type Desc
-                        string powerCustTypeDesc = null;
                         query.CurrentQuery = string.Format("CodeTables?$filter= CodeName='CUSTOMERTYPE' and CodeValue='{0}'", powerMaster.PowerCustType);
                         queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                         if (null != fault)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                             break;
                         }
                         var codeTableCustomerType = (CodeTable)queryResult.Records.Cast<CodeTable>().FirstOrNull();
-                        if (null != codeTableCustomerType)
-                        {
-                            powerCustTypeDesc = codeTableCustomerType.CodeDisp1;
-                        }
+                        string powerCustTypeDesc = codeTableCustomerType?.CodeDisp1;
 
                         // iii) Terminal Master
-                        string powerTerminalName = null;
                         query.CurrentQuery = string.Format("TerminalMasters?$filter= TerminalId='{0}'", powerMaster.PowerTerminalId);
                         queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                         if (null != fault)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                             break;
                         }
                         var terminalMaster = (TerminalMaster)queryResult.Records.Cast<TerminalMaster>().FirstOrNull();
-                        if (null != terminalMaster)
-                        {
-                            powerTerminalName = terminalMaster.TerminalName;
-                        }
+                        string powerTerminalName = terminalMaster?.TerminalName;
 
                         // iv) Region Master
-                        string powerRegionName = null;
                         query.CurrentQuery = string.Format("RegionMasters?$filter= RegionId='{0}'", powerMaster.PowerRegionId);
                         queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                         if (null != fault)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                             break;
                         }
                         var regionMaster = (RegionMaster)queryResult.Records.Cast<RegionMaster>().FirstOrNull();
-                        if (null != regionMaster)
-                        {
-                            powerRegionName = regionMaster.RegionName;
-                        }
+                        string powerRegionName = regionMaster?.RegionName;
 
                         // v) Power Status Desc 
-                        string powerStatusDesc = null;
                         query.CurrentQuery = string.Format("CodeTables?$filter= CodeName='POWERUNITSTATUS' and CodeValue='{0}'", powerMaster.PowerStatus);
                         queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                         if (null != fault)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                             break;
                         }
                         var codeTablePowerStatus = (CodeTable)queryResult.Records.Cast<CodeTable>().FirstOrNull();
-                        if (null != codeTablePowerStatus)
-                        {
-                            powerStatusDesc = codeTablePowerStatus.CodeDisp1;
-                        }
+                        string powerStatusDesc = codeTablePowerStatus?.CodeDisp1;
 
                         // vi) Customer Master
-                        CustomerMaster customerMaster = null;
                         query.CurrentQuery = string.Format("CustomerMasters?$filter= CustHostCode='{0}'", powerMaster.PowerCustHostCode);
                         queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                         if (null != fault)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                             break;
                         }
-                        customerMaster = (CustomerMaster) queryResult.Records.Cast<CustomerMaster>().FirstOrNull();
+                        CustomerMaster customerMaster = (CustomerMaster) queryResult.Records.Cast<CustomerMaster>().FirstOrNull();
 
                         // vii) Basic Trip Type
-                        string tripTypeBasicDesc = null;
                         query.CurrentQuery = string.Format("TripTypeBasics?$filter= TripTypeCode='{0}'", powerMaster.PowerCurrentTripSegType);
                         queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                         if (null != fault)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.ToString()));
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
                             break;
                         }
-                        var TripTypeBasic = (TripTypeBasic) queryResult.Records.Cast<TripTypeBasic>().FirstOrNull();
-                        if (TripTypeBasic != null)
-                        {
-                            tripTypeBasicDesc = TripTypeBasic.TripTypeDesc;
-                        }
+                        var tripTypeBasic = (TripTypeBasic) queryResult.Records.Cast<TripTypeBasic>().FirstOrNull();
+                        string tripTypeBasicDesc = tripTypeBasic?.TripTypeDesc;
 
                         // TODO: Use a mapper?
                         PowerHistory powerHistory = new PowerHistory();
@@ -390,18 +368,88 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(string.Format("Could not insert power history for Power Unit {0}.", driverLoginProcess.PowerId)));
                             break;
                         }
-
                     }
 
                     // 4g) Odometer tolerance checks.
+                    if (driverLoginProcess.OverrideFlag == null || driverLoginProcess.OverrideFlag == "N")
+                    {
+                        query.CurrentQuery = String.Format("Preferences?$filter= TerminalId='{0}' and Parameter='{1}'",
+                            employeeMaster.DefTerminalId, "DEFOdomWarnRange");
+                        queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture,
+                            settings.Token, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
+                            break;
+                        }
+                        var odomPreference = (Preference) queryResult.Records.Cast<Preference>().FirstOrNull();
+                        if (null != odomPreference?.ParameterValue)
+                        {
+                            int deltaMiles = int.Parse(odomPreference.ParameterValue);
+                            if (driverLoginProcess.Odometer < powerMaster.PowerOdometer.Value - deltaMiles ||
+                                driverLoginProcess.Odometer > powerMaster.PowerOdometer.Value + deltaMiles)
+                            {
+                                changeSetResult.FailedUpdates.Add(msgKey,
+                                    new MessageSet("Warning! Please check odometer and log in again."));
+                                break;
+                            }
+                        }
+                    }
 
-
-
-
+                    query.CurrentQuery = String.Format("DriverStatuss?$filter= EmployeeId='{0}'", driverLoginProcess.EmployeeId);
+                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
+                        break;
+                    }
+                    var driverStatus = (DriverStatus)queryResult.Records.Cast<DriverStatus>().FirstOrNull();
+                    // TODO:  What if null?
 
                     // 5) Validate Duplicate login?
+                    //if (null != driverStatus)
+                    //{
+                    //    if (driverStatus.PowerId == driverLoginProcess.PowerId &&
+                    //        driverStatus.Odometer == driverLoginProcess.Odometer)
+                    //    {
+                    //        // TODO: What/whoch DateTime form the handheld do we check?  Or do we backfill upon arrival?
+                    //        var timeSpan = driverStatus.LoginDateTime - driverLoginProcess.????;
+                    //        if (timeSpan < TimeSpan.FromSeconds(30) && timeSpan > TimeSpan.FromSeconds(-30))
+                    //        {
+                    //            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Duplicate Login"));
+                    //            break;
+                    //        }
+                    //    }
+                    //}
 
                     // 6) Determine current trip number, segment, and driver status
+                    if (null != driverStatus)
+                    {
+                        if (null == driverStatus.TripNumber)
+                        {
+                            driverLoginProcess.TripNumber = null;
+                            driverLoginProcess.TripSegNumber = null;
+                            driverLoginProcess.DriverStatus = null;
+                        }
+                        else
+                        {
+                            driverLoginProcess.TripNumber = driverStatus.TripNumber;
+                            driverLoginProcess.DriverStatus = driverStatus.PrevDriverStatus;
+                            if (null == driverLoginProcess.DriverStatus)
+                            {
+                                driverLoginProcess.DriverStatus = driverStatus.Status;
+                            }
+                            // TODO:  Fix/Reconcile DriverStatusConstants
+                            if ("D" == driverLoginProcess.DriverStatus)
+                            {
+                                
+
+
+                            }
+                        }
+                    }
+
+
 
                     // 7) Update Trip in progress flag
 
