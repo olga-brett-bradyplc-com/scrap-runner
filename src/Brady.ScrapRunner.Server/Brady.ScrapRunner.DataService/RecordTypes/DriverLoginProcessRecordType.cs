@@ -440,18 +440,52 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                                 driverLoginProcess.DriverStatus = driverStatus.Status;
                             }
                             // TODO:  Fix/Reconcile DriverStatusConstants
+                            // TODO:  Is Query supported?
+                            // TODO:  
                             if ("D" == driverLoginProcess.DriverStatus)
                             {
-                                
-
-
+                                query.CurrentQuery = string.Format(
+                                    "TripSegments?$filter= TripNumber='{0}' and ( TripSegStatus='P' or TripSegStatus='M' ) &$orderby=TripSegNumber esc",
+                                    driverStatus.TripNumber);
+                                queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture,
+                                    settings.Token, out fault);
+                                if (null != fault)
+                                {
+                                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault));
+                                    break;
+                                }
+                                TripSegment tripSegment =
+                                    (TripSegment) queryResult.Records.Cast<TripSegment>().FirstOrNull();
+                                driverLoginProcess.TripSegNumber = tripSegment?.TripSegNumber;
                             }
+                            else
+                            {
+                                driverLoginProcess.TripSegNumber = driverStatus.TripSegNumber;
+                            }
+                        }
+
+                        if (driverLoginProcess.DriverStatus != "E" && 
+                            driverLoginProcess.DriverStatus != "A" &&
+                            driverLoginProcess.DriverStatus != "S")
+                        {
+                            driverLoginProcess.DriverStatus = null;
                         }
                     }
 
-
-
-                    // 7) Update Trip in progress flag
+                    // 7) Update Trip in progress flag in the trip table
+                    if (driverLoginProcess.TripNumber != null && driverLoginProcess.TripSegNumber == "01")
+                    {
+                        if (driverLoginProcess.DriverStatus != "E" &&
+                            driverLoginProcess.DriverStatus != "A" &&
+                            driverLoginProcess.DriverStatus != "S" &&
+                            driverLoginProcess.DriverStatus != "D" &&
+                            driverLoginProcess.DriverStatus != "X" &&
+                            driverLoginProcess.DriverStatus != "B" &&
+                            driverLoginProcess.DriverStatus != "F")
+                        {
+                            // TODO:  Update Trip in progress flag in the trip table
+                        }
+                    }
 
                     // 8) Check for open ended delays
 
