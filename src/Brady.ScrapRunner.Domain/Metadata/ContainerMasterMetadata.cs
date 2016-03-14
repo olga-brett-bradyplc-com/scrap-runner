@@ -34,8 +34,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.ContainerTerminalId);
             StringProperty(x => x.ContainerRegionId);
             StringProperty(x => x.ContainerLocation);
-            DateProperty(x => x.ContainerLastActionDateTime);
-            DateProperty(x => x.ContainerPendingMoveDateTime);
+            TimeProperty(x => x.ContainerLastActionDateTime);
+            TimeProperty(x => x.ContainerPendingMoveDateTime);
             StringProperty(x => x.ContainerCurrentTripNumber);
             StringProperty(x => x.ContainerCurrentTripSegNumber);
             StringProperty(x => x.ContainerCurrentTripSegType);
@@ -46,7 +46,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.ContainerComments);
             StringProperty(x => x.ContainerPowerId);
             StringProperty(x => x.ContainerBarCodeFlag);
-            DateProperty(x => x.ContainerAddDateTime);
+            TimeProperty(x => x.ContainerAddDateTime);
             StringProperty(x => x.ContainerAddUserId);
             StringProperty(x => x.ContainerRestrictToHostCode);
             StringProperty(x => x.ContainerPrevCustHostCode);
