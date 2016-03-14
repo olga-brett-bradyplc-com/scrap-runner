@@ -25,7 +25,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
 
             StringProperty(x => x.ContainerType);
             StringProperty(x => x.ContainerSize);
-            DateProperty(x => x.ActionDate);
+            TimeProperty(x => x.ActionDate);
             StringProperty(x => x.ActionFlag);
             StringProperty(x => x.TerminalId);
             StringProperty(x => x.RegionId);
