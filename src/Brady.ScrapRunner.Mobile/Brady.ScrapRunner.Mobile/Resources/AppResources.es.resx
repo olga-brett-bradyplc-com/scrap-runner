@@ -289,4 +289,19 @@
   <data name="TruckIdHint" xml:space="preserve">
     <value>Identificación de camiones</value>
   </data>
+  <data name="CompletingTripSegment" xml:space="preserve">
+    <value>Completando Segmento de viaje</value>
+  </data>
+  <data name="LoadingTripInformation" xml:space="preserve">
+    <value>Esta información de carga de viaje</value>
+  </data>
+  <data name="PickupFull" xml:space="preserve">
+    <value>Recoger completa</value>
+  </data>
+  <data name="RouteSummary" xml:space="preserve">
+    <value>Resumen de la ruta</value>
+  </data>
+  <data name="SwitchTripType" xml:space="preserve">
+    <value>CAMBIAR</value>
+  </data>
 </root>
