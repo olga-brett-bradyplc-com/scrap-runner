@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
 
@@ -14,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
         {
 
             AutoUpdatesByDefault();
-            
+
             StringProperty(x => x.Id)
                 .IsHiddenInEditor()
                 .IsNotEditableInGrid();
@@ -32,7 +28,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.CodeDesc)
                 .Property(x => x.CodeType)
                 .Property(x => x.AppliesTo)
-
                 .OrderBy(x => x.CodeName);
         }
     }

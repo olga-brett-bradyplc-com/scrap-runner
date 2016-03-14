@@ -30,13 +30,13 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.CustTerminalId);
             StringProperty(x => x.ContainerType);
             StringProperty(x => x.ContainerSize);
-            DateProperty(x => x.LastActionDateTime);
+            TimeProperty(x => x.LastActionDateTime);
             StringProperty(x => x.LastTripNumber);
             StringProperty(x => x.LastTripSegNumber);
             StringProperty(x => x.LastTripSegType);
             IntegerProperty(x => x.LastQuantity);
             IntegerProperty(x => x.CurrentQuantity);
-            DateProperty(x => x.ChangedDateTime);
+            TimeProperty(x => x.ChangedDateTime);
             StringProperty(x => x.ChangedUserId);
             StringProperty(x => x.ChangedUserName);
             StringProperty(x => x.RemoveFromList);
