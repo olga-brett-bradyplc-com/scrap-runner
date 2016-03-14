@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Android.App;
+    using Android.Content;
     using Android.Content.PM;
     using Android.OS;
     using Android.Widget;
@@ -42,23 +43,16 @@
             base.OnPause();
         }
 
+        private void VibrateDevice()
+        {
+            var vibrateService = (Vibrator)GetSystemService(VibratorService);
+            if (vibrateService == null) return;
+            if (vibrateService.HasVibrator)
+                vibrateService.Vibrate(250);
+        }
+
         private void Scan()
         {
-            var opts = new MobileBarcodeScanningOptions
-            {
-                PossibleFormats = new List<ZXing.BarcodeFormat> {
-                    ZXing.BarcodeFormat.All_1D
-                },
-                CameraResolutionSelector = availableResolutions => {
-
-                    foreach (var ar in availableResolutions)
-                    {
-                        Console.WriteLine("Resolution: " + ar.Width + "x" + ar.Height);
-                    }
-                    return null;
-                }
-            };
-
             _scanFragment.StartScanning(result => {
 
                 // Null result means scanning was cancelled
@@ -69,8 +63,9 @@
                 }
 
                 // Otherwise, proceed with result
+                VibrateDevice();
                 RunOnUiThread(() => Toast.MakeText(this, "Scanned: " + result.Text, ToastLength.Short).Show());
-            }, opts);
+            }, MobileBarcodeScanningOptions.Default);
         }
     }
 }
