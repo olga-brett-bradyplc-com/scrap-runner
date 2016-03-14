@@ -42,12 +42,12 @@
             base.OnPause();
         }
 
-        void Scan()
+        private void Scan()
         {
             var opts = new MobileBarcodeScanningOptions
             {
                 PossibleFormats = new List<ZXing.BarcodeFormat> {
-                    ZXing.BarcodeFormat.QR_CODE
+                    ZXing.BarcodeFormat.All_1D
                 },
                 CameraResolutionSelector = availableResolutions => {
 
