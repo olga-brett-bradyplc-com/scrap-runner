@@ -1,9 +1,7 @@
 ﻿namespace Brady.ScrapRunner.Mobile.BarcodeDemo.Droid
 {
-    using System;
-    using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Android.App;
-    using Android.Content;
     using Android.Content.PM;
     using Android.OS;
     using Android.Widget;
@@ -17,22 +15,23 @@
         ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.KeyboardHidden)]
 	public class MainActivity : global::Android.Support.V4.App.FragmentActivity
     {
-        ZXingScannerFragment _scanFragment;
+        private ZXingScannerFragment _scanFragment;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main);
+            MobileBarcodeScanner.Initialize(Application);
             _scanFragment = new ZXingScannerFragment();
             SupportFragmentManager.BeginTransaction()
                 .Replace(Resource.Id.fragment_container, _scanFragment)
                 .Commit();
         }
 
-        protected override void OnResume()
+        protected override async void OnResume()
         {
             base.OnResume();
-
+            await Task.Delay(1000);
             Scan();
         }
 
@@ -53,16 +52,13 @@
 
         private void Scan()
         {
-            _scanFragment.StartScanning(result => {
-
-                // Null result means scanning was cancelled
+            _scanFragment.StartScanning(result => 
+            {
                 if (string.IsNullOrEmpty(result?.Text))
                 {
-                    Toast.MakeText(this, "Scanning Cancelled", ToastLength.Long).Show();
+                    Toast.MakeText(this, "Scanning cancelled", ToastLength.Long).Show();
                     return;
                 }
-
-                // Otherwise, proceed with result
                 VibrateDevice();
                 RunOnUiThread(() => Toast.MakeText(this, "Scanned: " + result.Text, ToastLength.Short).Show());
             }, MobileBarcodeScanningOptions.Default);
