@@ -7,15 +7,16 @@ using BWF.DataServices.Support.NHibernate.Abstract;
 namespace Brady.ScrapRunner.DataService.RecordTypes
 {
 
-    [CreateAction("ErrorLog")]
-    [EditAction("ErrorLog")]
-    [DeleteAction("ErrorLog")]
-    public class ErrorLogRecordType :
-        ChangeableRecordType<ErrorLog, int, ErrorLogValidator, ErrorLogDeletionValidator>
+    [CreateAction("Messages")]
+    [EditAction("Messages")]
+    [DeleteAction("Messages")]
+
+    public class MessagesRecordType :
+        ChangeableRecordType<Messages, int, MessagesValidator, MessagesDeletionValidator>
     {
         public override void ConfigureMapper()
         {
-            Mapper.CreateMap<ErrorLog, ErrorLog>();
+            Mapper.CreateMap<Messages, Messages>();
         }
     }
 }

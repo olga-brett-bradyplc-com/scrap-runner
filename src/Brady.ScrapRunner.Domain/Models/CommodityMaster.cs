@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A CommodityMaster record.
     /// </summary>
-    public class CommodityMaster : IHaveCompositeId, IEquatable<CommodityMaster>
+    public class CommodityMaster : IHaveId<string>, IEquatable<CommodityMaster>
     {
         public virtual string CommodityCode { get; set; }
         public virtual string CommodityDesc { get; set; }
@@ -26,7 +26,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0}", CommodityCode);
+                return CommodityCode;
             }
             set
             {

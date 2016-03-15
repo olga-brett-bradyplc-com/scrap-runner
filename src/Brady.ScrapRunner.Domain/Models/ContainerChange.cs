@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A ContainerChange record.
     /// </summary>
-    public class ContainerChange : IHaveCompositeId, IEquatable<ContainerChange>
+    public class ContainerChange : IHaveId<string>, IEquatable<ContainerChange>
     {
         public virtual string ContainerNumber { get; set; }
         public virtual string ContainerType { get; set; }
@@ -25,7 +25,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0}", ContainerNumber);
+                return  ContainerNumber;
             }
             set
             {
@@ -57,5 +57,4 @@ namespace Brady.ScrapRunner.Domain.Models
             }
         }
     }
-
 }

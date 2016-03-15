@@ -22,9 +22,9 @@ namespace Brady.ScrapRunner.DataService.Mappings
                 m.Update(false);
             });
 
-            ComposedId(map =>
+            Id(x => x.TerminalId, m =>
             {
-                map.Property(y => y.TerminalId, m => m.Generated(PropertyGeneration.Never));
+                m.Generator(Generators.Assigned);
             });
 
             Property(x => x.RegionId);

@@ -1,10 +1,6 @@
-﻿using Brady.ScrapRunner.Domain.Models;
+﻿using System;
+using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
@@ -34,15 +30,15 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.PowerRegionId);
             StringProperty(x => x.PowerLocation);
             StringProperty(x => x.PowerStatus);
-            DateProperty(x => x.PowerDateOutOfService);
-            DateProperty(x => x.PowerDateInService);
+            TimeProperty(x => x.PowerDateOutOfService);
+            TimeProperty(x => x.PowerDateInService);
             StringProperty(x => x.PowerDriverId);
             IntegerProperty(x => x.PowerOdometer);
             StringProperty(x => x.PowerComments);
             StringProperty(x => x.MdtId);
             StringProperty(x => x.PrimaryContainerType);
             StringProperty(x => x.OrigTerminalId);
-            DateProperty(x => x.PowerLastActionDateTime);
+            TimeProperty(x => x.PowerLastActionDateTime);
             StringProperty(x => x.PowerCurrentTripNumber);
             StringProperty(x => x.PowerCurrentTripSegNumber);
             StringProperty(x => x.PowerCurrentTripSegType);
@@ -76,8 +72,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.PowerCurrentTripSegType)
                 .Property(x => x.PowerAssetNumber)
                 .Property(x => x.PowerIdHost)
-                .OrderBy(x => x.PowerId);
-             
+                .OrderBy(x => x.PowerId);         
         }
     }
 }

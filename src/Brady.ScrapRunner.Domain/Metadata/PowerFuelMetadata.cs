@@ -35,7 +35,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripRegionId);
             StringProperty(x => x.TripDriverId);
             StringProperty(x => x.TripDriverName);
-            DateProperty(x => x.PowerDateOfFuel);
+            TimeProperty(x => x.PowerDateOfFuel);
             StringProperty(x => x.PowerState);
             StringProperty(x => x.PowerCountry);
             IntegerProperty(x => x.PowerOdometer);

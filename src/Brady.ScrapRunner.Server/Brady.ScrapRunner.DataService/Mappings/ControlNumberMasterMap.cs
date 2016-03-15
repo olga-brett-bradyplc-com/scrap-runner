@@ -20,9 +20,9 @@ namespace Brady.ScrapRunner.DataService.Mappings
 
             Table("ControlNumberMaster");
 
-            ComposedId(map =>
+            Id(x => x.ControlType, m =>
             {
-                map.Property(y => y.ControlType, m => m.Generated(PropertyGeneration.Never));
+                m.Generator(Generators.Assigned);
             });
 
             Property(x => x.Id, m =>

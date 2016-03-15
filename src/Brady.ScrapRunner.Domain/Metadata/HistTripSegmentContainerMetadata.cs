@@ -47,11 +47,11 @@ namespace Brady.ScrapRunner.Domain.Metadata
             IntegerProperty(x => x.TripSegContainerWeightTare);
             StringProperty(x => x.TripSegContainerReviewFlag);
             StringProperty(x => x.TripSegContainerReviewReason);
-            DateProperty(x => x.TripSegContainerActionDateTime);
+            TimeProperty(x => x.TripSegContainerActionDateTime);
             StringProperty(x => x.TripSegContainerEntryMethod);
-            DateProperty(x => x.WeightGrossDateTime);
-            DateProperty(x => x.WeightGross2ndDateTime);
-            DateProperty(x => x.WeightTareDateTime);
+            TimeProperty(x => x.WeightGrossDateTime);
+            TimeProperty(x => x.WeightGross2ndDateTime);
+            TimeProperty(x => x.WeightTareDateTime);
             IntegerProperty(x => x.TripSegContainerLevel);
             IntegerProperty(x => x.TripSegContainerLatitude);
             IntegerProperty(x => x.TripSegContainerLongitude);

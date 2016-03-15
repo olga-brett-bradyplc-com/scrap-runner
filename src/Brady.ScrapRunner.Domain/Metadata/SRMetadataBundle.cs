@@ -42,6 +42,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new HistTripSegmentMetadata()
                   , new HistTripSegmentContainerMetadata()
                   , new HistTripSegmentMileageMetadata()
+                  , new MessagesMetadata()
                   , new PowerFuelMetadata()
                   , new PowerHistoryMetadata()
                   , new PowerLimitsMetadata()

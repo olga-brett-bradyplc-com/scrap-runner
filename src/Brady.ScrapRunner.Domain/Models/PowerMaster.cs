@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace Brady.ScrapRunner.Domain.Models
 {
     /// <summary>
-    /// A PowerMaster record.  FIXME:  Remove the Id workaround for NHibernate 
+    /// A PowerMaster record.  
     /// </summary>
-    public class PowerMaster : IHaveCompositeId, IEquatable<PowerMaster>
+    public class PowerMaster : IHaveId<string>, IEquatable<PowerMaster>
     {
         public virtual string PowerId { get; set; }
         public virtual string PowerType { get; set; }
