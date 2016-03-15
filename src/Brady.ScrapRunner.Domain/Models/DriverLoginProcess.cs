@@ -51,7 +51,9 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripSegNumber { get; set; }
         // Initially null
         public virtual string DriverStatus { get; set; }
- 
+        // LoginDateTime form hand held.  Initially null?  Why shoud we trust the client?
+        public virtual DateTime? LoginDateTime { get; set; }
+
         //Either in this Message or a separate call
         //public virtual List<ContainerMasterLite> ContainerMasters { get; set; }
 
