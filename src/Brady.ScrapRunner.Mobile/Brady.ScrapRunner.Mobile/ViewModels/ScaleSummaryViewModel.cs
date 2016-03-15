@@ -33,7 +33,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            using (var tripDataLoad = UserDialogs.Instance.Loading("Loading Trip Data", maskType: MaskType.Clear))
+            using (var tripDataLoad = UserDialogs.Instance.Loading(AppResources.LoadingTripData, maskType: MaskType.Clear))
             {
                 var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
                 var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();

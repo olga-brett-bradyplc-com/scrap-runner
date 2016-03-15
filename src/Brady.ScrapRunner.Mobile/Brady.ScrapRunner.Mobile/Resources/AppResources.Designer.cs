@@ -107,6 +107,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Completing Trip Segment.
+        /// </summary>
+        public static string CompletingTripSegment {
+            get {
+                return ResourceManager.GetString("CompletingTripSegment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are arriving at:{0}{2}{1}{3}{1}{4}{0} Are you sure you want to mark trip as arrived?.
         /// </summary>
         public static string ConfirmArrivalMessage {
@@ -265,6 +274,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string LoadingTripData {
             get {
                 return ResourceManager.GetString("LoadingTripData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading Trip Information.
+        /// </summary>
+        public static string LoadingTripInformation {
+            get {
+                return ResourceManager.GetString("LoadingTripInformation", resourceCulture);
             }
         }
         
