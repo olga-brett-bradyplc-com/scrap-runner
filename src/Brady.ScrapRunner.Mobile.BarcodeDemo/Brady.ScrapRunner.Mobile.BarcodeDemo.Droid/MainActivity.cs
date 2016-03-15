@@ -10,19 +10,23 @@
     [Activity (
         Label = "ScrapRunner Barcode Demo",
         MainLauncher = true, 
-        Icon = "@drawable/icon", 
-        Theme = "@android:style/Theme.Holo.Light", 
+        Icon = "@drawable/ic_barcode", 
         ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.KeyboardHidden)]
 	public class MainActivity : global::Android.Support.V4.App.FragmentActivity
     {
         private ZXingScannerFragment _scanFragment;
+        private Button _flashButton;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main);
             MobileBarcodeScanner.Initialize(Application);
+
             _scanFragment = new ZXingScannerFragment();
+            _flashButton = FindViewById<Button>(Resource.Id.toggle_torch);
+            _flashButton.Click += (sender, e) => _scanFragment.ToggleTorch();
+
             SupportFragmentManager.BeginTransaction()
                 .Replace(Resource.Id.fragment_container, _scanFragment)
                 .Commit();

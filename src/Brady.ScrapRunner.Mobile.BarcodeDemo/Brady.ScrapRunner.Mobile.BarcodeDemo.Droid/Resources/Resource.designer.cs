@@ -48,7 +48,10 @@ namespace Brady.ScrapRunner.Mobile.BarcodeDemo.Droid
 		{
 			
 			// aapt resource value: 0x7f020000
-			public const int Icon = 2130837504;
+			public const int ic_barcode = 2130837504;
+			
+			// aapt resource value: 0x7f020001
+			public const int Icon = 2130837505;
 			
 			static Drawable()
 			{
@@ -73,7 +76,7 @@ namespace Brady.ScrapRunner.Mobile.BarcodeDemo.Droid
 			public const int textView1 = 2131034112;
 			
 			// aapt resource value: 0x7f050002
-			public const int textView2 = 2131034114;
+			public const int toggle_torch = 2131034114;
 			
 			static Id()
 			{
