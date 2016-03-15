@@ -317,4 +317,10 @@
   <data name="TruckIdHint" xml:space="preserve">
     <value>Truck ID</value>
   </data>
+  <data name="CompletingTripSegment" xml:space="preserve">
+    <value>Completing Trip Segment</value>
+  </data>
+  <data name="LoadingTripInformation" xml:space="preserve">
+    <value>Loading Trip Information</value>
+  </data>
 </root>

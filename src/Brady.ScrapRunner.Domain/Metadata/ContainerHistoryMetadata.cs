@@ -39,7 +39,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.ContainerRegionId);
             StringProperty(x => x.ContainerRegionName);
             StringProperty(x => x.ContainerLocation);
-            DateProperty(x => x.ContainerLastActionDateTime);
+            TimeProperty(x => x.ContainerLastActionDateTime);
             IntegerProperty(x => x.ContainerDaysAtSite);
             StringProperty(x => x.ContainerTripNumber);
             StringProperty(x => x.ContainerTripSegNumber);
