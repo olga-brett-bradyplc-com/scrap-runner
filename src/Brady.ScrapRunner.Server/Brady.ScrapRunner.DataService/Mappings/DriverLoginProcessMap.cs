@@ -35,6 +35,7 @@ namespace Brady.ScrapRunner.DataService.Mappings
             //Property(x => x.RegionId);
             //Property(x => x.PowerId);
             //Property(x => x.Odometer);
+            //Property(x => x.LoginDateTime);
         }
     }
 }
