@@ -143,7 +143,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async Task<bool> TruckAndOdometerAsync()
         {
 
-            using (var powerunitData = UserDialogs.Instance.Loading("Loading Trip Information", maskType: MaskType.Clear))
+            using (var powerunitData = UserDialogs.Instance.Loading(AppResources.LoadingTripInformation, maskType: MaskType.Clear))
             {
                 // Validate Power ID;
                 var powerIdTask = await _connection.GetConnection().GetAsync<string, PowerMaster>(TruckId);
