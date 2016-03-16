@@ -11,7 +11,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A ControlNumberMaster record.  
     /// </summary>
-    public class ControlNumberMaster : IHaveCompositeId, IEquatable<ControlNumberMaster>
+    public class ControlNumberMaster : IHaveId<string>, IEquatable<ControlNumberMaster>
     {
         public virtual string ControlType { get; set; }
         public virtual int? ControlNumberNext { get; set; }
@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0}", ControlType);
+                return ControlType;
             }
             set
             {

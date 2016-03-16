@@ -23,11 +23,11 @@ namespace Brady.ScrapRunner.DataService.Mappings
             //});
   
             // A (presumably) more direct mapping of assigned string ID
-            Id(x => x.CodeName, m =>
+             Id(x => x.CodeName, m =>
             {
                 m.Generator(Generators.Assigned);
             });
- 
+
             Property(x => x.Id, m =>
             {
                 m.Formula("CodeName");

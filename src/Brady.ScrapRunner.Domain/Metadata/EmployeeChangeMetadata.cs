@@ -40,7 +40,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .IsId()
                 .DisplayName("Password");
 
-            DateProperty(x => x.ChangeDateTime);
+            TimeProperty(x => x.ChangeDateTime);
 
             ViewDefaults()
                 .Property(x => x.EmployeeId)

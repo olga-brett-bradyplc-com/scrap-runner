@@ -30,7 +30,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             IntegerProperty(x => x.TripPointsStandardMinutes);
             IntegerProperty(x => x.TripPointsStandardMiles);
             IntegerProperty(x => x.TripPointsSendToMaps);
-            DateProperty(x => x.ChgDateTime);
+            TimeProperty(x => x.ChgDateTime);
             StringProperty(x => x.ChgEmployeeId);
 
 

@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A CustomerMaster record.
     /// </summary>
-    public class CustomerMaster : IHaveCompositeId, IEquatable<CustomerMaster>
+    public class CustomerMaster : IHaveId<string>, IEquatable<CustomerMaster>
     {
         public virtual string CustHostCode { get; set; }
         public virtual string CustType { get; set; }
@@ -89,7 +89,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0}", CustHostCode);
+                return CustHostCode;
             }
             set
             {
@@ -120,7 +120,5 @@ namespace Brady.ScrapRunner.Domain.Models
                 return hashCode;
             }
         }
-
     }
-
 }

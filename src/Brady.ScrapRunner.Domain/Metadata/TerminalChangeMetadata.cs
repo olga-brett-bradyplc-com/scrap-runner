@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
 
@@ -36,12 +32,12 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.CustCountry);
             StringProperty(x => x.CustPhone1);
             StringProperty(x => x.CustContact1);
-            DateProperty(x => x.CustOpenTime);
-            DateProperty(x => x.CustCloseTime);
+            TimeProperty(x => x.CustOpenTime);
+            TimeProperty(x => x.CustCloseTime);
             IntegerProperty(x => x.CustLatitude);
             IntegerProperty(x => x.CustLongitude);
             IntegerProperty(x => x.CustRadius);
-            DateProperty(x => x.ChgDateTime);
+            TimeProperty(x => x.ChgDateTime);
             StringProperty(x => x.ChgActionFlag);
             StringProperty(x => x.CustDriverInstructions);
 
@@ -68,7 +64,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.ChgDateTime)
                 .Property(x => x.ChgActionFlag)
                 .Property(x => x.CustDriverInstructions)
-
                 .OrderBy(x => x.TerminalId);
         }
     }

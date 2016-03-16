@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
 
@@ -41,7 +37,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             IntegerProperty(x => x.RegionIndex);
             IntegerProperty(x => x.TerminalIdNumber);
             StringProperty(x => x.MasterTerminal);
-            DateProperty(x => x.ChgDateTime);
+            TimeProperty(x => x.ChgDateTime);
             StringProperty(x => x.ChgEmployeeId);
             StringProperty(x => x.TerminalType);
             IntegerProperty(x => x.TimeZoneFactor);

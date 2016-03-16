@@ -1,10 +1,6 @@
-﻿using Brady.ScrapRunner.Domain.Models;
+﻿using System;
+using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
@@ -24,9 +20,9 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .IsId()
                 .DisplayName("Employee Id");
 
-            DateProperty(x => x.StartingTime);
-            DateProperty(x => x.QuitTime);
-            DateProperty(x => x.HoursPerDay);
+            TimeProperty(x => x.StartingTime);
+            TimeProperty(x => x.QuitTime);
+            TimeProperty(x => x.HoursPerDay);
             StringProperty(x => x.DispatcherId);
             StringProperty(x => x.Route);
             StringProperty(x => x.TerminalId);
@@ -66,7 +62,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.TrailerQualified)
                 .Property(x => x.PowerQualified)
                 .Property(x => x.ContractDriverFlag)
-
                 .OrderBy(x => x.EmployeeId);
 
         }
