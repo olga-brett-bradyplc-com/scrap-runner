@@ -170,6 +170,10 @@
           ]
         },
         {
+          "text": "Messages",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Messages"
+        },
+        {
           "text": "Power",
           "items": [
             {

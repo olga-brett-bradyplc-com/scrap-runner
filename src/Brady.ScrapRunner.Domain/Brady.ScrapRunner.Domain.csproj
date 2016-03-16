@@ -64,6 +64,7 @@
     <Compile Include="Metadata\HistTripSegmentContainerMetadata.cs" />
     <Compile Include="Metadata\HistTripSegmentMetadata.cs" />
     <Compile Include="Metadata\HistTripSegmentMileageMetadata.cs" />
+    <Compile Include="Metadata\MessagesMetadata.cs" />
     <Compile Include="Metadata\PowerFuelMetadata.cs" />
     <Compile Include="Metadata\PowerLimitsMetadata.cs" />
     <Compile Include="Metadata\SecurityMasterMetadata.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Models\HistTripSegment.cs" />
     <Compile Include="Models\HistTripSegmentContainer.cs" />
     <Compile Include="Models\HistTripSegmentMileage.cs" />
+    <Compile Include="Models\Messages.cs" />
     <Compile Include="Models\PowerFuel.cs" />
     <Compile Include="Models\PowerLimits.cs" />
     <Compile Include="Models\SecurityMaster.cs" />
@@ -160,12 +162,12 @@
       <HintPath>..\..\packages\AutoMapper.4.1.1\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="BWF.DataServices.Metadata, Version=2016.1.121.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\bwf.dataservices.metadata.2016.1.121-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.Metadata.dll</HintPath>
+    <Reference Include="BWF.DataServices.Metadata, Version=2016.1.155.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\bwf.dataservices.metadata.2016.1.155-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.Metadata.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="BWF.Enums, Version=2016.1.121.0, Culture=neutral, PublicKeyToken=3bc3db66488aec07, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\bwf.enums.2016.1.121-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.Enums.dll</HintPath>
+    <Reference Include="BWF.Enums, Version=2016.1.155.0, Culture=neutral, PublicKeyToken=3bc3db66488aec07, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\bwf.enums.2016.1.155-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.Enums.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

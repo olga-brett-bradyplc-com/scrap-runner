@@ -12,7 +12,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// A TripTypeBasic record.
     /// </summary>
 
-    public class TripTypeBasic : IHaveCompositeId, IEquatable<TripTypeBasic>
+    public class TripTypeBasic : IHaveId<string>, IEquatable<TripTypeBasic>
     {
         public virtual string TripTypeCode { get; set; }
         public virtual string TripTypeDesc { get; set; }

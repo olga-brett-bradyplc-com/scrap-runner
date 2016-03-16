@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A TerminalChange record.
     /// </summary>
-    public class TerminalChange : IHaveCompositeId, IEquatable<TerminalChange>
+    public class TerminalChange : IHaveId<string>, IEquatable<TerminalChange>
     {
         public virtual string TerminalId { get; set; }
         public virtual string RegionId { get; set; }
@@ -39,7 +39,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0}", TerminalId);
+                return TerminalId;
             }
             set
             {

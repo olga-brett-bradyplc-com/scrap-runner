@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace Brady.ScrapRunner.Domain.Models
 {
     /// <summary>
-    /// An EmployeeMaster record.  FIXME:  Remove the composite Id workaround for NHibernate and/or metadata 
+    /// An EmployeeMaster record.  
     /// </summary>
-    public class EmployeeMaster : IHaveCompositeId, IEquatable<EmployeeMaster>
+    public class EmployeeMaster : IHaveId<string>, IEquatable<EmployeeMaster>
     {
         public virtual string EmployeeId { get; set; }
         public virtual string TerminalId { get; set; }

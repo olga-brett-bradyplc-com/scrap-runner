@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// An DriverMaster record.  
     /// </summary>
-    public class DriverMaster : IHaveCompositeId, IEquatable<DriverMaster>
+    public class DriverMaster : IHaveId<string>, IEquatable<DriverMaster>
     {
         public virtual string EmployeeId { get; set; }
         public virtual DateTime? StartingTime { get; set; }

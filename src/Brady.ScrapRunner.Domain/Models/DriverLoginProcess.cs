@@ -51,7 +51,9 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripSegNumber { get; set; }
         // Initially null
         public virtual string DriverStatus { get; set; }
- 
+        // LoginDateTime form hand held.  Initially null?  Why shoud we trust the client?
+        public virtual DateTime? LoginDateTime { get; set; }
+
         //Either in this Message or a separate call
         //public virtual List<ContainerMasterLite> ContainerMasters { get; set; }
 
@@ -118,5 +120,24 @@ namespace Brady.ScrapRunner.Domain.Models
             }
         }
 
+        /// <summary>
+        /// Relevant input values, useful for logging
+        /// </summary>
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder("DriverLoginProcess{");
+            sb.Append("EmployeeId:" + EmployeeId);
+            sb.Append(", Password: " + Password);
+            sb.Append(", PowerId:" + PowerId);
+            sb.Append(", Odometer:" + Odometer);
+            sb.Append(", CodeListVersion:" + CodeListVersion);
+            sb.Append(", LastContainerMasterUpdate:" + LastContainerMasterUpdate);
+            sb.Append(", LastTerminalMasterUpdate:" + LastTerminalMasterUpdate);
+            sb.Append(", LocaleCode:" + LocaleCode);
+            sb.Append(", OverrideFlag:" + OverrideFlag);
+            sb.Append(", Mdtid: " + Mdtid);
+            sb.Append("}");
+            return sb.ToString();
+        }
     }
 }
