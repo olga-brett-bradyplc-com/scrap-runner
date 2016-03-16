@@ -758,7 +758,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                 transaction.Commit();
                 // We need to notify that data has changed for any types we have updated
                 // We always need to notify for the current type
-                dataService.NotifyOfExternalChangesToData(TypeName);
+                dataService.NotifyOfExternalChangesToData();
             }
             transaction.Dispose();
             session.Dispose();
