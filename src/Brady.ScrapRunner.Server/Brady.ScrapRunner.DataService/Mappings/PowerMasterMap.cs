@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Brady.ScrapRunner.DataService.Mappings
 {
     /// <summary>
-    /// A PowerMaster mapping to NHibernate.  FIXME:  Remove the Id workaround for NHibernate 
+    /// A PowerMaster mapping to NHibernate.  
     /// </summary>
     public class PowerMasterMap : ClassMapping<PowerMaster>
     {
@@ -19,24 +19,9 @@ namespace Brady.ScrapRunner.DataService.Mappings
 
             Table("PowerMaster");
 
-            // This alone causes NHibernate to also select (non-existant) Id.
-            //Property(x => x.PowerId);
-
-            // THis alone causes a HiLo generateion failure
-            //Id(x => x.PowerId);
-
-            // Id mapping example from 
-            // https://github.com/jagregory/fluent-nhibernate/wiki/Fluent-mapping
-            //   Id(x => x.Id)
-            //      .Column("PowerId")
-            //      .GeneratedBy.Assigned();
-
-            // But this doesn;t work as the Id() is a void 
-            //Id(x => x.PowerId).GeneratedBy.Assigned();
-
-            ComposedId(map =>
+            Id(x => x.PowerId, m =>
             {
-                map.Property(y => y.PowerId, m => m.Generated(PropertyGeneration.Never));
+                m.Generator(Generators.Assigned);
             });
 
             Property(x => x.Id, m =>

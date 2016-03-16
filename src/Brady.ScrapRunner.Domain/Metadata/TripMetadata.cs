@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
-
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
@@ -49,12 +44,12 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripRegionName);
             StringProperty(x => x.TripContactName);
             StringProperty(x => x.TripSalesman);
-            DateProperty(x => x.TripCustOpenTime);
-            DateProperty(x => x.TripCustCloseTime);
-            DateProperty(x => x.TripReadyDateTime);
+            TimeProperty(x => x.TripCustOpenTime);
+            TimeProperty(x => x.TripCustCloseTime);
+            TimeProperty(x => x.TripReadyDateTime);
             StringProperty(x => x.TripEnteredUserId);
             StringProperty(x => x.TripEnteredUserName);
-            DateProperty(x => x.TripEnteredDateTime);
+            TimeProperty(x => x.TripEnteredDateTime);
             IntegerProperty(x => x.TripStandardDriveMinutes);
             IntegerProperty(x => x.TripStandardStopMinutes);
             IntegerProperty(x => x.TripActualDriveMinutes);
@@ -75,7 +70,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripCommodityScaleMsg);
             IntegerProperty(x => x.TripSendReceiptFlag);
             StringProperty(x => x.TripDriverIdPrev);
-            DateProperty(x => x.TripCompletedDateTime);
+            TimeProperty(x => x.TripCompletedDateTime);
             IntegerProperty(x => x.TripSendScaleNotificationFlag);
             StringProperty(x => x.TripExtendedFlag);
             StringProperty(x => x.TripExtendedReason);
@@ -85,20 +80,20 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripCompletedUserId);
             StringProperty(x => x.TripCompletedUserName);
             StringProperty(x => x.TripReferenceNumber);
-            DateProperty(x => x.TripChangedDateTime);
+            TimeProperty(x => x.TripChangedDateTime);
             StringProperty(x => x.TripChangedUserId);
             StringProperty(x => x.TripChangedUserName);
             StringProperty(x => x.TripDirectSegNumber);
             IntegerProperty(x => x.TripDirectDriveMinutes);
             IntegerProperty(x => x.TripDirectTotalMinutes);
-            DateProperty(x => x.TripStartedDateTime);
+            TimeProperty(x => x.TripStartedDateTime);
             IntegerProperty(x => x.TripActualTotalMinutes);
             StringProperty(x => x.TripErrorDesc);
             StringProperty(x => x.TripDriverInstructions);
             StringProperty(x => x.TripDispatcherInstructions);
             StringProperty(x => x.TripScaleReferenceNumber);
             StringProperty(x => x.TripMultContainerFlag);
-            IntegerProperty(x => x.TripSendReseqFlag);
+            EnumProperty(x => x.TripSendReseqFlag);
             StringProperty(x => x.TripServerLocation);
             StringProperty(x => x.TripPowerAssetNumber);
             StringProperty(x => x.TripStatusPrev);
@@ -110,9 +105,9 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripHaulerZip);
             StringProperty(x => x.TripHaulerCountry);
             StringProperty(x => x.TripResolvedFlag);
-            DateProperty(x => x.TripSendScaleDateTime);
+            TimeProperty(x => x.TripSendScaleDateTime);
             IntegerProperty(x => x.TripResendScaleNotificationFlag);
-            DateProperty(x => x.TripResendScaleDateTime);
+            TimeProperty(x => x.TripResendScaleDateTime);
             StringProperty(x => x.TripImageFlag);
             StringProperty(x => x.TripScaleTerminalId);
             StringProperty(x => x.TripScaleTerminalName);
@@ -221,7 +216,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.TripResendScaleTerminalId)
                 .Property(x => x.TripResendScaleTerminalName)
                 .OrderBy(x => x.TripNumber);
-
         }
     }
 }

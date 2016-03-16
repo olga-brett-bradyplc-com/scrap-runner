@@ -12,7 +12,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// A TripTypeMasterDesc record.
     /// </summary>
 
-    public class TripTypeMasterDesc : IHaveCompositeId, IEquatable<TripTypeMasterDesc>
+    public class TripTypeMasterDesc : IHaveId<string>, IEquatable<TripTypeMasterDesc>
     {
         public virtual string TripTypeCode { get; set; }
         public virtual string TripTypeDesc { get; set; }
