@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A RegionMaster record.
     /// </summary>
-    public class RegionMaster : IHaveCompositeId, IEquatable<RegionMaster>
+    public class RegionMaster : IHaveId<string>, IEquatable<RegionMaster>
     {
         public virtual string RegionId { get; set; }
         public virtual string RegionName { get; set; }
@@ -26,7 +26,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0}", RegionId);
+                return RegionId;
             }
             set
             {

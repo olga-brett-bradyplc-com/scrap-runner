@@ -16,19 +16,9 @@ namespace Brady.ScrapRunner.DataService.Mappings
                         
             Table("DriverStatus");
 
-            // FIXME:
-            // Id mapping example from 
-            // http://notherdev.blogspot.co.uk/2012/02/nhibernates-mapping-by-code-summary.html
-            // and Peter Yule
-            // Id(x => x.Id, m =>
-            // {
-            //    m.Generator(Generators.Assigned);
-            // });
-
-            ComposedId(map =>
+            Id(x => x.EmployeeId, m =>
             {
-                map.Property(y => y.EmployeeId,
-                    m => m.Generated(PropertyGeneration.Never));
+                m.Generator(Generators.Assigned);
             });
 
             Property(x => x.Id, m =>

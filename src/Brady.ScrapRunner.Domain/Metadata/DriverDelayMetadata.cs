@@ -35,8 +35,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.DriverName);
             StringProperty(x => x.DelayCode);
             StringProperty(x => x.DelayReason);
-            DateProperty(x => x.DelayStartDateTime);
-            DateProperty(x => x.DelayEndDateTime);
+            TimeProperty(x => x.DelayStartDateTime);
+            TimeProperty(x => x.DelayEndDateTime);
             IntegerProperty(x => x.DelayLatitude);
             IntegerProperty(x => x.DelayLongitude);
             StringProperty(x => x.TerminalId);

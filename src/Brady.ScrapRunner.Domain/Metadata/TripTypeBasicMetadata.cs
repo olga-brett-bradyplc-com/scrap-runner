@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
-
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
@@ -34,7 +29,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.TripTypeHostCode)
                 .Property(x => x.TripTypeHostCodeScale)
                 .Property(x => x.TripTypeStandardMinutes)
-
                 .OrderBy(x => x.TripTypeCode);
         }
     }

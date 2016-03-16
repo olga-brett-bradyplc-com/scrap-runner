@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A DriverStatus record.  FIXME:  Remove the composite Id workaround for NHibernate and/or metadata 
     /// </summary>
-    public class DriverStatus : IHaveCompositeId, IEquatable<DriverStatus>
+    public class DriverStatus : IHaveId<string>, IEquatable<DriverStatus>
     {
 
         public virtual string EmployeeId { get; set; }

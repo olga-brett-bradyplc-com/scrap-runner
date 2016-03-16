@@ -40,8 +40,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.PowerRegionName);
             StringProperty(x => x.PowerLocation);
             StringProperty(x => x.PowerStatus);
-            DateProperty(x => x.PowerDateOutOfService);
-            DateProperty(x => x.PowerDateInService);
+            TimeProperty(x => x.PowerDateOutOfService);
+            TimeProperty(x => x.PowerDateInService);
             StringProperty(x => x.PowerDriverId);
             StringProperty(x => x.PowerDriverName);
             IntegerProperty(x => x.PowerOdometer);
@@ -59,7 +59,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.PowerCustCounty);
             StringProperty(x => x.PowerCustTownship);
             StringProperty(x => x.PowerCustPhone1);
-            DateProperty(x => x.PowerLastActionDateTime);
+            TimeProperty(x => x.PowerLastActionDateTime);
             StringProperty(x => x.PowerStatusDesc);
             StringProperty(x => x.PowerCurrentTripNumber);
             StringProperty(x => x.PowerCurrentTripSegNumber);

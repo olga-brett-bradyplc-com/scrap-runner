@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
 using BWF.DataServices.Metadata.Fluent.Enums;
@@ -25,7 +21,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .IsNotEditableInGrid()
                 .DisplayName("Error Id");
 
-            StringProperty(x => x.ErrorDateTime);
+            TimeProperty(x => x.ErrorDateTime);
             IntegerProperty(x => x.ErrorSeqNo);
             StringProperty(x => x.ErrorTerminalId);
             StringProperty(x => x.ErrorRegionId);

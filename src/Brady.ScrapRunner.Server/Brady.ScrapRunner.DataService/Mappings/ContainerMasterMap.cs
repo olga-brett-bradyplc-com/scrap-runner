@@ -21,10 +21,9 @@ namespace Brady.ScrapRunner.DataService.Mappings
                 m.Insert(false);
                 m.Update(false);
             });
-
-            ComposedId(map =>
+            Id(x => x.ContainerNumber, m =>
             {
-                map.Property(y => y.ContainerNumber, m => m.Generated(PropertyGeneration.Never));
+                m.Generator(Generators.Assigned);
             });
 
             Property(x => x.ContainerType);

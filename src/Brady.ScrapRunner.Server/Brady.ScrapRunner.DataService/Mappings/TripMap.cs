@@ -16,9 +16,9 @@ namespace Brady.ScrapRunner.DataService.Mappings
 
             Table("Trip");
 
-            ComposedId(map =>
+            Id(x => x.TripNumber, m =>
             {
-                map.Property(y => y.TripNumber, m => m.Generated(PropertyGeneration.Never));
+                m.Generator(Generators.Assigned);
             });
 
             Property(x => x.Id, m =>

@@ -64,6 +64,7 @@
     <Compile Include="Metadata\HistTripSegmentContainerMetadata.cs" />
     <Compile Include="Metadata\HistTripSegmentMetadata.cs" />
     <Compile Include="Metadata\HistTripSegmentMileageMetadata.cs" />
+    <Compile Include="Metadata\MessagesMetadata.cs" />
     <Compile Include="Metadata\PowerFuelMetadata.cs" />
     <Compile Include="Metadata\PowerLimitsMetadata.cs" />
     <Compile Include="Metadata\SecurityMasterMetadata.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Models\HistTripSegment.cs" />
     <Compile Include="Models\HistTripSegmentContainer.cs" />
     <Compile Include="Models\HistTripSegmentMileage.cs" />
+    <Compile Include="Models\Messages.cs" />
     <Compile Include="Models\PowerFuel.cs" />
     <Compile Include="Models\PowerLimits.cs" />
     <Compile Include="Models\SecurityMaster.cs" />
