@@ -200,6 +200,7 @@
     <Compile Include="Mappings\ControlNumberMasterMap.cs" />
     <Compile Include="Mappings\CustomerDirectionsMap.cs" />
     <Compile Include="Mappings\DriverEfficiencyMap.cs" />
+    <Compile Include="Mappings\PreferencesProcessMap.cs" />
     <Compile Include="Mappings\DriverLoginProcessMap.cs" />
     <Compile Include="Mappings\DriverMasterMap.cs" />
     <Compile Include="Mappings\EmployeeAreaMap.cs" />
@@ -247,6 +248,7 @@
     <Compile Include="Mappings\PreferenceMap.cs" />
     <Compile Include="Mappings\TripTypeMasterDescMap.cs" />
     <Compile Include="Mappings\TripTypeMasterDetailsMap.cs" />
+    <Compile Include="RecordTypes\PreferencesProcessRecordType.cs" />
     <Compile Include="RecordTypes\DriverLoginProcessRecordType.cs" />
     <Compile Include="RecordTypes\MessagesRecordType.cs" />
     <Compile Include="RecordTypes\TripPointsRecordType.cs" />
@@ -320,6 +322,8 @@
     <Compile Include="Validators\CustomerDirectionsValidator.cs" />
     <Compile Include="Validators\DriverEfficiencyDeletionValidator.cs" />
     <Compile Include="Validators\DriverEfficiencyValidator.cs" />
+    <Compile Include="Validators\PreferencesProcessValidator.cs" />
+    <Compile Include="Validators\PreferencesProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverLoginProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverMasterDeletionValidator.cs" />
     <Compile Include="Validators\DriverLoginProcessValidator.cs" />

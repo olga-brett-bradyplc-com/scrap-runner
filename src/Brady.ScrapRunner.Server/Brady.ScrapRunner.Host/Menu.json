@@ -8,6 +8,10 @@
         {
           "text": "DriverLoginProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLoginProcess"
+        },
+        {
+          "text": "PreferencesProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PreferencesProcess"
         }
       ]
     },
