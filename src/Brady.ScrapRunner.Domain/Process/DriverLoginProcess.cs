@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel.Channels;
 using System.Text;
-using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Interfaces;
 
-namespace Brady.ScrapRunner.Domain.Models
+namespace Brady.ScrapRunner.Domain.Process
 {
     //
     // A DriverLoginProcess (request and response).  A pseudo-record.
@@ -15,7 +13,7 @@ namespace Brady.ScrapRunner.Domain.Models
     // Q2) Is Mdtid needed for phones?  Or null Or "Phone"?
     // Q3) Is PndVer needed for phones?  Or null Or "Phone"?
     // Q4) What is overrideflag and how is it used or updated during login?
-    public class DriverLoginProcess : IHaveId<String>, IEquatable<DriverLoginProcess>
+    public class DriverLoginProcess : IHaveId<string>, IEquatable<DriverLoginProcess>
     {
 
         public virtual string EmployeeId { get; set; }
