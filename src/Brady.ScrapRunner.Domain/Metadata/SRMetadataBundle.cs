@@ -48,6 +48,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new PowerLimitsMetadata()
                   , new PowerMasterMetadata()
                   , new PreferenceMetadata()
+                  , new PreferencesProcessMetadata()
                   , new RegionMasterMetadata()
                   , new SecurityMasterMetadata()
                   , new TerminalChangeMetadata()

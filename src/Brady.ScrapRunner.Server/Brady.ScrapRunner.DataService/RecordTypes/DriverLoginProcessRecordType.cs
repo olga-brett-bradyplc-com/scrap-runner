@@ -4,12 +4,12 @@ using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Process;
 using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
@@ -20,19 +20,32 @@ using NHibernate.Util;
 namespace Brady.ScrapRunner.DataService.RecordTypes
 {
 
+    /// <summary>
+    /// The process for logging in a driver.
+    /// </summary>
     [EditAction("DriverLoginProcess")]
-    public class DriverLoginProcessRecordType :
-        ChangeableRecordType
+    public class DriverLoginProcessRecordType : ChangeableRecordType
             <DriverLoginProcess, string, DriverLoginProcessValidator, DriverLoginProcessDeletionValidator>
     {
 
+        /// <summary>
+        /// The obligatory abstract function implementation
+        /// </summary>
         public override void ConfigureMapper()
         {
             Mapper.CreateMap<DriverLoginProcess, DriverLoginProcess>();
         }
 
 
-        // This is the deprecated signature.
+        /// <summary>
+        /// This is the deprecated signature. 
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="token"></param>
+        /// <param name="username"></param>
+        /// <param name="changeSet"></param>
+        /// <param name="persistChanges"></param>
+        /// <returns></returns>
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService, string token, string username,
             ChangeSet<string, DriverLoginProcess> changeSet,
             bool persistChanges)
@@ -41,7 +54,13 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         }
 
 
-        // This is the "real" method
+        /// <summary>
+        /// This is the "real" method 
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="changeSet"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService,
             ChangeSet<string, DriverLoginProcess> changeSet, ProcessChangeSetSettings settings)
         {
@@ -66,20 +85,22 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             ChangeSetResult<string> changeSetResult = base.ProcessChangeSet(dataService, changeSet, settings);
 
             // If no problems, we are free to process.
+            // We only log in one person at a time but in the more genreal cases we could be processing multiple records.
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() && !changeSetResult.FailedDeletions.Any())
             {
-                // We only log in one person at a time but in the more genreal cases we could be processing multiple records.
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
 
-                    DriverLoginProcess driverLoginProcess = (DriverLoginProcess) changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
                     DataServiceFault fault;
                     string msgKey = key;
 
-                    // It appers I must backfill user input values that were clobbered by the call to the base process method.
+                    DriverLoginProcess driverLoginProcess = (DriverLoginProcess) changeSetResult.GetSuccessfulUpdateForId(key);
+
+                    // TODO: determine these on a case by case basis.
+                    string userCulture = "en-GB";
+                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
+
+                    // It appers n the gernal case I must backfill user input values that were clobbered by the call to the base process method.
                     DriverLoginProcess backfillDriverLoginProcess;
                     if (changeSet.Update.TryGetValue(key, out backfillDriverLoginProcess))
                     {
@@ -99,7 +120,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         //driverLoginProcess.LoginDateTime = backfillDriverLoginProcess.LoginDateTime
 
                         // TODO: What/which DateTime do we use.  We trust the remote or should we backfill upon arrival?
-
                     }
                     else
                     {
@@ -134,7 +154,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
                     //
                     // 3) Lookup preferences.  
-                    // Filtered in 17) Send Preferences  
                     //
                     query.CurrentQuery = string.Format("Preferences?$filter= TerminalId='{0}'", employeeMaster.TerminalId);
                     queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
@@ -580,32 +599,32 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     // TODO:  If trip is partially completed & power unit id has changed (from what?)
                     // TODO:  use the new power id and starting odometer to update trip segment and trip segment milage tables
                     // TODO:  What if more than one TripSegmentMileage?
-//                    query.CurrentQuery = string.Format(
-//                        "TripSegments?$filter= TripNumber='{0}' and TripSegNumber='{1}' and TripSegOdometerStart isnotnull and TripSegOdometerEnd is null ",
-//                            driverStatus.TripNumber, driverStatus.TripSegNumber);
-//                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-//                    if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
-//                    var tripSegment = (TripSegment) queryResult.Records.Cast<TripSegment>().FirstOrNull();
-//                    if (null != tripSegment)
-//                    {
-//                        tripSegment.TripSegPowerId = driverLoginProcess.PowerId;
-//                        tripSegment.TripSegOdometerStart = driverLoginProcess.Odometer;
-//                    }
-//
-//                    query.CurrentQuery = string.Format(
-//                        "TripSegmentMileages?$filter= TripNumber='{0}' and TripSegNumber='{1}' and TripSegMileageOdometerStart isnotnull and TripSegMileageOdometerEnd is null &$orderby=TripSegMileageSeqNumber desc",
-//                            driverStatus.TripNumber, driverStatus.TripSegNumber);
-//                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-//                    if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
-//                    var tripSegmentMileage = (TripSegmentMileage)queryResult.Records.Cast<TripSegmentMileage>().FirstOrNull();
-//                    if (null != tripSegmentMileage)
-//                    {
-//                        tripSegmentMileage.TripSegMileagePowerId = driverLoginProcess.PowerId;
-//                        tripSegmentMileage.TripSegMileageOdometerStart = driverLoginProcess.Odometer;
-//                        tripSegmentMileage.TripSegMileageDriverId = driverLoginProcess.EmployeeId;
-//                        tripSegmentMileage.TripSegMileageDriverName = string.Format("{0}, {1}", employeeMaster?.LastName,
-//                            employeeMaster?.FirstName);
-//                    }
+                    //                    query.CurrentQuery = string.Format(
+                    //                        "TripSegments?$filter= TripNumber='{0}' and TripSegNumber='{1}' and TripSegOdometerStart isnotnull and TripSegOdometerEnd is null ",
+                    //                            driverStatus.TripNumber, driverStatus.TripSegNumber);
+                    //                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    //                    if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
+                    //                    var tripSegment = (TripSegment) queryResult.Records.Cast<TripSegment>().FirstOrNull();
+                    //                    if (null != tripSegment)
+                    //                    {
+                    //                        tripSegment.TripSegPowerId = driverLoginProcess.PowerId;
+                    //                        tripSegment.TripSegOdometerStart = driverLoginProcess.Odometer;
+                    //                    }
+                    //
+                    //                    query.CurrentQuery = string.Format(
+                    //                        "TripSegmentMileages?$filter= TripNumber='{0}' and TripSegNumber='{1}' and TripSegMileageOdometerStart isnotnull and TripSegMileageOdometerEnd is null &$orderby=TripSegMileageSeqNumber desc",
+                    //                            driverStatus.TripNumber, driverStatus.TripSegNumber);
+                    //                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    //                    if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
+                    //                    var tripSegmentMileage = (TripSegmentMileage)queryResult.Records.Cast<TripSegmentMileage>().FirstOrNull();
+                    //                    if (null != tripSegmentMileage)
+                    //                    {
+                    //                        tripSegmentMileage.TripSegMileagePowerId = driverLoginProcess.PowerId;
+                    //                        tripSegmentMileage.TripSegMileageOdometerStart = driverLoginProcess.Odometer;
+                    //                        tripSegmentMileage.TripSegMileageDriverId = driverLoginProcess.EmployeeId;
+                    //                        tripSegmentMileage.TripSegMileageDriverName = string.Format("{0}, {1}", employeeMaster?.LastName,
+                    //                            employeeMaster?.FirstName);
+                    //                    }
 
                     // 10) Add/update record to DriverStatus table.
 
@@ -616,108 +635,18 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     // 13) Add record for PowerHistory table
 
                     // 14) Send container master updates
-                    Preference defContMasterValidation, defContMasterScanVal, defAllowAnyContainer;
-                    preferencesMap.TryGetValue("DEFContMasterValidation", out defContMasterValidation);
-                    preferencesMap.TryGetValue("DEFContMasterScanVal", out defContMasterScanVal);
-                    preferencesMap.TryGetValue("DEFAllowAnyContainer", out defAllowAnyContainer);
-                    if (defContMasterValidation?.ParameterValue == Constants.Yes || defContMasterScanVal?.ParameterValue == Constants.Yes)
-                    {
-                        
-                    }
-
+                    // Not implemented see ContainerMasterProcess.
 
                     // 15) Send terminal master updates
 
                     // 16) Send Universal Commodities
+                    // Not implemented see UniversalCommoditiesProcess.
 
                     // 17) Send preferences (after some filtering)
-                    string[] propNamesDesired = new string[] {
-                        "DEFPrevChangContID", 
-                        "DEFEnforceSeqProcess", 
-                        "DEFUseMaterGrading", 
-                        "DEFUseAutoArrive", 
-                        "DEFUseDrvAutoDelay", 
-                        "DEFDrvAutoDelayTime", 
-                        "DEFContMasterValidation", 
-                        "DEFCommodSelection", 
-                        "DEFDriverAdd", 
-                        "DEFDriverReceipt", 
-                        "DEFContMasterScannedVal", 
-                        "DEFOneContPerPowerUnit", 
-                        "DEFDriverEntersGPS", 
-                        "DEFDriverReceiptMask", 
-                        "DEFDriverReceiptAllTrips", 
-                        "DEFDriverWeights", 
-                        "DEFShowHostCode", 
-                        "DEFUseLitre", 
-                        "DEFUseKM", 
-                        "DEFUseContainerLevel", 
-                        "DEFContainerValidationCount", 
-                        "DEFReceiptValidationCount", 
-                        "DEFDriverReference", 
-                        "DEFDriverReferenceMask", 
-                        "DEFReferenceValidationCount", 
-                        "DEFCountry", 
-                        "DEFAllowAddRT", 
-                        "DEFAllowChangeRT", 
-                        "DEFPromptRTMsg", 
-                        "DEFReqScaleRefNo", 
-                        "DEFNotAvlScalRefNo", 
-                        "DEFConfirmTruckInvMsg", 
-                        "DEFEnableImageCapture", 
-                        "DEFAutoDropContainers", 
-                        "DEFShowSimilarContainers", 
-                        "DEFMinAutoTriggerDone", 
-                        "DEFPrevChangContID", 
-                        "DEFEnforceSeqProcess", 
-                        "DEFUseMaterGrading", 
-                        "DEFUseAutoArrive", 
-                        "DEFUseDrvAutoDelay", 
-                        "DEFDrvAutoDelayTime", 
-                        "DEFContMasterValidation", 
-                        "DEFCommodSelection", 
-                        "DEFDriverAdd", 
-                        "DEFDriverReceipt", 
-                        "DEFContMasterScannedVal", 
-                        "DEFOneContPerPowerUnit", 
-                        "DEFDriverEntersGPS", 
-                        "DEFDriverReceiptMask", 
-                        "DEFDriverReceiptAllTrips", 
-                        "DEFDriverWeights", 
-                        "DEFShowHostCode", 
-                        "DEFUseLitre", 
-                        "DEFUseKM", 
-                        "DEFUseContainerLevel", 
-                        "DEFContainerValidationCount", 
-                        "DEFReceiptValidationCount", 
-                        "DEFDriverReference", 
-                        "DEFDriverReferenceMask", 
-                        "DEFReferenceValidationCount", 
-                        "DEFCountry", 
-                        "DEFAllowAddRT", 
-                        "DEFAllowChangeRT", 
-                        "DEFPromptRTMsg", 
-                        "DEFReqScaleRefNo", 
-                        "DEFNotAvlScalRefNo", 
-                        "DEFConfirmTruckInvMsg", 
-                        "DEFEnableImageCapture", 
-                        "DEFAutoDropContainers", 
-                        "DEFShowSimilarContainers", 
-                        "DEFMinAutoTriggerDone"
-                    };
-                    var set = new HashSet<string>(propNamesDesired);
-                    var preferenceList = new List<Preference>();
-                    foreach (Preference p in preferences)
-                    {
-                        if (set.Contains(p.Parameter))
-                        {
-                            preferenceList.Add(p);
-                        }
-                    }
-                    driverLoginProcess.Preferences = preferenceList;
-
+                    // Not implemented see PreferencesProcess.
 
                     // 18) Send Code list
+                    // Not implemented see CodeListProcess.
 
                     // 19) Send Trips
 
