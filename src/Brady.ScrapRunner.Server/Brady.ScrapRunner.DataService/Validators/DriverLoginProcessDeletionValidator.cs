@@ -1,6 +1,7 @@
 ﻿using BWF.DataServices.Support.NHibernate.Interfaces;
 using FluentValidation;
 using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
 
 
 namespace Brady.ScrapRunner.DataService.Validators
