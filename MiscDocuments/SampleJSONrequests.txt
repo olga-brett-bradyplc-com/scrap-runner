@@ -431,4 +431,30 @@ curl --silent --insecure --request DELETE \
        --header "cookie: bwftoken=f06886c0-593f-4060-9783-c021d583fd58" \
 "https://localhost:7776/api/scraprunner/Preference/foo;x"
 
+***
+*** Sample Authentication and PreferencesProcess
+***
+
+curl --silent --insecure --request POST \
+     --header "Content-Type: application/json" \
+     --data "{\"username\":\"admin\", \"password\":\"mem_2014\"}" \
+"https://maunb-stm10.bradyplc.com:7776/authentication/login"
+
+curl --silent --insecure --request PUT \
+     --header "Content-Type: application/json" \
+     --header "cookie: bwftoken=bd73968a-2f83-4d03-82d1-364cd9ec2eaf" \
+     --data "{\"EmployeeId\":\"001\", \"Preferences\":[] }" \
+"https://maunb-stm10.bradyplc.com:7776//api/scraprunner/PreferencesProcess/001"
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=f0a7fc20-18df-475d-bb0b-d06fc92e1085" \
+"https://maunb-stm10.bradyplc.com:7776/api/scraprunner/query/PreferencesProcesss?filter=EmployeeId='001'"
+
+	{"Records":[{"$type":"Brady.ScrapRunner.Domain.Process.PreferencesProcess, Brady.ScrapRunner.Domain","EmployeeId":"001","Preferences":[],"Id":"001"}],"Aggregates":{},"TotalCount":1,"Query":"PreferencesProcesss?$filter=EmployeeId='001'"}
+
+curl --silent --insecure --request GET \
+       --header "Content-Type: application/json" \
+       --header "cookie: bwftoken=f0a7fc20-18df-475d-bb0b-d06fc92e1085" \
+"https://maunb-stm10.bradyplc.com:7776/api/scraprunner/query/PreferencesProcesss?filter=EmployeeId='001'&expand=Preferences"
 

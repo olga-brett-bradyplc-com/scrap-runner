@@ -34,6 +34,16 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         public override void ConfigureMapper()
         {
             Mapper.CreateMap<PreferencesProcess, PreferencesProcess>();
+
+            //Mapper.CreateMap<PreferencesProcess, PreferencesProcess>();
+            //Mapper.CreateMap<Preference, Preference>();
+
+            // Note we may need to map the nested child list too!
+            // Perhaps we need to be more explicit.  see also: 
+            // http://stackoverflow.com/questions/9394833/automapper-with-nested-child-list
+            //Mapper.CreateMap<PreferencesProcess, PreferencesProcess>()
+            //    .ForMember(dest => dest.Preferences, opts => opts.MapFrom(src => src.Preferences));
+            //Mapper.CreateMap<Preference, Preference>();
         }
 
 
