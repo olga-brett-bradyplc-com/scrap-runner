@@ -52,8 +52,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private string _truckId;
         private int? _odometer;
-        private string _truckIdHint;
-        private string _odometerReadingHint;
 
         public string TruckId
         {
@@ -73,26 +71,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 SetProperty(ref _odometer, value);
                 PowerUnitIdCommand.RaiseCanExecuteChanged();
             }
-        }
-
-        public string TruckIdHint
-        {
-            get { return _truckIdHint; }
-            set { SetProperty(ref _truckIdHint, value); }
-        }
-
-        public string OdometerReadingHint
-        {
-            get { return _odometerReadingHint; }
-            set { SetProperty(ref _odometerReadingHint, value); }
-        }
-
-        public override async void Start()
-        {
-            TruckIdHint = AppResources.TruckIdHint;
-            OdometerReadingHint = AppResources.OdometerReadingHint;
-
-            base.Start();
         }
 
         public MvxCommand PowerUnitIdCommand { get; protected set; }

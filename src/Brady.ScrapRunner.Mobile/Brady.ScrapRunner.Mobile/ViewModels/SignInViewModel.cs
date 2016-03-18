@@ -67,33 +67,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 SignInCommand.RaiseCanExecuteChanged();
             }
         }
-        private string _usernameHint;
-        private string _passwordHint;
-
-        public string UsernameHint
-        {
-            get { return _usernameHint; }
-            set
-            {
-                SetProperty(ref _usernameHint, value);
-            }
-        }
-
-        public string PasswordHint
-        {
-            get { return _passwordHint; }
-            set
-            {
-                SetProperty(ref _passwordHint, value);
-            }
-        }
-
-        public override async void Start()
-        {
-            UsernameHint = AppResources.UserNameHint;
-            PasswordHint = AppResources.PasswordHint;
-            base.Start();
-        }
 
         public MvxCommand SignInCommand { get; protected set; }
 
