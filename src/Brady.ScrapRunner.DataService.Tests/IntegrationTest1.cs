@@ -170,5 +170,49 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
 
         }
+        /// <summary>
+        /// Illustrate equivalence of QueryBuilder and raw querystring approach
+        /// </summary>
+        [TestMethod]
+        public void TestQueryEquivalance()
+        {
+
+            //    
+            // 1st Query the CodeTable for an ordered set of CUSTOMERTYPE using the QueryBuilder.
+            // Note QueryAsync(QueryBuilder) allows a strongly typed QueryResult
+            // so I can avoid a cast.
+            //
+            var codeTableQuery = new QueryBuilder<CodeTable>()
+                .Filter(y => y.Property(x => x.CodeName).EqualTo("CUSTOMERTYPE"))
+                .OrderBy(x => x.CodeName)
+                .OrderBy(x => x.CodeValue);
+            var queryString = codeTableQuery.GetQuery();
+            QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
+            Assert.AreEqual(7, queryResult.TotalCount, queryString);
+            foreach (CodeTable codeTableInstance in queryResult.Records)
+            {
+                Assert.AreEqual("CUSTOMERTYPE", codeTableInstance.CodeName, queryString);
+            }
+
+            //    
+            // 2st Query the CodeTable for an ordered set of CUSTOMERTYPE by a query string.
+            // Note QueryAsync(string) forces a weakly typed QueryResult<Object>
+            // so we must cast the Records.
+            //
+            var queryString2 = "CodeTables?$filter=CodeName='CUSTOMERTYPE' &$orderby=CodeName,CodeValue";
+            QueryResult queryResult2 = _client.QueryAsync(queryString2).Result;
+            Assert.AreEqual(7, queryResult2.TotalCount, queryString);
+            Assert.AreEqual(queryResult.TotalCount, queryResult2.TotalCount, "The two approaches are not the same!");
+            for (int i = 0; i < queryResult.TotalCount; i++)
+            {
+                CodeTable codeTable1 = queryResult.Records[i];
+                CodeTable codeTable2 = (CodeTable)queryResult2.Records[i];
+                Assert.AreEqual(codeTable1.Id, codeTable2.Id);
+                Assert.AreEqual(codeTable1.CodeName, codeTable2.CodeName);
+                Assert.AreEqual(codeTable1.CodeValue, codeTable2.CodeValue);
+            }
+
+        }
+
     }
 }
