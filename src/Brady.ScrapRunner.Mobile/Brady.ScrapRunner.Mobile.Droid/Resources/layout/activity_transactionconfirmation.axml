@@ -25,7 +25,8 @@
             android:layout_height="match_parent"
             android:textColor="#ffffff"
             android:background="@color/material_gray_900"
-            local:MvxBind="Click ConfirmTransactionsCommand; Text FinishLabel"
+            local:MvxBind="Click ConfirmTransactionsCommand"
+            local:MvxLang="Text FinishLabel"
             />
     </LinearLayout>
 </RelativeLayout>

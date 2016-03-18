@@ -59,6 +59,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
             // Ignore SSL certificate errors while debugging.
             ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 #endif
+            Mvx.RegisterType<IMvxLanguageBindingParser, CustomLanguageBindingParser>();
         }
     }
 }
