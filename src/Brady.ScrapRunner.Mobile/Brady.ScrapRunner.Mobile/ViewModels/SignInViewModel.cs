@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -68,7 +69,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
         private string _usernameHint;
         private string _passwordHint;
-        private string _signinLabel;
 
         public string UsernameHint
         {
@@ -88,20 +88,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        public string SignInLabel
-        {
-            get { return _signinLabel; }
-            set { SetProperty(ref _signinLabel, value); }
-        }
         public override async void Start()
         {
             UsernameHint = AppResources.UserNameHint;
             PasswordHint = AppResources.PasswordHint;
-            SignInLabel = AppResources.SignIn;
-
             base.Start();
         }
-
 
         public MvxCommand SignInCommand { get; protected set; }
 
@@ -194,6 +186,5 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             ShowViewModel<SettingsViewModel>();
         }
-
     }
 }

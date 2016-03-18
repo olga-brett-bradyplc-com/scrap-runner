@@ -1,6 +1,6 @@
 ﻿using MvvmCross.Localization;
 using System.ComponentModel;
-
+using System.Collections.Generic;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {

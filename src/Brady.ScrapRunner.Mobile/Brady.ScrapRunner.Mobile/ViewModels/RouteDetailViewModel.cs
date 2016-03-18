@@ -47,9 +47,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
  
         public override async void Start()
         {
-            EnrouteLabel = AppResources.EnrouteButtonLabel;
-            ArriveLabel = AppResources.ArriveLabel;
-
             var trip = await _tripService.FindTripAsync(TripNumber);
 
             if (trip != null)

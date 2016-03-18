@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Interfaces;
@@ -51,7 +52,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private string _truckId;
         private int? _odometer;
-        private string _continueLabel;
         private string _truckIdHint;
         private string _odometerReadingHint;
 
@@ -75,12 +75,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        public string ContinueLabel
-        {
-            get { return _continueLabel; }
-            set { SetProperty(ref _continueLabel, value); }
-        }
-
         public string TruckIdHint
         {
             get { return _truckIdHint; }
@@ -95,7 +89,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            ContinueLabel = AppResources.Continue;
             TruckIdHint = AppResources.TruckIdHint;
             OdometerReadingHint = AppResources.OdometerReadingHint;
 
