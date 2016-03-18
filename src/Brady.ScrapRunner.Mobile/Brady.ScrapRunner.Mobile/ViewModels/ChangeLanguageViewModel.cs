@@ -1,4 +1,5 @@
-﻿using MvvmCross.Binding.BindingContext;
+﻿using System.Windows.Input;
+using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.ExtensionMethods;
 using MvvmCross.Localization;
 
@@ -43,8 +44,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             AppResources.Culture = cultureInfo;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            Close(this);
             ShowViewModel<SignInViewModel>();
+            Close(this);
         }
         public MvxCommand<CultureInfo> SelectLanguageCommand { get; private set; }
      }
