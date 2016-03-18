@@ -33,7 +33,8 @@
         android:textColor="@color/material_gray_900"
         android:paddingLeft="10dp"
         android:background="#ffffff"
-        local:MvxBind="Click GrossWeightSetCommand; Text GrossLabel"
+        local:MvxBind="Click GrossWeightSetCommand"
+        local:MvxLang="Text GrossWeight"
         />
     <Button
         android:id="@+id/secondGrossButton"
@@ -44,7 +45,8 @@
         android:textColor="@color/material_gray_900"
         android:paddingLeft="10dp"
         android:background="#ffffff"
-        local:MvxBind="Click SecondGrossWeightSetCommand; Text SecondGrossLabel"
+        local:MvxBind="Click SecondGrossWeightSetCommand"
+        local:MvxLang="Text SecondGross"
         />
     <Button
         android:id="@+id/tareButton"
@@ -54,7 +56,8 @@
         android:layout_height="50dp"
         android:textColor="@color/material_gray_900"
         android:background="#ffffff"
-        local:MvxBind="Click TareWeightSetCommand; Text TareWeightLabel"
+        local:MvxBind="Click TareWeightSetCommand"
+        local:MvxLang="Text TareWeight"
         />
     <LinearLayout
         android:layout_height="65dp"
@@ -64,7 +67,8 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:textColor="#ffffff"
-            local:MvxBind="Click ContainerSetDownCommand; Text ContainerSetDownLabel"
+            local:MvxBind="Click ContainerSetDownCommand"
+            local:MvxLang="Text SetDown"
             android:background="@color/material_gray_900"
             />
     </LinearLayout>

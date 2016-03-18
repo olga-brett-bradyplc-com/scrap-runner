@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -66,42 +67,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 SignInCommand.RaiseCanExecuteChanged();
             }
         }
-        private string _usernameHint;
-        private string _passwordHint;
-        private string _signinLabel;
-
-        public string UsernameHint
-        {
-            get { return _usernameHint; }
-            set
-            {
-                SetProperty(ref _usernameHint, value);
-            }
-        }
-
-        public string PasswordHint
-        {
-            get { return _passwordHint; }
-            set
-            {
-                SetProperty(ref _passwordHint, value);
-            }
-        }
-
-        public string SignInLabel
-        {
-            get { return _signinLabel; }
-            set { SetProperty(ref _signinLabel, value); }
-        }
-        public override async void Start()
-        {
-            UsernameHint = AppResources.UserNameHint;
-            PasswordHint = AppResources.PasswordHint;
-            SignInLabel = AppResources.SignIn;
-
-            base.Start();
-        }
-
 
         public MvxCommand SignInCommand { get; protected set; }
 
@@ -194,6 +159,5 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             ShowViewModel<SettingsViewModel>();
         }
-
     }
 }

@@ -1,4 +1,6 @@
-﻿using MvvmCross.Localization;
+﻿using System.Windows.Input;
+using MvvmCross.Localization;
+using Brady.ScrapRunner.Mobile.Resources;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -27,20 +29,5 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             ShowViewModel<ChangeLanguageViewModel>();
         }
-
-        private string _changeLanguageLabel;
-
-        public string ChangeLanguageLabel
-        {
-            get { return _changeLanguageLabel; }
-            set { SetProperty(ref _changeLanguageLabel, value); }
-        }
-        public override async void Start()
-        {
-            ChangeLanguageLabel = AppResources.ChangeLanguage;
-
-            base.Start();
-        }
-
     }
 }
