@@ -41,7 +41,8 @@
             android:layout_alignParentRight="true"
             android:padding="20dp"
             android:background="@drawable/round_button_enroute"
-            local:MvxBind="Click EnRouteCommand; Text EnrouteLabel" />
+            local:MvxBind="Click EnRouteCommand" 
+            local:MvxLang="Text EnrouteButtonLabel"/>
         <Button
             android:id="@+id/ArriveButton"
             android:layout_width="58dp"
@@ -52,7 +53,8 @@
             android:padding="20dp"
             android:visibility="gone"
             android:background="@drawable/round_button_arrive"
-            local:MvxBind="Click ArriveCommand; Text ArriveLabel" />
+            local:MvxBind="Click ArriveCommand"
+            local:MvxLang="Text ArriveLabel" />
         <LinearLayout
             android:layout_height="wrap_content"
             android:orientation="vertical"
