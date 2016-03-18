@@ -55,14 +55,14 @@ namespace Brady.ScrapRunner.DataService.Tests
         {
             DateTime dt = new DateTime(2015, 12, 01);
             var terminalTableQuery = new QueryBuilder<TerminalChange>()
-                .Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt))
+                //.Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt))
                 .OrderBy(x => x.TerminalId);
             string queryString = terminalTableQuery.GetQuery();
             QueryResult<TerminalChange> queryResult = _client.QueryAsync(terminalTableQuery).Result;
 
             foreach (TerminalChange terminalTableInstance in queryResult.Records)
             {
-                Assert.IsTrue(terminalTableInstance.ChgDateTime > dt);
+                //Assert.IsTrue(terminalTableInstance.ChgDateTime > dt);
             }
 
             foreach (TerminalChange terminalTableInstance in queryResult.Records)
@@ -104,11 +104,11 @@ namespace Brady.ScrapRunner.DataService.Tests
 
             //Build the filter string
             string filterString = "$filter=";
-            if (dt != null)
-            {
-                filterString += string.Format("ChgDateTime>datetime({0})", dt);
-                haveFilter = true;
-            }
+            //if (dt != null)
+            //{
+            //    filterString += string.Format("ChgDateTime>datetime({0})", dt);
+            ///   haveFilter = true;
+            //}
             if (regionid != null)
             {
                 if (haveFilter) filterString += " and ";
