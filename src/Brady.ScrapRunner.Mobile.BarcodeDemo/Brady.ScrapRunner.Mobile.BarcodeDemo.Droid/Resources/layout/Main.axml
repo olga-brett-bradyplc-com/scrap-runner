@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
     <TextView
-        android:text="Top View"
+        android:text="Hold the camera up to the barcode."
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1" />
     <Button
-        android:text="Toggle Torch"
+        android:text="Toggle Flash"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
