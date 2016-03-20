@@ -14,8 +14,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         private readonly ITripService _tripService;
 
-        private string _finishLabel;
-
         public TransactionConfirmationViewModel(ITripService tripService)
         {
             _tripService = tripService;
@@ -29,17 +27,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             SubTitle = AppResources.Trip + $" {tripNumber}";
         }
 
-        public string FinishLabel
-        {
-            get { return _finishLabel; }
-            set { SetProperty(ref _finishLabel, value); }
-        }
-
-
         public override async void Start()
         {
-            FinishLabel = AppResources.FinishLabel;
-
             var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 

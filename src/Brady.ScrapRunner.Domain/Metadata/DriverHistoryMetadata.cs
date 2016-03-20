@@ -50,8 +50,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.PowerId);
             StringProperty(x => x.DriverArea);
             StringProperty(x => x.MDTId);
-            DateProperty(x => x.LoginDateTime);
-            DateProperty(x => x.ActionDateTime);
+            TimeProperty(x => x.LoginDateTime);
+            TimeProperty(x => x.ActionDateTime);
             IntegerProperty(x => x.DriverCumMinutes);
             IntegerProperty(x => x.Odometer);
             StringProperty(x => x.DestCustType);

@@ -37,8 +37,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripSegPowerId);
             StringProperty(x => x.TripSegDriverId);
             StringProperty(x => x.TripSegDriverName);
-            DateProperty(x => x.TripSegStartDateTime);
-            DateProperty(x => x.TripSegEndDateTime);
+            TimeProperty(x => x.TripSegStartDateTime);
+            TimeProperty(x => x.TripSegEndDateTime);
             IntegerProperty(x => x.TripSegStandardDriveMinutes);
             IntegerProperty(x => x.TripSegStandardStopMinutes);
             IntegerProperty(x => x.TripSegActualDriveMinutes);
@@ -78,10 +78,10 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripSegPrimaryContainerCommodityCode);
             StringProperty(x => x.TripSegPrimaryContainerCommodityDesc);
             StringProperty(x => x.TripSegPrimaryContainerLocation);
-            DateProperty(x => x.TripSegActualDriveStartDateTime);
-            DateProperty(x => x.TripSegActualDriveEndDateTime);
-            DateProperty(x => x.TripSegActualStopStartDateTime);
-            DateProperty(x => x.TripSegActualStopEndDateTime);
+            TimeProperty(x => x.TripSegActualDriveStartDateTime);
+            TimeProperty(x => x.TripSegActualDriveEndDateTime);
+            TimeProperty(x => x.TripSegActualStopStartDateTime);
+            TimeProperty(x => x.TripSegActualStopEndDateTime);
             IntegerProperty(x => x.TripSegStartLatitude);
             IntegerProperty(x => x.TripSegStartLongitude);
             IntegerProperty(x => x.TripSegEndLatitude);

@@ -1,10 +1,6 @@
-﻿using Brady.ScrapRunner.Domain.Models;
+﻿using System;
+using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {

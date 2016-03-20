@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A TerminalMaster record.  FIXME:  Remove the composite Id workaround for NHibernate and/or metadata 
     /// </summary>
-    public class TerminalMaster : IHaveCompositeId, IEquatable<TerminalMaster>
+    public class TerminalMaster : IHaveId<string>, IEquatable<TerminalMaster>
     {
 
         public virtual string TerminalId { get; set; }

@@ -12,7 +12,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// A Trip record.
     /// </summary>
 
-    public class Trip : IHaveCompositeId, IEquatable<Trip>
+    public class Trip : IHaveId<string>, IEquatable<Trip>
     {
         public virtual string TripNumber { get; set; }
         public virtual string TripStatus { get; set; }

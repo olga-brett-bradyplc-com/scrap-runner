@@ -42,7 +42,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripRegionId);
             StringProperty(x => x.TripRegionName);
             StringProperty(x => x.TripReferenceNumber);
-            DateProperty(x => x.TripCompletedDateTime);
+            TimeProperty(x => x.TripCompletedDateTime);
             IntegerProperty(x => x.TripActualDriveMinutes);
             IntegerProperty(x => x.TripStandardDriveMinutes);
             IntegerProperty(x => x.TripActualStopMinutes);

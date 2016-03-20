@@ -1,7 +1,6 @@
 using Brady.ScrapRunner.Mobile.Resources;
 using Microsoft.VisualBasic;
 using MvvmCross.Platform.IoC;
-using Brady.Scraprunner.Mobile;
 
 namespace Brady.ScrapRunner.Mobile
 {
@@ -50,7 +49,7 @@ namespace Brady.ScrapRunner.Mobile
                 cfg.AddProfile<ScrapRunnerMapperProfile>();
             });
 
-            Mvx.RegisterSingleton(new ResxTextProvider(AppResources.ResourceManager));
+            //Mvx.RegisterSingleton(new ResxTextProvider(AppResources.ResourceManager));
             RegisterAppStart<ViewModels.SignInViewModel>();
         }
     }
