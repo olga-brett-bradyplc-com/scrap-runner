@@ -3,11 +3,17 @@
     public static class Constants
     {
         public static readonly string ScrapRunner = "ScrapRunner";
+  
+        /// <summary>Yes: Y</summary>
         public static readonly string Yes = "Y";
+        
+        /// <summary>No: N</summary>
         public static readonly string No = "N";
 
-        //REASONCODES SR# is Scale Reference Number
-        //Useage: To prevent this reason code from being sent to the driver
+        /// <summary>
+        /// REASONCODES SR# is Scale Reference Number
+        /// Useage: To prevent this reason code from being sent to the driver
+        /// </summary>
         public static readonly string NOTAVLSCALREFNO = "SR#";
     }
 

@@ -442,19 +442,7 @@ curl --silent --insecure --request POST \
 
 curl --silent --insecure --request PUT \
      --header "Content-Type: application/json" \
-     --header "cookie: bwftoken=bd73968a-2f83-4d03-82d1-364cd9ec2eaf" \
+     --header "cookie: bwftoken=01b1d661-b1c6-4138-9780-a9e4a9cefb0d" \
      --data "{\"EmployeeId\":\"001\", \"Preferences\":[] }" \
-"https://maunb-stm10.bradyplc.com:7776//api/scraprunner/PreferencesProcess/001"
-
-curl --silent --insecure --request GET \
-       --header "Content-Type: application/json" \
-       --header "cookie: bwftoken=f0a7fc20-18df-475d-bb0b-d06fc92e1085" \
-"https://maunb-stm10.bradyplc.com:7776/api/scraprunner/query/PreferencesProcesss?filter=EmployeeId='001'"
-
-	{"Records":[{"$type":"Brady.ScrapRunner.Domain.Process.PreferencesProcess, Brady.ScrapRunner.Domain","EmployeeId":"001","Preferences":[],"Id":"001"}],"Aggregates":{},"TotalCount":1,"Query":"PreferencesProcesss?$filter=EmployeeId='001'"}
-
-curl --silent --insecure --request GET \
-       --header "Content-Type: application/json" \
-       --header "cookie: bwftoken=f0a7fc20-18df-475d-bb0b-d06fc92e1085" \
-"https://maunb-stm10.bradyplc.com:7776/api/scraprunner/query/PreferencesProcesss?filter=EmployeeId='001'&expand=Preferences"
+"https://maunb-stm10.bradyplc.com:7776//api/scraprunner/PreferencesProcess/001/withoutpersistance"
 

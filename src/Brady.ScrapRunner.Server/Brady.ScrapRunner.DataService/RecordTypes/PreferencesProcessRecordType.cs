@@ -20,14 +20,20 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 {
 
     /// <summary>
-    /// Get the relevant client preferences for the driver's terminal.
+    /// Get the relevant client preferences for the driver's terminal.  Note this our business processes 
+    /// is relatively independent of the "trivial" backing query.  As such, clients need to invoke this
+    /// service call using the form Put["/{dataServiceName}/{typeName}/{id}/withoutpersistance", true]
+    /// (example: PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/PreferencesProcess/001/withoutpersistance) 
+    /// this will prevent the Nancy.DataServiceModule from issuing an automatic re-retrieve 
+    /// (getSingleAsync()) within the postSingleAsync().   This re-retrieve of a trival query clobbers our post-processed 
+    /// ChangeSetResult
     /// </summary>
     [EditAction("PreferencesProcess")]
     public class PreferencesProcessRecordType : ChangeableRecordType
             <PreferencesProcess, string, PreferencesProcessValidator, PreferencesProcessDeletionValidator>
     {
 
- 
+
         /// <summary>
         /// Mandatory implementation of virtual base class method.
         /// </summary>
@@ -115,7 +121,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     PreferencesProcess backfillPreferencesProcess;
                     if (changeSet.Update.TryGetValue(key, out backfillPreferencesProcess))
                     {
-                        // Generally, use a mapper?  Can I set it to only map a subset?
+                        // Generally, use a mapper?  May not always be the best approach.
                         Mapper.Map(backfillPreferencesProcess, preferencesProcess);
                     }
                     else
