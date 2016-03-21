@@ -170,7 +170,34 @@
         /// <summary>Unknown: U</summary>
         public static readonly string Unknown   = "U";
     }
-
+    /// <summary>
+    /// The Security Level internal codes.  Used by the SecurityMaster table.
+    /// </summary>
+    public static class SecurityLevelConstants
+    {
+        /// <summary>System Administrator: SA</summary>
+        public static readonly string SysAdmin = "SA";
+        /// <summary>General Office: GO</summary>
+        public static readonly string GenOffice = "GO";
+        /// <summary>Dispatcher: DI</summary>
+        public static readonly string Dispatcher = "DI";
+        /// <summary>Super Dispatcher: SD</summary>
+        public static readonly string SuperDispatcher = "SD";
+        /// <summary>CallTaker: CT</summary>
+        public static readonly string CallTaker = "CT";
+        /// <summary>View Only: VO</summary>
+        public static readonly string ViewOnly = "VO";
+        /// <summary>View & Print: VW</summary>
+        public static readonly string ViewPrint = "VW";
+        /// <summary>Driver: DR</summary>
+        public static readonly string Driver = "DR";
+        /// <summary>Container Inventory: CI</summary>
+        public static readonly string ContainerInv = "CI";
+        /// <summary>Yard Work: YW</summary>
+        public static readonly string YardWork = "YW";
+        /// <summary>Gate Check: GT</summary>
+        public static readonly string GateCheck = "GT";
+    }
     public static class TripAssignStatusConstants
     {
         public static readonly string NotDispatched = "N";
