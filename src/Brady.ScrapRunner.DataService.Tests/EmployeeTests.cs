@@ -113,9 +113,9 @@ namespace Brady.ScrapRunner.DataService.Tests
             string terminalString = null;
 
             //string regionid = "SDF";
-            //string areaid = "ALL";
+            string areaid = "ALL";
             //string areaid = "LI";
-            string areaid = "NE";
+            //string areaid = "NE";
             //string DefSendOnlyYardsForArea = "N";
             //string DefSendOnlyYardsForArea = null;
 
@@ -130,7 +130,9 @@ namespace Brady.ScrapRunner.DataService.Tests
 
             //Build the filter string
             if (DefSendOnlyYardsForArea == Constants.Yes && areaid != null)
+            {
                 terminalString = BuildFilterArea(terminalField, areaid, null);
+            }
 
             string filterString = "$filter=";
             filterString += string.Format("SecurityLevel!='{0}'", SecurityLevelConstants.Driver);
@@ -141,7 +143,7 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
             if (terminalString != null)
             {
-                filterString += string.Format(" and ({0})", terminalString);
+                filterString += string.Format(" and {0}", terminalString);
             }
             //Build the order by string
             string orderString = "&$orderby = LastName,FirstName";
@@ -195,8 +197,13 @@ namespace Brady.ScrapRunner.DataService.Tests
                     areaFilter += string.Format("{0}='{1}'", terminalField, areaTableInstance.TerminalId);
                 }
             }
+            if (areaFilter == null)
+            {
+                areaFilter = string.Format("{0}=''", terminalField);
+            }
+            areaFilter = "(" + areaFilter + ")";
+
             return areaFilter;
         }
- 
     }
 }
