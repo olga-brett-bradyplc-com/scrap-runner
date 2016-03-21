@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Enums\DriverForceLogoffValue.cs" />
     <Compile Include="Enums\TripSendFlagValue.cs" />
     <Compile Include="Metadata\AreaMasterMetadata.cs" />
     <Compile Include="Metadata\CommodityMasterDestMetadata.cs" />
