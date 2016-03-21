@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.Mobile.Services
     public class DemoClientSettings : IClientSettings
     {
 
-        private Uri _serviceBaseUri = new Uri("https://jacnb-oib10.bradyplc.com:7776");
+        private Uri _serviceBaseUri = new Uri("https://maunb-jtw10.bradyplc.com:7776");
         private string _username = "admin";
         private string _password = "mem_2014";
 
