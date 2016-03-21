@@ -96,6 +96,7 @@
     <Compile Include="EmployeeTests.cs" />
     <Compile Include="IntegrationTest1.cs" />
     <Compile Include="MessagesTests.cs" />
+    <Compile Include="TerminalTests.cs" />
     <Compile Include="TripTests.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

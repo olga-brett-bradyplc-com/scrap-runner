@@ -9,7 +9,6 @@ using BWF.DataServices.PortableClients;
 using BWF.DataServices.PortableClients.Builder;
 using BWF.DataServices.PortableClients.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
 
 namespace Brady.ScrapRunner.DataService.Tests
 {
@@ -48,22 +47,35 @@ namespace Brady.ScrapRunner.DataService.Tests
         }
 
         /// <summary>
+        /// At login time or whenever a container is changed, we should send a list of containers from the 
+        /// ContainerChange table
+        /// 
+        /// if DefContMasterValidate = "Y" or DefContMasterScannedVal = "Y"
+        /// then send the list of containers
+        /// otherwise do not send anything
+        /// 
         /// Code to retrieve containers updated since a particular date from the ContainerChange table
+        /// RegionId and TerminalId are optional arguments
+        /// I have made all three arguments optional, but in actuality, there will always be a date
+        /// and optionally region and terminal
+        /// If all containers need to be sent, the query should be on the ContainerMaster, 
+        /// not the ContainerChange table
+        /// 
+        /// This method using QueryBuilder does not include the conditionals
         /// </summary>
         [TestMethod]
-        public void RetrieveContainerChangeUpdates()
+        public void RetrieveContainerChangeUpdatesQB()
         {
-            DateTime dt  = new DateTime(2016, 01, 01);
+            DateTime dt  = new DateTime(2015, 12, 01);
             var containerTableQuery = new QueryBuilder<ContainerChange>()
-                //.Filter(y => y.Property(x => x.ActionDate).GreaterThan(dt))
+                .Filter(y => y.Property(x => x.ActionDate).GreaterThan(dt))
                 .OrderBy(x => x.ContainerNumber);
             string queryString = containerTableQuery.GetQuery();
             QueryResult<ContainerChange> queryResult = _client.QueryAsync(containerTableQuery).Result;
 
             foreach (ContainerChange containerTableInstance in queryResult.Records)
             {
-                Assert.AreEqual(new DateTime(2016, 01, 01), dt);
-                //Assert.IsTrue(containerTableInstance.ActionDate > dt);
+                Assert.IsTrue(containerTableInstance.ActionDate > dt);
             }
 
             foreach (ContainerChange containerTableInstance in queryResult.Records)
@@ -77,26 +89,144 @@ namespace Brady.ScrapRunner.DataService.Tests
                                                  containerTableInstance.ContainerBarCodeNo));
             }
         }
-
         /// <summary>
+        /// At login time or whenever a container is changed, we should send a list of containers from the 
+        /// ContainerChange table
+        /// 
+        /// if DefContMasterValidate = "Y" or DefContMasterScannedVal = "Y"
+        /// then send the list of containers
+        /// otherwise do not send anything
+        /// 
+        /// Code to retrieve containers updated since a particular date from the ContainerChange table
+        /// RegionId and TerminalId are optional arguments
+        /// I have made all three arguments optional, but in actuality, there will always be a date
+        /// and optionally region and terminal
+        /// If all containers need to be sent, the query should be on the ContainerMaster, 
+        /// not the ContainerChange table
+        /// 
+        /// This method includes the conditionals
+        /// </summary>
+        [TestMethod]
+        public void RetrieveContainerChangeUpdates()
+        {
+            bool haveFilter = false;
+
+            //DateTime? dt = null;
+            string regionid = null;
+            string terminalid = null;
+
+            DateTime? dt = new DateTime(2015, 11, 01);
+            //string regionid = "SDF";
+            //string terminalid = "F1";
+            //string terminalid = "LI";
+
+            //Specify the base
+            string baseString = string.Format("ContainerChanges?");
+
+            //Build the filter string
+            string filterString = "$filter=";
+            if (dt != null)
+            {
+                filterString += string.Format("ActionDate>datetime({0})", dt);
+                haveFilter = true;
+            }
+            if (regionid != null)
+            {
+                if (haveFilter) filterString += " and ";
+                else haveFilter = true;
+                filterString += string.Format("RegionId='{0}'", regionid);
+            }
+            if (terminalid != null)
+            {
+               if (haveFilter) filterString += " and ";
+                else haveFilter = true;
+                filterString += string.Format("TerminalId='{0}'", terminalid);
+            }
+            //Build the order by string
+            string orderString = "&$orderby = ContainerNumber";
+
+            //Build the query
+            string queryString = baseString;
+            if (haveFilter) queryString += filterString;
+            queryString +=  orderString;
+
+            QueryResult queryResult = _client.QueryAsync(queryString).Result;
+
+            Console.WriteLine(string.Format("{0}", queryString));
+            foreach (ContainerChange containerTableInstance in queryResult.Records)
+            {
+                Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
+                                                 containerTableInstance.RegionId,
+                                                 containerTableInstance.TerminalId,
+                                                 containerTableInstance.ContainerNumber,
+                                                 containerTableInstance.ContainerType,
+                                                 containerTableInstance.ContainerSize,
+                                                 containerTableInstance.ActionDate,
+                                                 containerTableInstance.ActionFlag,
+                                                 containerTableInstance.ContainerBarCodeNo));
+            }
+        }
+        /// <summary>
+        /// If a driver's container master needs to be reloaded, we should send a complete
+        /// list of containers from the ContainerMaster table.
+        /// 
+        /// if DefContMasterValidate = "Y" or DefContMasterScannedVal = "Y"
+        /// then send the list of containers
+        /// otherwise do not send anything
+        /// 
         /// Code to retrieve all containers from the ContainerMaster
+        /// RegionId and TerminalId are optional arguments
+        /// 
+        /// This method includes the conditionals
         /// </summary>
         [TestMethod]
         public void RetrieveContainerMasterAll()
         {
-            var containerTableQuery = new QueryBuilder<ContainerMaster>()
-                .OrderBy(x => x.ContainerNumber);
-            string queryString = containerTableQuery.GetQuery();
-            QueryResult<ContainerMaster> queryResult = _client.QueryAsync(containerTableQuery).Result;
+            bool haveFilter = false;
 
-            foreach (ContainerMaster containerTableInstance in queryResult.Records)
+            string regionid = null;
+            //string terminalid = null;
+
+            //string regionid = "SDF";
+            //string terminalid = "F1";
+           string terminalid = "LI";
+
+            //To use this query at login, provide the following:  
+            //if preference DEFAllowAnyContainer =Y
+            //do not provide region or terminal
+            //otherwise provide just the region
+
+            //Specify the base
+            string baseString = string.Format("ContainerMasters?");
+
+            //Build the filter string
+            string filterString = "$filter=";
+            if (regionid != null)
             {
-                //Assert.AreEqual(containerTableInstance.ContainerNumber, containerTableInstance.ContainerNumber, queryString);
+                if (haveFilter) filterString += " and ";
+                else haveFilter = true;
+                filterString += string.Format("ContainerRegionId='{0}'", regionid);
             }
+            if (terminalid != null)
+            {
+                if (haveFilter) filterString += " and ";
+                else haveFilter = true;
+                filterString += string.Format("ContainerTerminalId='{0}'", terminalid);
+            }
+            //Build the order by string
+            string orderString = "&$orderby = ContainerNumber";
+
+            //Build the query
+            string queryString = baseString;
+            if (haveFilter) queryString += filterString;
+            queryString += orderString;
+
+            QueryResult queryResult = _client.QueryAsync(queryString).Result;
 
             foreach (ContainerMaster containerTableInstance in queryResult.Records)
             {
-                Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}",
+                Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                                                 containerTableInstance.ContainerRegionId,
                                                  containerTableInstance.ContainerTerminalId,
                                                  containerTableInstance.ContainerNumber,
                                                  containerTableInstance.ContainerType,
