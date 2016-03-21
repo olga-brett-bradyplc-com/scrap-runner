@@ -79,48 +79,75 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
         }
         /// <summary>
-        /// After a driver has logged in, and terminals have changed, we should send a list of 
-        /// changed terminals from the TerminalChange table
+        /// At login time or whenever a terminal is changed, we should send a list of terminals from the 
+        /// TerminalChange table
         /// 
-        /// Code to retrieve terminals updated since a particular date from the TerminalChange table
-        /// RegionId and TerminalId are optional arguments
+        /// if DefAllowAddRT = Y or DefAllowChangeRT = Y 
+        /// then send the list of terminals
+        /// otherwise do not send anything
+        ///
+        /// If Preference DefSendOnlyYardsForArea = Y
+        /// then send only the yards for the driver's area
+        /// otherwise send only the yards for the driver's region
+        /// 
+        /// RegionId and AreaId are optional arguments
         /// </summary>
         [TestMethod]
         public void RetrieveTerminalChangeUpdates()
         {
             bool haveFilter = false;
 
-            //DateTime? dt = null;
+            DateTime? dt = null;
             string regionid = null;
-            string terminalid = null;
+            //string areaid = null;
+            //string DefSendOnlyYardsForArea = null;
 
-            DateTime? dt = new DateTime(2015, 11, 01);
+            //DateTime? dt = new DateTime(2015, 11, 01);
             //string regionid = "SDF";
-            //string terminalid = "F1";
-            //string terminalid = "LI";
+            //string areaid = "ALL";
+            //string areaid = "LI";
+            string areaid = "NE";
+            string DefSendOnlyYardsForArea = "Y";
+            //string DefSendOnlyYardsForArea = "N";
 
+            //To use this query at login, provide the following:
+            //chgdatetime from driver's login or driverstatus table
+            //driver's preference: DefSendOnlyYardsForArea
+            //if DefSendOnlyYardsForArea = "Y", provide driver's area
+            //otherwise, provide driver's region
+            string terminalString = null;
+
+            //Specify the terminal field name in the TerminalMaster table
+            string terminalField = "TerminalId";
             //Specify the base
             string baseString = string.Format("TerminalChanges?");
 
             //Build the filter string
             string filterString = "$filter=";
-            //if (dt != null)
-            //{
-            //    filterString += string.Format("ChgDateTime>datetime({0})", dt);
-            ///   haveFilter = true;
-            //}
+            if (dt != null)
+            {
+                filterString += string.Format("ChgDateTime>datetime({0})", dt);
+                haveFilter = true;
+            }
+            //Build the filter string
+            if (DefSendOnlyYardsForArea == Constants.Yes && areaid != null)
+            {
+                terminalString = BuildFilterArea(terminalField, areaid, null);
+                if (terminalString != null)
+                {
+                    if (haveFilter) filterString += " and ";
+                    else haveFilter = true;
+                    filterString += string.Format(terminalString);
+                }
+            }
+
             if (regionid != null)
             {
                 if (haveFilter) filterString += " and ";
                 else haveFilter = true;
                 filterString += string.Format("RegionId='{0}'", regionid);
             }
-            if (terminalid != null)
-            {
-                if (haveFilter) filterString += " and ";
-                else haveFilter = true;
-                filterString += string.Format("TerminalId='{0}'", terminalid);
-            }
+
             //Build the order by string
             string orderString = "&$orderby = TerminalId";
 
@@ -146,8 +173,8 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
         }
         /// <summary>
-        /// At login time, we should send a list of terminals from the TerminalMaster table
-        /// Also if the driver's terminal master needs to be reloaded.
+        /// If a driver's terminal master needs to be reloaded, we should send a complete
+        /// list of terminals from the TerminalMaster table.
         /// 
         /// if DefAllowAddRT = Y or DefAllowChangeRT = Y 
         /// then send the list of terminals
@@ -164,12 +191,11 @@ namespace Brady.ScrapRunner.DataService.Tests
         {
             bool haveFilter = false;
 
-            string regionid = null;
+            //string regionid = null;
             //string areaid = null;
             //string DefSendOnlyYardsForArea = null;
-            string terminalString = null;
 
-            //string regionid = "SDF";
+            string regionid = "SDF";
             //string areaid = "ALL";
             //string areaid = "LI";
             string areaid = "NE";
@@ -180,6 +206,7 @@ namespace Brady.ScrapRunner.DataService.Tests
             //driver's preference: DefSendOnlyYardsForArea
             //if DefSendOnlyYardsForArea = "Y", provide driver's area
             //otherwise, provide driver's region
+            string terminalString = null;
 
             //Specify the terminal field name in the TerminalMaster table
             string terminalField = "TerminalId";
@@ -187,16 +214,22 @@ namespace Brady.ScrapRunner.DataService.Tests
             string baseString = string.Format("TerminalMasters?");
 
             //Build the filter string
-            if (DefSendOnlyYardsForArea == Constants.Yes && areaid != null)
-                terminalString = BuildFilterArea(terminalField, areaid, null);
-            else if (regionid != null)
-                terminalString = BuildFilterRegion(terminalField, regionid);
-
             string filterString = "$filter=";
-            if (terminalString != null)
+
+            if (DefSendOnlyYardsForArea == Constants.Yes && areaid != null)
             {
-                filterString += string.Format("({0})", terminalString);
-                haveFilter = true;
+                terminalString = BuildFilterArea(terminalField, areaid, null);
+                if (terminalString != null)
+                {
+                    haveFilter = true;
+                    filterString += string.Format(terminalString);
+                }
+            }
+            if (regionid != null)
+            {
+                if (haveFilter) filterString += " and ";
+                else haveFilter = true;
+                filterString += string.Format("Region='{0}'", regionid);
             }
             //Build the order by string
             string orderString = "&$orderby = TerminalId";
@@ -256,6 +289,10 @@ namespace Brady.ScrapRunner.DataService.Tests
                     Assert.AreEqual(areaTableInstance.AreaId, areaid, queryString);
                 }
             }
+            if (areaFilter == null)
+            {
+                areaFilter = string.Format("{0}=''", terminalField);
+            }
             areaFilter = "(" + areaFilter + ")";
 
             Console.WriteLine(string.Format("{0}", areaFilter));
@@ -280,6 +317,10 @@ namespace Brady.ScrapRunner.DataService.Tests
             {
                 if (regionFilter != null) regionFilter += " or ";
                 regionFilter += string.Format("{0}='{1}'", terminalField, terminalTableInstance.TerminalId);
+            }
+            if (regionFilter == null)
+            {
+                regionFilter = string.Format("{0}=''", terminalField);
             }
             regionFilter = "(" + regionFilter + ")";
 
@@ -316,6 +357,12 @@ namespace Brady.ScrapRunner.DataService.Tests
                     areaFilter += string.Format("{0}='{1}'", terminalField, areaTableInstance.TerminalId);
                 }
             }
+            if (areaFilter == null)
+            {
+                areaFilter = string.Format("{0}=''", terminalField);
+            }
+            areaFilter = "(" + areaFilter + ")";
+
             return areaFilter;
         }
         /// <summary>
@@ -338,6 +385,11 @@ namespace Brady.ScrapRunner.DataService.Tests
                 if (regionFilter != null) regionFilter += " or ";
                 regionFilter += string.Format("{0}='{1}'", terminalField, terminalTableInstance.TerminalId);
             }
+            if (regionFilter == null)
+            {
+                regionFilter = string.Format("{0}=''", terminalField);
+            }
+            regionFilter = "(" + regionFilter + ")";
 
             return regionFilter;
         }

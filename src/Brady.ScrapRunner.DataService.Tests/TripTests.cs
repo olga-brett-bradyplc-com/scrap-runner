@@ -134,6 +134,86 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
         }
         /// <summary>
+        /// Code to retrieve trips, tripsegments, tripsegmentcontainers to be sent to a particular driver after a driver has logged in
+        /// SQL Query:
+        ///     select * from Trip where TripDriverId = '930' 
+        ///         and(TripStatus = 'P' or TripStatus = 'M')
+        ///         and(TripAssignStatus = 'D' or TripAssignStatus = 'A')
+        ///         and(TripSendFlag = 1)
+        ///         order by TripSequenceNumber ASC 
+        ///     for each TripNumber    
+        ///     select * from TripSegment where TripNumber = {TripNumber}
+        ///         and TripSegStatus = 'P' or TripStatus = 'M')
+        ///     for each TripSegment    
+        ///     select * from TripSegmentContainer where TripNumber = {TripNumber}
+        ///         and TripSegNumber = {TripSegNumber}
+        ///   After it is sent, TripSendFlag is set to 2 (SentToDriver)
+        ///   For a New Trip, Mobile Device displays "New Trip (%s):\n%s",TripNumber, TripSegDestCustName
+        ///   For a Modified Trip, Mobile Device displays "Trip Modified (%s):\n%s",TripNumber, TripSegDestCustName
+        /// </summary>
+
+        [TestMethod]
+        public void RetrieveTripInfoAfterLogin()
+        {
+            string driverid = "930";
+            var tripTableQuery = new QueryBuilder<Trip>()
+                .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverid)
+                .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
+                .And().Property(x => x.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
+                .And().Property(x => x.TripSendFlag).EqualTo(TripSendFlagValue.Ready))
+                .OrderBy(x => x.TripSequenceNumber);
+            string queryString = tripTableQuery.GetQuery();
+            QueryResult<Trip> queryResult = _client.QueryAsync(tripTableQuery).Result;
+
+            foreach (Trip tripTableInstance in queryResult.Records)
+            {
+                Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}",
+                                                 tripTableInstance.TripTerminalId,
+                                                 tripTableInstance.TripDriverId,
+                                                 tripTableInstance.TripNumber,
+                                                 tripTableInstance.TripStatus,
+                                                 tripTableInstance.TripAssignStatus,
+                                                 tripTableInstance.TripSendFlag,
+                                                 tripTableInstance.TripCustName));
+
+                var tripsegmentTableQuery = new QueryBuilder<TripSegment>()
+                    .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripTableInstance.TripNumber)
+                    .And().Property(x => x.TripSegStatus).In(TripSegStatusConstants.Pending, TripSegStatusConstants.Missed))
+                    .OrderBy(x => x.TripSegNumber);
+                string query2String = tripsegmentTableQuery.GetQuery();
+                QueryResult<TripSegment> query2Result = _client.QueryAsync(tripsegmentTableQuery).Result;
+                foreach (TripSegment tripsegmentTableInstance in query2Result.Records)
+                {
+                    Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}",
+                                                     tripsegmentTableInstance.TripNumber,
+                                                     tripsegmentTableInstance.TripSegNumber,
+                                                     tripsegmentTableInstance.TripSegStatus,
+                                                     tripsegmentTableInstance.TripSegOrigCustHostCode,
+                                                     tripsegmentTableInstance.TripSegOrigCustName,
+                                                     tripsegmentTableInstance.TripSegDestCustHostCode,
+                                                     tripsegmentTableInstance.TripSegDestCustName));
+
+                    var tripsegcontainerTableQuery = new QueryBuilder<TripSegmentContainer>()
+                        .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripsegmentTableInstance.TripNumber)
+                        .And().Property(x => x.TripSegNumber).EqualTo(tripsegmentTableInstance.TripSegNumber))
+                        .OrderBy(x => x.TripSegContainerSeqNumber);
+                    string query3String = tripsegcontainerTableQuery.GetQuery();
+                    QueryResult<TripSegmentContainer> query3Result = _client.QueryAsync(tripsegcontainerTableQuery).Result;
+                    foreach (TripSegmentContainer tripsegcontainerTableInstance in query3Result.Records)
+                    {
+                        Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                                                         tripsegcontainerTableInstance.TripNumber,
+                                                         tripsegcontainerTableInstance.TripSegNumber,
+                                                         tripsegcontainerTableInstance.TripSegContainerSeqNumber,
+                                                         tripsegcontainerTableInstance.TripSegContainerNumber,
+                                                         tripsegcontainerTableInstance.TripSegContainerType,
+                                                         tripsegcontainerTableInstance.TripSegContainerSize));
+                    }
+                }
+            }
+        }      
+                
+        /// <summary>
         ///Sending Cancelled Trip Notice to a Driver where a trip that was previously dispatched to him, has 
         ///now been canceled, put on hold, or changed to a future date
         ///   select * from Trip where TripDriverId = '930' 
@@ -293,6 +373,42 @@ namespace Brady.ScrapRunner.DataService.Tests
                                                  tripTableInstance.TripStatus,
                                                  tripTableInstance.TripSendReseqFlag,
                                                  tripTableInstance.TripCustName));
+            }
+        }
+        /// <summary>
+        /// Sending a force logoff message to driver that is logged in
+        /// 
+        /// select * from DriverStatus where DriverId = {driverId}  
+        ///    AND SendHHLogoffFlag = 1
+        ///    AND(DriverStatus<> 'K' and DriverStatus <> 'R') 
+        /// 
+        /// After a force logoff message is sent, SendHHLogoffFlag is set to 2
+        /// When Mobile Device sends back an ack, SendHHLogoffFlag is set to 3
+        /// </summary>
+        [TestMethod]
+        public void SendForceLogoffMessageToDriver()
+        {
+            string driverid = "930";
+
+            var driverTableQuery = new QueryBuilder<DriverStatus>()
+                .Filter(y => y.Property(x => x.EmployeeId).EqualTo(driverid)
+                .And().Property(x => x.SendHHLogoffFlag).EqualTo(DriverForceLogoffValue.Ready)
+                .And().Property(x => x.Status).NotIn(DriverStatusSRConstants.Disconnected, DriverStatusSRConstants.Ready));
+
+            string queryString = driverTableQuery.GetQuery();
+            QueryResult<DriverStatus> queryResult = _client.QueryAsync(driverTableQuery).Result;
+
+            foreach (DriverStatus driverTableInstance in queryResult.Records)
+            {
+                Assert.AreEqual(driverTableInstance.SendHHLogoffFlag, DriverForceLogoffValue.Ready, queryString);
+            }
+
+            foreach (DriverStatus driverTableInstance in queryResult.Records)
+            {
+                Console.WriteLine(string.Format("{0}\t{1}\t{2}",
+                                                 driverTableInstance.EmployeeId,
+                                                 driverTableInstance.SendHHLogoffFlag,
+                                                 driverTableInstance.Status));
             }
         }
     }

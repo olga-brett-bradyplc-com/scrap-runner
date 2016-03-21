@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BWF.DataServices.Metadata.Interfaces;
+using Brady.ScrapRunner.Domain.Enums;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
@@ -42,7 +43,7 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string PrevDriverStatus { get; set; }
         public virtual string MdtVersion { get; set; }
         public virtual string GPSXmitFlag { get; set; }
-        public virtual int?  SendHHLogoffFlag { get; set; }
+        public virtual DriverForceLogoffValue SendHHLogoffFlag { get; set; }
         public virtual DateTime? TerminalMasterDateTime { get; set; }
         public virtual int? DriverLCID { get; set; }
 
