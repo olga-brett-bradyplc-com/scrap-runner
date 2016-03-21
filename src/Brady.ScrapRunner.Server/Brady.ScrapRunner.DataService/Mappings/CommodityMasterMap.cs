@@ -15,6 +15,11 @@ namespace Brady.ScrapRunner.DataService.Mappings
         {
             Table("CommodityMaster");
 
+            Id(x => x.CommodityCode, m =>
+            {
+                m.Generator(Generators.Assigned);
+            });
+
             Property(x => x.Id, m =>
             {
                 m.Formula("CommodityCode");
@@ -22,11 +27,6 @@ namespace Brady.ScrapRunner.DataService.Mappings
                 m.Update(false);
             });
       
-            ComposedId(map =>
-            {
-                map.Property(y => y.CommodityCode, m => m.Generated(PropertyGeneration.Never));
-            });
-
             Property(x => x.CommodityDesc);
             Property(x => x.InventoryCode);
             Property(x => x.ContainerType);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Interfaces;
@@ -51,9 +52,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private string _truckId;
         private int? _odometer;
-        private string _continueLabel;
-        private string _truckIdHint;
-        private string _odometerReadingHint;
 
         public string TruckId
         {
@@ -73,33 +71,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 SetProperty(ref _odometer, value);
                 PowerUnitIdCommand.RaiseCanExecuteChanged();
             }
-        }
-
-        public string ContinueLabel
-        {
-            get { return _continueLabel; }
-            set { SetProperty(ref _continueLabel, value); }
-        }
-
-        public string TruckIdHint
-        {
-            get { return _truckIdHint; }
-            set { SetProperty(ref _truckIdHint, value); }
-        }
-
-        public string OdometerReadingHint
-        {
-            get { return _odometerReadingHint; }
-            set { SetProperty(ref _odometerReadingHint, value); }
-        }
-
-        public override async void Start()
-        {
-            ContinueLabel = AppResources.Continue;
-            TruckIdHint = AppResources.TruckIdHint;
-            OdometerReadingHint = AppResources.OdometerReadingHint;
-
-            base.Start();
         }
 
         public MvxCommand PowerUnitIdCommand { get; protected set; }
@@ -143,7 +114,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async Task<bool> TruckAndOdometerAsync()
         {
 
-            using (var powerunitData = UserDialogs.Instance.Loading("Loading Trip Information", maskType: MaskType.Clear))
+            using (var powerunitData = UserDialogs.Instance.Loading(AppResources.LoadingTripInformation, maskType: MaskType.Clear))
             {
                 // Validate Power ID;
                 var powerIdTask = await _connection.GetConnection().GetAsync<string, PowerMaster>(TruckId);

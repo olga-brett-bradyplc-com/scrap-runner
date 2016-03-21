@@ -31,7 +31,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .IsId()
                 .DisplayName("Trip Seg Image Seq Number");
 
-            DateProperty(x => x.TripSegImageActionDateTime);
+            TimeProperty(x => x.TripSegImageActionDateTime);
             StringProperty(x => x.TripSegImageLocation);
             StringProperty(x => x.TripSegImagePrintedName);
             StringProperty(x => x.TripSegImageType);

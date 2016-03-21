@@ -15,16 +15,16 @@ namespace Brady.ScrapRunner.DataService.Mappings
         {
             Table("ContainerChange");
 
+            Id(x => x.ContainerNumber, m =>
+            {
+                m.Generator(Generators.Assigned);
+            });
+
             Property(x => x.Id, m =>
             {
                 m.Formula("ContainerNumber");
                 m.Insert(false);
                 m.Update(false);
-            });
-
-            ComposedId(map =>
-            {
-                map.Property(y => y.ContainerNumber, m => m.Generated(PropertyGeneration.Never));
             });
 
             Property(x => x.ContainerType);

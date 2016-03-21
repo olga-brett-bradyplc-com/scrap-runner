@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A ContainerMaster record.
     /// </summary>
-    public class ContainerMaster : IHaveCompositeId, IEquatable<ContainerMaster>
+    public class ContainerMaster : IHaveId<string>, IEquatable<ContainerMaster>
     {
         public virtual string ContainerNumber { get; set; }
         public virtual string ContainerType { get; set; }
@@ -62,7 +62,7 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0}", ContainerNumber);
+                return ContainerNumber;
             }
             set
             {

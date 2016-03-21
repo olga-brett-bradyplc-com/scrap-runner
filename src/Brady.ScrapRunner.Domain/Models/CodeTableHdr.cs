@@ -8,9 +8,9 @@ using BWF.DataServices.Metadata.Interfaces;
 namespace Brady.ScrapRunner.Domain.Models
 {
     /// <summary>
-    /// A CodeTableHdr record.
+    /// A full CodeTableHdr record.
     /// </summary>
-    public class CodeTableHdr : IHaveCompositeId, IEquatable<CodeTableHdr>
+    public class CodeTableHdr : IHaveId<string>, IEquatable<CodeTableHdr>
     {
         public virtual string CodeName { get; set; }
         public virtual string CodeDesc { get; set; }
@@ -21,11 +21,11 @@ namespace Brady.ScrapRunner.Domain.Models
         {
             get
             {
-                return string.Format("{0}", CodeName);
+                return CodeName;
             }
             set
             {
-
+                // No-op 
             }
         }
 

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
 
@@ -34,8 +30,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.ContainerTerminalId);
             StringProperty(x => x.ContainerRegionId);
             StringProperty(x => x.ContainerLocation);
-            DateProperty(x => x.ContainerLastActionDateTime);
-            DateProperty(x => x.ContainerPendingMoveDateTime);
+            TimeProperty(x => x.ContainerLastActionDateTime);
+            TimeProperty(x => x.ContainerPendingMoveDateTime);
             StringProperty(x => x.ContainerCurrentTripNumber);
             StringProperty(x => x.ContainerCurrentTripSegNumber);
             StringProperty(x => x.ContainerCurrentTripSegType);
@@ -46,7 +42,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.ContainerComments);
             StringProperty(x => x.ContainerPowerId);
             StringProperty(x => x.ContainerBarCodeFlag);
-            DateProperty(x => x.ContainerAddDateTime);
+            TimeProperty(x => x.ContainerAddDateTime);
             StringProperty(x => x.ContainerAddUserId);
             StringProperty(x => x.ContainerRestrictToHostCode);
             StringProperty(x => x.ContainerPrevCustHostCode);
@@ -114,7 +110,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.ContainerBarCodeNo)
                 .Property(x => x.ContainerInboundTerminalId)
                 .Property(x => x.ContainerQtyInIDFlag)
-
                 .OrderBy(x => x.ContainerNumber);
         }
     }

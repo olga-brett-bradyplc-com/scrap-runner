@@ -1,10 +1,6 @@
-﻿using Brady.ScrapRunner.Domain.Models;
+﻿using System;
+using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
@@ -40,8 +36,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.EmployeeType);
             StringProperty(x => x.CompanyCode);
             StringProperty(x => x.EmployeeStatus);
-            DateProperty(x => x.LoginDateTime);
-            DateProperty(x => x.AccessDateTime);
+            TimeProperty(x => x.LoginDateTime);
+            TimeProperty(x => x.AccessDateTime);
             StringProperty(x => x.WorkArea);
             StringProperty(x => x.BillerInitials);
             IntegerProperty(x => x.NumTimesLogin);
@@ -124,9 +120,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.LoginID)
                 .Property(x => x.LoginIDPrev)
                 .Property(x => x.InactiveDate)
-
                 .OrderBy(x => x.EmployeeId);
-
         }
     }
 }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Fluent.Abstract;
 
@@ -48,8 +44,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.CustAutoReceiptFlag);
             StringProperty(x => x.CustContact1);
             StringProperty(x => x.CustContact2);
-            DateProperty(x => x.CustOpenTime);
-            DateProperty(x => x.CustCloseTime);
+            TimeProperty(x => x.CustOpenTime);
+            TimeProperty(x => x.CustCloseTime);
             IntegerProperty(x => x.CustEtakLatitude);
             IntegerProperty(x => x.CustEtakLongitude);
             StringProperty(x => x.CustDispatchZone);
@@ -64,16 +60,16 @@ namespace Brady.ScrapRunner.Domain.Metadata
             DateProperty(x => x.CustInactiveDate);
             StringProperty(x => x.CustOverrideTripType);
             IntegerProperty(x => x.CustTimeFactor);
-            DateProperty(x => x.CustLastPUDate);
-            DateProperty(x => x.CustAddDate);
-            DateProperty(x => x.ChgDateTime);
+            TimeProperty(x => x.CustLastPUDate);
+            TimeProperty(x => x.CustAddDate);
+            TimeProperty(x => x.ChgDateTime);
             StringProperty(x => x.ChgEmployeeId);
             StringProperty(x => x.AddEmployeeId);
             StringProperty(x => x.CustTempFlag);
             StringProperty(x => x.CustAutoRcptSettings);
             StringProperty(x => x.CustAutoGPSFlag);
             StringProperty(x => x.GPSChgEmployeeId);
-            DateProperty(x => x.GPSChgDateTime);
+            TimeProperty(x => x.GPSChgDateTime);
             StringProperty(x => x.GPSChgSource);
             IntegerProperty(x => x.CustSendLatLonReqFlag);
             StringProperty(x => x.RTYardHostCode);
@@ -84,8 +80,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.CustDispatcherInstructions);
             StringProperty(x => x.CustNightRunFlag);
             StringProperty(x => x.CustRegionId);
-            DateProperty(x => x.ComChgDateTime);
-            DateProperty(x => x.LocChgDateTime);
+            TimeProperty(x => x.ComChgDateTime);
+            TimeProperty(x => x.LocChgDateTime);
             StringProperty(x => x.CustExpediteFlag);
             StringProperty(x => x.HasForkLift);
             StringProperty(x => x.CustSignatureRequired);
@@ -168,7 +164,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.CustAutoReceiptAllFlag)
                 .Property(x => x.CustomerComments)
                 .Property(x => x.CustEMailAddress2)
-
                 .OrderBy(x => x.CustHostCode);
         }
     }

@@ -17,7 +17,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
         Theme = "@style/ScrapRunnerTheme.SignIn")]
     public class SignInView : BaseActivity<SignInViewModel>
     {
-
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);

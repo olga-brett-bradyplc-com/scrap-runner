@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain.Process;
 
 namespace Brady.ScrapRunner.DataService.Mappings
 {
@@ -35,6 +36,7 @@ namespace Brady.ScrapRunner.DataService.Mappings
             //Property(x => x.RegionId);
             //Property(x => x.PowerId);
             //Property(x => x.Odometer);
+            //Property(x => x.LoginDateTime);
         }
     }
 }

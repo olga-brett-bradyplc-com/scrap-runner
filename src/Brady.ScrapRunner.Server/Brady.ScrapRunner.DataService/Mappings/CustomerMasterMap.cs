@@ -21,10 +21,10 @@ namespace Brady.ScrapRunner.DataService.Mappings
                 m.Insert(false);
                 m.Update(false);
             });
-      
-            ComposedId(map =>
+
+            Id(x => x.CustHostCode, m =>
             {
-                map.Property(y => y.CustHostCode, m => m.Generated(PropertyGeneration.Never));
+                m.Generator(Generators.Assigned);
             });
 
             Property(x => x.CustType);

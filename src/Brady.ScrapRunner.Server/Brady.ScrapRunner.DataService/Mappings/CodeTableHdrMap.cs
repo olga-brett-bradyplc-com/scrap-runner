@@ -15,16 +15,24 @@ namespace Brady.ScrapRunner.DataService.Mappings
         {
             Table("CodeTableHdr");
 
+            // The way to do composed IDs
+            //ComposedId(map =>
+            //{
+            //    map.Property(y => y.CodeName, 
+            //      m => m.Generated(PropertyGeneration.Never));
+            //});
+  
+            // A (presumably) more direct mapping of assigned string ID
+             Id(x => x.CodeName, m =>
+            {
+                m.Generator(Generators.Assigned);
+            });
+
             Property(x => x.Id, m =>
             {
                 m.Formula("CodeName");
                 m.Insert(false);
                 m.Update(false);
-            });
-
-            ComposedId(map =>
-            {
-                map.Property(y => y.CodeName, m => m.Generated(PropertyGeneration.Never));
             });
 
             Property(x => x.CodeDesc);

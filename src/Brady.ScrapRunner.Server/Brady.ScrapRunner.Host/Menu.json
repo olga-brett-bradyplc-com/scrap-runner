@@ -8,6 +8,10 @@
         {
           "text": "DriverLoginProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLoginProcess"
+        },
+        {
+          "text": "PreferencesProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PreferencesProcess"
         }
       ]
     },
@@ -168,6 +172,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EventLog"
             }
           ]
+        },
+        {
+          "text": "Messages",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Messages"
         },
         {
           "text": "Power",
