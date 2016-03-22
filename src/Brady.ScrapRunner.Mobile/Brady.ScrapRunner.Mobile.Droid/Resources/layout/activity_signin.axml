@@ -11,29 +11,28 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_centerInParent="true">
-      <EditText
+        <EditText
             android:background="@drawable/rounded_edittext_top_states"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:padding="4dp"
-            local:MvxBind="Text UserName" 
-            local:MvxLang="Hint UsernameHint"/>
-      <EditText
-          android:background="@drawable/rounded_edittext_bottom_states"
-          android:layout_width="match_parent"
-          android:layout_height="48dp"
-          android:padding="4dp"
-          android:layout_marginTop="2dp"
-          android:inputType="textPassword"
-          local:MvxBind="Text Password" 
-          local:MvxLang="Hint PasswordHint"/>
-      <Button
-          local:MvxBind="Click SignInCommand"
-          local:MvxLang="Text SignIn"
-          android:layout_width="match_parent"
-          android:layout_height="48dp"
-          android:layout_marginTop="4dp"
-          />
+            local:MvxBind="Text UserName"
+            local:MvxLang="Hint UserNameHint" />
+        <EditText
+            android:background="@drawable/rounded_edittext_bottom_states"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:layout_marginTop="2dp"
+            android:inputType="textPassword"
+            local:MvxBind="Text Password"
+            local:MvxLang="Hint PasswordHint" />
+        <Button
+            local:MvxBind="Click SignInCommand"
+            local:MvxLang="Text SignIn"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp" />
     </LinearLayout>
     <ImageView
         android:layout_above="@id/center_panel"
