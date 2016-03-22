@@ -34,6 +34,20 @@ namespace Brady.ScrapRunner.DataService.Mappings
             Property(x => x.CustName);
             Property(x => x.CustAddress1);
             Property(x => x.CustAddress2);
+            Property(x => x.CustCity);
+            Property(x => x.CustState);
+            Property(x => x.CustZip);
+            Property(x => x.CustCountry);
+            Property(x => x.CustPhone1);
+            Property(x => x.CustContact1);
+            Property(x => x.CustOpenTime);
+            Property(x => x.CustCloseTime);
+            Property(x => x.CustLatitude);
+            Property(x => x.CustLongitude);
+            Property(x => x.CustRadius);
+            Property(x => x.ChgDateTime);
+            Property(x => x.ChgActionFlag);
+            Property(x => x.CustDriverInstructions);
         }
     }
 }
