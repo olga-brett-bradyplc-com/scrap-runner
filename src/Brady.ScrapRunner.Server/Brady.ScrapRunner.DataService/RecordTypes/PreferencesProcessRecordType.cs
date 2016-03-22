@@ -21,7 +21,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
     /// <summary>
     /// Get the relevant client preferences for the driver's terminal.  Note this our business processes 
-    /// is relatively independent of the "trivial" backing query.  As such, clients need to invoke this
+    /// is relatively independent of the "trivial" backing query.  As such, we temporarily need to invoke this
     /// service call using the form Put["/{dataServiceName}/{typeName}/{id}/withoutpersistance", true]
     /// (example: PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/PreferencesProcess/001/withoutpersistance) 
     /// this will prevent the Nancy.DataServiceModule from issuing an automatic re-retrieve 
@@ -41,15 +41,12 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         {
             Mapper.CreateMap<PreferencesProcess, PreferencesProcess>();
 
-            //Mapper.CreateMap<PreferencesProcess, PreferencesProcess>();
-            //Mapper.CreateMap<Preference, Preference>();
-
-            // Note we may need to map the nested child list too!
-            // Perhaps we need to be more explicit.  see also: 
+            // Note should we ever need to map the nested child list too, 
+            // we would need to be more explicit.  see also: 
             // http://stackoverflow.com/questions/9394833/automapper-with-nested-child-list
-            //Mapper.CreateMap<PreferencesProcess, PreferencesProcess>()
+            // Mapper.CreateMap<PreferencesProcess, PreferencesProcess>()
             //    .ForMember(dest => dest.Preferences, opts => opts.MapFrom(src => src.Preferences));
-            //Mapper.CreateMap<Preference, Preference>();
+            // Mapper.CreateMap<Preference, Preference>();
         }
 
 
@@ -121,7 +118,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     PreferencesProcess backfillPreferencesProcess;
                     if (changeSet.Update.TryGetValue(key, out backfillPreferencesProcess))
                     {
-                        // Generally, use a mapper?  May not always be the best approach.
+                        // Generally use a mapper?  May not always be the best approach.
                         Mapper.Map(backfillPreferencesProcess, preferencesProcess);
                     }
                     else
@@ -318,7 +315,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             }
             return faultDetected;
         }
-
    
     }
 }
