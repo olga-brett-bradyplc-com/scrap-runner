@@ -1,7 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+    <include
+        layout="@layout/toolbar" />
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <EditText
+            android:id="@+id/containerId"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Segment Container Number" />
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <EditText
+            android:id="@+id/containerId"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Location" />
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <EditText
+            android:id="@+id/containerId"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Commodity" />
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <EditText
+            android:id="@+id/containerId"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Level" />
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <EditText
+            android:id="@+id/containerId"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Notes" />
+    </android.support.design.widget.TextInputLayout>
 </LinearLayout>

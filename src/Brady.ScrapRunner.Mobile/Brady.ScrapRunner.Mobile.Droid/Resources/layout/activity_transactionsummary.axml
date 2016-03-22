@@ -21,7 +21,8 @@
         android:orientation="vertical"
         android:layout_below="@id/CameraView"
         local:MvxItemTemplate="@layout/item_transactions_listitem"
-        local:GroupItemTemplate="@layout/item_transactions" />
+        local:GroupItemTemplate="@layout/item_transactions"
+        local:MvxBind="ItemClick TransactionSelectedCommand" />
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="65dp"
@@ -33,7 +34,6 @@
             android:textColor="#ffffff"
             android:background="@color/material_gray_900"
             local:MvxBind="Click ConfirmationSelectedCommand"
-            local:MvxLang="Text FinishLabel"
-            />
+            local:MvxLang="Text FinishLabel" />
     </LinearLayout>
 </RelativeLayout>

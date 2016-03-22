@@ -1,32 +1,16 @@
-﻿using System.Threading.Tasks;
-using Brady.ScrapRunner.Mobile.Interfaces;
-using Brady.ScrapRunner.Mobile.Resources;
-
-namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System.Collections.ObjectModel;
     using System.Linq;
     using Helpers;
     using Models;
     using MvvmCross.Core.ViewModels;
+    using Brady.ScrapRunner.Mobile.Interfaces;
+    using Brady.ScrapRunner.Mobile.Resources;
 
     public class TransactionSummaryViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
-        private string _cameraViewLabel;
-        private string _finishLabel;
-
-        public string CameraViewLabel
-        {
-            get { return _cameraViewLabel; }
-            set { SetProperty(ref _cameraViewLabel, value); }
-        }
-
-        public string FinishLabel
-        {
-            get { return _finishLabel; }
-            set { SetProperty(ref _finishLabel, value); }
-        }
 
         public TransactionSummaryViewModel(ITripService tripService)
         {
@@ -40,6 +24,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripNumber = tripNumber;
             SubTitle = TripNumber;
             ConfirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand);
+            TransactionSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteTransactionSelectedCommand);
         }
 
         // Grab all relevant data
@@ -73,7 +58,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Command bindings
-        public MvxCommand TransactionSelectedCommand { get; private set; }
+        public MvxCommand<TripSegmentContainerModel> TransactionSelectedCommand { get; private set; }
         public MvxCommand TransactionScannedCommand { get; private set; }
         public MvxCommand ConfirmationSelectedCommand { get; private set; }
 
@@ -85,10 +70,30 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _tripNumber, value); }
         }
 
-        // Command impl
-        public void ExecuteTransactionSelectedCommand()
+        private string _cameraViewLabel;
+        public string CameraViewLabel
         {
-            ShowViewModel<TransactionDetailViewModel>();
+            get { return _cameraViewLabel; }
+            set { SetProperty(ref _cameraViewLabel, value); }
+        }
+
+        private string _finishLabel;
+        public string FinishLabel
+        {
+            get { return _finishLabel; }
+            set { SetProperty(ref _finishLabel, value); }
+        }
+
+        // Command impl
+        public void ExecuteTransactionSelectedCommand(TripSegmentContainerModel tripContainer)
+        {
+            ShowViewModel<TransactionDetailViewModel>(
+                new
+                {
+                    tripNumber = tripContainer.TripNumber,
+                    tripSegmentNumber = tripContainer.TripSegNumber,
+                    tripSegmentContainerNumber = tripContainer.TripSegContainerNumber
+                });
         }
 
         public void ExecuteConfirmationSelectedCommand()

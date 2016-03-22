@@ -88,6 +88,19 @@ namespace Brady.ScrapRunner.Mobile.Services
             return containers;
         }
 
+        public async Task<TripSegmentContainerModel> FindTripSegmentContainer(string tripNumber, string tripSegNo,
+            int? tripSegContainerSeqNumber)
+        {
+            // We're using TripSegContainerSeqNumber instead of TripSegContainerNumber because the latter of the two
+            // can be null, i.e. it hasn't been set/scanned yet
+            var container = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(
+                    tscm =>
+                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
+                        tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).ToListAsync();
+            return container.FirstOrDefault();
+        }
+
         public async Task<int> CompleteTripAsync(string tripNumber)
         {
             var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
