@@ -46,23 +46,25 @@ namespace Brady.ScrapRunner.DataService.Tests
         }
 
         /// <summary>
-        /// Code to retrieve terminals updated since a particular date from the TerminalChange table
-        /// 
-        /// This method using QueryBuilder does not include the conditionals
+        /// Code to test RetrieveTerminalChangesByRegion,RetrieveTerminalChangesAll
+        /// At login time or whenever a terminal is changed, we should send a list of terminals from the 
+        /// TerminalChange table
         /// </summary>
         [TestMethod]
-        public void RetrieveTerminalChangeUpdatesQB()
+        public void RetrieveTerminalChangeUpdates()
         {
+            string regionid = null;
             DateTime dt = new DateTime(2015, 12, 01);
-            var terminalTableQuery = new QueryBuilder<TerminalChange>()
-                //.Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt))
-                .OrderBy(x => x.TerminalId);
-            string queryString = terminalTableQuery.GetQuery();
-            QueryResult<TerminalChange> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            QueryResult<TerminalChange> queryResult;
+
+            if (regionid != null)
+                queryResult = RetrieveTerminalChangesByRegion(dt, regionid);
+             else
+                queryResult = RetrieveTerminalChangesAll(dt);
 
             foreach (TerminalChange terminalTableInstance in queryResult.Records)
             {
-                //Assert.IsTrue(terminalTableInstance.ChgDateTime > dt);
+                Assert.IsTrue(terminalTableInstance.ChgDateTime > dt);
             }
 
             foreach (TerminalChange terminalTableInstance in queryResult.Records)
@@ -79,6 +81,84 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
         }
         /// <summary>
+        /// Retrieves terminal change records for a given region since a given date
+        /// </summary>
+        public QueryResult<TerminalChange> RetrieveTerminalChangesByRegion(DateTime dt, string regionid)
+        {
+            var terminalTableQuery = new QueryBuilder<TerminalChange>()
+                .Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt)
+                .And().Property(x => x.RegionId).EqualTo(regionid))
+                .OrderBy(x => x.TerminalId);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalChange> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Retrieves terminal change records for a given region since a given date
+        /// </summary>
+        public QueryResult<TerminalChange> RetrieveTerminalChangesAll(DateTime dt)
+        {
+            var terminalTableQuery = new QueryBuilder<TerminalChange>()
+                .Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt))
+                .OrderBy(x => x.TerminalId);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalChange> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Code to test RetrieveTerminalMasterByRegion,RetrieveTerminalMasterAll
+        /// If a driver's terminal master needs to be reloaded, we should send a list of terminals 
+        /// from the TerminalMaster table.
+        /// RegionId is an optional argument.
+        /// </summary>
+        [TestMethod]
+        public void RetrieveTerminalMaster()
+        {
+            string regionid = null;
+            QueryResult<TerminalMaster> queryResult;
+
+            if (regionid != null)
+                queryResult = RetrieveTerminalMasterByRegion(regionid);
+            else
+                queryResult = RetrieveTerminalMasterAll();
+
+            foreach (TerminalMaster terminalTableInstance in queryResult.Records)
+            {
+                Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                                                 terminalTableInstance.Region,
+                                                 terminalTableInstance.TerminalId,
+                                                 terminalTableInstance.TerminalName,
+                                                 terminalTableInstance.Address1,
+                                                 terminalTableInstance.City,
+                                                 terminalTableInstance.State));
+            }
+        }
+        /// <summary>
+        /// Retrieves terminal master records for a given region 
+        /// </summary>
+        public QueryResult<TerminalMaster> RetrieveTerminalMasterByRegion(string regionid)
+        {
+            var terminalTableQuery = new QueryBuilder<TerminalMaster>()
+                .Filter(y => y.Property(x => x.Region).EqualTo(regionid))
+                .OrderBy(x => x.TerminalName);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalMaster> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Retrieves terminal master records for a given region 
+        /// </summary>
+        public QueryResult<TerminalMaster> RetrieveTerminalMasterAll()
+        {
+            var terminalTableQuery = new QueryBuilder<TerminalMaster>()
+                .OrderBy(x => x.TerminalName);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalMaster> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+ 
+        
+        /// <summary>
         /// At login time or whenever a terminal is changed, we should send a list of terminals from the 
         /// TerminalChange table
         /// 
@@ -93,7 +173,7 @@ namespace Brady.ScrapRunner.DataService.Tests
         /// RegionId and AreaId are optional arguments
         /// </summary>
         [TestMethod]
-        public void RetrieveTerminalChangeUpdates()
+        public void RetrieveTerminalChangeUpdatesRS()
         {
             bool haveFilter = false;
 
@@ -187,7 +267,7 @@ namespace Brady.ScrapRunner.DataService.Tests
         /// RegionId and AreaId are optional arguments
         /// </summary>
         [TestMethod]
-        public void RetrieveTerminalsForDriver()
+        public void RetrieveTerminalsForDriverRS()
         {
             bool haveFilter = false;
 
