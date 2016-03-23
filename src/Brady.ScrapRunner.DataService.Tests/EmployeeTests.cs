@@ -1,16 +1,17 @@
-﻿    using System;
-    using System.Configuration;
-    using System.Runtime.CompilerServices;
-    using Brady.ScrapRunner.Domain;
-    using Brady.ScrapRunner.Domain.Models;
-    using BWF.DataServices.Domain.Models;
-    using BWF.DataServices.Metadata.Models;
-    using BWF.DataServices.PortableClients;
-    using BWF.DataServices.PortableClients.Builder;
-    using BWF.DataServices.PortableClients.Interfaces;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System.Diagnostics;
-    using Brady.ScrapRunner.Domain.Enums;
+﻿using System;
+using System.Configuration;
+using System.Runtime.CompilerServices;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Models;
+using BWF.DataServices.Domain.Models;
+using BWF.DataServices.Metadata.Models;
+using BWF.DataServices.PortableClients;
+using BWF.DataServices.PortableClients.Builder;
+using BWF.DataServices.PortableClients.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics;
+using Brady.ScrapRunner.Domain.Enums;
+using System.Collections.Generic;
 
 namespace Brady.ScrapRunner.DataService.Tests
 {
@@ -50,32 +51,33 @@ namespace Brady.ScrapRunner.DataService.Tests
         }
 
         /// <summary>
-        /// At login time, we should send a list of users from the EmployeeMaster table
-        /// 
+        /// Code to test RetrieveDispatcherListForArea, RetrieveDispatcherListForRegion,RetrieveDispatcherListAll
+        /// At login time, we will send a list of users that have access to messaging
         /// If preference SendDispatchersForArea is set to Y
         /// then send only the users whose yard is in the driver's area
         /// otherwise send only the users for the driver's region
-        /// 
         /// RegionId and AreaId are optional arguments
         /// SecurityLevel <> 'DR' 
         /// AllowMessaging = 'Y'
-        /// 
-        /// This method using QueryBuilder does not include the conditionals
         /// </summary>
         [TestMethod]
-        public void RetrieveDispatcherListForDriverQB()
+        public void RetrieveDispatcherListForDriver()
         {
-            var employeeTableQuery = new QueryBuilder<EmployeeMaster>()
-                .Filter(y => y.Property(x => x.SecurityLevel).NotEqualTo(SecurityLevelConstants.Driver)
-                .And().Property(x => x.AllowMessaging).EqualTo(Constants.Yes))            
-                .OrderBy(x => x.LastName)
-                .OrderBy(x => x.FirstName);
-            string queryString = employeeTableQuery.GetQuery();
-            QueryResult<EmployeeMaster> queryResult = _client.QueryAsync(employeeTableQuery).Result;
+            string areaid = "LI";
+            string regionid = null;
+            string DefSendOnlyYardsForArea = "Y";
+            QueryResult<EmployeeMaster> queryResult;
+
+            if (DefSendOnlyYardsForArea == Constants.Yes && areaid != null)
+                queryResult = RetrieveDispatcherListForArea(areaid);
+            else if (regionid != null)
+                queryResult = RetrieveDispatcherListForRegion(regionid);
+            else
+                queryResult = RetrieveDispatcherListAll();
 
             foreach (EmployeeMaster employeeTableInstance in queryResult.Records)
             {
-                Assert.AreNotEqual(employeeTableInstance.SecurityLevel, SecurityLevelConstants.Driver, queryString);
+                Assert.AreNotEqual(employeeTableInstance.SecurityLevel, SecurityLevelConstants.Driver);
             }
 
             foreach (EmployeeMaster employeeTableInstance in queryResult.Records)
@@ -90,6 +92,68 @@ namespace Brady.ScrapRunner.DataService.Tests
                                                  employeeTableInstance.FirstName));
             }
         }
+         /// <summary>
+        /// Retrieves the list of dispatchers for a given area
+        /// </summary>
+        public QueryResult<EmployeeMaster> RetrieveDispatcherListForArea(string areaid)
+        {
+            List<string> terminals = BuildTerminalList(areaid);
+            var employeeTableQuery = new QueryBuilder<EmployeeMaster>()
+                .Filter(y => y.Property(x => x.SecurityLevel).NotEqualTo(SecurityLevelConstants.Driver)
+                .And().Property(x => x.AllowMessaging).EqualTo(Constants.Yes)
+                .And().Property(x => x.TerminalId).In(terminals.ToArray()))
+                .OrderBy(x => x.LastName)
+                .OrderBy(x => x.FirstName);
+            string queryString = employeeTableQuery.GetQuery();
+            QueryResult<EmployeeMaster> queryResult = _client.QueryAsync(employeeTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Retrieves the list of dispatchers for a given region
+        /// </summary>
+        public QueryResult<EmployeeMaster> RetrieveDispatcherListForRegion(string regionid)
+        {
+            var employeeTableQuery = new QueryBuilder<EmployeeMaster>()
+                .Filter(y => y.Property(x => x.SecurityLevel).NotEqualTo(SecurityLevelConstants.Driver)
+                .And().Property(x => x.AllowMessaging).EqualTo(Constants.Yes)
+                .And().Property(x => x.RegionId).EqualTo(regionid))
+                .OrderBy(x => x.LastName)
+                .OrderBy(x => x.FirstName);
+            string queryString = employeeTableQuery.GetQuery();
+            QueryResult<EmployeeMaster> queryResult = _client.QueryAsync(employeeTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Retrieves the list of all dispatchers 
+        /// </summary>
+        public QueryResult<EmployeeMaster> RetrieveDispatcherListAll()
+        {
+            var employeeTableQuery = new QueryBuilder<EmployeeMaster>()
+                .Filter(y => y.Property(x => x.SecurityLevel).NotEqualTo(SecurityLevelConstants.Driver)
+                .And().Property(x => x.AllowMessaging).EqualTo(Constants.Yes))
+                .OrderBy(x => x.LastName)
+                .OrderBy(x => x.FirstName);
+            string queryString = employeeTableQuery.GetQuery();
+            QueryResult<EmployeeMaster> queryResult = _client.QueryAsync(employeeTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Builds a list of terminals for a given area 
+        /// </summary>
+        public List<string> BuildTerminalList(string areaid)
+        {
+            List<string> terminals = new List<string>();
+            var areaTableQuery = new QueryBuilder<AreaMaster>()
+                .Filter(y => y.Property(x => x.AreaId).EqualTo(areaid));
+            string queryString = areaTableQuery.GetQuery();
+            QueryResult<AreaMaster> queryResult = _client.QueryAsync(areaTableQuery).Result;
+            foreach (AreaMaster areaTableInstance in queryResult.Records)
+            {
+                terminals.Add(areaTableInstance.TerminalId);
+            }
+            return terminals;
+        }
+
         /// <summary>
         /// At login time, we should send a list of users from the EmployeeMaster table
         /// 
@@ -104,7 +168,7 @@ namespace Brady.ScrapRunner.DataService.Tests
         /// This method includes the conditionals and BuildFilterArea
         /// </summary>
         [TestMethod]
-        public void RetrieveDispatcherListForDriver()
+        public void RetrieveDispatcherListForDriverRS()
         {
             string regionid = null;
             //string areaid = null;
