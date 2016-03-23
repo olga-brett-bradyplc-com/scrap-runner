@@ -8,7 +8,9 @@
         layout="@layout/toolbar" />
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_marginBottom="4dp">
         <EditText
             android:id="@+id/containerId"
             android:layout_width="match_parent"
@@ -17,7 +19,9 @@
     </android.support.design.widget.TextInputLayout>
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_marginBottom="4dp">
         <EditText
             android:id="@+id/containerId"
             android:layout_width="match_parent"
@@ -26,7 +30,9 @@
     </android.support.design.widget.TextInputLayout>
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_marginBottom="4dp">
         <EditText
             android:id="@+id/containerId"
             android:layout_width="match_parent"
@@ -35,7 +41,9 @@
     </android.support.design.widget.TextInputLayout>
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_marginBottom="4dp">
         <EditText
             android:id="@+id/containerId"
             android:layout_width="match_parent"
@@ -44,7 +52,9 @@
     </android.support.design.widget.TextInputLayout>
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_marginBottom="4dp">
         <EditText
             android:id="@+id/containerId"
             android:layout_width="match_parent"
