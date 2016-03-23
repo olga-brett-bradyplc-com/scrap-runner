@@ -155,7 +155,285 @@
         /// <summary>Dispatcher logged out.  LoggedOutDisp: T</summary>
         public static readonly string LoggedOutDisp = "T"; 
     }
+    /// <summary>
+    /// Driver Preference internal codes. From the Preferences table.
+    /// </summary>
+    public static class PrefDriverConstants
+    {
+        /// <summary>
+        /// The following preferences will be discontinued in the redevelopment project:
+        /// DEFUseMaterGrading:Use Materials Grading Screen (Y/N) - Could be implemented later.
+        /// DEFUseAutoArrive:Use Auto Arrive Feature (Y/N) - Always use auto arrive.
+        /// DEFContMasterValidation:Container Master validation for manual entry (Y/N) - Always validate.
+        /// DEFContMasterScannedVal:Container Master validation for scanned entry (Y/N) - Always validate.
+        /// DEFDriverEntersGPS:Allow Driver to enter GPS (Y/N) - Always allow.
+        /// DEFDriverAdd:Driver may add container on site (Y/N) - Not used.
+        /// </summary>
 
+        /// TRIP-RELATED PREFERENCES
+        /// <summary>
+        /// DEFEnforceSeqProcess:
+        /// Enforce sequential processing of trips (Y/N):
+        /// When this option is set to “Y”, the driver cannot go out of the sequence displayed in the 
+        /// Route Summary screen of the driver computer in completing the trips.
+        /// </summary>
+        public static readonly string DEFEnforceSeqProcess = "DEFEnforceSeqProcess";
+
+        /// <summary>
+        /// DEFMinAutoTriggerDone:
+        /// Minutes to wait before auto trigger Done on Stop Trans screen:
+        /// Enter the number of minutes driver can be on Stop Transactions screen before “Done” is 
+        /// triggered automatically. If no value is entered, “Done” will not be automatically triggered. 
+        /// </summary>
+        public static readonly string DEFMinAutoTriggerDone = "DEFMinAutoTriggerDone";
+
+        /// <summary>
+        /// DEFUseDrvAutoDelay:
+        /// Use Driver Auto Delay (Y/N):
+        /// When this option is set to “Y”, the handheld will automatically display the “Delay” screen 
+        /// when the driver has returned to the yard and no activity has occurred for x number of minutes. 
+        /// </summary>
+        public static readonly string DEFUseDrvAutoDelay = "DEFUseDrvAutoDelay";
+
+        /// <summary>
+        /// DEFDrvAutoDelayTime:
+        /// Driver Auto Delay Time (minutes):
+        /// The number of minutes after which the handheld will display the “Delay” screen if the 
+        /// “Use Driver Auto Delay” option has been set to “Y”. 
+        /// </summary>
+        public static readonly string DEFDrvAutoDelayTime = "DEFDrvAutoDelayTime";
+
+        /// CONTAINER-RELATED PREFERENCES
+        /// <summary>
+        /// DEFOneContPerPowerUnit:
+        /// Restrict Driver to one container per power unit (Y/N):
+        /// When this option is set to “Y”, only one container is permitted on any leg of a trip. 
+        /// If a container is loaded, it must be dropped before another container can be loaded.
+        /// </summary>
+        public static readonly string DEFOneContPerPowerUnit = "DEFOneContPerPowerUnit";
+
+        /// <summary>
+        /// DEFConfirmTruckInvMsg:
+        /// Confirm Truck Inventory Message?(Y/N):
+        /// This preference can only be set to “Y” if ‘Restrict Driver to one container per power unit’ is set to “Y”. 
+        /// When this option is set to “Y”, if a container is already loaded when the driver logs in, the following  
+        /// message is displayed: Is container {xxxx} being used for the first trip? 
+        /// </summary>
+        public static readonly string DEFConfirmTruckInvMsg = "DEFConfirmTruckInvMsg";
+
+        /// <summary>
+        /// DEFPrevChangContID:
+        /// Prevent Driver from Changing Container ID (Y/N):
+        /// When this option is set to “Y”, the driver cannot load a container other than the one entered by 
+        /// the dispatcher. If no container has been loaded or a container other than the one entered by the 
+        /// dispatcher has been loaded and the driver attempts to go enroute, the enroute will be cancelled 
+        /// and the driver will be instructed to load the container entered by the dispatcher. 
+        /// If the dispatcher did not enter a container, the driver will still not be able to go enroute without 
+        /// first loading a container. Though in that case any container can be loaded.
+        /// This preference will cause the message: 
+        /// "ENROUTE CANCELED You need to load the following container(s) to complete trip:xxxxxx Type, Size"
+        /// to display on the handheld before the driver can go enroute on a drop type segment
+        /// </summary>
+        public static readonly string DEFPrevChangContID = "DEFPrevChangContID";
+
+        /// <summary>
+        /// DEFAutoDropContainers:
+        /// Auto drop containers not used on Stop Trans screen? (Y/N):
+        /// When this option is set to “Y”, any container in power unit inventory not used on 
+        /// Stop Transactions screen will be dropped in the yard, empty. 
+        /// If ‘Restrict Driver to one container per power unit’ is set to “Y”, this setting cannot be set to “Y”. 
+        /// </summary>
+        public static readonly string DEFAutoDropContainers = "DEFAutoDropContainers";
+
+        /// <summary>
+        /// DEFShowSimilarContainers:
+        /// Show similar container numbers if match not found?(Y/N):
+        /// When this option is set to “Y”, if a container match is not found for the value entered by the driver, 
+        /// a list of similar containers is shown for the driver to choose from. 
+        /// </summary>
+        public static readonly string DEFShowSimilarContainers = "DEFShowSimilarContainers";
+
+        /// <summary>
+        /// DEFUseContainerLevel:
+        /// Require Driver To Enter Container Level? (Y/N):
+        /// When this option is set to "Y", the driver must select the container fill level. 
+        /// The available fill levels are set on "4110 User Defined Code Table Maintenance", CONTAINERLEVEL
+        /// </summary>
+        public static readonly string DEFUseContainerLevel = "DEFUseContainerLevel";
+
+        /// <summary>
+        /// DEFContainerValidationCount:
+        /// # Times Driver Must Re-enter Container Number:
+        /// If a driver manually enters a container number, this sets the number of times the driver must 
+        /// re-enter the container number to validate. Set to 0 to not require reentry. 
+        /// </summary>
+        public static readonly string DEFContainerValidationCount = "DEFContainerValidationCount";
+
+        /// <summary>
+        /// DEFReqEntryContNumberForNB:
+        /// Require Driver to Enter Container # for NB# serialized labels?(Y/N):
+        /// When this option is set to “Y”, when a driver uses a container with a serialized label and a 
+        /// container type of NB#, he will be prompted to enter the correct container number, type and size. 
+        /// This will update the container record and will not be required the next time the container is used.
+        /// </summary>
+        public static readonly string DEFReqEntryContNumberForNB = "DEFReqEntryContNumberForNB";
+
+        /// COMMODITY-RELATED PREFERENCES
+        /// <summary>
+        /// DEFCommodSelection:
+        /// Driver selects commodity on pick up (Y/N):
+        /// When this option is set to “Y”, the driver can change the commodity on the 
+        /// “Stop Transaction” screen to indicate which commodity was actually loaded or picked up. 
+        /// </summary>
+        public static readonly string DEFCommodSelection = "DEFCommodSelection";
+
+        /// RECEIPT-RELATED PREFERENCES
+        /// <summary>
+        /// DEFDriverReceipt:
+        /// Require Driver to enter Receipt Number (Y/N):
+        /// When this option is set to “Y”, the driver must enter the driver receipt number, either by scanning it or 
+        /// entering it manually. This is only required for accounts that have “Driver to Supply” checked on the 2030 
+        /// Account Master Maintenance screen. It is for purchases unless “Require Driver Receipt For All Trips?” is 
+        /// also set to Y
+        /// </summary>
+        public static readonly string DEFDriverReceipt = "DEFDriverReceipt";
+
+        /// <summary>
+        /// DEFDriverReceiptAllTrips:
+        /// Require Driver Receipt For All Trip Types? (Y/N):
+        /// Unless this is set to Y receipt entry is only required for trips where material is purchased. 
+        /// </summary>
+        public static readonly string DEFDriverReceiptAllTrips = "DEFDriverReceiptAllTrips";
+
+        /// <summary>
+        /// DEFDriverReceiptMask:
+        /// Receipt Number Mask:
+        /// The entered receipt number must match this mask. # = numbers @ = alpha characters & = alphanumeric characters
+        /// Anything else is taken as a literal character. The input must match that character exactly. 
+        /// For example: ####-@@@@& This means that the receipt number must have four numbers, followed by a “dash”, 
+        /// followed by four alpha characters, followed by one alphanumeric character. 
+        /// </summary>
+        public static readonly string DEFDriverReceiptMask = "DEFDriverReceiptMask";
+
+        /// <summary>
+        /// DEFReceiptValidationCount:
+        /// # Times Driver Must Re-enter Receipt Number:
+        /// If a driver manually enters a receipt number, this sets the number of times the driver must 
+        /// re-enter the receipt number to validate. Set to 0 to not require re-entry. 
+        /// </summary>
+        public static readonly string DEFReceiptValidationCount = "DEFReceiptValidationCount";
+
+        /// SCALE REFERENCE NUMBER-RELATED PREFERENCES
+        /// <summary>
+        /// DEFDriverReference:
+        /// Require Driver to enter Scale Ref # at Gross? (Y/N):
+        /// When this option is set to "Y", the driver must enter a scale reference number when the gross weight is collected. 
+        /// </summary>
+        public static readonly string DEFDriverReference = "DEFDriverReference";
+
+        /// <summary>
+        /// DEFReqScaleRefNo:
+        /// Require Driver to enter Scale Ref# at Tare? (Y/N):
+        /// When this option is set to "Y", the driver must enter a scale reference number when the tare weight is collected. 
+        /// </summary>
+        public static readonly string DEFReqScaleRefNo = "DEFReqScaleRefNo";
+
+        /// <summary>
+        /// DEFDriverReferenceMask:
+        /// Scale Reference Number mask:
+        /// The entered scale reference number must match this mask. # = numbers @ = alpha characters & = alphanumeric 
+        /// characters Anything else is taken as a literal character. The input must match that character exactly. 
+        /// For example: ####-@@@@& This means that the receipt number must have four numbers, followed by a “dash”, 
+        /// followed by four alpha characters, followed by one alphanumeric character.
+        /// </summary>
+        public static readonly string DEFDriverReferenceMask = "DEFDriverReferenceMask";
+
+        /// <summary>
+        /// DEFReferenceValidationCount:
+        /// # Times Driver Must Re-enter scale reference Number:
+        /// If a driver manually enters a scale reference number, this sets the number of times the driver must 
+        /// re-enter the scale reference number to validate. Set to 0 to not require re-entry. 
+        /// </summary>
+        public static readonly string DEFReferenceValidationCount = "DEFReferenceValidationCount";
+
+        /// <summary>
+        /// DEFReqScaleRefNo:
+        /// Add "Not Available" button to scale ref # screen?(Y/N):
+        /// When this option is set to "Y", the driver can indicate a scale reference number was unavailable and continue 
+        /// with the processing of the container. If set to "N", the driver will not be able to proceed without entering a 
+        /// scale reference number.
+        /// </summary>
+        public static readonly string DEFNotAvlScalRefNo = "DEFNotAvlScalRefNo";
+
+        /// <summary>
+        /// DEFDriverWeights:
+        /// Require Driver To Enter Weights? (Y/N):
+        /// This causes an additional entry screen to pop up so the driver can enter scale weights. 
+        /// </summary>
+        public static readonly string DEFDriverWeights = "DEFDriverWeights";
+
+        /// <summary>
+        /// DEFShowHostCode:
+        /// Show Account Host Code When Driver Weighs Gross? (Y/N):
+        /// This displays the accounts host code in a pop up screen on the Yard/Scale function. 
+        /// This is so the driver can give the host code to the scale operator in installations 
+        /// where ScrapRunner is not integrated to a scale software system. 
+        /// </summary>
+        public static readonly string DEFShowHostCode = "DEFShowHostCode";
+
+        /// RETURN TO YARD-RELATED PREFERENCES
+        /// <summary>
+        /// DEFAllowAddRT:
+        /// Allow Driver to Add a Return To Yard Segment? (Y/N):
+        /// When this option is set to "Y", the driver can add a Return to Yard segment if all of the containers on the 
+        /// Stop Transactions screen have been processed, AND it's last segment of the trip, AND the last segment of the 
+        /// trip is not a Return to Yard segment. 
+        /// </summary>
+        public static readonly string DEFAllowAddRT = "DEFAllowAddRT";
+
+        /// <summary>
+        /// DEFAllowAddRT:
+        /// Allow Driver to Change a Yard? (Y/N):
+        /// When this option is set to "Y", if the driver is on a Return to Yard segment, the yard can be changed. 
+        /// </summary>
+        public static readonly string DEFAllowChangeRT = "DEFAllowChangeRT";
+
+        /// <summary>
+        /// DEFPromptRTMsg:
+        /// Prompt Driver with Return to Yard Msg? (Y/N):
+        /// When this option is set to "Y", a pop-up will appear on the handheld asking if the driver wants to add 
+        /// a Return to Yard segment if all of the containers on the Stop Transactions screen have been processed, 
+        /// AND it's last segment of the trip, AND the last segment of the trip is not a Return to Yard segment.
+        /// </summary>
+        public static readonly string DEFPromptRTMsg = "DEFPromptRTMsg";
+
+        /// MISC PREFERENCES
+        /// <summary>
+        /// DEFEnableImageCapture:
+        /// Enable Image Capture?(Y/N):
+        /// When this option is set to “Y”, driver can take a picture while on an active trip. 
+        /// </summary>
+        public static readonly string DEFEnableImageCapture = "DEFEnableImageCapture";
+
+        /// <summary>
+        /// DEFCountry:
+        /// Default Country Code:
+        /// May not be used.
+        /// </summary>
+        public static readonly string DEFCountry = "DEFCountry";
+
+        /// <summary>
+        /// DEFUseLitre:
+        /// Use liters for display purposes(instead of gallons)? (Y/N):
+        /// </summary>
+        public static readonly string DEFUseLitre = "DEFUseLitre";
+
+        /// <summary>
+        /// DEFUseKM:
+        /// Use kilometers for display purposes(instead of miles)? (Y/N):
+        /// </summary>
+        public static readonly string DEFUseKM = "DEFUseKM";
+    }
     /// <summary>
     /// The Power Status internal codes.  Used by the PowerMaster table.
     /// </summary>
