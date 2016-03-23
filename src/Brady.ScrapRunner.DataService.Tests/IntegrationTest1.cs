@@ -213,6 +213,42 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
 
         }
+        [TestMethod]
+        public void IllustrateQueryBuilder()
+        {
+
+            // Simple AND of two clauses (nested within the AND)
+            var qb = new QueryBuilder<EmployeeMaster>();
+            qb.Filter(em => em.Property(x => x.SecurityLevel).NotEqualTo(SecurityLevelConstants.Driver)
+                 .And(em2 => em2.Property(x => x.AllowMessaging).EqualTo(Constants.Yes)));
+            Assert.AreEqual("EmployeeMasters?$filter=SecurityLevel!='DR' and (AllowMessaging='Y')", qb.GetQuery());
+            Console.WriteLine(string.Format("{0}", qb.GetQuery()));
+
+            // Simple AND of two clauses (appended to AND)
+            qb = new QueryBuilder<EmployeeMaster>();
+            qb.Filter(em => em.Property(x => x.SecurityLevel).NotEqualTo(SecurityLevelConstants.Driver)
+                .And().Property(x => x.AllowMessaging).EqualTo(Constants.Yes));
+            Assert.AreEqual("EmployeeMasters?$filter=SecurityLevel!='DR' and AllowMessaging='Y'", qb.GetQuery());
+            Console.WriteLine(string.Format("{0}", qb.GetQuery()));
+
+            // Simple AND of three clauses (nested within the ANDs)
+            var terminalid = "FOO";
+            qb = new QueryBuilder<EmployeeMaster>();
+            qb.Filter(em => em.Property(emp => emp.SecurityLevel).NotEqualTo(SecurityLevelConstants.Driver)
+                .And(em2 => em2.Property(x => x.AllowMessaging).EqualTo(Constants.Yes))
+                .And(em3 => em3.Property(x2 => x2.TerminalId).EqualTo(terminalid)));
+            Assert.AreEqual("EmployeeMasters?$filter=SecurityLevel!='DR' and (AllowMessaging='Y') and (TerminalId='FOO')", qb.GetQuery());
+            Console.WriteLine(string.Format("{0}", qb.GetQuery()));
+
+            // Simple AND of three clauses (appended to ANDs)
+            qb = new QueryBuilder<EmployeeMaster>();
+            qb.Filter(em => em.Property(emp => emp.SecurityLevel).NotEqualTo(SecurityLevelConstants.Driver)
+                .And().Property(x => x.AllowMessaging).EqualTo(Constants.Yes)
+                .And().Property(x2 => x2.TerminalId).EqualTo(terminalid));
+            Assert.AreEqual("EmployeeMasters?$filter=SecurityLevel!='DR' and AllowMessaging='Y' and TerminalId='FOO'", qb.GetQuery());
+            Console.WriteLine(string.Format("{0}", qb.GetQuery()));
+
+        }
 
     }
 }
