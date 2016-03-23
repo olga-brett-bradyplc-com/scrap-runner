@@ -60,17 +60,12 @@ namespace Brady.ScrapRunner.DataService.Tests
         public void RetrieveMessagesForDriver()
         {
             string driverid = "930";
-            var messagesTableQuery = new QueryBuilder<Messages>()
-                .Filter(y => y.Property(x => x.ReceiverId).EqualTo(driverid)
-                .And().Property(x => x.Processed).EqualTo(Constants.No)
-                .And().Property(x => x.DeleteFlag).EqualTo(Constants.No))
-                .OrderBy(x => x.MsgId);
-            string queryString = messagesTableQuery.GetQuery();
-            QueryResult<Messages> queryResult = _client.QueryAsync(messagesTableQuery).Result;
+            QueryResult<Messages> queryResult;
+            queryResult = RetrieveMessagesForDriverId(driverid);
 
             foreach (Messages messageTableInstance in queryResult.Records)
             {
-                Assert.AreEqual(messageTableInstance.ReceiverId.Trim(), driverid, queryString);
+                Assert.AreEqual(messageTableInstance.ReceiverId.Trim(), driverid);
             }
 
             foreach (Messages messageTableInstance in queryResult.Records)
@@ -84,6 +79,20 @@ namespace Brady.ScrapRunner.DataService.Tests
                                                  messageTableInstance.DeleteFlag,
                                                  messageTableInstance.MsgText));
             }
+        }
+        /// <summary>
+        /// Retrieves unsent messages for a given driver
+        /// </summary>
+        public QueryResult<Messages> RetrieveMessagesForDriverId(string driverid)
+        {
+            var messagesTableQuery = new QueryBuilder<Messages>()
+                .Filter(y => y.Property(x => x.ReceiverId).EqualTo(driverid)
+                .And().Property(x => x.Processed).EqualTo(Constants.No)
+                .And().Property(x => x.DeleteFlag).EqualTo(Constants.No))
+                .OrderBy(x => x.MsgId);
+            string queryString = messagesTableQuery.GetQuery();
+            QueryResult<Messages> queryResult = _client.QueryAsync(messagesTableQuery).Result;
+            return queryResult;
         }
     }
 }
