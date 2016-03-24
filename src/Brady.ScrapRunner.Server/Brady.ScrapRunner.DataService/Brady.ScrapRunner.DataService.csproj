@@ -306,6 +306,7 @@
     <Compile Include="RecordTypes\TripSegmentRecordType.cs" />
     <Compile Include="RecordTypes\TripTypeMasterDescRecordType.cs" />
     <Compile Include="RecordTypes\TripTypeMasterRecordType.cs" />
+    <Compile Include="Util\Common.cs" />
     <Compile Include="Validators\AreaMasterDeletionValidator.cs" />
     <Compile Include="Validators\AreaMasterValidator.cs" />
     <Compile Include="Validators\CommodityMasterDestDeletionValidator.cs" />
