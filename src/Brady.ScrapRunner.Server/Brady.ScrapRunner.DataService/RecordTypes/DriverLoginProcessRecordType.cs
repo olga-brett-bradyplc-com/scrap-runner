@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Brady.ScrapRunner.DataService.Interfaces;
+using Brady.ScrapRunner.DataService.Util;
 using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Process;
@@ -70,6 +71,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
             ISession session = null;
             ITransaction transaction = null;
+            ChangeSetResult<string> scratchChangeSetResult;
 
             // If session isn't passed in and changes are being persisted
             // then open a new session
@@ -255,10 +257,10 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                             powerMaster.PowerOdometer = driverLoginProcess.Odometer;
 
                             // Update PowerMaster 
-                            if (!UpdatePowerMaster(dataService, settings, powerMaster))
+                            scratchChangeSetResult = Common.UpdatePowerMaster(dataService, settings, powerMaster);
+                            if (Common.LogChangeSetFailure(scratchChangeSetResult, powerMaster, log))
                             {
                                 var s = string.Format("Unable to update power unit {0}.", driverLoginProcess.PowerId);
-                                log.Error(s);
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                 break;
                             }
@@ -433,7 +435,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                                 var tripChangeSet = (ChangeSet<string, Trip>) tripRecordType.GetNewChangeSet();
                                 tripChangeSet.AddUpdate(trip.Id, trip);
                                 var tripChangeSetResult = tripRecordType.ProcessChangeSet(dataService, tripChangeSet, settings);
-                                if (logChangeSetFailure(tripChangeSetResult, trip))
+                                if (Common.LogChangeSetFailure(tripChangeSetResult, tripChangeSet, log))
                                 {
                                     var s = string.Format("Could not update Trip for TripInProgressFlag: {0}.", Constants.No);
                                     changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
@@ -491,7 +493,8 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                             // Actually update them 2 steps later?
                             // TODO: Do we skip all this if there is no TripNumber?
                             driverStatus.Status = DriverStatusSRConstants.BackOnDuty;
-                            if (!UpdateDriverStatus(dataService, settings, driverStatus))
+                            scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
+                            if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
                             {
                                 var s = "Could not update driver status";
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
@@ -556,7 +559,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                             tripSegmentMileage.TripSegMileagePowerId = driverLoginProcess.PowerId;
                             tripSegmentMileage.TripSegMileageOdometerStart = driverLoginProcess.Odometer;
                             tripSegmentMileage.TripSegMileageDriverId = driverLoginProcess.EmployeeId;
-                            tripSegmentMileage.TripSegMileageDriverName = GetDriverName(employeeMaster);
+                            tripSegmentMileage.TripSegMileageDriverName = Common.GetDriverName(employeeMaster);
                         }
 
                         // 10) Add/update record to DriverStatus table.
@@ -572,11 +575,12 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         powerMaster.PowerCurrentTripNumber = driverLoginProcess.TripNumber;
                         powerMaster.PowerCurrentTripSegNumber = driverLoginProcess.TripSegNumber;
 
-                        if (!UpdatePowerMaster(dataService, settings, powerMaster))
+                        scratchChangeSetResult = Common.UpdatePowerMaster(dataService, settings, powerMaster);
+                        if (Common.LogChangeSetFailure(scratchChangeSetResult, powerMaster, log))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey,
-                                new MessageSet(string.Format("Could not update Power Master for Power Unit {0}.",
-                                    driverLoginProcess.PowerId)));
+                            var s = string.Format("Could not update Power Master for Power Unit {0}.",
+                                driverLoginProcess.PowerId);
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
 
@@ -598,6 +602,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         // Not implemented see ContainerMasterProcess.
 
                         // 15) Send terminal master updates
+                        // Not implemented see TerminalMasterProcess.
 
                         // 16) Send Universal Commodities
                         // Not implemented see UniversalCommoditiesProcess.
@@ -686,70 +691,9 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             return faultDetected;
         }
 
-        /// <summary>
-        /// Log an entry for every detected failure within a changeSetResult.
-        /// </summary>
-        /// <param name="changeSetResult"></param>
-        /// <param name="requestObject">Data that caused the error.</param>
-        /// <returns>true if a failure is detected</returns>
-        private bool logChangeSetFailure(ChangeSetResult<string> changeSetResult, object requestObject)
-        {
-            bool errorsDetected = false;
-            if (changeSetResult.FailedCreates.Any())
-            {
-                errorsDetected = true;
-                foreach (long key in changeSetResult.FailedCreates.Keys)
-                {
-                    var failedChange = changeSetResult.GetFailedCreateForRef(key);
-                    log.ErrorFormat("ChangeSet create error occured.  Summary: {0} during login request: {1}", failedChange.Summary, requestObject);
-                    log.ErrorFormat("ChangeSet create error occured.  {0} during login request: {1}", failedChange , requestObject);
-                }
-            }
-            if (changeSetResult.FailedUpdates.Any())
-            {
-                errorsDetected = true;
-                foreach (string key in changeSetResult.FailedUpdates.Keys)
-                {
-                    var failedChange = changeSetResult.GetFailedUpdateForId(key);
-                    log.ErrorFormat("ChangeSet update error occured.  Summary: {0} during login request: {1}", failedChange.Summary, requestObject);
-                    log.ErrorFormat("ChangeSet update error occured.  {0} during login request: {1}", failedChange, requestObject);
-                }
-            }
-            if (changeSetResult.FailedDeletions.Any())
-            {
-                errorsDetected = true;
-                foreach (string key in changeSetResult.FailedDeletions.Keys)
-                {
-                    var failedChange = changeSetResult.GetFailedDeleteForId(key);
-                    log.ErrorFormat("ChangeSet delete error occured.  Summary: {0} during login request: {1}", failedChange.Summary, requestObject);
-                    log.ErrorFormat("ChangeSet delete error occured.  {0} during login request: {1}", failedChange, requestObject);
-                }
-            }
-            return errorsDetected;
-        }
 
 
-        /// <summary>
-        /// Update a PowerMaster record.
-        /// </summary>
-        /// <param name="dataService"></param>
-        /// <param name="settings"></param>
-        /// <param name="powerMaster"></param>
-        /// <returns>false if any errors</returns>
-        private bool UpdatePowerMaster(IDataService dataService, ProcessChangeSetSettings settings,
-            PowerMaster powerMaster)
-        {
-            bool success = true;
-            var recordType = (PowerMasterRecordType) dataService.RecordTypes.Single(x => x.TypeName == "PowerMaster");
-            var changeSet = (ChangeSet<string, PowerMaster>) recordType.GetNewChangeSet();
-            changeSet.AddUpdate(powerMaster.Id, powerMaster);
-            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (logChangeSetFailure(changeSetResult, powerMaster))
-            {
-                success = false;
-            }
-            return success;
-        }
+
 
 
         /// <summary>
@@ -915,7 +859,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                 PowerDateOutOfService = powerMaster.PowerDateOutOfService,
                 PowerDateInService = powerMaster.PowerDateInService,
                 PowerDriverId = powerMaster.PowerDriverId,
-                PowerDriverName = GetDriverName(employeeMaster), 
+                PowerDriverName = Common.GetDriverName(employeeMaster), 
                 PowerOdometer = powerMaster.PowerOdometer,
                 PowerComments = powerMaster.PowerComments,
                 MdtId = powerMaster.MdtId,
@@ -945,7 +889,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             long recordRef = 1;
             changeSet.AddCreate(recordRef, powerHistory, userRoleIds, userRoleIds);
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (logChangeSetFailure(changeSetResult, powerHistory))
+            if (Common.LogChangeSetFailure(changeSetResult, powerHistory, log))
             {
                 return false;
             }
@@ -953,27 +897,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         }
 
 
-        /// <summary>
-        /// Update a DriverStatus record.
-        /// </summary>
-        /// <param name="dataService"></param>
-        /// <param name="settings"></param>
-        /// <param name="driverStatus"></param>
-        /// <returns>false if any errors</returns>
-        private bool UpdateDriverStatus(IDataService dataService, ProcessChangeSetSettings settings,
-            DriverStatus driverStatus)
-        {
-            bool success = true;
-            var recordType = (DriverStatusRecordType) dataService.RecordTypes.Single(x => x.TypeName == "DriverStatus");
-            var changeSet = (ChangeSet<string, DriverStatus>) recordType.GetNewChangeSet();
-            changeSet.AddUpdate(driverStatus.Id, driverStatus);
-            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (logChangeSetFailure(changeSetResult, driverStatus))
-            {
-                success = false;
-            }
-            return success;
-        }
 
 
         /// <summary>
@@ -1098,7 +1021,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                 // TripSegStatusDesc = tripSegment.TripSegStatusDesc,
                 DriverStatus = driverStatus.Status,
                 DriverStatusDesc = driverStatusDesc,
-                DriverName = GetDriverName(employeeMaster),
+                DriverName = Common.GetDriverName(employeeMaster),
                 TerminalId = driverStatus.TerminalId,
                 TerminalName = driverTerminalName,
                 RegionId = driverStatus.RegionId,
@@ -1134,34 +1057,13 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             long recordRef = 1;
             changeSet.AddCreate(recordRef, driverHistory, userRoleIds, userRoleIds);
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (logChangeSetFailure(changeSetResult, driverHistory))
+            if (Common.LogChangeSetFailure(changeSetResult, driverHistory, log))
             {
                 return false;
             }
             return true;
         }
 
-        /// <summary>
-        /// Return "LastName, FirstName" or as much as possible.
-        /// </summary>
-        /// <param name="employeeMaster"></param>
-        /// <returns>null if both name components are null</returns>
-        private string GetDriverName(EmployeeMaster employeeMaster)
-        {
-            string driverName = null;
-            if (null != employeeMaster)
-            {
-                if (null != employeeMaster.LastName)
-                {
-                    driverName = employeeMaster.LastName;
-                }
-                if (null != employeeMaster.FirstName)
-                {
-                    driverName += ", " + employeeMaster.FirstName;
-                }
-            }
-            return driverName;
-        }
 
     }
 }

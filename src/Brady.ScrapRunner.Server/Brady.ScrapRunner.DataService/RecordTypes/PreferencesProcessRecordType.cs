@@ -136,7 +136,11 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         CurrentQuery = string.Format("EmployeeMasters?$filter= EmployeeId='{0}'", preferencesProcess.EmployeeId)
                     };
                     var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                    if (handleFault(changeSetResult, msgKey, fault, preferencesProcess)) { break; }
+                    if (Util.Common.LogFault(query, fault, log))
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
                     var employeeMaster = (EmployeeMaster) queryResult.Records.Cast<EmployeeMaster>().FirstOrNull();
                     if (employeeMaster == null)
                     {
@@ -149,7 +153,11 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     query.CurrentQuery = string.Format("Preferences?$filter= TerminalId='{0}'", employeeMaster.TerminalId);
                     queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                    if (handleFault(changeSetResult, msgKey, fault, preferencesProcess)) { break; }
+                    if (Util.Common.LogFault(query, fault, log))
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
                     var preferences = queryResult.Records.Cast<Preference>().ToArray();
 
                     //
@@ -157,7 +165,11 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     query.CurrentQuery = string.Format("TerminalMasters?$filter= TerminalId='{0}'", employeeMaster.TerminalId);
                     queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                    if (handleFault(changeSetResult, msgKey, fault, preferencesProcess)) { break; }
+                    if (Util.Common.LogFault(query, fault, log))
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
                     var terminalMaster = (TerminalMaster)queryResult.Records.Cast<TerminalMaster>().FirstOrNull();
 
                     //
@@ -254,27 +266,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             return changeSetResult;
         }
 
-    
-        /// <summary>
-        /// If any data service faults occur.  We want to log them, stop processing and return the error.
-        /// </summary>
-        /// <param name="changeSetResult"></param>
-        /// <param name="msgKey"></param>
-        /// <param name="fault"></param>
-        /// <param name="preferencesProcess"></param>
-        /// <returns></returns>
-        private bool handleFault(ChangeSetResult<String> changeSetResult, String msgKey, DataServiceFault fault,
-            PreferencesProcess preferencesProcess)
-        {
-            bool faultDetected = false;
-            if (null != fault)
-            {
-                faultDetected = true;
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                log.ErrorFormat("Fault occured: {0} during login request: {1}", fault.Message, preferencesProcess);
-            }
-            return faultDetected;
-        }
-   
+       
     }
 }
