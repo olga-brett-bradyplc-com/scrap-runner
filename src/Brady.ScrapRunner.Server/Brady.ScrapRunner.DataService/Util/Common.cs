@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Brady.ScrapRunner.DataService.RecordTypes;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
+using BWF.DataServices.PortableClients;
 using log4net;
 
 namespace Brady.ScrapRunner.DataService.Util
@@ -94,7 +96,6 @@ namespace Brady.ScrapRunner.DataService.Util
                 foreach (string key in changeSetResult.FailedDeletions.Keys)
                 {
                     var failedChange = changeSetResult.GetFailedDeleteForId(key);
-                    //log.ErrorFormat("ChangeSet delete error occured.  Summary: {0} during request: {1}", failedChange.Summary, requestObject);
                     log.ErrorFormat("ChangeSet delete error occured: {0}, Request object: {1}", failedChange, requestObject);
                 }
             }
@@ -137,6 +138,42 @@ namespace Brady.ScrapRunner.DataService.Util
             return changeSetResult;
         }
 
+
+        /// <summary>
+        ///  Get a simple list of all preferences for a terminalId.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="terminalId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if termianlId is null</returns>
+        public static List<Preference> GetPreferences(IDataService dataService, ProcessChangeSetSettings settings, 
+            string userCulture, IEnumerable<long> userRoleIds,
+            string terminalId, out DataServiceFault fault)
+        {
+            fault = null;
+            List<Preference> preferences = new List<Preference>();
+            if (null != terminalId)
+            {
+                Query query = new Query
+                {
+                    // "Preferences?$filter= TerminalId='{0}'", terminalId
+                    CurrentQuery = new QueryBuilder<Preference>().Filter(t =>
+                        t.Property(p => p.TerminalId).EqualTo(terminalId)).GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return preferences;
+                }
+                preferences = queryResult.Records.Cast<Preference>().ToList();
+            }
+            return preferences;
+        }
 
     }
 }
