@@ -9,6 +9,7 @@ using BWF.DataServices.PortableClients;
 using BWF.DataServices.PortableClients.Builder;
 using BWF.DataServices.PortableClients.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
 namespace Brady.ScrapRunner.DataService.Tests
 {
@@ -53,13 +54,17 @@ namespace Brady.ScrapRunner.DataService.Tests
         [TestMethod]
         public void RetrieveTerminalChangeUpdates()
         {
+            string areaid = "OS";
             string regionid = null;
-            DateTime dt = new DateTime(2015, 12, 01);
+            string DEFSendOnlyYardsForArea = "Y";
+            DateTime dt = new DateTime(2015, 10, 01);
             QueryResult<TerminalChange> queryResult;
 
-            if (regionid != null)
-                queryResult = RetrieveTerminalChangesByRegion(dt, regionid);
-             else
+            if (DEFSendOnlyYardsForArea == Constants.Yes && areaid != null)
+                queryResult = RetrieveTerminalChangesForArea(dt, areaid);
+            else if (regionid != null)
+                queryResult = RetrieveTerminalChangesForRegion(dt, regionid);
+            else
                 queryResult = RetrieveTerminalChangesAll(dt);
 
             foreach (TerminalChange terminalTableInstance in queryResult.Records)
@@ -81,9 +86,24 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
         }
         /// <summary>
+        /// Retrieves terminal change records for a given area since a given date
+        /// </summary>
+        public QueryResult<TerminalChange> RetrieveTerminalChangesForArea(DateTime dt, string areaid)
+        {
+            List<string> terminals = BuildTerminalList(areaid);
+            var terminalTableQuery = new QueryBuilder<TerminalChange>()
+                .Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt)
+                .And().Property(x => x.TerminalId).In(terminals.ToArray()))
+                .OrderBy(x => x.TerminalId);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalChange> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+        
+        /// <summary>
         /// Retrieves terminal change records for a given region since a given date
         /// </summary>
-        public QueryResult<TerminalChange> RetrieveTerminalChangesByRegion(DateTime dt, string regionid)
+        public QueryResult<TerminalChange> RetrieveTerminalChangesForRegion(DateTime dt, string regionid)
         {
             var terminalTableQuery = new QueryBuilder<TerminalChange>()
                 .Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt)
@@ -106,6 +126,22 @@ namespace Brady.ScrapRunner.DataService.Tests
             return queryResult;
         }
         /// <summary>
+        /// Builds a list of terminals for a given area 
+        /// </summary>
+        public List<string> BuildTerminalList(string areaid)
+        {
+            List<string> terminals = new List<string>();
+            var areaTableQuery = new QueryBuilder<AreaMaster>()
+                .Filter(y => y.Property(x => x.AreaId).EqualTo(areaid));
+            string queryString = areaTableQuery.GetQuery();
+            QueryResult<AreaMaster> queryResult = _client.QueryAsync(areaTableQuery).Result;
+            foreach (AreaMaster areaTableInstance in queryResult.Records)
+            {
+                terminals.Add(areaTableInstance.TerminalId);
+            }
+            return terminals;
+        } 
+        /// <summary>
         /// Code to test RetrieveTerminalMasterByRegion,RetrieveTerminalMasterAll
         /// If a driver's terminal master needs to be reloaded, we should send a list of terminals 
         /// from the TerminalMaster table.
@@ -114,11 +150,15 @@ namespace Brady.ScrapRunner.DataService.Tests
         [TestMethod]
         public void RetrieveTerminalMaster()
         {
+            string areaid = "NE";
             string regionid = null;
+            string DEFSendOnlyYardsForArea = "Y";
             QueryResult<TerminalMaster> queryResult;
 
-            if (regionid != null)
-                queryResult = RetrieveTerminalMasterByRegion(regionid);
+            if (DEFSendOnlyYardsForArea == Constants.Yes && areaid != null)
+                queryResult = RetrieveTerminalMasterForArea(areaid);
+            else if (regionid != null)
+                queryResult = RetrieveTerminalMasterForRegion(regionid);
             else
                 queryResult = RetrieveTerminalMasterAll();
 
@@ -136,7 +176,20 @@ namespace Brady.ScrapRunner.DataService.Tests
         /// <summary>
         /// Retrieves terminal master records for a given region 
         /// </summary>
-        public QueryResult<TerminalMaster> RetrieveTerminalMasterByRegion(string regionid)
+        public QueryResult<TerminalMaster> RetrieveTerminalMasterForArea(string areaid)
+        {
+            List<string> terminals = BuildTerminalList(areaid);
+            var terminalTableQuery = new QueryBuilder<TerminalMaster>()
+                .Filter(y => y.Property(x => x.TerminalId).In(terminals.ToArray()))
+                .OrderBy(x => x.TerminalName);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalMaster> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Retrieves terminal master records for a given region 
+        /// </summary>
+        public QueryResult<TerminalMaster> RetrieveTerminalMasterForRegion(string regionid)
         {
             var terminalTableQuery = new QueryBuilder<TerminalMaster>()
                 .Filter(y => y.Property(x => x.Region).EqualTo(regionid))
@@ -342,8 +395,8 @@ namespace Brady.ScrapRunner.DataService.Tests
         public void RetrieveTerminalsForArea()
         {
             //string areaid = "ALL";
-            string areaid = "NE";
-            //string areaid = "LI";
+            //string areaid = "NE";
+            string areaid = "LI";
             string terminalid = null;
             //string terminalid = "F1";
             string terminalField = "TerminalId";
