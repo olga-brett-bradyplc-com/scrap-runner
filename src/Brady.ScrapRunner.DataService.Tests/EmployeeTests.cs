@@ -65,10 +65,10 @@ namespace Brady.ScrapRunner.DataService.Tests
         {
             string areaid = "LI";
             string regionid = null;
-            string DefSendOnlyYardsForArea = "Y";
+            string DEFSendDispatchersForArea = "Y";
             QueryResult<EmployeeMaster> queryResult;
 
-            if (DefSendOnlyYardsForArea == Constants.Yes && areaid != null)
+            if (DEFSendDispatchersForArea == Constants.Yes && areaid != null)
                 queryResult = RetrieveDispatcherListForArea(areaid);
             else if (regionid != null)
                 queryResult = RetrieveDispatcherListForRegion(regionid);

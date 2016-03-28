@@ -439,6 +439,59 @@
         /// Use kilometers for display purposes(instead of miles)? (Y/N):
         /// </summary>
         public static readonly string DEFUseKM = "DEFUseKM";
+
+        //ADDITIONAL PREFERENCE FROM TERMINALMASTER
+        /// <summary>
+        /// TimeZoneFactor:
+        /// Time Zone Factor: Difference between the terminal's time zone (for the driver) from the server time zone.
+        /// Example: If server is in Eastern Time Zone and driver is based out of a yard in Pacific Time Zone, 
+        /// the TimeZoneFactor is -3
+        /// </summary>
+        public static readonly string TimeZoneFactor = "TimeZoneFactor";
+
+        /// <summary>
+        /// DaylightSavings:
+        /// Daylight Savings: Y= terminal is in a time zone that observes daylight savings time.
+        /// </summary>
+        public static readonly string DaylightSavings = "DaylightSavings";
+
+        //OTHER DRIVER PREFERENCES
+        //These driver preferences are not sent to the driver, but are used in determining other
+        //types of information or validations sent to the driver
+        /// <summary>
+        /// DEFOdomWarnRange:
+        /// Range to Send Odometer Warning: (default is 5 over or below)
+        /// If the entered reading is more or less than xx miles/kilometers than the last recorded 
+        /// reading, a warning message is displayed on the screen. 
+        /// Message is "Warning! Please check odometer and log in again."
+        /// </summary>
+        public static readonly string DEFOdomWarnRange = "DEFOdomWarnRange";
+
+        /// <summary>
+        /// DEFPutTripInReviewNA:
+        /// Put trip into review if driver is unable to enter scale ref#? (Y/N) 
+        /// When this option is set to “Y”, if the driver is unable to enter the scale reference number 
+        /// the trip will be put into review status. Dispatch will enter the scale reference number and 
+        /// the status will be updated to completed. 
+        /// </summary>
+        public static readonly string DEFPutTripInReviewNA = "DEFPutTripInReviewNA";
+
+        /// <summary>
+        /// DEFSendOnlyYardsForArea:
+        /// Send only yards for driver’s default area to driver? (Y/N) 
+        /// When this option is set to “Y”, only yards in the driver’s default area are sent at log in. 
+        /// This is used to populate the list of yards if ‘Allow Driver to Add a Return To Yard Segment’ is set to “Y”. 
+        /// </summary>
+        public static readonly string DEFSendOnlyYardsForArea = "DEFSendOnlyYardsForArea";
+
+        /// <summary>
+        /// DEFSendDispatchersForArea:
+        /// For messaging, send dispatcher list only for driver’s default area? (Y/N)  
+        /// When this option is set to “Y”, only dispatchers in the driver’s default area are sent at log in. 
+        /// This is used to populate the list of dispatchers when driver goes to Messages, Send Messages.  
+        /// </summary>
+        public static readonly string DEFSendDispatchersForArea = "DEFSendDispatchersForArea";
+        
     }
     /// <summary>
     /// The Power Status internal codes.  Used by the PowerMaster table.
