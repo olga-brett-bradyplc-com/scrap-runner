@@ -28,6 +28,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private void ExecuteChangeLanguageCommand()
         {
             ShowViewModel<ChangeLanguageViewModel>();
+            Close(this);
         }
     }
 }
