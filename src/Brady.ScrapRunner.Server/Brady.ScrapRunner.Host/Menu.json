@@ -6,6 +6,10 @@
       "text": "SR Processes",
       "items": [
         {
+          "text": "ContainerChangeProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChangeProcess"
+        },
+        {
           "text": "DriverLoginProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLoginProcess"
         },

@@ -44,6 +44,7 @@
     <Compile Include="Enums\TripSendFlagValue.cs" />
     <Compile Include="Metadata\AreaMasterMetadata.cs" />
     <Compile Include="Metadata\CommodityMasterDestMetadata.cs" />
+    <Compile Include="Metadata\ContainerChangeProcessMetadata.cs" />
     <Compile Include="Metadata\ContainerHistoryMetadata.cs" />
     <Compile Include="Metadata\ContainerQuantityHistoryMetadata.cs" />
     <Compile Include="Metadata\ContainerQuantityMetadata.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="Models\TripTypeMaster.cs" />
     <Compile Include="Models\TripTypeMasterDesc.cs" />
     <Compile Include="Models\TripTypeMasterDetails.cs" />
+    <Compile Include="Process\ContainerChangeProcess.cs" />
     <Compile Include="Process\DriverLoginProcess.cs" />
     <Compile Include="Process\PreferencesProcess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

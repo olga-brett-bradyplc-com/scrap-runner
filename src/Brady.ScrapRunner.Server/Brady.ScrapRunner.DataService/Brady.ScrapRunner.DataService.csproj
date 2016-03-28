@@ -194,6 +194,7 @@
     <Compile Include="Interfaces\ISRRepository.cs" />
     <Compile Include="Mappings\AreaMasterMap.cs" />
     <Compile Include="Mappings\CommodityMasterDestMap.cs" />
+    <Compile Include="Mappings\ContainerChangeProcessMap.cs" />
     <Compile Include="Mappings\ContainerHistoryMap.cs" />
     <Compile Include="Mappings\ContainerQuantityHistoryMap.cs" />
     <Compile Include="Mappings\ContainerQuantityMap.cs" />
@@ -248,6 +249,7 @@
     <Compile Include="Mappings\PreferenceMap.cs" />
     <Compile Include="Mappings\TripTypeMasterDescMap.cs" />
     <Compile Include="Mappings\TripTypeMasterDetailsMap.cs" />
+    <Compile Include="RecordTypes\ContainerChangeProcessRecordType.cs" />
     <Compile Include="RecordTypes\PreferencesProcessRecordType.cs" />
     <Compile Include="RecordTypes\DriverLoginProcessRecordType.cs" />
     <Compile Include="RecordTypes\MessagesRecordType.cs" />
@@ -311,6 +313,8 @@
     <Compile Include="Validators\AreaMasterValidator.cs" />
     <Compile Include="Validators\CommodityMasterDestDeletionValidator.cs" />
     <Compile Include="Validators\CommodityMasterDestValidator.cs" />
+    <Compile Include="Validators\ContainerChangeProcessDeletionValidator.cs" />
+    <Compile Include="Validators\ContainerChangeProcessValidator.cs" />
     <Compile Include="Validators\ContainerHistoryDeletionValidator.cs" />
     <Compile Include="Validators\ContainerHistoryValidator.cs" />
     <Compile Include="Validators\ContainerQuantityDeletionValidator.cs" />
