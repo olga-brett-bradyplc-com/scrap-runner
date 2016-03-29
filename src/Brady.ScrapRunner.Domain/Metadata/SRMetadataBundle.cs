@@ -17,6 +17,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new CommodityMasterMetadata()
                   , new CommodityMasterDestMetadata()
                   , new ContainerChangeMetadata()
+                  , new ContainerChangeProcessMetadata()
                   , new ContainerHistoryMetadata()
                   , new ContainerMasterMetadata()
                   , new ContainerQuantityMetadata()
