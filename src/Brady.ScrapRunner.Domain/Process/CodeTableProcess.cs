@@ -7,23 +7,30 @@ using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Interfaces;
 
 namespace Brady.ScrapRunner.Domain.Process
+
 {
     /// <summary>
-    /// A ContainerChangeProcess (request and response).  A pseudo-record.
+    /// A CodeTableProcess (request and response).  A pseudo-record.
     /// </summary>
-    public class ContainerChangeProcess : IHaveId<String>, IEquatable<ContainerChangeProcess>
+    public class CodeTableProcess : IHaveId<string>, IEquatable<CodeTableProcess>
     {
         /// <summary>
         /// Mandatory input paramter
         /// </summary>
         public virtual string EmployeeId { get; set; }
-        public virtual DateTime LastContainerMasterUpdate { get; set; }
-        public virtual string ContainerNumber { get; set; }
+        public virtual string CodeName { get; set; }
+        public virtual string CodeValue { get; set; }
+        public virtual string CodeDisp1 { get; set; }
+        public virtual string CodeDisp2 { get; set; }
+        public virtual string CodeDisp3 { get; set; }
+        public virtual string CodeDisp4 { get; set; }
+        public virtual string CodeDisp5 { get; set; }
+        public virtual string CodeDisp6 { get; set; }
 
         /// <summary>
         /// The return value
         /// </summary>
-        public virtual List<ContainerChange> Containers { get; set; }
+        public virtual List<CodeTable> CodeTables { get; set; }
 
         public virtual String Id
         {
@@ -36,7 +43,7 @@ namespace Brady.ScrapRunner.Domain.Process
                 // no-op
             }
         }
-        public virtual bool Equals(ContainerChangeProcess other)
+        public virtual bool Equals(CodeTableProcess other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -48,7 +55,7 @@ namespace Brady.ScrapRunner.Domain.Process
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((ContainerChangeProcess)obj);
+            return Equals((CodeTableProcess)obj);
         }
 
         public override int GetHashCode()
@@ -64,7 +71,7 @@ namespace Brady.ScrapRunner.Domain.Process
         /// </summary>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder("ContainerChangeProcess{");
+            StringBuilder sb = new StringBuilder("CodeTableProcess{");
             sb.Append("EmployeeId:" + EmployeeId);
             sb.Append("}");
             return sb.ToString();

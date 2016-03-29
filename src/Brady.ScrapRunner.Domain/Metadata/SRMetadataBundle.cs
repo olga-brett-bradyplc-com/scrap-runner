@@ -13,6 +13,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             : base(Constants.ScrapRunner
                   , new AreaMasterMetadata() 
                   , new CodeTableMetadata()
+                  , new CodeTableProcessMetadata()
                   , new CodeTableHdrMetadata()
                   , new CommodityMasterMetadata()
                   , new CommodityMasterDestMetadata()
@@ -53,6 +54,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new RegionMasterMetadata()
                   , new SecurityMasterMetadata()
                   , new TerminalChangeMetadata()
+                  , new TerminalChangeProcessMetadata()
                   , new TerminalMasterMetadata()
                   , new TripMetadata()
                   , new TripPointsMetadata()
