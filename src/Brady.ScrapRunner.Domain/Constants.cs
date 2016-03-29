@@ -299,6 +299,17 @@
         /// </summary>
         public static readonly string DEFCommodSelection = "DEFCommodSelection";
 
+        /// <summary>
+        /// DEFSendMasterCommodities:
+        /// Send Master Commodities to Driver (Y/N):
+        /// When this option is set to “Y”, the commodities that have the universal flag set to Y are sent to
+        /// the driver at login. DEFCommodSelection also needs to be set to Y.
+        /// This is a new preference. Previously the universal flag was used in Material Grading.
+        /// Now that Material Grading will not be included in the redevelopment project, we can use the universal
+        /// flag for this purpose.
+        /// </summary>
+        public static readonly string DEFSendUniversalCommodities = "DEFSendUniversalCommodities";
+
         /// RECEIPT-RELATED PREFERENCES
         /// <summary>
         /// DEFDriverReceipt:

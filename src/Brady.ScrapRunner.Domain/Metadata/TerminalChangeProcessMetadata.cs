@@ -8,9 +8,9 @@ using BWF.DataServices.Metadata.Fluent.Abstract;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
-    public class ContainerChangeProcessMetadata : TypeMetadataProvider<ContainerChangeProcess>
+    public class TerminalChangeProcessMetadata: TypeMetadataProvider<TerminalChangeProcess>
     {
-        public ContainerChangeProcessMetadata()
+       public TerminalChangeProcessMetadata()
         {
 
             AutoUpdatesByDefault();
@@ -23,13 +23,12 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .IsId()
                 .DisplayName("Employee Id");
 
-            TimeProperty(x => x.LastContainerMasterUpdate);
-            StringProperty(x => x.ContainerNumber);
+            TimeProperty(x => x.LastTerminalChangeUpdate);
+            StringProperty(x => x.TerminalId);
 
             ViewDefaults()
             .Property(x => x.EmployeeId)
-            .Property(x => x.LastContainerMasterUpdate)
-            .Property(x => x.ContainerNumber)
+            .Property(x => x.LastTerminalChangeUpdate)
             .OrderBy(x => x.EmployeeId);
         }
     }

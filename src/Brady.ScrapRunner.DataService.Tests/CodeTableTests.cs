@@ -91,16 +91,63 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
         }
         /// <summary>
+        /// Code to retrieve all code tables to be sent to the driver
+        /// CONTAINERSIZE
+        /// CONTAINERTYPE
+        /// DELAYCODES 
+        /// EXCEPTIONCODES
+        /// REASONCODES
+        /// Although CONTAINERSIZE contains both type and size, some types that do not have sizes will not be present in the
+        /// CONTAINERSIZE table, so both CONTAINERTYPE and CONTAINERSIZE tables need to be sent
+        /// RegionId, if present, is stored in CodeDisp5. If null the code is included for all regions.
+        /// </summary>
+        [TestMethod]
+        public void RetrieveCodeTablesForDriver()
+        {
+            string regionId = "SDF";
+            var codeTableQuery = new QueryBuilder<CodeTable>()
+                    .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerType)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerSize)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.DelayCodes)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ExceptionCodes)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ReasonCodes)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerLevel))
+                    .OrderBy(x => x.CodeName)
+                    .OrderBy(x => x.CodeValue);
+
+                   // .And().Parenthesis(z => z.Property(x => x.CodeDisp5).EqualTo(regionId)
+                   //         .Or(x => x.CodeDisp5).IsNull())
+
+            string queryString = codeTableQuery.GetQuery();
+            QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
+
+            Console.WriteLine(string.Format("{0}",queryString));
+            foreach (CodeTable codeTableInstance in queryResult.Records)
+            {
+                Console.WriteLine(string.Format("{0}\t\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
+                                    codeTableInstance.CodeName,
+                                    codeTableInstance.CodeValue, 
+                                    codeTableInstance.CodeDisp1, 
+                                    codeTableInstance.CodeDisp2,
+                                    codeTableInstance.CodeDisp3,
+                                    codeTableInstance.CodeDisp4,
+                                    codeTableInstance.CodeDisp5,
+                                    codeTableInstance.CodeDisp6));
+            }
+        } 
+        /// <summary>
         /// Code to retrieve container types and sizes from the CodeTable
         /// Both type and size info is in the CONTAINERSIZE CodeTable
         /// </summary>
         [TestMethod]
         public void RetrieveContainerTypeSize()
         {
+            string regionId = "SDF";
             var codeTableQuery = new QueryBuilder<CodeTable>()
-                .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerSize))
-                .OrderBy(x => x.CodeDisp1)
-                .OrderBy(x => x.CodeDisp2);
+                .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerSize)
+                .And(x => x.CodeDisp5).EqualTo(regionId)
+                .Or(x => x.CodeDisp5).IsNull())
+                .OrderBy(x => x.CodeValue);
             string queryString = codeTableQuery.GetQuery();
             QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
 
@@ -249,6 +296,30 @@ namespace Brady.ScrapRunner.DataService.Tests
             foreach (CodeTable codeTableInstance in queryResult.Records)
             {
                 Console.WriteLine(string.Format("{0}\t{1}", codeTableInstance.CodeValue, codeTableInstance.CodeDisp1));
+            }
+        }
+        /// <summary>
+        /// Get a list of all commodities with the universal flag set to Y.
+        /// These will be sent to the driver at login..
+        /// </summary>
+        [TestMethod]
+        public void RetrieveMasterCommoditiesForDriver()
+        {
+            var commodityTableQuery = new QueryBuilder<CommodityMaster>()
+                   .Filter(y => y.Property(x => x.InactiveFlag).NotEqualTo(Constants.Yes)
+                    .Or(x => x.InactiveFlag).IsNull()
+                    .And(x => x.UniversalFlag).EqualTo(Constants.Yes))
+                    .OrderBy(x => x.CommodityDesc);
+            string queryString = commodityTableQuery.GetQuery();
+            QueryResult<CommodityMaster> queryResult = _client.QueryAsync(commodityTableQuery).Result;
+            Console.WriteLine(string.Format("{0}", queryString));
+             foreach (CommodityMaster commodityTableInstance in queryResult.Records)
+            {
+                Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}", 
+                    commodityTableInstance.CommodityCode, 
+                    commodityTableInstance.CommodityDesc,
+                    commodityTableInstance.InactiveFlag,
+                    commodityTableInstance.UniversalFlag));
             }
         }
     }

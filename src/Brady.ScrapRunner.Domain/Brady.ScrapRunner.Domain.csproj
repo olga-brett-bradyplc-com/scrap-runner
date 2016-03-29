@@ -43,6 +43,7 @@
     <Compile Include="Enums\DriverForceLogoffValue.cs" />
     <Compile Include="Enums\TripSendFlagValue.cs" />
     <Compile Include="Metadata\AreaMasterMetadata.cs" />
+    <Compile Include="Metadata\CodeTableProcessMetadata.cs" />
     <Compile Include="Metadata\CommodityMasterDestMetadata.cs" />
     <Compile Include="Metadata\ContainerChangeProcessMetadata.cs" />
     <Compile Include="Metadata\ContainerHistoryMetadata.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Metadata\CodeTableHdrMetadata.cs" />
     <Compile Include="Metadata\DriverHistoryMetadata.cs" />
     <Compile Include="Metadata\DriverDelayMetadata.cs" />
+    <Compile Include="Metadata\TerminalChangeProcessMetadata.cs" />
     <Compile Include="Metadata\TerminalMasterMetadata.cs" />
     <Compile Include="Metadata\DriverStatusMetadata.cs" />
     <Compile Include="Metadata\EmployeeMasterMetadata.cs" />
@@ -156,9 +158,11 @@
     <Compile Include="Models\TripTypeMaster.cs" />
     <Compile Include="Models\TripTypeMasterDesc.cs" />
     <Compile Include="Models\TripTypeMasterDetails.cs" />
+    <Compile Include="Process\CodeTableProcess.cs" />
     <Compile Include="Process\ContainerChangeProcess.cs" />
     <Compile Include="Process\DriverLoginProcess.cs" />
     <Compile Include="Process\PreferencesProcess.cs" />
+    <Compile Include="Process\TerminalChangeProcess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Enums\TripSendReseqFlagValue.cs" />
   </ItemGroup>

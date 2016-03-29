@@ -9,21 +9,21 @@ using BWF.DataServices.Metadata.Interfaces;
 namespace Brady.ScrapRunner.Domain.Process
 {
     /// <summary>
-    /// A ContainerChangeProcess (request and response).  A pseudo-record.
+    /// A TerminalChangeProcess (request and response).  A pseudo-record.
     /// </summary>
-    public class ContainerChangeProcess : IHaveId<String>, IEquatable<ContainerChangeProcess>
+    public class TerminalChangeProcess : IHaveId<String>, IEquatable<TerminalChangeProcess>
     {
         /// <summary>
         /// Mandatory input paramter
         /// </summary>
         public virtual string EmployeeId { get; set; }
-        public virtual DateTime LastContainerMasterUpdate { get; set; }
-        public virtual string ContainerNumber { get; set; }
+        public virtual DateTime LastTerminalChangeUpdate { get; set; }
+        public virtual string TerminalId { get; set; }
 
         /// <summary>
         /// The return value
         /// </summary>
-        public virtual List<ContainerChange> Containers { get; set; }
+        public virtual List<TerminalChange> Terminals { get; set; }
 
         public virtual String Id
         {
@@ -36,7 +36,7 @@ namespace Brady.ScrapRunner.Domain.Process
                 // no-op
             }
         }
-        public virtual bool Equals(ContainerChangeProcess other)
+        public virtual bool Equals(TerminalChangeProcess other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -48,7 +48,7 @@ namespace Brady.ScrapRunner.Domain.Process
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((ContainerChangeProcess)obj);
+            return Equals((TerminalChangeProcess)obj);
         }
 
         public override int GetHashCode()
@@ -64,7 +64,7 @@ namespace Brady.ScrapRunner.Domain.Process
         /// </summary>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder("ContainerChangeProcess{");
+            StringBuilder sb = new StringBuilder("TerminalChangeProcess{");
             sb.Append("EmployeeId:" + EmployeeId);
             sb.Append("}");
             return sb.ToString();

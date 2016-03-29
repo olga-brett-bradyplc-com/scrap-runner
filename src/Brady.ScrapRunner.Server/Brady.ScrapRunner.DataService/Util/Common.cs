@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using Brady.ScrapRunner.DataService.RecordTypes;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.DataService.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
@@ -141,77 +142,283 @@ namespace Brady.ScrapRunner.DataService.Util
             return changeSetResult;
         }
 
+        /// AREAMASTER Table queries
         /// <summary>
-        ///  Get a simple list of all preferences for a terminalId.
+        ///  Get a list of all terminals for a given area.
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
-        /// <param name="terminalId"></param>
+        /// <param name="areaId"></param>
         /// <param name="fault"></param>
-        /// <returns>An empty list if termianlId is null</returns>
-        public static List<Preference> GetPreferences(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, string terminalId, out DataServiceFault fault)
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<string> GetTerminalsByArea(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string areaId, out DataServiceFault fault)
         {
             fault = null;
-            List<Preference> preferences = new List<Preference>();
-            if (null != terminalId)
+            List<AreaMaster> terminalsArea = new List<AreaMaster>();
+            List<string> terminals = new List<string>();
+            if (null != areaId)
             {
                 Query query = new Query
                 {
-                    // "Preferences?$filter= TerminalId='{0}'", terminalId
-                    CurrentQuery = new QueryBuilder<Preference>()
-                         .Filter(t => t.Property(p => p.TerminalId).EqualTo(terminalId))
-                         .GetQuery()
+                    CurrentQuery = new QueryBuilder<AreaMaster>()
+                    .Filter(y => y.Property(x => x.AreaId).EqualTo(areaId))
+                    .OrderBy(x => x.TerminalId)
+                    .GetQuery()
                 };
-                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
-                    out fault);
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                 if (null != fault)
                 {
-                    return preferences;
+                    return null;
                 }
-                preferences = queryResult.Records.Cast<Preference>().ToList();
+                terminalsArea = queryResult.Records.Cast<AreaMaster>().ToList();
+                if (null != terminalsArea)
+                {
+                    foreach (AreaMaster terminalInstance in terminalsArea)
+                    {
+                        terminals.Add(terminalInstance.TerminalId);
+                    }
+                }
             }
-            return preferences;
+            return terminals;
         }
-
+        /// CODETABLE Table queries
         /// <summary>
-        ///  Get an employee record from the EmployeeMaster
+        /// Get a list of all codetable values that are sent to the driver at login.
+        /// CONTAINERSIZE
+        /// CONTAINERTYPE
+        /// DELAYCODES 
+        /// EXCEPTIONCODES
+        /// REASONCODES
+        /// Note: CONTAINERLEVEL is optional, based on a  preference:DEFUseContainerLevel
+        /// This is the qery that does not include CONTAINERLEVEL
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
-        /// <param name="employeeId"></param>
         /// <param name="fault"></param>
-        /// <returns>An empty list if employeeId is null</returns>
-        public static EmployeeMaster GetEmployee(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, string employeeId, out DataServiceFault fault)
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<CodeTable> GetAllCodeTablesForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string regionId, out DataServiceFault fault)
         {
             fault = null;
-            EmployeeMaster employee = new EmployeeMaster();
-            if (null != employeeId)
+            List<CodeTable> codetables = new List<CodeTable>();
+            Query query = new Query
             {
-                Query query = new Query
-                {
-                    CurrentQuery = new QueryBuilder<EmployeeMaster>()
-                         .Filter(t => t.Property(p => p.EmployeeId).EqualTo(employeeId))
-                         .GetQuery()
-                };
-                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
-                    out fault);
-                if (null != fault)
-                {
-                    return employee;
-                }
-                employee = (EmployeeMaster) queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
+                //Under construction...
+                CurrentQuery = new QueryBuilder<CodeTable>()
+                    .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerType)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerSize)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.DelayCodes)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ExceptionCodes)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ReasonCodes))
+                    .OrderBy(x => x.CodeName)
+                    .OrderBy(x => x.CodeValue)
+                    .GetQuery()
+            };
+            var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+            if (null != fault)
+            {
+                return codetables;
             }
-            return employee;
+            codetables = queryResult.Records.Cast<CodeTable>().ToList();
+            return codetables;
+        }
+        /// CODETABLE Table queries
+        /// <summary>
+        /// Get a list of all codetable values that are sent to the driver at login.
+        /// CONTAINERSIZE
+        /// CONTAINERTYPE
+        /// DELAYCODES 
+        /// EXCEPTIONCODES
+        /// REASONCODES
+        /// CONTAINERLEVEL is optional, based on a  preference:DEFUseContainerLevel
+        /// so this is the separate query that also returns CONTAINERLEVEL code table.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<CodeTable> GetAllCodeTablesIncLevelForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string regionId, out DataServiceFault fault)
+        {
+            fault = null;
+            List<CodeTable> codetables = new List<CodeTable>();
+            Query query = new Query
+            {
+                //Under construction...
+                CurrentQuery = new QueryBuilder<CodeTable>()
+                    .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerType)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerSize)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.DelayCodes)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ExceptionCodes)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ReasonCodes)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerLevel))
+                    .OrderBy(x => x.CodeName)
+                    .OrderBy(x => x.CodeValue)
+                    .GetQuery()
+            };
+            var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+            if (null != fault)
+            {
+                return codetables;
+            }
+
+            return codetables;
+        }
+        
+        /// CODETABLE Table queries
+        /// <summary>
+        /// Get a list of all CONTAINERLEVEL codetable values.
+        /// The preference:DEFUseContainerLevel determines whether container level is used.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<CodeTable> GetContainerLevelCodes(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, out DataServiceFault fault)
+        {
+            fault = null;
+            List<CodeTable> containerlevels = new List<CodeTable>();
+            Query query = new Query
+            {
+                CurrentQuery = new QueryBuilder<CodeTable>()
+                    .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerLevel))
+                    .OrderBy(x => x.CodeValue)
+                    .GetQuery()
+            };
+            var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+            if (null != fault)
+            {
+                return containerlevels;
+            }
+            containerlevels = queryResult.Records.Cast<CodeTable>().ToList();
+            return containerlevels;
         }
 
+        /// CODETABLE Table queries
+        /// <summary>
+        /// Get a list of all CONTAINERTYPE codetable values.
+        /// RegionId, if present, is stored in CodeDisp5. If null the code is included for all regions.
+        /// Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<CodeTable> GetContainerTypeCodes(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string regionId, out DataServiceFault fault)
+        {
+            fault = null;
+            List<CodeTable> containerTypes = new List<CodeTable>();
+            Query query = new Query
+            {
+                CurrentQuery = new QueryBuilder<CodeTable>()
+                    .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerType)
+                    .And(x => x.CodeDisp5).EqualTo(regionId)
+                    .Or(x => x.CodeDisp5).IsNull())
+                    .OrderBy(x => x.CodeValue)
+                    .GetQuery()
+            };
+            var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+            if (null != fault)
+            {
+                return containerTypes;
+            }
+            containerTypes = queryResult.Records.Cast<CodeTable>().ToList();
+            return containerTypes;
+        }
+
+        /// CODETABLE Table queries
+        /// <summary>
+        /// Get a list of all CONTAINERSIZE codetable values.
+        /// Although CONTAINERSIZE contains both type and size, some types that do not have sizes will not be present in the
+        /// CONTAINERSIZE table, so both CONTAINERTYPE and CONTAINERSIZE tables need to be sent
+        /// RegionId, if present, is stored in CodeDisp5. If null the code is included for all regions.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<CodeTable> GetContainerTypeSizeCodes(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string regionId, out DataServiceFault fault)
+        {
+            fault = null;
+            List<CodeTable> containerTypeSizes = new List<CodeTable>();
+            Query query = new Query
+            {
+                CurrentQuery = new QueryBuilder<CodeTable>()
+                    .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerSize)
+                    .And(x => x.CodeDisp5).EqualTo(regionId)
+                    .Or(x => x.CodeDisp5).IsNull())
+                    .OrderBy(x => x.CodeValue)
+                    .GetQuery()
+            };
+            var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+            if (null != fault)
+            {
+                return containerTypeSizes;
+            }
+            containerTypeSizes = queryResult.Records.Cast<CodeTable>().ToList();
+            return containerTypeSizes;
+        }
+
+        /// COMMODITYMASTER Table queries
+        /// <summary>
+        /// Get a list of all commodities with the universal flag set to Y.
+        /// These will be sent to the driver at login..
+        /// Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<CommodityMaster> GetMasterCommoditiesForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, out DataServiceFault fault)
+        {
+            fault = null;
+            List<CommodityMaster> commodityTypes = new List<CommodityMaster>();
+            Query query = new Query
+            {
+                CurrentQuery = new QueryBuilder<CommodityMaster>()
+                    .Filter(y => y.Property(x => x.InactiveFlag).NotEqualTo(Constants.Yes)
+                    .Or(x => x.InactiveFlag).IsNull()
+                    .And(x => x.UniversalFlag).EqualTo(Constants.Yes))
+                    .OrderBy(x => x.CommodityDesc)
+                    .GetQuery()
+            };
+            var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+            if (null != fault)
+            {
+                return commodityTypes;
+            }
+            commodityTypes = queryResult.Records.Cast<CommodityMaster>().ToList();
+            return commodityTypes;
+        }
+
+        /// CONTAINERCHANGE Table queries
         /// <summary>
         ///  Get a list of all container master updates after a given date time.
         ///  Caller needs to check if the fault is non-null before using the returned list.
@@ -247,6 +454,7 @@ namespace Brady.ScrapRunner.DataService.Util
             return containers;
         }
 
+        /// CONTAINERCHANGE Table queries
         /// <summary>
         ///  Get a list of all container master updates after a given date time for a given region.
         ///  Caller needs to check if the fault is non-null before using the returned list.
@@ -284,6 +492,79 @@ namespace Brady.ScrapRunner.DataService.Util
             return containers;
         }
 
+        /// EMPLOYEEMASTER Table queries
+        /// <summary>
+        ///  Get an employee record from the EmployeeMaster
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="employeeId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if employeeId is null</returns>
+        public static EmployeeMaster GetEmployee(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string employeeId, out DataServiceFault fault)
+        {
+            fault = null;
+            EmployeeMaster employee = new EmployeeMaster();
+            if (null != employeeId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<EmployeeMaster>()
+                         .Filter(t => t.Property(p => p.EmployeeId).EqualTo(employeeId))
+                         .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return employee;
+                }
+                employee = (EmployeeMaster) queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
+            }
+            return employee;
+        }
+
+        /// PREFERENCE Table queries
+        /// <summary>
+        ///  Get a simple list of all preferences for a terminalId.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="terminalId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if termianlId is null</returns>
+        public static List<Preference> GetPreferences(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string terminalId, out DataServiceFault fault)
+        {
+            fault = null;
+            List<Preference> preferences = new List<Preference>();
+            if (null != terminalId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Preference>()
+                         .Filter(t => t.Property(p => p.TerminalId).EqualTo(terminalId))
+                         .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return preferences;
+                }
+                preferences = queryResult.Records.Cast<Preference>().ToList();
+            }
+            return preferences;
+        }
+
+        /// PREFERENCE Table queries
         /// <summary>
         ///  Get the preference by parameter.
         ///  Caller needs to check if the fault is non-null before using the returned list.
@@ -325,6 +606,88 @@ namespace Brady.ScrapRunner.DataService.Util
                 }
             }
             return parametervalue;
+        }
+
+        /// TERMINALCHANGE Table queries
+        /// <summary>
+        ///  Get a list of all terminal master updates after a given date time for a given region.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="dateTime"></param>
+        /// <param name="regionId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<TerminalChange> GetTerminalChangesByRegion(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, string regionId, out DataServiceFault fault)
+        {
+            fault = null;
+            List<TerminalChange> terminals = new List<TerminalChange>();
+            if (null != dateTime)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TerminalChange>()
+                    .Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dateTime)
+                    .And().Property(x => x.RegionId).EqualTo(regionId))
+                    .OrderBy(x => x.TerminalId)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return terminals;
+                }
+                terminals = queryResult.Records.Cast<TerminalChange>().ToList();
+            }
+            return terminals;
+        }
+
+        /// TERMINALCHANGE Table queries
+        /// <summary>
+        ///  Get a list of all terminal master updates after a given date time for a given region.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="dateTime"></param>
+        /// <param name="areaId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<TerminalChange> GetTerminalChangesByArea(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, string areaId, out DataServiceFault fault)
+        {
+            fault = null;
+            List<string> terminalsInArea = new List<string>();
+            if (null != dateTime)
+            {
+                terminalsInArea = Util.Common.GetTerminalsByArea
+                    (dataService, settings, userCulture, userRoleIds, areaId, out fault);
+            }
+            List<TerminalChange> terminals = new List<TerminalChange>();
+            if (null != dateTime)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TerminalChange>()
+                    .Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dateTime)
+                    .And().Property(x => x.TerminalId).In(terminalsInArea.ToArray()))
+                    .OrderBy(x => x.TerminalId)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return terminals;
+                }
+                terminals = queryResult.Records.Cast<TerminalChange>().ToList();
+            }
+            return terminals;
         }
     }
 }
