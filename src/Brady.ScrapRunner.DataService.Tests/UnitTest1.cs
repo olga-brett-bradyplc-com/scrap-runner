@@ -8,6 +8,7 @@ using BWF.DataServices.PortableClients;
 using BWF.DataServices.PortableClients.Builder;
 using BWF.DataServices.PortableClients.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Web;
 
 namespace Brady.ScrapRunner.DataService.Tests
 {
@@ -82,6 +83,13 @@ namespace Brady.ScrapRunner.DataService.Tests
                 .And().Property(x => x.AllowMessaging).EqualTo(Constants.Yes)
                 .And().Property(x2 => x2.TerminalId).EqualTo(terminalid));
             Assert.AreEqual("EmployeeMasters?$filter=SecurityLevel!='DR' and AllowMessaging='Y' and TerminalId='FOO'", qb.GetQuery());
+
+            var qb2 = new QueryBuilder<CodeTable>();
+            qb2.Filter(ct => ct.Property(p => p.CodeName).EqualTo(CodeTableNameConstants.DelayCodes)
+                    .And().Parenthesis(paren => paren.Property(p => p.CodeDisp5)
+                        .EqualTo("SDF").Or(x => x.CodeDisp5).IsNull()));
+            Assert.AreEqual("CodeTables?$filter=CodeName='DELAYCODES' and (CodeDisp5='SDF' or CodeDisp5 isNull)", qb2.GetQuery());
+
         }
 
     }
