@@ -193,7 +193,10 @@
     <Compile Include="Concrete\SRRepository.cs" />
     <Compile Include="Interfaces\ISRRepository.cs" />
     <Compile Include="Mappings\AreaMasterMap.cs" />
+    <Compile Include="Mappings\CodeTableProcessMap.cs" />
     <Compile Include="Mappings\CommodityMasterDestMap.cs" />
+    <Compile Include="Mappings\CommodityMasterProcessMap.cs" />
+    <Compile Include="Mappings\ContainerChangeProcessMap.cs" />
     <Compile Include="Mappings\ContainerHistoryMap.cs" />
     <Compile Include="Mappings\ContainerQuantityHistoryMap.cs" />
     <Compile Include="Mappings\ContainerQuantityMap.cs" />
@@ -229,6 +232,7 @@
     <Compile Include="Mappings\CodeTableHdrMap.cs" />
     <Compile Include="Mappings\DriverHistoryMap.cs" />
     <Compile Include="Mappings\DriverDelayMap.cs" />
+    <Compile Include="Mappings\TerminalChangeProcessMap.cs" />
     <Compile Include="Mappings\TerminalMasterMap.cs" />
     <Compile Include="Mappings\DriverStatusMap.cs" />
     <Compile Include="Mappings\EmployeeMasterMap.cs" />
@@ -248,9 +252,13 @@
     <Compile Include="Mappings\PreferenceMap.cs" />
     <Compile Include="Mappings\TripTypeMasterDescMap.cs" />
     <Compile Include="Mappings\TripTypeMasterDetailsMap.cs" />
+    <Compile Include="RecordTypes\CodeTableProcessRecordType.cs" />
+    <Compile Include="RecordTypes\CommodityMasterProcessRecordType.cs" />
+    <Compile Include="RecordTypes\ContainerChangeProcessRecordType.cs" />
     <Compile Include="RecordTypes\PreferencesProcessRecordType.cs" />
     <Compile Include="RecordTypes\DriverLoginProcessRecordType.cs" />
     <Compile Include="RecordTypes\MessagesRecordType.cs" />
+    <Compile Include="RecordTypes\TerminalChangeProcessRecordType.cs" />
     <Compile Include="RecordTypes\TripPointsRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentImageRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentTimeContainerRecordType.cs" />
@@ -309,8 +317,14 @@
     <Compile Include="Util\Common.cs" />
     <Compile Include="Validators\AreaMasterDeletionValidator.cs" />
     <Compile Include="Validators\AreaMasterValidator.cs" />
+    <Compile Include="Validators\CodeTableProcessDeletionValidator.cs" />
+    <Compile Include="Validators\CodeTableProcessValidator.cs" />
     <Compile Include="Validators\CommodityMasterDestDeletionValidator.cs" />
     <Compile Include="Validators\CommodityMasterDestValidator.cs" />
+    <Compile Include="Validators\CommodityMasterProcessDeletionValidator.cs" />
+    <Compile Include="Validators\CommodityMasterProcessValidator.cs" />
+    <Compile Include="Validators\ContainerChangeProcessDeletionValidator.cs" />
+    <Compile Include="Validators\ContainerChangeProcessValidator.cs" />
     <Compile Include="Validators\ContainerHistoryDeletionValidator.cs" />
     <Compile Include="Validators\ContainerHistoryValidator.cs" />
     <Compile Include="Validators\ContainerQuantityDeletionValidator.cs" />
@@ -364,6 +378,8 @@
     <Compile Include="Validators\PowerLimitsValidator.cs" />
     <Compile Include="Validators\SecurityMasterDeletionValidator.cs" />
     <Compile Include="Validators\SecurityMasterValidator.cs" />
+    <Compile Include="Validators\TerminalChangeProcessDeletionValidator.cs" />
+    <Compile Include="Validators\TerminalChangeProcessValidator.cs" />
     <Compile Include="Validators\TerminalChangeValidator.cs" />
     <Compile Include="Validators\TerminalChangeDeletionValidator.cs" />
     <Compile Include="Validators\ContainerChangeValidator.cs" />

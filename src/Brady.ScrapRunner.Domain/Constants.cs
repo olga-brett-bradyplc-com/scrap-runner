@@ -15,6 +15,12 @@
         /// Useage: To prevent this reason code from being sent to the driver
         /// </summary>
         public static readonly string NOTAVLSCALREFNO = "SR#";
+
+        /// <summary>
+        /// SYSTEM_TERMINALID "0000" is the TerminalId for system preferences
+        /// Useage: To retrieve system preferences
+        /// </summary>
+        public static readonly string SYSTEM_TERMINALID = "0000";
     }
 
     public static class BasicTripTypeConstants
@@ -293,6 +299,17 @@
         /// </summary>
         public static readonly string DEFCommodSelection = "DEFCommodSelection";
 
+        /// <summary>
+        /// DEFSendMasterCommodities:
+        /// Send Master Commodities to Driver (Y/N):
+        /// When this option is set to “Y”, the commodities that have the universal flag set to Y are sent to
+        /// the driver at login. DEFCommodSelection also needs to be set to Y.
+        /// This is a new preference. Previously the universal flag was used in Material Grading.
+        /// Now that Material Grading will not be included in the redevelopment project, we can use the universal
+        /// flag for this purpose.
+        /// </summary>
+        public static readonly string DEFSendMasterCommodities = "DEFSendMasterCommodities";
+
         /// RECEIPT-RELATED PREFERENCES
         /// <summary>
         /// DEFDriverReceipt:
@@ -492,6 +509,19 @@
         /// </summary>
         public static readonly string DEFSendDispatchersForArea = "DEFSendDispatchersForArea";
         
+    }
+    /// <summary>
+    /// Driver Preference internal codes. From the Preferences table.
+    /// </summary>
+    public static class PrefSystemConstants
+    {
+        /// <summary>
+        /// DEFAllowAnyContainer:
+        /// Send all containers to driver regardless of company? (Y/N)
+        /// When this option is set to “Y”, all container updates will be sent to the driver. 
+        /// Otherwise only send containers for the driver's region. 
+        /// </summary>
+        public static readonly string DEFAllowAnyContainer = "DEFAllowAnyContainer";
     }
     /// <summary>
     /// The Power Status internal codes.  Used by the PowerMaster table.
