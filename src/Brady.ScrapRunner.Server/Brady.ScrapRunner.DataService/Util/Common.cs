@@ -227,7 +227,17 @@ namespace Brady.ScrapRunner.DataService.Util
                 return codetables;
             }
             codetables = queryResult.Records.Cast<CodeTable>().ToList();
-            return codetables;
+
+            //Filter the results
+            //If a region id is in the CodeDisp5 field, make sure it matches the region id for the user
+            //Also for reason codes, do not send the reason code SR#
+            var filteredcodetables =
+                from entry in codetables
+                where (entry.CodeDisp5 == regionId || entry.CodeDisp5 == null)
+                && (entry.CodeValue != Constants.NOTAVLSCALREFNO)
+                select entry;
+
+            return filteredcodetables.Cast<CodeTable>().ToList();
         }
         /// CODETABLE Table queries
         /// <summary>
@@ -271,8 +281,18 @@ namespace Brady.ScrapRunner.DataService.Util
             {
                 return codetables;
             }
+            codetables = queryResult.Records.Cast<CodeTable>().ToList();
 
-            return codetables;
+            //Filter the results
+            //If a region id is in the CodeDisp5 field, make sure it matches the region id for the user
+            //Also for reason codes, do not send the reason code SR#
+            var filteredcodetables = 
+                from entry in codetables
+                where (entry.CodeDisp5 == regionId || entry.CodeDisp5 == null)
+                && (entry.CodeValue != Constants.NOTAVLSCALREFNO)
+                select entry;
+
+            return filteredcodetables.Cast<CodeTable>().ToList();
         }
         
         /// CODETABLE Table queries

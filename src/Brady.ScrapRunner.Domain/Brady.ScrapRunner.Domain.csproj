@@ -45,6 +45,7 @@
     <Compile Include="Metadata\AreaMasterMetadata.cs" />
     <Compile Include="Metadata\CodeTableProcessMetadata.cs" />
     <Compile Include="Metadata\CommodityMasterDestMetadata.cs" />
+    <Compile Include="Metadata\CommodityMasterProcessMetadata.cs" />
     <Compile Include="Metadata\ContainerChangeProcessMetadata.cs" />
     <Compile Include="Metadata\ContainerHistoryMetadata.cs" />
     <Compile Include="Metadata\ContainerQuantityHistoryMetadata.cs" />
@@ -159,6 +160,7 @@
     <Compile Include="Models\TripTypeMasterDesc.cs" />
     <Compile Include="Models\TripTypeMasterDetails.cs" />
     <Compile Include="Process\CodeTableProcess.cs" />
+    <Compile Include="Process\CommodityMasterProcess.cs" />
     <Compile Include="Process\ContainerChangeProcess.cs" />
     <Compile Include="Process\DriverLoginProcess.cs" />
     <Compile Include="Process\PreferencesProcess.cs" />

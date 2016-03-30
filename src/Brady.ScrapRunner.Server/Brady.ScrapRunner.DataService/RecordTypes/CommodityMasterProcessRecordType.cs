@@ -25,28 +25,28 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     /// Note this our business processes is relatively independent of the "trivial" backing query.  
     /// As such, we temporarily need to invoke this
     /// service call using the form Put["/{dataServiceName}/{typeName}/{id}/withoutpersistance", true]
-    /// (example: PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/CodeTableChangeProcess/001/withoutpersistance) 
+    /// (example: PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/CommodityMasterChangeProcess/001/withoutpersistance) 
     /// this will prevent the Nancy.DataServiceModule from issuing an automatic re-retrieve 
     /// (getSingleAsync()) within the postSingleAsync().   This re-retrieve of a trival query clobbers our post-processed 
     /// ChangeSetResult
     /// </summary>
-    [EditAction("CodeTableProcess")]
-    public class CodeTableProcessRecordType : ChangeableRecordType
-                <CodeTableProcess, string, CodeTableProcessValidator, CodeTableProcessDeletionValidator>
+    [EditAction("CommodityMasterProcess")]
+    public class CommodityMasterProcessRecordType : ChangeableRecordType
+                <CommodityMasterProcess, string, CommodityMasterProcessValidator, CommodityMasterProcessDeletionValidator>
     {
         /// <summary>
         /// Mandatory implementation of virtual base class method.
         /// </summary>
         public override void ConfigureMapper()
         {
-            Mapper.CreateMap<CodeTableProcess, CodeTableProcess>();
+            Mapper.CreateMap<CommodityMasterProcess, CommodityMasterProcess>();
 
             // Note should we ever need to map the nested child list too, 
             // we would need to be more explicit.  see also: 
             // http://stackoverflow.com/questions/9394833/automapper-with-nested-child-list
-            // Mapper.CreateMap<CodeTableProcess, CodeTableProcess>()
-            //    .ForMember(dest => dest.CodeTable, opts => opts.MapFrom(src => src.CodeTable));
-            // Mapper.CreateMap<CodeTable, CodeTable>();
+            // Mapper.CreateMap<CommodityMasterProcess, CommodityMasterProcess>()
+            //    .ForMember(dest => dest.CommodityMaster, opts => opts.MapFrom(src => src.CommodityMaster));
+            // Mapper.CreateMap<CommodityMaster, CommodityMaster>();
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         /// <param name="persistChanges"></param>
         /// <returns></returns>
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService, string token, string username,
-            ChangeSet<string, CodeTableProcess> changeSet,
+            ChangeSet<string, CommodityMasterProcess> changeSet,
             bool persistChanges)
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
@@ -72,7 +72,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         /// <param name="settings"></param>
         /// <returns></returns>
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService,
-            ChangeSet<string, CodeTableProcess> changeSet, ProcessChangeSetSettings settings)
+            ChangeSet<string, CommodityMasterProcess> changeSet, ProcessChangeSetSettings settings)
         {
 
             ISession session = null;
@@ -104,7 +104,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     DataServiceFault fault;
                     string msgKey = key;
 
-                    CodeTableProcess codetablesProcess = (CodeTableProcess)changeSetResult.GetSuccessfulUpdateForId(key);
+                    CommodityMasterProcess commodityMasterProcess = (CommodityMasterProcess)changeSetResult.GetSuccessfulUpdateForId(key);
 
                     // TODO:  Determine userCulture and userRoleIds on a per user basis.
                     string userCulture = "en-GB";
@@ -112,15 +112,15 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
                     // It appears, in the gernal case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
-                    CodeTableProcess backfillCodeTableProcess;
-                    if (changeSet.Update.TryGetValue(key, out backfillCodeTableProcess))
+                    CommodityMasterProcess backfillCommodityMasterProcess;
+                    if (changeSet.Update.TryGetValue(key, out backfillCommodityMasterProcess))
                     {
                         // Generally use a mapper?  May not always be the best approach.
-                        Mapper.Map(backfillCodeTableProcess, codetablesProcess);
+                        Mapper.Map(backfillCommodityMasterProcess, commodityMasterProcess);
                     }
                     else
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Unable to process codetable for Driver ID " + codetablesProcess.EmployeeId));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Unable to process commodity master for Driver ID " + commodityMasterProcess.EmployeeId));
                         break;
                     }
 
@@ -128,7 +128,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     // Validate driver id / Get the EmployeeMaster record
                     //
                     EmployeeMaster employeeMaster = Util.Common.GetEmployee(dataService, settings, userCulture, userRoleIds,
-                                                    codetablesProcess.EmployeeId, out fault);
+                                                    commodityMasterProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -136,15 +136,15 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     }
                     if (employeeMaster == null)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Driver ID " + codetablesProcess.EmployeeId));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Driver ID " + commodityMasterProcess.EmployeeId));
                         break;
                     }
 
                     //
-                    // Lookup Preference: DEFUseContainerLevel
+                    // Lookup Preference: DEFSendMasterCommodities
                     //
-                    string prefUseContainerLevel = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
-                                                   employeeMaster.TerminalId, PrefDriverConstants.DEFUseContainerLevel, out fault);
+                    string prefSendMasterCommodities = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                    employeeMaster.TerminalId, PrefDriverConstants.DEFSendMasterCommodities, out fault);
                     if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -152,18 +152,12 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     }
                     // Lookup container changes.  
                     //
-                    List<CodeTable> codetables = new List<CodeTable>();
-                    if (prefUseContainerLevel == Constants.Yes)
+                    List<CommodityMaster> commoditymasters = new List<CommodityMaster>();
+                    if (prefSendMasterCommodities == Constants.Yes)
                     {
                         //This query includes container level
-                        codetables = Util.Common.GetAllCodeTablesIncLevelForDriver(dataService, settings, userCulture, userRoleIds,
-                                        employeeMaster.RegionId, out fault);
-                    }
-                    else
-                    {
-                        //This query does not include container level
-                        codetables = Util.Common.GetAllCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
-                                        employeeMaster.RegionId, out fault);
+                        commoditymasters = Util.Common.GetMasterCommoditiesForDriver(dataService, settings, userCulture, userRoleIds,
+                                            out fault);
                     }
                     if (fault != null)
                     {
@@ -171,17 +165,11 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         break;
                     }
                     //For testing
-                    foreach (CodeTable codetable in codetables)
+                    foreach (CommodityMaster commoditymaster in commoditymasters)
                     {
-                        Console.WriteLine(string.Format("{0}\t\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
-                                            codetable.CodeName,
-                                            codetable.CodeValue,
-                                            codetable.CodeDisp1,
-                                            codetable.CodeDisp2,
-                                            codetable.CodeDisp3,
-                                            codetable.CodeDisp4,
-                                            codetable.CodeDisp5,
-                                            codetable.CodeDisp6));
+                        Console.WriteLine(string.Format("{0}\t{1}",
+                                            commoditymaster.CommodityCode,
+                                            commoditymaster.CommodityDesc));
                     }
                 }
             }
@@ -213,4 +201,3 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         }
     }
 }
-
