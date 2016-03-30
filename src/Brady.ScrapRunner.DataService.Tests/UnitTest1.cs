@@ -1,14 +1,7 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.Remoting.Channels;
-using Brady.ScrapRunner.Domain;
+﻿using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
-using BWF.DataServices.Domain.Models;
 using BWF.DataServices.PortableClients;
-using BWF.DataServices.PortableClients.Builder;
-using BWF.DataServices.PortableClients.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudio.TestTools.UnitTesting.Web;
 
 namespace Brady.ScrapRunner.DataService.Tests
 {
@@ -84,6 +77,7 @@ namespace Brady.ScrapRunner.DataService.Tests
                 .And().Property(x2 => x2.TerminalId).EqualTo(terminalid));
             Assert.AreEqual("EmployeeMasters?$filter=SecurityLevel!='DR' and AllowMessaging='Y' and TerminalId='FOO'", qb.GetQuery());
 
+            // Simple explicit parenthesis
             var qb2 = new QueryBuilder<CodeTable>();
             qb2.Filter(ct => ct.Property(p => p.CodeName).EqualTo(CodeTableNameConstants.DelayCodes)
                     .And().Parenthesis(paren => paren.Property(p => p.CodeDisp5)
