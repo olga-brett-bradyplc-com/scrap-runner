@@ -10,6 +10,10 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTableProcess"
         },
         {
+          "text": "CommodityMasterProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CommodityMasterProcess"
+        },
+        {
           "text": "ContainerChangeProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChangeProcess"
         },

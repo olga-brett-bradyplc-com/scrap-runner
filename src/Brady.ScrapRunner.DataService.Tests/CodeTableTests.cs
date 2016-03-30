@@ -10,6 +10,8 @@ using BWF.DataServices.PortableClients.Builder;
 using BWF.DataServices.PortableClients.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Brady.ScrapRunner.DataService.Tests
 {
@@ -120,9 +122,20 @@ namespace Brady.ScrapRunner.DataService.Tests
 
             string queryString = codeTableQuery.GetQuery();
             QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
+            Console.WriteLine(string.Format("{0}", queryString));
 
-            Console.WriteLine(string.Format("{0}",queryString));
-            foreach (CodeTable codeTableInstance in queryResult.Records)
+            List<CodeTable> codetables = new List<CodeTable>();
+            codetables = queryResult.Records.Cast<CodeTable>().ToList();
+            //Filter the results
+            //If a region id is in the CodeDisp5 field, make sure it matches the region id for the user
+            //Also for reason codes, do not send the reason code SR#
+            var filteredcodetables =
+                from entry in codetables
+                where (entry.CodeDisp5 == regionId || entry.CodeDisp5 == null)
+                && (entry.CodeValue != Constants.NOTAVLSCALREFNO)
+                select entry;
+
+            foreach (CodeTable codeTableInstance in filteredcodetables)
             {
                 Console.WriteLine(string.Format("{0}\t\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
                                     codeTableInstance.CodeName,
