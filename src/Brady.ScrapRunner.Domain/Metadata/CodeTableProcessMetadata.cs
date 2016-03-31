@@ -8,7 +8,7 @@ using BWF.DataServices.Metadata.Fluent.Abstract;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
-    class CodeTableProcessMetadata : TypeMetadataProvider<CodeTableProcess>
+    public class CodeTableProcessMetadata : TypeMetadataProvider<CodeTableProcess>
     {
         public CodeTableProcessMetadata()
         {

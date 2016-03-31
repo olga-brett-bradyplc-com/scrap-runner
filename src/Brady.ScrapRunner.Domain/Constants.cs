@@ -308,7 +308,7 @@
         /// Now that Material Grading will not be included in the redevelopment project, we can use the universal
         /// flag for this purpose.
         /// </summary>
-        public static readonly string DEFSendUniversalCommodities = "DEFSendUniversalCommodities";
+        public static readonly string DEFSendMasterCommodities = "DEFSendMasterCommodities";
 
         /// RECEIPT-RELATED PREFERENCES
         /// <summary>

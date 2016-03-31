@@ -156,7 +156,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     if (prefUseContainerLevel == Constants.Yes)
                     {
                         //This query includes container level
-                        codetables = Util.Common.GetAllCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
+                        codetables = Util.Common.GetAllCodeTablesIncLevelForDriver(dataService, settings, userCulture, userRoleIds,
                                         employeeMaster.RegionId, out fault);
                     }
                     else
