@@ -6,66 +6,71 @@ using BWF.DataServices.Metadata.Interfaces;
 
 namespace Brady.ScrapRunner.Domain.Process
 {
-    //
-    // A DriverLoginProcess (request and response).  A pseudo-record.
-    //
-    // Q1) Are these named special to indicate In/Out or Req/Resp nature of pseudo-record
-    // Q2) Is Mdtid needed for phones?  Or null Or "Phone"?
-    // Q3) Is PndVer needed for phones?  Or null Or "Phone"?
-    // Q4) What is overrideflag and how is it used or updated during login?
+    ///
+    /// A DriverLoginProcess (request and response).
+    ///
     public class DriverLoginProcess : IHaveId<string>, IEquatable<DriverLoginProcess>
     {
-
         public virtual string EmployeeId { get; set; }
+
         public virtual string Password { get; set; }
+
         public virtual string PowerId { get; set; }
+
         public virtual int Odometer { get; set; }
-        // Here for now, possibly break out as separate call
-        public virtual string CodeListVersion { get; set; }
-        // Here for now, probably break out as separate call
-        public virtual DateTime? LastContainerMasterUpdate { get; set; }
-        // Here for now, possibly break out as separate call
-        public virtual DateTime? LastTerminalMasterUpdate { get; set; }
-        // Eg: 1033 = English, USA
-        //     2058 = Spanish, Mexico
-        // Is this a device preference or could it be a user preference (membership?)
+
+        /// TODO: Q: Is this really a device preference or could/should it be a user preference perhaps via membership?
+        /// Eg: 1033 = English, USA
+        ///     2058 = Spanish, Mexico
         public virtual string LocaleCode { get; set; }
-        // How is this used?
+
+        /// <summary>Set this to Y if driver has double checked Odometer and is resubmitting</summary>
         public virtual string OverrideFlag { get; set; }
 
-        // Initially null Or "Phone"?
+        /// TODO: Q: Is Mdtid needed for phones?  Initially null Or "Phone"?
         public virtual string Mdtid { get; set; }
-        // Initially null
+
+        /// Initially null
         public virtual string TermId { get; set; }
-        // Initially null
+
+        /// Initially null
         public virtual string RegionId { get; set; }
-        // Initially null
+        
+        /// Initially null
         public virtual string AreaId { get; set; }
-        // Initially null Or "Phone"?
+
+        /// <summary>PndVer is a client version number for the handheld.  Typically used for logging issues.</summary>
+        /// TODO: We'll need something similar for phones
         public virtual string PndVer { get; set; }
-        // Initially null
+
+        /// Initially null
         public virtual string TripNumber { get; set; }
-        // Initially null
+
+        /// Initially null
         public virtual string TripSegNumber { get; set; }
-        // Initially null
+
+        /// Initially null
         public virtual string DriverStatus { get; set; }
-        // LoginDateTime form hand held.  Initially null?  Why shoud we trust the client?
+        
+        /// The LoginDateTime from the phone.  (Q: Why shoud we trust the client or whe do we backfill on server side?)
         public virtual DateTime? LoginDateTime { get; set; }
 
-        //Either in this Message or a separate call
+        //Login Step 14) Send container master updates.  Not implemented see ContainerMasterProcess.
+        //public virtual DateTime? LastContainerMasterUpdate { get; set; }
         //public virtual List<ContainerMasterLite> ContainerMasters { get; set; }
 
-        //Either in this Message or a separate call
+        //Login Step 15) Send terminal master updates.  Not implemented see TerminalMasterProcess.
+        //public virtual DateTime? LastTerminalMasterUpdate { get; set; }
         //public virtual List<TermainalMasterLite> TerminalMasters { get; set; }
 
-        //Either in this Message or a separate call
+        //Login Step 16) Send Universal Commodities.  Not implemented see UniversalCommoditiesProcess.
         //public virtual List<CommodityMasterLite> UniversalCommodities { get; set; }
 
-        //For now in this Message
-        public virtual List<Preference> Preferences { get; set; }
+        //Login Step 17): Send Preferences.  Not implemented see PreferencesProcess.
+        //public virtual List<Preference> Preferences { get; set; }
 
-        //For now in this Message
-        public virtual List<CodeTable> CodeTables { get; set; }
+        //Login step?
+        //public virtual List<CodeTable> CodeTables { get; set; }
 
         // 19) Send Trips (common processing)
         // a.Send the Commodities and Locations for each unique customer host code.
@@ -128,9 +133,6 @@ namespace Brady.ScrapRunner.Domain.Process
             sb.Append(", Password: " + Password);
             sb.Append(", PowerId:" + PowerId);
             sb.Append(", Odometer:" + Odometer);
-            sb.Append(", CodeListVersion:" + CodeListVersion);
-            sb.Append(", LastContainerMasterUpdate:" + LastContainerMasterUpdate);
-            sb.Append(", LastTerminalMasterUpdate:" + LastTerminalMasterUpdate);
             sb.Append(", LocaleCode:" + LocaleCode);
             sb.Append(", OverrideFlag:" + OverrideFlag);
             sb.Append(", Mdtid: " + Mdtid);

@@ -22,9 +22,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.PowerId);
             IntegerProperty(x => x.Odometer);
             TimeProperty(x => x.LoginDateTime);
-            StringProperty(x => x.CodeListVersion);
-            TimeProperty(x => x.LastContainerMasterUpdate);
-            TimeProperty(x => x.LastTerminalMasterUpdate);
             StringProperty(x => x.LocaleCode);
             StringProperty(x => x.OverrideFlag);
             StringProperty(x => x.Mdtid);
@@ -42,9 +39,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.PowerId)
             .Property(x => x.Odometer)
             .Property(x => x.LoginDateTime)
-            .Property(x => x.CodeListVersion)
-            .Property(x => x.LastContainerMasterUpdate)
-            .Property(x => x.LastTerminalMasterUpdate)
             .Property(x => x.LocaleCode)
             .Property(x => x.OverrideFlag)
             .Property(x => x.Mdtid)

@@ -24,13 +24,25 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 {
 
     /// <summary>
-    /// The process for logging in a driver.
+    /// The process for logging in a driver.  Call this process "withoutrequery".
     /// </summary>
+    /// 
+    /// Note this processes is relatively independent of the "trivial" backing query and results
+    /// are simply built up in memory.  As such, make this service call using the form of 
+    /// PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery
+    /// 
+    /// cURL example: 
+    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/DriverLoginProcess/001/withoutrequery
+    /// Portable Client example: 
+    ///     var updateResult = client.UpdateAsync(itemToUpdate, requeryUpdated:false).Result;
+    ///  
+    /// This mode will prevent the Nancy.DataServiceModule from issuing an automatic re-retrieve via getSingleAsync() 
+    /// within the postSingleAsync().  These re-retrieves of a trival query clobber our post-processed ChangeSetResult
+    /// in memory.
     [EditAction("DriverLoginProcess")]
     public class DriverLoginProcessRecordType : ChangeableRecordType
         <DriverLoginProcess, string, DriverLoginProcessValidator, DriverLoginProcessDeletionValidator>
     {
-
 
         /// <summary>
         /// The obligatory abstract function implementation
@@ -71,7 +83,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
             ISession session = null;
             ITransaction transaction = null;
-            ChangeSetResult<string> scratchChangeSetResult;
 
             // If session isn't passed in and changes are being persisted
             // then open a new session
@@ -101,6 +112,9 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
                         DataServiceFault fault;
                         string msgKey = key;
+                        ChangeSetResult<string> scratchChangeSetResult;
+                        int powerHistoryInsertCount = 0;
+                        int driverHistoryInsertCount = 0;
 
                         // TODO: determine these on a case by case basis.
                         string userCulture = "en-GB";
@@ -112,10 +126,10 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         if (changeSet.Update.TryGetValue(key, out backfillDriverLoginProcess))
                         {
                             // Use a mapper?  This might not always be the best approach.  
-                            // But these are static, can I set this to map a subset?
+                            // And these are static!  Can I set this to map a subset?
                             Mapper.Map(backfillDriverLoginProcess, driverLoginProcess);
 
-                            // OR do I just simply bsckfill the minimalist set?
+                            // OR do I just simply backfill the minimalist set?
                             //driverLoginProcess.CodeListVersion = backfillDriverLoginProcess.CodeListVersion;
                             //driverLoginProcess.LastContainerMasterUpdate = backfillDriverLoginProcess.LastContainerMasterUpdate;
                             //driverLoginProcess.LastTerminalMasterUpdate = backfillDriverLoginProcess.LastTerminalMasterUpdate;
@@ -263,7 +277,8 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                             }
 
                             // Add PowerHistory
-                            if (!InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, userRoleIds,
+                            if (!InsertPowerHistory(dataService, settings, powerMaster, employeeMaster,
+                                ++powerHistoryInsertCount, userRoleIds,
                                 userCulture, out fault))
                             {
                                 if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
@@ -421,7 +436,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                                 var trip = (Trip) queryResult.Records.Cast<Trip>().FirstOrNull();
                                 if (null == trip)
                                 {
-                                    // TODO:  What if null?  Hard Error
+                                    // TODO:  What if null?  Hard Error?
                                 }
                                 trip.TripInProgressFlag = Constants.No;
                                 var tripRecordType = (TripRecordType) dataService.RecordTypes.Single(x => x.TypeName == "Trip");
@@ -492,8 +507,8 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                 break;
                             }
-                            if (!InsertDriverHistory(dataService, settings, employeeMaster, driverStatus, userRoleIds,
-                                userCulture, out fault))
+                            if (!InsertDriverHistory(dataService, settings, employeeMaster, driverStatus, 
+                                ++driverHistoryInsertCount, userRoleIds, userCulture, out fault))
                             {
                                 if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
                                 {
@@ -575,8 +590,8 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         }
 
                         // 13) Add record for PowerHistory table
-                        if (!InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, userRoleIds,
-                                userCulture, out fault))
+                        if (!InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, 
+                                ++powerHistoryInsertCount, userRoleIds, userCulture, out fault))
                         {
                             if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
                             {
@@ -681,26 +696,29 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             return faultDetected;
         }
 
-    
+
         /// <summary>
         /// Insert a PowerHistory record.
-        //  Note:  caller must handle faults.  E.G. if( handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
+        ///  Note:  caller must handle faults.  E.G. if( handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="powerMaster"></param>
         /// <param name="employeeMaster"></param>
+        /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         private bool InsertPowerHistory(IDataService dataService, ProcessChangeSetSettings settings,
-            PowerMaster powerMaster, EmployeeMaster employeeMaster,
+            PowerMaster powerMaster, EmployeeMaster employeeMaster, int callCountThisTxn,
             IEnumerable<long> userRoleIdsEnumerable, string userCulture, out DataServiceFault fault)
         {
             List<long> userRoleIds = userRoleIdsEnumerable.ToList();
 
             // i) Next Sequential for PowerNumber
+            // Note this is a commited snapshot read, a not dirty value, thus we have to keep do our own bookkeeping
+            // to support multiple inserts in one txn: callCountThisTxn
             Query query = new Query
             {
                 // "PowerHistorys?$filter= PowerId='{0}' &$orderby=PowerSeqNumber desc", powerMaster.PowerId
@@ -714,11 +732,11 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             {
                 return false;
             }
-            int powerSeqNo = 1;
+            int powerSeqNo = callCountThisTxn;
             var powerHistoryMax = (PowerHistory) queryResult.Records.Cast<PowerHistory>().FirstOrNull();
             if (powerHistoryMax != null)
             {
-                powerSeqNo = 1 + powerHistoryMax.PowerSeqNumber;
+                powerSeqNo = powerHistoryMax.PowerSeqNumber + callCountThisTxn;
             }
 
             // ii) Power Cust Type Desc
@@ -885,18 +903,19 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         /// <param name="settings"></param>
         /// <param name="employeeMaster"></param>
         /// <param name="driverStatus"></param>
+        /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         private bool InsertDriverHistory(IDataService dataService, ProcessChangeSetSettings settings,
-            EmployeeMaster employeeMaster, DriverStatus driverStatus,
+            EmployeeMaster employeeMaster, DriverStatus driverStatus, int callCountThisTxn,
             IEnumerable<long> userRoleIdsEnumerable, string userCulture, out DataServiceFault fault)
         {
             List<long> userRoleIds = userRoleIdsEnumerable.ToList();
 
-            // lookup max(DriverHistory.DriverSeqNumber) + 1
-            int driverSeqNo = 1;
+            // Note this is a commited snapshot read, a not dirty value, thus we have to keep do our own bookkeeping
+            // to support multiple inserts in one txn: callCountThisTxn
             var query = new Query
             {
                 //"DriverHistorys?$filter= EmployeeId='{0}' and TripNumber='{1}' &$orderby=DriverSeqNumber desc", employeeMaster.EmployeeId, driverStatus.TripNumber
@@ -911,10 +930,11 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             {
                 return false;
             }
+            int driverSeqNo = callCountThisTxn;
             var driverHistoryMax = (DriverHistory) queryResult.Records.Cast<PowerHistory>().FirstOrNull();
             if (driverHistoryMax != null)
             {
-                driverSeqNo = 1 + driverHistoryMax.DriverSeqNumber;
+                driverSeqNo = driverHistoryMax.DriverSeqNumber + callCountThisTxn;
             }
 
             // lookup code DRIVERSTATUS

@@ -21,15 +21,15 @@ using BWF.DataServices.PortableClients;
 namespace Brady.ScrapRunner.DataService.RecordTypes
 {
     /// <summary>
-    /// Get the relevant client container changes for the driver based on the last action date.  
-    /// Note this our business processes is relatively independent of the "trivial" backing query.  
-    /// As such, we temporarily need to invoke this
-    /// service call using the form Put["/{dataServiceName}/{typeName}/{id}/withoutpersistance", true]
-    /// (example: PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/ContainerChangeProcess/001/withoutpersistance) 
-    /// this will prevent the Nancy.DataServiceModule from issuing an automatic re-retrieve 
-    /// (getSingleAsync()) within the postSingleAsync().   This re-retrieve of a trival query clobbers our post-processed 
-    /// ChangeSetResult
+    /// Get the relevant client container changes for the driver based on the last action date.  Call this process "withoutrequery". 
     /// </summary>
+    ///
+    /// Call this service using the form PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery
+    /// cURL example: 
+    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/ContainerChangeProcess/001/withoutrequery 
+    /// Portable Client example: 
+    ///     var updateResult = client.UpdateAsync(itemToUpdate, requeryUpdated:false).Result;
+    ///  
     [EditAction("ContainerChangeProcess")]
     public class ContainerChangeProcessRecordType : ChangeableRecordType
             <ContainerChangeProcess, string, ContainerChangeProcessValidator, ContainerChangeProcessDeletionValidator>
@@ -40,13 +40,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         public override void ConfigureMapper()
         {
             Mapper.CreateMap<ContainerChangeProcess, ContainerChangeProcess>();
-
-            // Note should we ever need to map the nested child list too, 
-            // we would need to be more explicit.  see also: 
-            // http://stackoverflow.com/questions/9394833/automapper-with-nested-child-list
-            // Mapper.CreateMap<ContainerChangeProcess, ContainerChangeProcess>()
-            //    .ForMember(dest => dest.ContainerChange, opts => opts.MapFrom(src => src.ContainerChange));
-            // Mapper.CreateMap<ContainerChange, ContainerChange>();
         }
 
         /// <summary>
@@ -64,6 +57,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+   
         /// <summary>
         /// This is the "real" method implementation.
         /// </summary>
@@ -168,7 +162,13 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    //For testing
+
+                    // Don't forget to actually backfill the ContainerProcess object contained within 
+                    // the ChangeSetResult that exits this method and is returned to the caller.
+                    containersProcess.Containers = containerchanges;
+
+                    // For testing?  That what Integration Tests are for.   Console tests are unreliable.
+                    // Why not just log this at trace level?  Then you don't have to remember go back and clean this out.
                     //foreach (ContainerChange container in containerchanges)
                     //{
                     //    Console.WriteLine(container.ContainerNumber);
