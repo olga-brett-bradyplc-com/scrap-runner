@@ -257,7 +257,7 @@
     <Compile Include="RecordTypes\CommodityMasterProcessRecordType.cs" />
     <Compile Include="RecordTypes\ContainerChangeProcessRecordType.cs" />
     <Compile Include="RecordTypes\PreferencesProcessRecordType.cs" />
-    <Compile Include="RecordTypes\DriverLoginProcessRecordType.cs" />
+    <Compile Include="ProcessTypes\DriverLoginProcessRecordType.cs" />
     <Compile Include="RecordTypes\MessagesRecordType.cs" />
     <Compile Include="RecordTypes\TerminalChangeProcessRecordType.cs" />
     <Compile Include="RecordTypes\TripInfoProcessRecordType.cs" />
