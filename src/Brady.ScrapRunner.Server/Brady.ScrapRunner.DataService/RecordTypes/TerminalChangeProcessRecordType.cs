@@ -17,6 +17,7 @@ using BWF.DataServices.Metadata.Models;
 using NHibernate;
 using NHibernate.Util;
 using BWF.DataServices.PortableClients;
+using System.Diagnostics;
 
 namespace Brady.ScrapRunner.DataService.RecordTypes
 {
@@ -121,7 +122,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     // Validate driver id / Get the EmployeeMaster record
                     //
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployee(dataService, settings, userCulture, userRoleIds,
+                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   terminalsProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -169,9 +170,10 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
                     // For testing?  That what Integration Tests are for.   Console tests are unreliable.
                     // Why not just log this at trace level?  Then you don't have to remember go back and clean this out.
+                    // For testing. Using debug.
                     foreach (TerminalChange terminal in terminalchanges)
                     {
-                        Console.WriteLine(terminal.TerminalId);
+                        Debug.WriteLine(terminal.TerminalId);
                     }              
                 }
             }

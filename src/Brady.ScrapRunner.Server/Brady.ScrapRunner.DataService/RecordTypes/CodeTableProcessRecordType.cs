@@ -15,6 +15,7 @@ using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using NHibernate;
+using System.Diagnostics;
 
 namespace Brady.ScrapRunner.DataService.RecordTypes
 {
@@ -120,7 +121,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     // Validate driver id / Get the EmployeeMaster record
                     //
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployee(dataService, settings, userCulture, userRoleIds,
+                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                     codetablesProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -168,11 +169,12 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     // the ChangeSetResult that exits this method and is returned to the caller.
                     codetablesProcess.CodeTables = codetables;
 
-                    // For testing?  That what Integration Tests are for.  Console tests are unreliable.
+                    // For testing?  That what Integration Tests are for.   Console tests are unreliable.
                     // Why not just log this at trace level?  Then you don't have to remember go back and clean this out.
+                    // For testing. Using debug.
                     foreach (CodeTable codetable in codetables)
                     {
-                        Console.WriteLine(string.Format("{0}\t\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
+                        Debug.WriteLine(string.Format("{0}\t\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
                                             codetable.CodeName,
                                             codetable.CodeValue,
                                             codetable.CodeDisp1,
