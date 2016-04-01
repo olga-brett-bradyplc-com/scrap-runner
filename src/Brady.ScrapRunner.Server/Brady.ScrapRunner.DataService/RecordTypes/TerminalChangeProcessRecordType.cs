@@ -170,6 +170,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
                     // For testing?  That what Integration Tests are for.   Console tests are unreliable.
                     // Why not just log this at trace level?  Then you don't have to remember go back and clean this out.
+                    // For testing. Using debug.
                     foreach (TerminalChange terminal in terminalchanges)
                     {
                         Debug.WriteLine(terminal.TerminalId);
