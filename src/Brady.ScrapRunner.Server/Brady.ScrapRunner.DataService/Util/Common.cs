@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Brady.ScrapRunner.DataService.RecordTypes;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
-using Brady.ScrapRunner.DataService.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
@@ -22,7 +21,6 @@ namespace Brady.ScrapRunner.DataService.Util
     /// </summary>
     public class Common
     {
-
 
         /// <summary>
         /// Return "LastName, FirstName" or as much as possible from the provided EmployeeMaster object.
@@ -46,7 +44,6 @@ namespace Brady.ScrapRunner.DataService.Util
             return driverName;
         }
 
-
         /// <summary>
         /// Log an entry into the specified logger if a fault is detected.
         /// </summary>
@@ -64,7 +61,6 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return faultDetected;
         }
-
 
         /// <summary>
         /// Log an entry into the specified logger for every detected failure within a changeSetResult.
@@ -100,13 +96,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 foreach (string key in changeSetResult.FailedDeletions.Keys)
                 {
                     var failedChange = changeSetResult.GetFailedDeleteForId(key);
-                    //log.ErrorFormat("ChangeSet delete error occured.  Summary: {0} during request: {1}", failedChange.Summary, requestObject);
                     log.ErrorFormat("ChangeSet delete error occured: {0}, Request object: {1}", failedChange, requestObject);
                 }
             }
             return errorsDetected;
         }
-
 
         /// <summary>
         /// Update a PowerMaster record.
@@ -124,7 +118,6 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-
 
         /// <summary>
         /// Update a DriverStatus record.
@@ -186,6 +179,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return terminals;
         }
+
         /// CODETABLE Table queries
         /// <summary>
         /// Get a list of all codetable values that are sent to the driver at login.
@@ -202,6 +196,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="settings"></param>
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if driverId is null</returns>
         public static List<CodeTable> GetAllCodeTablesForDriver(IDataService dataService, ProcessChangeSetSettings settings,
@@ -240,6 +235,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             return filteredcodetables.Cast<CodeTable>().ToList();
         }
+
         /// CODETABLE Table queries
         /// <summary>
         /// Get a list of all codetable values that are sent to the driver at login.
@@ -256,6 +252,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="settings"></param>
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if driverId is null</returns>
         public static List<CodeTable> GetAllCodeTablesIncLevelForDriver(IDataService dataService, ProcessChangeSetSettings settings,
@@ -306,7 +303,6 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="settings"></param>
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
-        /// <param name="regionId"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if driverId is null</returns>
         public static List<CodeTable> GetContainerLevelCodes(IDataService dataService, ProcessChangeSetSettings settings,

@@ -16,25 +16,28 @@ using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using NHibernate;
 using NHibernate.Util;
-using System.Diagnostics;
+using BWF.DataServices.PortableClients;
 
 namespace Brady.ScrapRunner.DataService.RecordTypes
 {
 
     /// <summary>
-    /// Get the relevant client preferences for the driver's terminal.  Note this our business processes 
-    /// is relatively independent of the "trivial" backing query.  As such, we temporarily need to invoke this
-    /// service call using the form Put["/{dataServiceName}/{typeName}/{id}/withoutpersistance", true]
-    /// (example: PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/PreferencesProcess/001/withoutpersistance) 
-    /// this will prevent the Nancy.DataServiceModule from issuing an automatic re-retrieve 
-    /// (getSingleAsync()) within the postSingleAsync().   This re-retrieve of a trival query clobbers our post-processed 
-    /// ChangeSetResult
+    /// Get the relevant client preferences for the driver's terminal.  Call this process "withoutrequery".
     /// </summary>
+    /// 
+    /// Note this processes is relatively independent of the "trivial" backing query and results
+    /// are simply built up in memory.  As such, make this service call using the form of 
+    /// PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery
+    /// 
+    /// cURL example:
+    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/PreferencesProcess/001/withoutrequery
+    /// Portable Client example:
+    ///     var updateResult = client.UpdateAsync(itemToUpdate, requeryUpdated:false).Result;
+    ///  
     [EditAction("PreferencesProcess")]
     public class PreferencesProcessRecordType : ChangeableRecordType
             <PreferencesProcess, string, PreferencesProcessValidator, PreferencesProcessDeletionValidator>
     {
-
 
         /// <summary>
         /// Mandatory implementation of virtual base class method.
@@ -43,7 +46,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         {
             Mapper.CreateMap<PreferencesProcess, PreferencesProcess>();
 
-            // Note should we ever need to map the nested child list too, 
+            // Should we ever need to map the nested child list too, 
             // we would need to be more explicit.  see also: 
             // http://stackoverflow.com/questions/9394833/automapper-with-nested-child-list
             // Mapper.CreateMap<PreferencesProcess, PreferencesProcess>()
@@ -132,13 +135,18 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     // Validate driver id / Get the EmployeeMaster
                     //
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
-                                                  preferencesProcess.EmployeeId, out fault);
-                    if (fault != null)
+                    Query query = new Query()
+                    {
+                        CurrentQuery = new QueryBuilder<EmployeeMaster>()
+                            .Filter(em => em.Property(p => p.EmployeeId).EqualTo(preferencesProcess.EmployeeId)).GetQuery()
+                    };
+                    var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (Util.Common.LogFault(query, fault, log))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
+                    var employeeMaster = (EmployeeMaster) queryResult.Records.Cast<EmployeeMaster>().FirstOrNull();
                     if (employeeMaster == null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Driver ID " + preferencesProcess.EmployeeId));
@@ -148,36 +156,34 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     // Lookup preferences.  
                     //
-                    List<Preference> preferences = new List<Preference>();
-                    preferences = Util.Common.GetPreferenceByTerminal(dataService, settings, userCulture, userRoleIds,
-                                                  employeeMaster.TerminalId,  out fault);
-                    if (fault != null)
+                    query = new Query()
+                    {
+                        CurrentQuery = new QueryBuilder<Preference>()
+                            .Filter(pr => pr.Property(p => p.TerminalId).EqualTo(employeeMaster.TerminalId)).GetQuery()
+                    };
+                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (Util.Common.LogFault(query, fault, log))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    Debug.WriteLine("Employee");
-                    Debug.WriteLine(string.Format("{0}\t{1}\t{2}",
-                                                     employeeMaster.EmployeeId,
-                                                     employeeMaster.TerminalId,
-                                                     employeeMaster.SecurityLevel));
+                    var preferences = queryResult.Records.Cast<Preference>().ToArray();
 
                     //
                     // Lookup TerminalMaster for two "additional" preferences 
                     //
-
-                    TerminalMaster terminalMaster = Util.Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
-                                                  employeeMaster.TerminalId, out fault);
-                    if (fault != null)
+                    query = new Query()
+                    {
+                        CurrentQuery = new QueryBuilder<TerminalMaster>()
+                            .Filter(tm => tm.Property(p => p.TerminalId).EqualTo(employeeMaster.TerminalId)).GetQuery()
+                    };
+                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (Util.Common.LogFault(query, fault, log))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    Debug.WriteLine("Terminal");
-                    Debug.WriteLine(string.Format("{0}\t{1}\t{2}",
-                                                     terminalMaster.TerminalId,
-                                                     terminalMaster.TimeZoneFactor,
-                                                     terminalMaster.DaylightSavings));
+                    var terminalMaster = (TerminalMaster)queryResult.Records.Cast<TerminalMaster>().FirstOrNull();
 
                     //
                     // Filter for the 30some properties of interst.
@@ -244,16 +250,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         });
                     }
                     preferencesProcess.Preferences = preferenceList;
-                    //For testing
-                    Debug.WriteLine("Preferences");
-                    foreach (Preference preference in preferenceList)
-                    {
-                        Debug.WriteLine(string.Format("{0}\t{1}\t{2}",
-                                                         preference.TerminalId,
-                                                         preference.Parameter,
-                                                         preference.ParameterValue));
-                    }
-
                 }
             }
 

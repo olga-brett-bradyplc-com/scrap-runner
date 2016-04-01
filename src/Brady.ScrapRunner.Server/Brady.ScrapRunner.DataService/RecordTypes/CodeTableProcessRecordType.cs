@@ -15,22 +15,21 @@ using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using NHibernate;
-using NHibernate.Util;
-using BWF.DataServices.PortableClients;
-using System.Diagnostics;
 
 namespace Brady.ScrapRunner.DataService.RecordTypes
 {
     /// <summary>
-    /// Get the relevant client code table values for the driver.  
-    /// Note this our business processes is relatively independent of the "trivial" backing query.  
-    /// As such, we temporarily need to invoke this
-    /// service call using the form Put["/{dataServiceName}/{typeName}/{id}/withoutpersistance", true]
-    /// (example: PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/CodeTableChangeProcess/001/withoutpersistance) 
-    /// this will prevent the Nancy.DataServiceModule from issuing an automatic re-retrieve 
-    /// (getSingleAsync()) within the postSingleAsync().   This re-retrieve of a trival query clobbers our post-processed 
-    /// ChangeSetResult
+    /// Get the relevant client code table values for the driver.  Call this process "withoutrequery".
     /// </summary>
+    /// 
+    /// Note this our business processes is relatively independent of the "trivial" backing query.  
+    /// call using the form PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery"
+    /// 
+    /// cURL example: 
+    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/CodeTableChangeProcess/001/withoutrequery
+    /// Portable Client example: 
+    ///     var updateResult = client.UpdateAsync(itemToUpdate, requeryUpdated:false).Result;
+    ///  
     [EditAction("CodeTableProcess")]
     public class CodeTableProcessRecordType : ChangeableRecordType
                 <CodeTableProcess, string, CodeTableProcessValidator, CodeTableProcessDeletionValidator>
@@ -41,13 +40,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         public override void ConfigureMapper()
         {
             Mapper.CreateMap<CodeTableProcess, CodeTableProcess>();
-
-            // Note should we ever need to map the nested child list too, 
-            // we would need to be more explicit.  see also: 
-            // http://stackoverflow.com/questions/9394833/automapper-with-nested-child-list
-            // Mapper.CreateMap<CodeTableProcess, CodeTableProcess>()
-            //    .ForMember(dest => dest.CodeTable, opts => opts.MapFrom(src => src.CodeTable));
-            // Mapper.CreateMap<CodeTable, CodeTable>();
         }
 
         /// <summary>
@@ -128,7 +120,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     // Validate driver id / Get the EmployeeMaster record
                     //
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    EmployeeMaster employeeMaster = Util.Common.GetEmployee(dataService, settings, userCulture, userRoleIds,
                                                     codetablesProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -171,10 +163,16 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    //For testing
+
+                    // Don't forget to actually backfill the CodeTableProcess object contained within 
+                    // the ChangeSetResult that exits this method and is returned to the caller.
+                    codetablesProcess.CodeTables = codetables;
+
+                    // For testing?  That what Integration Tests are for.  Console tests are unreliable.
+                    // Why not just log this at trace level?  Then you don't have to remember go back and clean this out.
                     foreach (CodeTable codetable in codetables)
                     {
-                        Debug.WriteLine(string.Format("{0}\t\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
+                        Console.WriteLine(string.Format("{0}\t\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
                                             codetable.CodeName,
                                             codetable.CodeValue,
                                             codetable.CodeDisp1,

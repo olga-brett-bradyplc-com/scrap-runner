@@ -22,15 +22,15 @@ using System.Diagnostics;
 namespace Brady.ScrapRunner.DataService.RecordTypes
 {
     /// <summary>
-    /// Get the relevant client code table values for the driver.  
-    /// Note this our business processes is relatively independent of the "trivial" backing query.  
-    /// As such, we temporarily need to invoke this
-    /// service call using the form Put["/{dataServiceName}/{typeName}/{id}/withoutpersistance", true]
-    /// (example: PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/CommodityMasterChangeProcess/001/withoutpersistance) 
-    /// this will prevent the Nancy.DataServiceModule from issuing an automatic re-retrieve 
-    /// (getSingleAsync()) within the postSingleAsync().   This re-retrieve of a trival query clobbers our post-processed 
-    /// ChangeSetResult
+    /// Get the relevant client code table values for the driver.    Call this process "withoutrequery".
     /// </summary>
+    /// 
+    /// Call using the form PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery
+    /// cURL example: 
+    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/CommodityMasterChangeProcess/001/withoutrequery
+    /// Portable Client example: 
+    ///     var updateResult = client.UpdateAsync(itemToUpdate, requeryUpdated:false).Result;
+    /// 
     [EditAction("CommodityMasterProcess")]
     public class CommodityMasterProcessRecordType : ChangeableRecordType
                 <CommodityMasterProcess, string, CommodityMasterProcessValidator, CommodityMasterProcessDeletionValidator>
@@ -41,13 +41,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         public override void ConfigureMapper()
         {
             Mapper.CreateMap<CommodityMasterProcess, CommodityMasterProcess>();
-
-            // Note should we ever need to map the nested child list too, 
-            // we would need to be more explicit.  see also: 
-            // http://stackoverflow.com/questions/9394833/automapper-with-nested-child-list
-            // Mapper.CreateMap<CommodityMasterProcess, CommodityMasterProcess>()
-            //    .ForMember(dest => dest.CommodityMaster, opts => opts.MapFrom(src => src.CommodityMaster));
-            // Mapper.CreateMap<CommodityMaster, CommodityMaster>();
         }
 
         /// <summary>
@@ -65,6 +58,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+
         /// <summary>
         /// This is the "real" method implementation.
         /// </summary>
@@ -165,7 +159,13 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    //For testing
+
+                    // Don't forget to actually backfill the CommodityMasterProcess object contained within 
+                    // the ChangeSetResult that exits this method and is returned to the caller.
+                    commodityMasterProcess.CommodityMasters = commoditymasters;
+
+                    // For testing?  That what Integration Tests are for.   Console tests are unreliable.
+                    // Why not just log this at trace level?  Then you don't have to remember go back and clean this out.
                     foreach (CommodityMaster commoditymaster in commoditymasters)
                     {
                         Debug.WriteLine(string.Format("{0}\t{1}",
