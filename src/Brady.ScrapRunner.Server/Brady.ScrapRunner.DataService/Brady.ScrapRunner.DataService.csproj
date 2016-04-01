@@ -237,6 +237,7 @@
     <Compile Include="Mappings\DriverStatusMap.cs" />
     <Compile Include="Mappings\EmployeeMasterMap.cs" />
     <Compile Include="Mappings\PowerMasterMap.cs" />
+    <Compile Include="Mappings\TripInfoProcessMap.cs" />
     <Compile Include="Mappings\TripPointsMap.cs" />
     <Compile Include="Mappings\TripReferenceNumberMap.cs" />
     <Compile Include="Mappings\TripSegmentContainerMap.cs" />
@@ -259,6 +260,7 @@
     <Compile Include="RecordTypes\DriverLoginProcessRecordType.cs" />
     <Compile Include="RecordTypes\MessagesRecordType.cs" />
     <Compile Include="RecordTypes\TerminalChangeProcessRecordType.cs" />
+    <Compile Include="RecordTypes\TripInfoProcessRecordType.cs" />
     <Compile Include="RecordTypes\TripPointsRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentImageRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentTimeContainerRecordType.cs" />
@@ -406,6 +408,8 @@
     <Compile Include="RecordTypes\PreferenceRecordType.cs" />
     <Compile Include="Validators\EmployeeMasterDeletionValidator.cs" />
     <Compile Include="Validators\EmployeeMasterValidator.cs" />
+    <Compile Include="Validators\TripInfoProcessDeletionValidator.cs" />
+    <Compile Include="Validators\TripInfoProcessValidator.cs" />
     <Compile Include="Validators\TripPointsDeletionValidator.cs" />
     <Compile Include="Validators\TripPointsValidator.cs" />
     <Compile Include="Validators\TripReferenceNumberDeletionValidator.cs" />

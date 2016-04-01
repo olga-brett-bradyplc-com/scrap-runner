@@ -28,6 +28,10 @@
         {
           "text": "TerminalChangeProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TerminalChangeProcess"
+        },
+        {
+          "text": "TripInfoProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripInfoProcess"
         }
       ]
     },

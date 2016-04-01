@@ -57,6 +57,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new TerminalChangeMetadata()
                   , new TerminalChangeProcessMetadata()
                   , new TerminalMasterMetadata()
+                  , new TripInfoProcessMetadata()
                   , new TripMetadata()
                   , new TripPointsMetadata()
                   , new TripReferenceNumberMetadata()

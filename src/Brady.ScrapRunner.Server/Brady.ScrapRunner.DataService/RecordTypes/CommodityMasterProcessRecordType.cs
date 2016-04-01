@@ -17,6 +17,7 @@ using BWF.DataServices.Metadata.Models;
 using NHibernate;
 using NHibernate.Util;
 using BWF.DataServices.PortableClients;
+using System.Diagnostics;
 
 namespace Brady.ScrapRunner.DataService.RecordTypes
 {
@@ -127,7 +128,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     // Validate driver id / Get the EmployeeMaster record
                     //
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployee(dataService, settings, userCulture, userRoleIds,
+                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                     commodityMasterProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -167,7 +168,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //For testing
                     foreach (CommodityMaster commoditymaster in commoditymasters)
                     {
-                        Console.WriteLine(string.Format("{0}\t{1}",
+                        Debug.WriteLine(string.Format("{0}\t{1}",
                                             commoditymaster.CommodityCode,
                                             commoditymaster.CommodityDesc));
                     }

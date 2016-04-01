@@ -89,6 +89,7 @@
     <Compile Include="Metadata\PowerMasterMetadata.cs" />
     <Compile Include="Metadata\PreferenceMetadata.cs" />
     <Compile Include="Metadata\SRMetadataBundle.cs" />
+    <Compile Include="Metadata\TripInfoProcessMetadata.cs" />
     <Compile Include="Metadata\TripPointsMetadata.cs" />
     <Compile Include="Metadata\TripReferenceNumberMetadata.cs" />
     <Compile Include="Metadata\TripSegmentContainerMetadata.cs" />
@@ -165,6 +166,7 @@
     <Compile Include="Process\DriverLoginProcess.cs" />
     <Compile Include="Process\PreferencesProcess.cs" />
     <Compile Include="Process\TerminalChangeProcess.cs" />
+    <Compile Include="Process\TripInfoProcess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Enums\TripSendReseqFlagValue.cs" />
   </ItemGroup>

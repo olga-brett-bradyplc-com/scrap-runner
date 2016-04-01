@@ -11,6 +11,7 @@ using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.PortableClients;
 using log4net;
+using Brady.ScrapRunner.Domain.Enums;
 
 namespace Brady.ScrapRunner.DataService.Util
 {
@@ -449,7 +450,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="userRoleIds"></param>
         /// <param name="dateTime"></param>
         /// <param name="fault"></param>
-        /// <returns>An empty list if driverId is null</returns>
+        /// <returns>An empty list if dateTime is null</returns>
         public static List<ContainerChange> GetContainerChanges(IDataService dataService, ProcessChangeSetSettings settings,
              string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, out DataServiceFault fault)
         {
@@ -486,13 +487,13 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="dateTime"></param>
         /// <param name="regionId"></param>
         /// <param name="fault"></param>
-        /// <returns>An empty list if driverId is null</returns>
+        /// <returns>An empty list if dateTime or regionId is null</returns>
         public static List<ContainerChange> GetContainerChangesByRegion(IDataService dataService, ProcessChangeSetSettings settings,
              string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, string regionId, out DataServiceFault fault)
         {
             fault = null;
             List<ContainerChange> containers = new List<ContainerChange>();
-            if (null != dateTime)
+            if (null != dateTime && regionId != null)
             {
                 Query query = new Query
                 {
@@ -511,7 +512,41 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return containers;
         }
-
+        /// DRIVER Table and driver-related queries
+        /// <summary>
+        ///  Get an driver status record from the DriverStatus
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null</returns>
+        public static DriverStatus GetDriverStatus(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string driverId, out DataServiceFault fault)
+        {
+            fault = null;
+            DriverStatus driver = new DriverStatus();
+            if (null != driverId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<DriverStatus>()
+                         .Filter(t => t.Property(p => p.EmployeeId).EqualTo(driverId))
+                         .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return driver;
+                }
+                driver = (DriverStatus)queryResult.Records.Cast<DriverStatus>().FirstOrDefault();
+            }
+            return driver;
+        }
         /// EMPLOYEEMASTER Table queries
         /// <summary>
         ///  Get an employee record from the EmployeeMaster
@@ -547,7 +582,112 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return employee;
         }
-
+        /// EMPLOYEEMASTER Table queries
+        /// <summary>
+        ///  Get an employee record from the EmployeeMaster for a driver
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="employeeId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if employeeId is null</returns>
+        public static EmployeeMaster GetEmployeeDriver(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string employeeId, out DataServiceFault fault)
+        {
+            fault = null;
+            EmployeeMaster employee = new EmployeeMaster();
+            if (null != employeeId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<EmployeeMaster>()
+                         .Filter(t => t.Property(p => p.EmployeeId).EqualTo(employeeId)
+                        .And().Property(x => x.SecurityLevel).EqualTo(SecurityLevelConstants.Driver))
+                         .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return employee;
+                }
+                employee = (EmployeeMaster)queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
+            }
+            return employee;
+        }
+        /// POWERMASTER Table queries
+        /// <summary>
+        ///  Get a a power master record for a given power unit.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="powerId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if powerId is null</returns>
+        public static PowerMaster GetPowerUnit(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string powerId, out DataServiceFault fault)
+        {
+            fault = null;
+            PowerMaster powerunit = new PowerMaster();
+            if (null != powerId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<PowerMaster>()
+                    .Filter(y => y.Property(x => x.PowerId).EqualTo(powerId))
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return powerunit;
+                }
+                powerunit = (PowerMaster)queryResult.Records.Cast<PowerMaster>().FirstOrDefault();
+            }
+            return powerunit;
+        }
+        /// POWERMASTER Table queries
+        /// <summary>
+        ///  Get a a power master record for a given power unit.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="powerId"></param>
+        /// <param name="regionId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if powerId or regionId is null</returns>
+        public static PowerMaster GetPowerUnitForRegion(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string powerId, string regionId, out DataServiceFault fault)
+        {
+            fault = null;
+            PowerMaster powerunit = new PowerMaster();
+            if (null != powerId && null != regionId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<PowerMaster>()
+                    .Filter(y => y.Property(x => x.PowerId).EqualTo(powerId)
+                    .And().Property(x => x.PowerRegionId).EqualTo(regionId))
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return powerunit;
+                }
+                powerunit = (PowerMaster)queryResult.Records.Cast<PowerMaster>().FirstOrDefault();
+            }
+            return powerunit;
+        }
         /// PREFERENCE Table queries
         /// <summary>
         ///  Get a simple list of all preferences for a terminalId.
@@ -559,7 +699,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="userRoleIds"></param>
         /// <param name="terminalId"></param>
         /// <param name="fault"></param>
-        /// <returns>An empty list if termianlId is null</returns>
+        /// <returns>An empty list if terminalId is null</returns>
         public static List<Preference> GetPreferences(IDataService dataService, ProcessChangeSetSettings settings,
              string userCulture, IEnumerable<long> userRoleIds, string terminalId, out DataServiceFault fault)
         {
@@ -628,6 +768,42 @@ namespace Brady.ScrapRunner.DataService.Util
             return parametervalue;
         }
 
+        /// PREFERENCE Table queries
+        /// <summary>
+        ///  Get the preferencse by terminal.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="terminalId"></param>
+        /// <param name="fault"></param>
+        /// <returns>>An empty list if terminalId is null</returns>
+        public static List<Preference> GetPreferenceByTerminal(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string terminalId, out DataServiceFault fault)
+        { 
+            fault = null;
+            List<Preference> preferences = new List<Preference>();
+
+            if (null != terminalId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Preference>()
+                        .Filter(y => y.Property(x => x.TerminalId).EqualTo(terminalId))
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return preferences;
+                }
+
+                preferences = queryResult.Records.Cast<Preference>().ToList();
+            }
+            return preferences;
+        }
         /// TERMINALCHANGE Table queries
         /// <summary>
         ///  Get a list of all terminal master updates after a given date time for a given region.
@@ -640,13 +816,13 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="dateTime"></param>
         /// <param name="regionId"></param>
         /// <param name="fault"></param>
-        /// <returns>An empty list if driverId is null</returns>
+        /// <returns>An empty list if dateTime or regionId is null</returns>
         public static List<TerminalChange> GetTerminalChangesByRegion(IDataService dataService, ProcessChangeSetSettings settings,
              string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, string regionId, out DataServiceFault fault)
         {
             fault = null;
             List<TerminalChange> terminals = new List<TerminalChange>();
-            if (null != dateTime)
+            if (null != dateTime && null != regionId)
             {
                 Query query = new Query
                 {
@@ -668,7 +844,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
         /// TERMINALCHANGE Table queries
         /// <summary>
-        ///  Get a list of all terminal master updates after a given date time for a given region.
+        ///  Get a list of all terminal master updates after a given date time for a given area.
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
         /// <param name="dataService"></param>
@@ -678,13 +854,13 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="dateTime"></param>
         /// <param name="areaId"></param>
         /// <param name="fault"></param>
-        /// <returns>An empty list if driverId is null</returns>
+        /// <returns>An empty list if dateTime or areaId is null</returns>
         public static List<TerminalChange> GetTerminalChangesByArea(IDataService dataService, ProcessChangeSetSettings settings,
              string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, string areaId, out DataServiceFault fault)
         {
             fault = null;
             List<string> terminalsInArea = new List<string>();
-            if (null != dateTime)
+            if (null != dateTime && null != areaId)
             {
                 terminalsInArea = Util.Common.GetTerminalsByArea
                     (dataService, settings, userCulture, userRoleIds, areaId, out fault);
@@ -708,6 +884,331 @@ namespace Brady.ScrapRunner.DataService.Util
                 terminals = queryResult.Records.Cast<TerminalChange>().ToList();
             }
             return terminals;
+        }
+        /// TERMINALMASTER Table queries
+        /// <summary>
+        ///  Get a a terminal master record for a given terminal.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="terminalId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if terminalId is null</returns>
+        public static TerminalMaster GetTerminal(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string terminalId, out DataServiceFault fault)
+        {
+            fault = null;
+
+            TerminalMaster terminal = new TerminalMaster();
+            if (null != terminalId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TerminalMaster>()
+                    .Filter(y => y.Property(x => x.TerminalId).EqualTo(terminalId))
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return terminal;
+                }
+                terminal = (TerminalMaster)queryResult.Records.Cast<TerminalMaster>().FirstOrDefault();
+            }
+            return terminal;
+        }
+        /// TRIP Table and trip-related queries
+        /// <summary>
+        ///  Get a list of all trips to be sent to a given driver at login time.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<Trip> GetTripInfoForDriverAtLogin(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string driverId, out DataServiceFault fault)
+        {
+            fault = null;
+            List<Trip> trips = new List<Trip>();
+            if (null != driverId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Trip>()
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverId)
+                    .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
+                    .And().Property(x => x.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
+                    .And().Property(x => x.TripSendFlag).In(TripSendFlagValue.Ready, TripSendFlagValue.SentToDriver))
+                    .OrderBy(x => x.TripSequenceNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return trips;
+                }
+                trips = queryResult.Records.Cast<Trip>().ToList();
+            }
+            return trips;
+        }
+        /// TRIP Table and trip-related queries
+        /// <summary>
+        ///  Get a list of all trips to be sent to a given driver whenever a new trip is added or an existing trip is modified.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null</returns>
+        public static List<Trip> GetTripInfoForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string driverId, out DataServiceFault fault)
+        {
+            fault = null;
+            List<Trip> trips = new List<Trip>();
+            if (null != driverId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Trip>()
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverId)
+                    .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
+                    .And().Property(x => x.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
+                    .And().Property(x => x.TripSendFlag).EqualTo(TripSendFlagValue.Ready))
+                    .OrderBy(x => x.TripSequenceNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return trips;
+                }
+                trips = queryResult.Records.Cast<Trip>().ToList();
+            }
+            return trips;
+        }
+        /// TRIP Table and trip-related queries
+        /// <summary>
+        ///  Get a list of trip reference numbers to be sent to a given driver for a given trip.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if tripNumber is null</returns>
+        public static List<TripReferenceNumber> GetTripReferenceNumbers(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            List<TripReferenceNumber> tripRefNums = new List<TripReferenceNumber>();
+            if (null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripReferenceNumber>()
+                    .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripNumber))
+                    .OrderBy(x => x.TripRefNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripRefNums;
+                }
+                tripRefNums = queryResult.Records.Cast<TripReferenceNumber>().ToList();
+            }
+            return tripRefNums;
+        }
+        /// TRIP Table and trip-related queries
+        /// <summary>
+        ///  Get a list of trip segments to be sent to a given driver for a given trip.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if tripNumber is null</returns>
+        public static List<TripSegment> GetTripSegments(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            List<TripSegment> tripSegments = new List<TripSegment>();
+            if (null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripSegment>()
+                    .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripNumber)
+                    .And().Property(x => x.TripSegStatus).In(TripSegStatusConstants.Pending, TripSegStatusConstants.Missed))
+                    .OrderBy(x => x.TripSegNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripSegments;
+                }
+                tripSegments = queryResult.Records.Cast<TripSegment>().ToList();
+            }
+            return tripSegments;
+        }
+        /// TRIP Table and trip-related queries
+        /// <summary>
+        ///  Get a list of trip segment containers to be sent to a given driver for a given trip.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if tripNumber is null</returns>
+        public static List<TripSegmentContainer> GetTripContainers(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            List<TripSegmentContainer> tripSegmentContainers = new List<TripSegmentContainer>();
+            if (null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripSegmentContainer>()
+                    .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripNumber))
+                    .OrderBy(x => x.TripSegContainerSeqNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripSegmentContainers;
+                }
+                tripSegmentContainers = queryResult.Records.Cast<TripSegmentContainer>().ToList();
+            }
+            return tripSegmentContainers;
+        }
+        /// TRIP Table and trip-related queries
+        /// <summary>
+        ///  Get a list of directions for each destination custhostcode to be sent to a given driver.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="custHostCode"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if custHostCode is null</returns>
+        public static List<CustomerDirections> GetCustomerDirections(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string custHostCode, out DataServiceFault fault)
+        {
+            fault = null;
+            List<CustomerDirections> custDirections = new List<CustomerDirections>();
+            if (null != custHostCode)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<CustomerDirections>()
+                    .Filter(y => y.Property(x => x.CustHostCode).EqualTo(custHostCode))
+                    .OrderBy(x => x.CustHostCode)
+                    .OrderBy(x => x.DirectionsSeqNo)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return custDirections;
+                }
+                custDirections = queryResult.Records.Cast<CustomerDirections>().ToList();
+            }
+            return custDirections;
+        }
+        /// TRIP Table and trip-related queries
+        /// <summary>
+        ///  Get a list of commodities for each destination custhostcode to be sent to a given driver.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="custHostCode"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if custHostCode is null</returns>
+        public static List<CustomerCommodity> GetCustomerCommodities(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string custHostCode, out DataServiceFault fault)
+        {
+            fault = null;
+            List<CustomerCommodity> custCommodities = new List<CustomerCommodity>();
+            if (null != custHostCode)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<CustomerCommodity>()
+                    .Filter(y => y.Property(x => x.CustHostCode).EqualTo(custHostCode))
+                    .OrderBy(x => x.CustHostCode)
+                    .OrderBy(x => x.CustCommodityDesc)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return custCommodities;
+                }
+                custCommodities = queryResult.Records.Cast<CustomerCommodity>().ToList();
+            }
+            return custCommodities;
+        }
+        /// TRIP Table and trip-related queries
+        /// <summary>
+        ///  Get a list of locations for each destination custhostcode to be sent to a given driver.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="custHostCode"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if custHostCode is null</returns>
+        public static List<CustomerLocation> GetCustomerLocations(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string custHostCode, out DataServiceFault fault)
+        {
+            fault = null;
+            List<CustomerLocation> custLocations = new List<CustomerLocation>();
+            if (null != custHostCode)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<CustomerLocation>()
+                    .Filter(y => y.Property(x => x.CustHostCode).EqualTo(custHostCode))
+                    .OrderBy(x => x.CustHostCode)
+                    .OrderBy(x => x.CustLocation)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return custLocations;
+                }
+                custLocations = queryResult.Records.Cast<CustomerLocation>().ToList();
+            }
+            return custLocations;
         }
     }
 }
