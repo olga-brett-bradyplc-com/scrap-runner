@@ -522,6 +522,14 @@
         /// Otherwise only send containers for the driver's region. 
         /// </summary>
         public static readonly string DEFAllowAnyContainer = "DEFAllowAnyContainer";
+
+        /// <summary>
+        /// DEFAllowAnyPowerUnit:
+        /// Allow driver to log in with any power unit (Y/N)
+        /// When this option is set to “Y”, a driver can log in to any power unit.
+        /// Otherwise a driver can log in to a power unit whose region matches the driver's region. 
+        /// </summary>
+        public static readonly string DEFAllowAnyPowerUnit = "DEFAllowAnyPowerUnit";
     }
     /// <summary>
     /// The Power Status internal codes.  Used by the PowerMaster table.
