@@ -47,6 +47,8 @@
         [MaxLength(300)]
         public string TripSegContainerComment { get; set; }
 
+        public DateTime? TripSegContainerActionDateTime { get; set; }
+
         public DateTime? WeightGrossDateTime { get; set; }
 
         public long? TripSegContainerWeightGross { get; set; }
@@ -73,7 +75,7 @@
 
         // Convenience methods
         [Ignore]
-        public string DefaultTripSegContainerSeqNumber
+        public string DefaultTripSegContainerNumber
         {
             get
             {
