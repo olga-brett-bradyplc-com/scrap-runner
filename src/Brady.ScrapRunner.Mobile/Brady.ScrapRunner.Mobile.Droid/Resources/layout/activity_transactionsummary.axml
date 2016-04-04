@@ -2,28 +2,27 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <include
         layout="@layout/toolbar" />
-<!-- Place holder for camera view -->
-    <Button
-        android:id="@+id/CameraView"
+<!-- FrameLayout is used as a fragment for the camera -->
+    <FrameLayout
+        android:id="@+id/camera_fragment"
         android:layout_marginTop="56dp"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="#000000" />
+        android:layout_weight="1" />
     <MvxExt.BindableGroupListView
         android:id="@+id/TransactionSummaryListView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:layout_below="@id/CameraView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/camera_fragment"
         local:MvxItemTemplate="@layout/item_transactions_listitem"
-        local:GroupItemTemplate="@layout/item_transactions" />
+        local:GroupItemTemplate="@layout/item_transactions"
+        local:MvxBind="ItemClick TransactionSelectedCommand" />
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="65dp"
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
@@ -33,7 +32,6 @@
             android:textColor="#ffffff"
             android:background="@color/material_gray_900"
             local:MvxBind="Click ConfirmationSelectedCommand"
-            local:MvxLang="Text FinishLabel"
-            />
+            local:MvxLang="Text FinishLabel" />
     </LinearLayout>
 </RelativeLayout>

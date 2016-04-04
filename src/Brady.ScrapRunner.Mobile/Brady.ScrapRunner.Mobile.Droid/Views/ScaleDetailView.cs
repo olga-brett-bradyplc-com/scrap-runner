@@ -74,13 +74,13 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
 
         private void OnTareTimeChanged(object sender, PropertyChangedEventArgs args)
         {
-            var button = FindViewById<Button>(Resource.Id.grossButton);
+            var button = FindViewById<Button>(Resource.Id.tareButton);
             button.Text = "Tare : " + ViewModel.GrossTime;
         }
 
         private void OnSecondGrossTimeChanged(object sender, PropertyChangedEventArgs args)
         {
-            var button = FindViewById<Button>(Resource.Id.grossButton);
+            var button = FindViewById<Button>(Resource.Id.secondGrossButton);
             button.Text = "Second Gross : " + ViewModel.GrossTime;
         }
     }

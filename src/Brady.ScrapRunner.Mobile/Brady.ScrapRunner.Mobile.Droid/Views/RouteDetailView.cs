@@ -108,7 +108,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
                 var firstTripSegmentContainer = element.First();
 
                 var tempType = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerTypeText);
-                tempType.Text = firstTripSegmentContainer.DefaultTripSegContainerSeqNumber +
+                tempType.Text = firstTripSegmentContainer.DefaultTripSegContainerNumber +
                     " " + firstTripSegmentContainer.TripSegContainerType +
                     "-" + firstTripSegmentContainer.TripSegContainerSize;
                 tempType.Id = 2;

@@ -1,10 +1,3 @@
-using System.ComponentModel;
-using System.Resources;
-using Android.Content.PM;
-using Android.Widget;
-using Brady.ScrapRunner.Mobile.Resources;
-using MvvmCross.Binding.BindingContext;
-
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
     using Android.App;
