@@ -9,6 +9,7 @@ using BWF.DataServices.PortableClients;
 using BWF.DataServices.PortableClients.Builder;
 using BWF.DataServices.PortableClients.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
 namespace Brady.ScrapRunner.DataService.Tests
 {
@@ -46,23 +47,29 @@ namespace Brady.ScrapRunner.DataService.Tests
         }
 
         /// <summary>
-        /// Code to retrieve terminals updated since a particular date from the TerminalChange table
-        /// 
-        /// This method using QueryBuilder does not include the conditionals
+        /// Code to test RetrieveTerminalChangesByRegion,RetrieveTerminalChangesAll
+        /// At login time or whenever a terminal is changed, we should send a list of terminals from the 
+        /// TerminalChange table
         /// </summary>
         [TestMethod]
-        public void RetrieveTerminalChangeUpdatesQB()
+        public void RetrieveTerminalChangeUpdates()
         {
-            DateTime dt = new DateTime(2015, 12, 01);
-            var terminalTableQuery = new QueryBuilder<TerminalChange>()
-                //.Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt))
-                .OrderBy(x => x.TerminalId);
-            string queryString = terminalTableQuery.GetQuery();
-            QueryResult<TerminalChange> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            string areaid = "OS";
+            string regionid = null;
+            string DEFSendOnlyYardsForArea = "Y";
+            DateTime dt = new DateTime(2015, 10, 01);
+            QueryResult<TerminalChange> queryResult;
+
+            if (DEFSendOnlyYardsForArea == Constants.Yes && areaid != null)
+                queryResult = RetrieveTerminalChangesForArea(dt, areaid);
+            else if (regionid != null)
+                queryResult = RetrieveTerminalChangesForRegion(dt, regionid);
+            else
+                queryResult = RetrieveTerminalChangesAll(dt);
 
             foreach (TerminalChange terminalTableInstance in queryResult.Records)
             {
-                //Assert.IsTrue(terminalTableInstance.ChgDateTime > dt);
+                Assert.IsTrue(terminalTableInstance.ChgDateTime > dt);
             }
 
             foreach (TerminalChange terminalTableInstance in queryResult.Records)
@@ -79,48 +86,201 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
         }
         /// <summary>
-        /// After a driver has logged in, and terminals have changed, we should send a list of 
-        /// changed terminals from the TerminalChange table
-        /// 
-        /// Code to retrieve terminals updated since a particular date from the TerminalChange table
-        /// RegionId and TerminalId are optional arguments
+        /// Retrieves terminal change records for a given area since a given date
+        /// </summary>
+        public QueryResult<TerminalChange> RetrieveTerminalChangesForArea(DateTime dt, string areaid)
+        {
+            List<string> terminals = BuildTerminalList(areaid);
+            var terminalTableQuery = new QueryBuilder<TerminalChange>()
+                .Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt)
+                .And().Property(x => x.TerminalId).In(terminals.ToArray()))
+                .OrderBy(x => x.TerminalId);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalChange> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+        
+        /// <summary>
+        /// Retrieves terminal change records for a given region since a given date
+        /// </summary>
+        public QueryResult<TerminalChange> RetrieveTerminalChangesForRegion(DateTime dt, string regionid)
+        {
+            var terminalTableQuery = new QueryBuilder<TerminalChange>()
+                .Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt)
+                .And().Property(x => x.RegionId).EqualTo(regionid))
+                .OrderBy(x => x.TerminalId);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalChange> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Retrieves terminal change records for a given region since a given date
+        /// </summary>
+        public QueryResult<TerminalChange> RetrieveTerminalChangesAll(DateTime dt)
+        {
+            var terminalTableQuery = new QueryBuilder<TerminalChange>()
+                .Filter(y => y.Property(x => x.ChgDateTime).GreaterThan(dt))
+                .OrderBy(x => x.TerminalId);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalChange> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Builds a list of terminals for a given area 
+        /// </summary>
+        public List<string> BuildTerminalList(string areaid)
+        {
+            List<string> terminals = new List<string>();
+            var areaTableQuery = new QueryBuilder<AreaMaster>()
+                .Filter(y => y.Property(x => x.AreaId).EqualTo(areaid));
+            string queryString = areaTableQuery.GetQuery();
+            QueryResult<AreaMaster> queryResult = _client.QueryAsync(areaTableQuery).Result;
+            foreach (AreaMaster areaTableInstance in queryResult.Records)
+            {
+                terminals.Add(areaTableInstance.TerminalId);
+            }
+            return terminals;
+        } 
+        /// <summary>
+        /// Code to test RetrieveTerminalMasterByRegion,RetrieveTerminalMasterAll
+        /// If a driver's terminal master needs to be reloaded, we should send a list of terminals 
+        /// from the TerminalMaster table.
+        /// RegionId is an optional argument.
         /// </summary>
         [TestMethod]
-        public void RetrieveTerminalChangeUpdates()
+        public void RetrieveTerminalMaster()
+        {
+            string areaid = "NE";
+            string regionid = null;
+            string DEFSendOnlyYardsForArea = "Y";
+            QueryResult<TerminalMaster> queryResult;
+
+            if (DEFSendOnlyYardsForArea == Constants.Yes && areaid != null)
+                queryResult = RetrieveTerminalMasterForArea(areaid);
+            else if (regionid != null)
+                queryResult = RetrieveTerminalMasterForRegion(regionid);
+            else
+                queryResult = RetrieveTerminalMasterAll();
+
+            foreach (TerminalMaster terminalTableInstance in queryResult.Records)
+            {
+                Console.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                                                 terminalTableInstance.Region,
+                                                 terminalTableInstance.TerminalId,
+                                                 terminalTableInstance.TerminalName,
+                                                 terminalTableInstance.Address1,
+                                                 terminalTableInstance.City,
+                                                 terminalTableInstance.State));
+            }
+        }
+        /// <summary>
+        /// Retrieves terminal master records for a given region 
+        /// </summary>
+        public QueryResult<TerminalMaster> RetrieveTerminalMasterForArea(string areaid)
+        {
+            List<string> terminals = BuildTerminalList(areaid);
+            var terminalTableQuery = new QueryBuilder<TerminalMaster>()
+                .Filter(y => y.Property(x => x.TerminalId).In(terminals.ToArray()))
+                .OrderBy(x => x.TerminalName);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalMaster> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Retrieves terminal master records for a given region 
+        /// </summary>
+        public QueryResult<TerminalMaster> RetrieveTerminalMasterForRegion(string regionid)
+        {
+            var terminalTableQuery = new QueryBuilder<TerminalMaster>()
+                .Filter(y => y.Property(x => x.Region).EqualTo(regionid))
+                .OrderBy(x => x.TerminalName);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalMaster> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+        /// <summary>
+        /// Retrieves terminal master records for a given region 
+        /// </summary>
+        public QueryResult<TerminalMaster> RetrieveTerminalMasterAll()
+        {
+            var terminalTableQuery = new QueryBuilder<TerminalMaster>()
+                .OrderBy(x => x.TerminalName);
+            string queryString = terminalTableQuery.GetQuery();
+            QueryResult<TerminalMaster> queryResult = _client.QueryAsync(terminalTableQuery).Result;
+            return queryResult;
+        }
+ 
+        
+        /// <summary>
+        /// At login time or whenever a terminal is changed, we should send a list of terminals from the 
+        /// TerminalChange table
+        /// 
+        /// if DefAllowAddRT = Y or DefAllowChangeRT = Y 
+        /// then send the list of terminals
+        /// otherwise do not send anything
+        ///
+        /// If Preference DefSendOnlyYardsForArea = Y
+        /// then send only the yards for the driver's area
+        /// otherwise send only the yards for the driver's region
+        /// 
+        /// RegionId and AreaId are optional arguments
+        /// </summary>
+        [TestMethod]
+        public void RetrieveTerminalChangeUpdatesRS()
         {
             bool haveFilter = false;
 
-            //DateTime? dt = null;
+            DateTime? dt = null;
             string regionid = null;
-            string terminalid = null;
+            //string areaid = null;
+            //string DefSendOnlyYardsForArea = null;
 
-            DateTime? dt = new DateTime(2015, 11, 01);
+            //DateTime? dt = new DateTime(2015, 11, 01);
             //string regionid = "SDF";
-            //string terminalid = "F1";
-            //string terminalid = "LI";
+            //string areaid = "ALL";
+            //string areaid = "LI";
+            string areaid = "NE";
+            string DefSendOnlyYardsForArea = "Y";
+            //string DefSendOnlyYardsForArea = "N";
 
+            //To use this query at login, provide the following:
+            //chgdatetime from driver's login or driverstatus table
+            //driver's preference: DefSendOnlyYardsForArea
+            //if DefSendOnlyYardsForArea = "Y", provide driver's area
+            //otherwise, provide driver's region
+            string terminalString = null;
+
+            //Specify the terminal field name in the TerminalMaster table
+            string terminalField = "TerminalId";
             //Specify the base
             string baseString = string.Format("TerminalChanges?");
 
             //Build the filter string
             string filterString = "$filter=";
-            //if (dt != null)
-            //{
-            //    filterString += string.Format("ChgDateTime>datetime({0})", dt);
-            ///   haveFilter = true;
-            //}
+            if (dt != null)
+            {
+                filterString += string.Format("ChgDateTime>datetime({0})", dt);
+                haveFilter = true;
+            }
+            //Build the filter string
+            if (DefSendOnlyYardsForArea == Constants.Yes && areaid != null)
+            {
+                terminalString = BuildFilterArea(terminalField, areaid, null);
+                if (terminalString != null)
+                {
+                    if (haveFilter) filterString += " and ";
+                    else haveFilter = true;
+                    filterString += string.Format(terminalString);
+                }
+            }
+
             if (regionid != null)
             {
                 if (haveFilter) filterString += " and ";
                 else haveFilter = true;
                 filterString += string.Format("RegionId='{0}'", regionid);
             }
-            if (terminalid != null)
-            {
-                if (haveFilter) filterString += " and ";
-                else haveFilter = true;
-                filterString += string.Format("TerminalId='{0}'", terminalid);
-            }
+
             //Build the order by string
             string orderString = "&$orderby = TerminalId";
 
@@ -146,8 +306,8 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
         }
         /// <summary>
-        /// At login time, we should send a list of terminals from the TerminalMaster table
-        /// Also if the driver's terminal master needs to be reloaded.
+        /// If a driver's terminal master needs to be reloaded, we should send a complete
+        /// list of terminals from the TerminalMaster table.
         /// 
         /// if DefAllowAddRT = Y or DefAllowChangeRT = Y 
         /// then send the list of terminals
@@ -160,16 +320,15 @@ namespace Brady.ScrapRunner.DataService.Tests
         /// RegionId and AreaId are optional arguments
         /// </summary>
         [TestMethod]
-        public void RetrieveTerminalsForDriver()
+        public void RetrieveTerminalsForDriverRS()
         {
             bool haveFilter = false;
 
-            string regionid = null;
+            //string regionid = null;
             //string areaid = null;
             //string DefSendOnlyYardsForArea = null;
-            string terminalString = null;
 
-            //string regionid = "SDF";
+            string regionid = "SDF";
             //string areaid = "ALL";
             //string areaid = "LI";
             string areaid = "NE";
@@ -180,6 +339,7 @@ namespace Brady.ScrapRunner.DataService.Tests
             //driver's preference: DefSendOnlyYardsForArea
             //if DefSendOnlyYardsForArea = "Y", provide driver's area
             //otherwise, provide driver's region
+            string terminalString = null;
 
             //Specify the terminal field name in the TerminalMaster table
             string terminalField = "TerminalId";
@@ -187,16 +347,22 @@ namespace Brady.ScrapRunner.DataService.Tests
             string baseString = string.Format("TerminalMasters?");
 
             //Build the filter string
-            if (DefSendOnlyYardsForArea == Constants.Yes && areaid != null)
-                terminalString = BuildFilterArea(terminalField, areaid, null);
-            else if (regionid != null)
-                terminalString = BuildFilterRegion(terminalField, regionid);
-
             string filterString = "$filter=";
-            if (terminalString != null)
+
+            if (DefSendOnlyYardsForArea == Constants.Yes && areaid != null)
             {
-                filterString += string.Format("({0})", terminalString);
-                haveFilter = true;
+                terminalString = BuildFilterArea(terminalField, areaid, null);
+                if (terminalString != null)
+                {
+                    haveFilter = true;
+                    filterString += string.Format(terminalString);
+                }
+            }
+            if (regionid != null)
+            {
+                if (haveFilter) filterString += " and ";
+                else haveFilter = true;
+                filterString += string.Format("Region='{0}'", regionid);
             }
             //Build the order by string
             string orderString = "&$orderby = TerminalId";
@@ -229,8 +395,8 @@ namespace Brady.ScrapRunner.DataService.Tests
         public void RetrieveTerminalsForArea()
         {
             //string areaid = "ALL";
-            string areaid = "NE";
-            //string areaid = "LI";
+            //string areaid = "NE";
+            string areaid = "LI";
             string terminalid = null;
             //string terminalid = "F1";
             string terminalField = "TerminalId";
@@ -256,6 +422,10 @@ namespace Brady.ScrapRunner.DataService.Tests
                     Assert.AreEqual(areaTableInstance.AreaId, areaid, queryString);
                 }
             }
+            if (areaFilter == null)
+            {
+                areaFilter = string.Format("{0}=''", terminalField);
+            }
             areaFilter = "(" + areaFilter + ")";
 
             Console.WriteLine(string.Format("{0}", areaFilter));
@@ -280,6 +450,10 @@ namespace Brady.ScrapRunner.DataService.Tests
             {
                 if (regionFilter != null) regionFilter += " or ";
                 regionFilter += string.Format("{0}='{1}'", terminalField, terminalTableInstance.TerminalId);
+            }
+            if (regionFilter == null)
+            {
+                regionFilter = string.Format("{0}=''", terminalField);
             }
             regionFilter = "(" + regionFilter + ")";
 
@@ -316,6 +490,12 @@ namespace Brady.ScrapRunner.DataService.Tests
                     areaFilter += string.Format("{0}='{1}'", terminalField, areaTableInstance.TerminalId);
                 }
             }
+            if (areaFilter == null)
+            {
+                areaFilter = string.Format("{0}=''", terminalField);
+            }
+            areaFilter = "(" + areaFilter + ")";
+
             return areaFilter;
         }
         /// <summary>
@@ -338,6 +518,11 @@ namespace Brady.ScrapRunner.DataService.Tests
                 if (regionFilter != null) regionFilter += " or ";
                 regionFilter += string.Format("{0}='{1}'", terminalField, terminalTableInstance.TerminalId);
             }
+            if (regionFilter == null)
+            {
+                regionFilter = string.Format("{0}=''", terminalField);
+            }
+            regionFilter = "(" + regionFilter + ")";
 
             return regionFilter;
         }

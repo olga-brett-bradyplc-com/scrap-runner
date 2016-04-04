@@ -6,12 +6,32 @@
       "text": "SR Processes",
       "items": [
         {
+          "text": "CodeTableProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CodeTableProcess"
+        },
+        {
+          "text": "CommodityMasterProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/CommodityMasterProcess"
+        },
+        {
+          "text": "ContainerChangeProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChangeProcess"
+        },
+        {
           "text": "DriverLoginProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLoginProcess"
         },
         {
           "text": "PreferencesProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PreferencesProcess"
+        },
+        {
+          "text": "TerminalChangeProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TerminalChangeProcess"
+        },
+        {
+          "text": "TripInfoProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripInfoProcess"
         }
       ]
     },

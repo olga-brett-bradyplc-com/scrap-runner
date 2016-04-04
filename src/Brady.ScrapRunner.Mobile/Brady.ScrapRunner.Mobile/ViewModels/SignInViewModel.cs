@@ -158,6 +158,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private void ExecuteSettingsCommand()
         {
             ShowViewModel<SettingsViewModel>();
+            Close(this);
         }
     }
 }

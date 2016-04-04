@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using BWF.DataServices.Core.Concrete.ChangeSets;
@@ -15,25 +16,42 @@ using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using NHibernate;
 using NHibernate.Util;
+using BWF.DataServices.PortableClients;
 
 namespace Brady.ScrapRunner.DataService.RecordTypes
 {
 
     /// <summary>
-    /// Get the relevant client preferences for the driver's terminal.
+    /// Get the relevant client preferences for the driver's terminal.  Call this process "withoutrequery".
     /// </summary>
+    /// 
+    /// Note this processes is relatively independent of the "trivial" backing query and results
+    /// are simply built up in memory.  As such, make this service call using the form of 
+    /// PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery
+    /// 
+    /// cURL example:
+    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/PreferencesProcess/001/withoutrequery
+    /// Portable Client example:
+    ///     var updateResult = client.UpdateAsync(itemToUpdate, requeryUpdated:false).Result;
+    ///  
     [EditAction("PreferencesProcess")]
     public class PreferencesProcessRecordType : ChangeableRecordType
             <PreferencesProcess, string, PreferencesProcessValidator, PreferencesProcessDeletionValidator>
     {
 
- 
         /// <summary>
         /// Mandatory implementation of virtual base class method.
         /// </summary>
         public override void ConfigureMapper()
         {
             Mapper.CreateMap<PreferencesProcess, PreferencesProcess>();
+
+            // Should we ever need to map the nested child list too, 
+            // we would need to be more explicit.  see also: 
+            // http://stackoverflow.com/questions/9394833/automapper-with-nested-child-list
+            // Mapper.CreateMap<PreferencesProcess, PreferencesProcess>()
+            //    .ForMember(dest => dest.Preferences, opts => opts.MapFrom(src => src.Preferences));
+            // Mapper.CreateMap<Preference, Preference>();
         }
 
 
@@ -105,7 +123,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     PreferencesProcess backfillPreferencesProcess;
                     if (changeSet.Update.TryGetValue(key, out backfillPreferencesProcess))
                     {
-                        // Generally, use a mapper?  Can I set it to only map a subset?
+                        // Generally use a mapper?  May not always be the best approach.
                         Mapper.Map(backfillPreferencesProcess, preferencesProcess);
                     }
                     else
@@ -119,10 +137,15 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     Query query = new Query()
                     {
-                        CurrentQuery = string.Format("EmployeeMasters?$filter= EmployeeId='{0}'", preferencesProcess.EmployeeId)
+                        CurrentQuery = new QueryBuilder<EmployeeMaster>()
+                            .Filter(em => em.Property(p => p.EmployeeId).EqualTo(preferencesProcess.EmployeeId)).GetQuery()
                     };
                     var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                    if (handleFault(changeSetResult, msgKey, fault, preferencesProcess)) { break; }
+                    if (Util.Common.LogFault(query, fault, log))
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
                     var employeeMaster = (EmployeeMaster) queryResult.Records.Cast<EmployeeMaster>().FirstOrNull();
                     if (employeeMaster == null)
                     {
@@ -133,17 +156,33 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     // Lookup preferences.  
                     //
-                    query.CurrentQuery = string.Format("Preferences?$filter= TerminalId='{0}'", employeeMaster.TerminalId);
+                    query = new Query()
+                    {
+                        CurrentQuery = new QueryBuilder<Preference>()
+                            .Filter(pr => pr.Property(p => p.TerminalId).EqualTo(employeeMaster.TerminalId)).GetQuery()
+                    };
                     queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                    if (handleFault(changeSetResult, msgKey, fault, preferencesProcess)) { break; }
+                    if (Util.Common.LogFault(query, fault, log))
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
                     var preferences = queryResult.Records.Cast<Preference>().ToArray();
 
                     //
                     // Lookup TerminalMaster for two "additional" preferences 
                     //
-                    query.CurrentQuery = string.Format("TerminalMasters?$filter= TerminalId='{0}'", employeeMaster.TerminalId);
+                    query = new Query()
+                    {
+                        CurrentQuery = new QueryBuilder<TerminalMaster>()
+                            .Filter(tm => tm.Property(p => p.TerminalId).EqualTo(employeeMaster.TerminalId)).GetQuery()
+                    };
                     queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                    if (handleFault(changeSetResult, msgKey, fault, preferencesProcess)) { break; }
+                    if (Util.Common.LogFault(query, fault, log))
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
                     var terminalMaster = (TerminalMaster)queryResult.Records.Cast<TerminalMaster>().FirstOrNull();
 
                     //
@@ -152,78 +191,37 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     // Return preferences
                     //
                     string[] propNamesDesired = {
-                        "DEFPrevChangContID", 
-                        "DEFEnforceSeqProcess", 
-                        "DEFUseMaterGrading", 
-                        "DEFUseAutoArrive", 
-                        "DEFUseDrvAutoDelay", 
-                        "DEFDrvAutoDelayTime", 
-                        "DEFContMasterValidation", 
-                        "DEFCommodSelection", 
-                        "DEFDriverAdd", 
-                        "DEFDriverReceipt", 
-                        "DEFContMasterScannedVal", 
-                        "DEFOneContPerPowerUnit", 
-                        "DEFDriverEntersGPS", 
-                        "DEFDriverReceiptMask", 
-                        "DEFDriverReceiptAllTrips", 
-                        "DEFDriverWeights", 
-                        "DEFShowHostCode", 
-                        "DEFUseLitre", 
-                        "DEFUseKM", 
-                        "DEFUseContainerLevel", 
-                        "DEFContainerValidationCount", 
-                        "DEFReceiptValidationCount", 
-                        "DEFDriverReference", 
-                        "DEFDriverReferenceMask", 
-                        "DEFReferenceValidationCount", 
-                        "DEFCountry", 
-                        "DEFAllowAddRT", 
-                        "DEFAllowChangeRT", 
-                        "DEFPromptRTMsg", 
-                        "DEFReqScaleRefNo", 
-                        "DEFNotAvlScalRefNo", 
-                        "DEFConfirmTruckInvMsg", 
-                        "DEFEnableImageCapture", 
-                        "DEFAutoDropContainers", 
-                        "DEFShowSimilarContainers", 
-                        "DEFMinAutoTriggerDone", 
-                        "DEFPrevChangContID", 
-                        "DEFEnforceSeqProcess", 
-                        "DEFUseMaterGrading", 
-                        "DEFUseAutoArrive", 
-                        "DEFUseDrvAutoDelay", 
-                        "DEFDrvAutoDelayTime", 
-                        "DEFContMasterValidation", 
-                        "DEFCommodSelection", 
-                        "DEFDriverAdd", 
-                        "DEFDriverReceipt", 
-                        "DEFContMasterScannedVal", 
-                        "DEFOneContPerPowerUnit", 
-                        "DEFDriverEntersGPS", 
-                        "DEFDriverReceiptMask", 
-                        "DEFDriverReceiptAllTrips", 
-                        "DEFDriverWeights", 
-                        "DEFShowHostCode", 
-                        "DEFUseLitre", 
-                        "DEFUseKM", 
-                        "DEFUseContainerLevel", 
-                        "DEFContainerValidationCount", 
-                        "DEFReceiptValidationCount", 
-                        "DEFDriverReference", 
-                        "DEFDriverReferenceMask", 
-                        "DEFReferenceValidationCount", 
-                        "DEFCountry", 
-                        "DEFAllowAddRT", 
-                        "DEFAllowChangeRT", 
-                        "DEFPromptRTMsg", 
-                        "DEFReqScaleRefNo", 
-                        "DEFNotAvlScalRefNo", 
-                        "DEFConfirmTruckInvMsg", 
-                        "DEFEnableImageCapture", 
-                        "DEFAutoDropContainers", 
-                        "DEFShowSimilarContainers", 
-                        "DEFMinAutoTriggerDone"
+                        PrefDriverConstants.DEFEnforceSeqProcess,
+                        PrefDriverConstants.DEFMinAutoTriggerDone,
+                        PrefDriverConstants.DEFUseDrvAutoDelay,
+                        PrefDriverConstants.DEFDrvAutoDelayTime,
+                        PrefDriverConstants.DEFOneContPerPowerUnit,
+                        PrefDriverConstants.DEFConfirmTruckInvMsg,
+                        PrefDriverConstants.DEFPrevChangContID,
+                        PrefDriverConstants.DEFAutoDropContainers,
+                        PrefDriverConstants.DEFShowSimilarContainers,
+                        PrefDriverConstants.DEFUseContainerLevel,
+                        PrefDriverConstants.DEFContainerValidationCount,
+                        PrefDriverConstants.DEFReqEntryContNumberForNB,
+                        PrefDriverConstants.DEFCommodSelection,
+                        PrefDriverConstants.DEFDriverReceipt,
+                        PrefDriverConstants.DEFDriverReceiptAllTrips,
+                        PrefDriverConstants.DEFDriverReceiptMask,
+                        PrefDriverConstants.DEFReceiptValidationCount,
+                        PrefDriverConstants.DEFDriverReference,
+                        PrefDriverConstants.DEFReqScaleRefNo,
+                        PrefDriverConstants.DEFDriverReferenceMask,
+                        PrefDriverConstants.DEFReferenceValidationCount,
+                        PrefDriverConstants.DEFNotAvlScalRefNo,
+                        PrefDriverConstants.DEFDriverWeights,
+                        PrefDriverConstants.DEFShowHostCode,
+                        PrefDriverConstants.DEFAllowAddRT,
+                        PrefDriverConstants.DEFAllowChangeRT,
+                        PrefDriverConstants.DEFPromptRTMsg,
+                        PrefDriverConstants.DEFEnableImageCapture,
+                        PrefDriverConstants.DEFCountry,
+                        PrefDriverConstants.DEFUseLitre,
+                        PrefDriverConstants.DEFUseKM
                     };
                     var keepSet = new HashSet<string>(propNamesDesired);
 
@@ -281,28 +279,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             return changeSetResult;
         }
 
-    
-        /// <summary>
-        /// If any data service faults occur.  We want to log them, stop processing and return the error.
-        /// </summary>
-        /// <param name="changeSetResult"></param>
-        /// <param name="msgKey"></param>
-        /// <param name="fault"></param>
-        /// <param name="preferencesProcess"></param>
-        /// <returns></returns>
-        private bool handleFault(ChangeSetResult<String> changeSetResult, String msgKey, DataServiceFault fault,
-            PreferencesProcess preferencesProcess)
-        {
-            bool faultDetected = false;
-            if (null != fault)
-            {
-                faultDetected = true;
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                log.ErrorFormat("Fault occured: {0} during login request: {1}", fault.Message, preferencesProcess);
-            }
-            return faultDetected;
-        }
-
-   
+       
     }
 }
