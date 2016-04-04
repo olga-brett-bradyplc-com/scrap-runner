@@ -16,10 +16,8 @@ using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using NHibernate;
 using NHibernate.Util;
-using BWF.DataServices.PortableClients;
-using System.Diagnostics;
 
-namespace Brady.ScrapRunner.DataService.RecordTypes
+namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
     /// <summary>
     /// Get the relevant client code table values for the driver.    Call this process "withoutrequery".
@@ -164,14 +162,15 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     // the ChangeSetResult that exits this method and is returned to the caller.
                     commodityMasterProcess.CommodityMasters = commoditymasters;
 
-                    // For testing?  That what Integration Tests are for.   Console tests are unreliable.
-                    // Why not just log this at trace level?  Then you don't have to remember go back and clean this out.
-                    // For testing. Using debug.
+                    //Now using log4net.ILog implementation to test results of query.
+                    log.Debug("SRTEST:CommodityMasterProcess");
                     foreach (CommodityMaster commoditymaster in commoditymasters)
                     {
-                        Debug.WriteLine(string.Format("{0}\t{1}",
-                                            commoditymaster.CommodityCode,
-                                            commoditymaster.CommodityDesc));
+                        log.DebugFormat("SRTEST:CommodityCode:{0} Desc:{1} InactiveFlag:{2} UniversalFlag:{3}",
+                                        commoditymaster.CommodityCode,
+                                        commoditymaster.CommodityDesc,
+                                        commoditymaster.InactiveFlag,
+                                        commoditymaster.UniversalFlag);
                     }
                 }
             }

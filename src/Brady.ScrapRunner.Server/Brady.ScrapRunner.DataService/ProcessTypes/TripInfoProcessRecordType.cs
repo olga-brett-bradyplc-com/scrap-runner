@@ -16,22 +16,22 @@ using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using NHibernate;
 using NHibernate.Util;
-using BWF.DataServices.PortableClients;
 using System.Text;
-using System.Diagnostics;
 
-namespace Brady.ScrapRunner.DataService.RecordTypes
+namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
     /// <summary>
     /// Get the relevant client trip information for the driver.  
-    /// Note this our business processes is relatively independent of the "trivial" backing query.  
-    /// As such, we temporarily need to invoke this
-    /// service call using the form Put["/{dataServiceName}/{typeName}/{id}/withoutpersistance", true]
-    /// (example: PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/TripInfoProcess/001/withoutpersistance) 
-    /// this will prevent the Nancy.DataServiceModule from issuing an automatic re-retrieve 
-    /// (getSingleAsync()) within the postSingleAsync().   This re-retrieve of a trival query clobbers our post-processed 
-    /// ChangeSetResult
     /// </summary>
+    /// 
+    /// Note this our business processes is relatively independent of the "trivial" backing query.  
+    /// call using the form PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery"
+    /// 
+    /// cURL example: 
+    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/TripInfoChangeProcess/001/withoutrequery
+    /// Portable Client example: 
+    ///     var updateResult = client.UpdateAsync(itemToUpdate, requeryUpdated:false).Result;
+    ///  
     [EditAction("TripInfoProcess")]
     public class TripInfoProcessRecordType : ChangeableRecordType
             <TripInfoProcess, string, TripInfoProcessValidator, TripInfoProcessDeletionValidator>
@@ -176,8 +176,16 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     foreach (Trip tripInfo in tripList)
                     {
                         //For testing
-                        Debug.WriteLine("Trip");
-                        Debug.WriteLine(tripInfo.TripNumber);
+                        log.Debug("SRTEST:TripInfoProcess - Trip");
+                        log.DebugFormat("SRTEST:TripNumber:{0} Status:{1} AssignStatus:{2} Type:{3} Seq#:{4} Driver:{5} CustHostCode:{6} {7}",
+                                        tripInfo.TripNumber,
+                                        tripInfo.TripStatus,
+                                        tripInfo.TripAssignStatus,
+                                        tripInfo.TripType,
+                                        tripInfo.TripSequenceNumber,
+                                        tripInfo.TripDriverId,
+                                        tripInfo.TripCustHostCode,
+                                        tripInfo.TripCustName);
 
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the reference numbers
@@ -190,13 +198,14 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                             break;
                         }
                         //For testing
-                        Debug.WriteLine("Trip Reference Numbers");
+                        log.Debug("SRTEST:TripInfoProcess - Trip Reference Numbers");
                         foreach (TripReferenceNumber tripreference in tripReferenceList)
                         {
-                            Debug.WriteLine(string.Format("{0}\t{1}\t{2}",
-                                                             tripreference.TripNumber,
-                                                             tripreference.TripRefNumber,
-                                                             tripreference.TripRefNumberDesc));
+                      
+                            log.DebugFormat("SRTEST:TripNumber:{0} RefNumber:{1} Desc:{2}",
+                                            tripreference.TripNumber,
+                                            tripreference.TripRefNumber,
+                                            tripreference.TripRefNumberDesc);
                         }
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the segments
@@ -209,7 +218,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                             break;
                         }
                         //For testing
-                        Debug.WriteLine("Trip Segment");
+                        log.Debug("SRTEST:TripInfoProcess - Trip Segment");
                         foreach (TripSegment tripsegment in tripSegmentList)
                         {
                             ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,15 +227,14 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                             if (customersInTrips.Where(x => x.Contains(tripsegment.TripSegDestCustHostCode)).FirstOrDefault() == null)
                                 customersInTrips.Add(tripsegment.TripSegDestCustHostCode);
                             //For testing
-                            Debug.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}",
-                                                                tripsegment.TripNumber,
-                                                                tripsegment.TripSegNumber,
-                                                                tripsegment.TripSegStatus,
-                                                                tripsegment.TripSegOrigCustHostCode,
-                                                                tripsegment.TripSegOrigCustName,
-                                                                tripsegment.TripSegDestCustHostCode,
-                                                                tripsegment.TripSegDestCustName));
-
+                            log.DebugFormat("SRTEST:TripNumber:{0} Seg:{1} Status:{2} Orig:{3} {4} Dest:{5} {6} ",
+                                tripsegment.TripNumber,
+                                tripsegment.TripSegNumber,
+                                tripsegment.TripSegStatus,
+                                tripsegment.TripSegOrigCustHostCode,
+                                tripsegment.TripSegOrigCustName,
+                                tripsegment.TripSegDestCustHostCode,
+                                tripsegment.TripSegDestCustName);
                         }
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the containers for all of the segments
@@ -239,23 +247,23 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                             break;
                         }
                         //For testing
-                        Debug.WriteLine("Trip Containers");
+                        log.Debug("SRTEST:TripInfoProcess - Trip Containers");
                         foreach (TripSegmentContainer tripsegcontainer in tripContainerList)
                         {
-                            Debug.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
-                                                                tripsegcontainer.TripNumber,
-                                                                tripsegcontainer.TripSegNumber,
-                                                                tripsegcontainer.TripSegContainerSeqNumber,
-                                                                tripsegcontainer.TripSegContainerNumber,
-                                                                tripsegcontainer.TripSegContainerType,
-                                                                tripsegcontainer.TripSegContainerSize));
+                            log.DebugFormat("SRTEST:TripNumber:{0} SegNumber:{1} SeqNumber:{2} ContainerNumber:{3} Type:{4} Size:{5}",
+                                tripsegcontainer.TripNumber,
+                                tripsegcontainer.TripSegNumber,
+                                tripsegcontainer.TripSegContainerSeqNumber,
+                                tripsegcontainer.TripSegContainerNumber,
+                                tripsegcontainer.TripSegContainerType,
+                                tripsegcontainer.TripSegContainerSize);
                         }
                     }//end of foreach (Trip tripInfo in tripList)
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////
                     //Loop through the list of customer host codes
                     //Get the directions to each customer host code 
-                    Debug.WriteLine("Customer Directions");
+                    log.Debug("SRTEST:TripInfoProcess - Customer Directions");
                     foreach (string custHostCode in customersInTrips)
                     {
                         List<CustomerDirections> custDirectionsList = new List<CustomerDirections>();
@@ -275,7 +283,9 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                                 sbDirections.Append(" ");
                             }
                             string directions = sbDirections.ToString().Trim();
-                            Debug.WriteLine(string.Format("{0}\t{1}", custHostCode, directions));
+                            log.DebugFormat("SRTEST:HostCode:{0} Directions:{1}",
+                                            custHostCode,
+                                            directions);
                         }
                     }
 
@@ -284,7 +294,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     {
                         //Loop through the list of customer host codes
                         //if DefCommodSelection = Y, set the commodities for each customer
-                        Debug.WriteLine("Customer Commodities");
+                        log.Debug("SRTEST:TripInfoProcess - Customer Commodities");
                         foreach (string custHostCode in customersInTrips)
                         {
                             List<CustomerCommodity> custCommoditiesList = new List<CustomerCommodity>();
@@ -297,17 +307,17 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                             }
                             foreach (CustomerCommodity customerCommodity in custCommoditiesList)
                             {
-                                Debug.WriteLine(string.Format("{0}\t{1}\t{2}",
-                                                 customerCommodity.CustHostCode,
-                                                 customerCommodity.CustCommodityCode,
-                                                 customerCommodity.CustCommodityDesc));
+                                 log.DebugFormat("SRTEST:HostCode:{0} Code:{1} Desc:{2}",
+                                                customerCommodity.CustHostCode,
+                                                customerCommodity.CustCommodityCode,
+                                                customerCommodity.CustCommodityDesc);
                             }
                         }
                     }
                     ////////////////////////////////////////////////////////////////////////////////////////////////
                     //Loop through the list of customer host codes
                     //Get the locations for each customer
-                    Debug.WriteLine("Customer Locations");
+                    log.Debug("SRTEST:TripInfoProcess - Customer Locations");
                     foreach (string custHostCode in customersInTrips)
                     {
                         List<CustomerLocation> custLocationsList = new List<CustomerLocation>();
@@ -320,9 +330,10 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         }
                         foreach (CustomerLocation customerLocation in custLocationsList)
                         {
-                            Debug.WriteLine(string.Format("{0}\t{1}",
-                                              customerLocation.CustHostCode,
-                                              customerLocation.CustLocation));
+
+                            log.DebugFormat("SRTEST:HostCode:{0} Location:{1}",
+                                           customerLocation.CustHostCode,
+                                           customerLocation.CustLocation);
                         }
                     }
                 }
