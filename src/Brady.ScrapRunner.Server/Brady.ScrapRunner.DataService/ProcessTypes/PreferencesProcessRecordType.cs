@@ -18,7 +18,7 @@ using NHibernate;
 using NHibernate.Util;
 using BWF.DataServices.PortableClients;
 
-namespace Brady.ScrapRunner.DataService.RecordTypes
+namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
 
     /// <summary>
@@ -135,18 +135,13 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     // Validate driver id / Get the EmployeeMaster
                     //
-                    Query query = new Query()
-                    {
-                        CurrentQuery = new QueryBuilder<EmployeeMaster>()
-                            .Filter(em => em.Property(p => p.EmployeeId).EqualTo(preferencesProcess.EmployeeId)).GetQuery()
-                    };
-                    var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                    if (Util.Common.LogFault(query, fault, log))
+                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                                                  preferencesProcess.EmployeeId, out fault);
+                    if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    var employeeMaster = (EmployeeMaster) queryResult.Records.Cast<EmployeeMaster>().FirstOrNull();
                     if (employeeMaster == null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Driver ID " + preferencesProcess.EmployeeId));
@@ -156,34 +151,35 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     //
                     // Lookup preferences.  
                     //
-                    query = new Query()
-                    {
-                        CurrentQuery = new QueryBuilder<Preference>()
-                            .Filter(pr => pr.Property(p => p.TerminalId).EqualTo(employeeMaster.TerminalId)).GetQuery()
-                    };
-                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                    if (Util.Common.LogFault(query, fault, log))
+                    List<Preference> preferences = new List<Preference>();
+                    preferences = Util.Common.GetPreferenceByTerminal(dataService, settings, userCulture, userRoleIds,
+                                                  employeeMaster.TerminalId, out fault);
+                    if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    var preferences = queryResult.Records.Cast<Preference>().ToArray();
+                    log.Debug("SRTEST:PreferenceProcess - Employee");
+                    log.DebugFormat("SRTEST:EmployeeId:{0} TerminalId:{1} SecurityLevel:{2}",                                    employeeMaster.EmployeeId,
+                                    employeeMaster.EmployeeId,
+                                    employeeMaster.TerminalId,
+                                    employeeMaster.SecurityLevel);
 
                     //
                     // Lookup TerminalMaster for two "additional" preferences 
                     //
-                    query = new Query()
-                    {
-                        CurrentQuery = new QueryBuilder<TerminalMaster>()
-                            .Filter(tm => tm.Property(p => p.TerminalId).EqualTo(employeeMaster.TerminalId)).GetQuery()
-                    };
-                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                    if (Util.Common.LogFault(query, fault, log))
+                    TerminalMaster terminalMaster = Util.Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+                                                  employeeMaster.TerminalId, out fault);
+                    if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    var terminalMaster = (TerminalMaster)queryResult.Records.Cast<TerminalMaster>().FirstOrNull();
+                    log.Debug("SRTEST:PreferenceProcess - Terminal");
+                    log.DebugFormat("SRTEST:TerminalId:{0} TimeZoneFactor:{1} DaylightSavings:{2}",
+                                    terminalMaster.TerminalId,
+                                    terminalMaster.TimeZoneFactor,
+                                    terminalMaster.DaylightSavings);
 
                     //
                     // Filter for the 30some properties of interst.
@@ -250,6 +246,15 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         });
                     }
                     preferencesProcess.Preferences = preferenceList;
+                    //For testing
+                    log.Debug("SRTEST:PreferenceProcess - Preferences");
+                    foreach (Preference preference in preferenceList)
+                    {
+                        log.DebugFormat("SRTEST:TerminalId:{0} Parameter:{1} ParameterValue:{2}",
+                                    preference.TerminalId,
+                                    preference.Parameter,
+                                    preference.ParameterValue);
+                    }
                 }
             }
 
