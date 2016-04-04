@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Brady.ScrapRunner.DataService.Interfaces;
+using Brady.ScrapRunner.DataService.RecordTypes;
 using Brady.ScrapRunner.DataService.Util;
 using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.Domain;
@@ -20,7 +21,7 @@ using BWF.DataServices.PortableClients;
 using NHibernate;
 using NHibernate.Util;
 
-namespace Brady.ScrapRunner.DataService.RecordTypes
+namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
 
     /// <summary>
