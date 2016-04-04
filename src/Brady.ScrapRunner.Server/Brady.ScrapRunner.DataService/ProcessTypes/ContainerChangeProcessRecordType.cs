@@ -15,32 +15,30 @@ using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using NHibernate;
-using System.Diagnostics;
+using NHibernate.Util;
 
-namespace Brady.ScrapRunner.DataService.RecordTypes
+namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
     /// <summary>
-    /// Get the relevant client code table values for the driver.  Call this process "withoutrequery".
+    /// Get the relevant client container changes for the driver based on the last action date.  Call this process "withoutrequery". 
     /// </summary>
-    /// 
-    /// Note this our business processes is relatively independent of the "trivial" backing query.  
-    /// call using the form PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery"
-    /// 
+    ///
+    /// Call this service using the form PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery
     /// cURL example: 
-    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/CodeTableChangeProcess/001/withoutrequery
+    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/ContainerChangeProcess/001/withoutrequery 
     /// Portable Client example: 
     ///     var updateResult = client.UpdateAsync(itemToUpdate, requeryUpdated:false).Result;
     ///  
-    [EditAction("CodeTableProcess")]
-    public class CodeTableProcessRecordType : ChangeableRecordType
-                <CodeTableProcess, string, CodeTableProcessValidator, CodeTableProcessDeletionValidator>
+    [EditAction("ContainerChangeProcess")]
+    public class ContainerChangeProcessRecordType : ChangeableRecordType
+            <ContainerChangeProcess, string, ContainerChangeProcessValidator, ContainerChangeProcessDeletionValidator>
     {
         /// <summary>
         /// Mandatory implementation of virtual base class method.
         /// </summary>
         public override void ConfigureMapper()
         {
-            Mapper.CreateMap<CodeTableProcess, CodeTableProcess>();
+            Mapper.CreateMap<ContainerChangeProcess, ContainerChangeProcess>();
         }
 
         /// <summary>
@@ -53,11 +51,12 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         /// <param name="persistChanges"></param>
         /// <returns></returns>
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService, string token, string username,
-            ChangeSet<string, CodeTableProcess> changeSet,
+            ChangeSet<string, ContainerChangeProcess> changeSet,
             bool persistChanges)
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+   
         /// <summary>
         /// This is the "real" method implementation.
         /// </summary>
@@ -66,7 +65,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         /// <param name="settings"></param>
         /// <returns></returns>
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService,
-            ChangeSet<string, CodeTableProcess> changeSet, ProcessChangeSetSettings settings)
+            ChangeSet<string, ContainerChangeProcess> changeSet, ProcessChangeSetSettings settings)
         {
 
             ISession session = null;
@@ -98,7 +97,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     DataServiceFault fault;
                     string msgKey = key;
 
-                    CodeTableProcess codetablesProcess = (CodeTableProcess)changeSetResult.GetSuccessfulUpdateForId(key);
+                    ContainerChangeProcess containersProcess = (ContainerChangeProcess)changeSetResult.GetSuccessfulUpdateForId(key);
 
                     // TODO:  Determine userCulture and userRoleIds on a per user basis.
                     string userCulture = "en-GB";
@@ -106,15 +105,15 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
 
                     // It appears, in the gernal case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
-                    CodeTableProcess backfillCodeTableProcess;
-                    if (changeSet.Update.TryGetValue(key, out backfillCodeTableProcess))
+                    ContainerChangeProcess backfillContainerChangeProcess;
+                    if (changeSet.Update.TryGetValue(key, out backfillContainerChangeProcess))
                     {
                         // Generally use a mapper?  May not always be the best approach.
-                        Mapper.Map(backfillCodeTableProcess, codetablesProcess);
+                        Mapper.Map(backfillContainerChangeProcess, containersProcess);
                     }
                     else
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Unable to process codetable for Driver ID " + codetablesProcess.EmployeeId));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Unable to process containerchange for Driver ID " + containersProcess.EmployeeId));
                         break;
                     }
 
@@ -122,7 +121,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     // Validate driver id / Get the EmployeeMaster record
                     //
                     EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
-                                                    codetablesProcess.EmployeeId, out fault);
+                                                  containersProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -130,15 +129,15 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     }
                     if (employeeMaster == null)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Driver ID " + codetablesProcess.EmployeeId));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Driver ID " + containersProcess.EmployeeId));
                         break;
                     }
 
                     //
-                    // Lookup Preference: DEFUseContainerLevel
+                    // Lookup Preference: DEFAllowAnyContainer
                     //
-                    string prefUseContainerLevel = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
-                                                   employeeMaster.TerminalId, PrefDriverConstants.DEFUseContainerLevel, out fault);
+                    string prefAllowAnyContainer = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                  Constants.SYSTEM_TERMINALID, PrefSystemConstants.DEFAllowAnyContainer, out fault);
                     if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -146,18 +145,16 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     }
                     // Lookup container changes.  
                     //
-                    List<CodeTable> codetables = new List<CodeTable>();
-                    if (prefUseContainerLevel == Constants.Yes)
+                    List<ContainerChange> containerchanges = new List<ContainerChange> ();
+                    if (prefAllowAnyContainer == Constants.Yes)
                     {
-                        //This query includes container level
-                        codetables = Util.Common.GetAllCodeTablesIncLevelForDriver(dataService, settings, userCulture, userRoleIds,
-                                        employeeMaster.RegionId, out fault);
+                        containerchanges = Util.Common.GetContainerChanges(dataService, settings, userCulture, userRoleIds,
+                          containersProcess.LastContainerMasterUpdate, out fault);
                     }
                     else
                     {
-                        //This query does not include container level
-                        codetables = Util.Common.GetAllCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
-                                        employeeMaster.RegionId, out fault);
+                        containerchanges = Util.Common.GetContainerChangesByRegion(dataService, settings, userCulture, userRoleIds,
+                          containersProcess.LastContainerMasterUpdate, employeeMaster.RegionId, out fault);
                     }
                     if (fault != null)
                     {
@@ -165,24 +162,22 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                         break;
                     }
 
-                    // Don't forget to actually backfill the CodeTableProcess object contained within 
+                    // Don't forget to actually backfill the ContainerProcess object contained within 
                     // the ChangeSetResult that exits this method and is returned to the caller.
-                    codetablesProcess.CodeTables = codetables;
+                    containersProcess.Containers = containerchanges;
 
-                    // For testing?  That what Integration Tests are for.   Console tests are unreliable.
-                    // Why not just log this at trace level?  Then you don't have to remember go back and clean this out.
-                    // For testing. Using debug.
-                    foreach (CodeTable codetable in codetables)
+                    //Now using log4net.ILog implementation to test results of query.
+                    log.Debug("SRTEST:ContainerChangeProcess");
+                    foreach (ContainerChange container in containerchanges)
                     {
-                        Debug.WriteLine(string.Format("{0}\t\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
-                                            codetable.CodeName,
-                                            codetable.CodeValue,
-                                            codetable.CodeDisp1,
-                                            codetable.CodeDisp2,
-                                            codetable.CodeDisp3,
-                                            codetable.CodeDisp4,
-                                            codetable.CodeDisp5,
-                                            codetable.CodeDisp6));
+                        log.DebugFormat("SRTEST:ContainerNumber:{0} Type:{1} Size:{2} Date:{3} Flag:{4} TerminalId:{5} BarCode:{6}", 
+                                        container.ContainerNumber, 
+                                        container.ContainerType,
+                                        container.ContainerSize,
+                                        container.ActionDate,
+                                        container.ActionFlag,
+                                        container.TerminalId,
+                                        container.ContainerBarCodeNo);
                     }
                 }
             }
@@ -214,4 +209,3 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         }
     }
 }
-
