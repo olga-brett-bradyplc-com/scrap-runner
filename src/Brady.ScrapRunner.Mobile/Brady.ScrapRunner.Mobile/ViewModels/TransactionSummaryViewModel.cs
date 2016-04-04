@@ -104,7 +104,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // Command impl
         private void ExecuteTransactionScannedCommand(string scannedNumber)
         {
-
             // If current transaction tripsegcontainernum == scannedNumber, mark it
             if (CurrentTransaction.TripSegContainerNumber.Equals(scannedNumber))
             {

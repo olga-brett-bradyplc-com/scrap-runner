@@ -102,13 +102,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
                 // Assume transaction did not complete
                 if (ViewModel.CurrentTransaction.TripSegContainerActionDateTime == currentActionDateTime)
                 {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(this);
-                    alert.SetTitle("Scanning Error");
-                    alert.SetMessage("There was a problem scanning this label.");
-                    alert.SetPositiveButton("Ok", (sender, args) =>
-                    {});
-
-                    RunOnUiThread(() => { alert.Show(); });
+                    // @TODO : Implement dialog with appropiate messaging
+                    Log.Error("scraprunner", "Could not scan label");
                 }
                 // Assume the transaction was successfully entered
                 else
@@ -127,14 +122,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
                 }
 
             }, MobileBarcodeScanningOptions.Default);
-        }
-
-        private void UpdateTripSegNumber(MvxListView listGrouping, string text)
-        {
-        }
-
-        private void UpdateListImage(MvxListView listGrouping, int resource)
-        {
         }
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
