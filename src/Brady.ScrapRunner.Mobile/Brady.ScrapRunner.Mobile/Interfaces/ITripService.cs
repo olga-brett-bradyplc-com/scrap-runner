@@ -18,6 +18,9 @@
 
         Task<List<TripSegmentContainerModel>> FindNextTripSegmentContainersAsync(string tripNumber, string tripSegNo);
 
+        Task<TripSegmentContainerModel> FindTripSegmentContainer(string tripNumber, string tripSegNo,
+            int? tripSegContainerSeqNumber);
+
         Task<int> CompleteTripAsync(string tripNumber);
 
         Task<int> CompleteTripSegmentAsync(string tripNumber, string tripSegNo);

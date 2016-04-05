@@ -10,17 +10,17 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Brady.ScrapRunner.Mobile.ViewModels;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Views
 {
-    [Activity(Label = "TransactionDetailView")]
-    public class TransactionDetailView : Activity
+    [Activity(Label = "Transaction Detail View")]
+    public class TransactionDetailView : BaseActivity<TransactionDetailViewModel>
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
-            // Create your application here
+            SetContentView(Resource.Layout.activity_transactiondetail);
         }
     }
 }

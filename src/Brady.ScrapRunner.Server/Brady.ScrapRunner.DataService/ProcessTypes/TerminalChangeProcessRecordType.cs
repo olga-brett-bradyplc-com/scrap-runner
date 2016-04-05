@@ -16,10 +16,8 @@ using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using NHibernate;
 using NHibernate.Util;
-using BWF.DataServices.PortableClients;
-using System.Diagnostics;
 
-namespace Brady.ScrapRunner.DataService.RecordTypes
+namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
     /// <summary>
     /// Get the relevant client terminal changes for the driver based on the last action date.    Call this process "withoutrequery".
@@ -168,13 +166,18 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
                     // the ChangeSetResult that exits this method and is returned to the caller.
                     terminalsProcess.Terminals = terminalchanges;
 
-                    // For testing?  That what Integration Tests are for.   Console tests are unreliable.
-                    // Why not just log this at trace level?  Then you don't have to remember go back and clean this out.
-                    // For testing. Using debug.
+                    //Now using log4net.ILog implementation to test results of query.
+                    log.Debug("SRTEST:TerminalChangeProcess");
                     foreach (TerminalChange terminal in terminalchanges)
                     {
-                        Debug.WriteLine(terminal.TerminalId);
-                    }              
+                        log.DebugFormat("SRTEST:TerminalId:{0} RegionId:{1} Yard:{2} {3} ChgDateTime:{4} ChgActionFlag:{5}",
+                                        terminal.TerminalId,
+                                        terminal.RegionId,
+                                        terminal.CustHostCode,
+                                        terminal.CustName,
+                                        terminal.ChgDateTime,
+                                        terminal.ChgActionFlag);
+                    }
                 }
             }
 
