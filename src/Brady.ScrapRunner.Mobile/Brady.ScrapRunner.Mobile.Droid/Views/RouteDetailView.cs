@@ -7,6 +7,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.Animations;
@@ -76,14 +77,14 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             switch (ViewModel.CurrentStatus)
             {
                 case "EN":
-                    layout.SetBackgroundColor(Color.ParseColor("#43b517"));
-                    toolbar.SetBackgroundColor(Color.ParseColor("#43b517"));
+                    layout.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.enroute)));
+                    toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.enroute)));
                     enrouteButton.Visibility = ViewStates.Invisible;
                     arriveButton.Visibility = ViewStates.Visible;
                     break;
                 case "AR":
-                    layout.SetBackgroundColor(Color.ParseColor("#b51717"));
-                    toolbar.SetBackgroundColor(Color.ParseColor("#b51717"));
+                    layout.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.arrive)));
+                    toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.arrive)));
                     arriveButton.Visibility = ViewStates.Invisible;
                     directionsButton.SetX(directionsButton.GetX() + 135);
                     buttonLayout.Visibility = ViewStates.Visible;
