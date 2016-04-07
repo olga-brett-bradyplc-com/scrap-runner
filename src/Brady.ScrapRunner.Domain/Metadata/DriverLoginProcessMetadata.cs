@@ -22,7 +22,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.PowerId);
             IntegerProperty(x => x.Odometer);
             TimeProperty(x => x.LoginDateTime);
-            StringProperty(x => x.LocaleCode);
+            IntegerProperty(x => x.LocaleCode);
             StringProperty(x => x.OverrideFlag);
             StringProperty(x => x.Mdtid);
             StringProperty(x => x.TermId);
@@ -32,7 +32,9 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripNumber);
             StringProperty(x => x.TripSegNumber);
             StringProperty(x => x.DriverStatus);
-            
+            TimeProperty(x => x.ContainerMasterDateTime);
+            TimeProperty(x => x.TerminalMasterDateTime);
+
             ViewDefaults()
             .Property(x => x.EmployeeId)
             .Property(x => x.Password)
@@ -49,6 +51,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.TripNumber)
             .Property(x => x.TripSegNumber)
             .Property(x => x.DriverStatus)
+            .Property(x => x.ContainerMasterDateTime)
+            .Property(x => x.TerminalMasterDateTime)
 
             .OrderBy(x => x.EmployeeId);
         }

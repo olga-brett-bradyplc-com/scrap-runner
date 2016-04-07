@@ -21,6 +21,12 @@
         /// Useage: To retrieve system preferences
         /// </summary>
         public static readonly string SYSTEM_TERMINALID = "0000";
+
+        /// <summary>
+        /// TSS_FIRSTSEGNUMBER "01" is the first segment number
+        /// Useage: To retrieve first trip segment
+        /// </summary>
+        public static readonly string TSS_FIRSTSEGNUMBER = "01";
     }
 
     public static class BasicTripTypeConstants

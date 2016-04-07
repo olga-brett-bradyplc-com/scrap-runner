@@ -22,7 +22,7 @@ namespace Brady.ScrapRunner.Domain.Process
         /// TODO: Q: Is this really a device preference or could/should it be a user preference perhaps via membership?
         /// Eg: 1033 = English, USA
         ///     2058 = Spanish, Mexico
-        public virtual string LocaleCode { get; set; }
+        public virtual int? LocaleCode { get; set; }
 
         /// <summary>Set this to Y if driver has double checked Odometer and is resubmitting</summary>
         public virtual string OverrideFlag { get; set; }
@@ -54,6 +54,12 @@ namespace Brady.ScrapRunner.Domain.Process
         
         /// The LoginDateTime from the phone.  (Q: Why shoud we trust the client or whe do we backfill on server side?)
         public virtual DateTime? LoginDateTime { get; set; }
+
+        /// The ContainerMasterDateTime from the phone.  
+        public virtual DateTime? ContainerMasterDateTime { get; set; }
+
+        /// The ContainerMasterDateTime from the phone.  
+        public virtual DateTime? TerminalMasterDateTime { get; set; }
 
         //Login Step 14) Send container master updates.  Not implemented see ContainerMasterProcess.
         //public virtual DateTime? LastContainerMasterUpdate { get; set; }
