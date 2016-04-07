@@ -159,12 +159,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     List<Trip> tripList = new List<Trip>();
                     if (bLogin)
                     {
-                        tripList = Util.Common.GetTripInfoForDriverAtLogin(dataService, settings, userCulture, userRoleIds,
+                        tripList = Util.Common.GetTripsForDriverAtLogin(dataService, settings, userCulture, userRoleIds,
                           tripInfoProcess.EmployeeId, out fault);
                     }
                     else
                     {
-                        tripList = Util.Common.GetTripInfoForDriver(dataService, settings, userCulture, userRoleIds,
+                        tripList = Util.Common.GetTripsForDriver(dataService, settings, userCulture, userRoleIds,
                           tripInfoProcess.EmployeeId, out fault);
                     }
                     if (fault != null)
