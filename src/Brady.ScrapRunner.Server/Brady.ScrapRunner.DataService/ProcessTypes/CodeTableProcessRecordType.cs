@@ -149,13 +149,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (prefUseContainerLevel == Constants.Yes)
                     {
                         //This query includes container level
-                        codetables = Util.Common.GetAllCodeTablesIncLevelForDriver(dataService, settings, userCulture, userRoleIds,
+                        codetables = Util.Common.GetCodeTablesIncLevelForDriver(dataService, settings, userCulture, userRoleIds,
                                         employeeMaster.RegionId, out fault);
                     }
                     else
                     {
                         //This query does not include container level
-                        codetables = Util.Common.GetAllCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
+                        codetables = Util.Common.GetCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
                                         employeeMaster.RegionId, out fault);
                     }
                     if (fault != null)
