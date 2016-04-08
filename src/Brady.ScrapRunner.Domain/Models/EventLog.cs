@@ -14,7 +14,7 @@ namespace Brady.ScrapRunner.Domain.Models
     {
         // The new key populated by autoincrement column
         public virtual int EventId { get; set;}
-        public virtual DateTime EventDateTime { get; set; }
+        public virtual DateTime? EventDateTime { get; set; }
         public virtual int EventSeqNo { get; set; }
         public virtual string EventTerminalId { get; set; }
         public virtual string EventRegionId { get; set; }

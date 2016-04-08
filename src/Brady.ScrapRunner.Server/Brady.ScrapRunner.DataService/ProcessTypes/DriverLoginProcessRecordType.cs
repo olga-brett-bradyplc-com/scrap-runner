@@ -20,6 +20,7 @@ using BWF.DataServices.Metadata.Models;
 using BWF.DataServices.PortableClients;
 using NHibernate;
 using NHibernate.Util;
+using System.Text;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -227,6 +228,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                          prefAllowAnyPowerUnit,
                                          powerMaster.PowerRegionId);
 
+                        ////////////////////////////////////////////////
                         // 4c) Check power unit status: Scheduled for the shop? PS_SHOP = "S"
                         if (PowerStatusConstants.Shop == powerMaster.PowerStatus)
                         {
@@ -236,6 +238,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
 
+                        ////////////////////////////////////////////////
                         // 4d) Is unit in use by another driver? PS_INUSE = "I"
                         if (powerMaster.PowerStatus == PowerStatusConstants.InUse &&
                             powerMaster.PowerDriverId != employeeMaster.EmployeeId)
@@ -247,6 +250,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
 
+                        ////////////////////////////////////////////////
                         // 4e) If no odometer record for this unit, accept as sent by the handheld.  
                         // 4f) If overrride flag = "Y", accept as sent by the handheld.  
                         // 4g) Odometer tolerance checks.
@@ -264,7 +268,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             if (null != prefOdomWarnRange)
                             {
                                 //For testing
-                                log.Debug("SRTEST:GetPreferenceByParameter");
+                                log.Debug("SRTEST:Check Odometer");
                                 log.DebugFormat("SRTEST:OdomRange:{0} PowerId:{1} Odom:{2} OdomFromDriver:{3}",
                                                  prefOdomWarnRange,
                                                  powerMaster.PowerId,
@@ -281,8 +285,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     break;
                                 }
                             }
-                         }
+                        }
 
+                        ////////////////////////////////////////////////
                         //Get the driver status record for the driver. If one does not exist, eventually add one.
                         var driverStatus = Util.Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
                                                     driverLoginProcess.EmployeeId, out fault);
@@ -321,8 +326,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //        }
                         //    }
 
+                        ////////////////////////////////////////////////
                         // 6) Determine current trip number, segment, and driver status
-                        ////////////////////////////////////////////////////////////////////////////////////
                         //The purpose of the current trip info is, if the driver logs out and back in again in the
                         //middle of a trip, the mobile device can position the app on the current segment.
                         //This is to prevent the driver from having to re-enter information that he has already completed.
@@ -377,12 +382,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                              driverStatus.Status,
                                              driverStatus.PrevDriverStatus);
 
-                            //I think this covers the case where the driver might have been enroute, but then disconnected.
-                            //The enroute is stored in the previous driver status, while disconnect is now the driver status.
-                            //The enroute is the one we want to use.
-                            //If there is a previous driver status, use it. Otherwise use driver status.
-                            driverStatus.Status = driverStatus.PrevDriverStatus ?? driverStatus.Status;
-
                             //Remove the driver status except for enroutes,arrives, and state line crossings
                             //Other statuses that the driver might have been in (delay, back on duty, fuel, done) don't matter anymore.
                             if (DriverStatusSRConstants.EnRoute != driverStatus.Status &&
@@ -392,6 +391,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 driverLoginProcess.DriverStatus = null;
                             }
 
+                            //I think this covers the case where the driver might have been enroute, but then disconnected.
+                            //The enroute is stored in the previous driver status, while disconnect is now the driver status.
+                            //The enroute is the one we want to use.
+                            //If there is a previous driver status, use it. Otherwise use driver status.
+                            driverStatus.Status = driverStatus.PrevDriverStatus ?? driverStatus.Status;
+
+                            ////////////////////////////////////////////////
                             // 7) Update Trip in progress flag in the trip table
                             if (driverStatus.TripNumber != null &&
                                 driverStatus.TripSegNumber == Constants.TSS_FIRSTSEGNUMBER)
@@ -424,7 +430,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         trip.TripInProgressFlag = Constants.No;
 
                                         scratchChangeSetResult = Common.UpdateTrip(dataService, settings, trip);
-
+                                        log.Debug("SRTEST:Saving Trip Record - TripInProgressFlag");
                                         if (Common.LogChangeSetFailure(scratchChangeSetResult, trip, log))
                                         {
                                             var s = string.Format("Could not update Trip for TripInProgressFlag: {0}.", Constants.No);
@@ -437,73 +443,39 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         }//end of else if (null == driverStatus.TripNumber)
 
-                        // 8) Check for open ended delays  
-                        var driverDelays = Util.Common.GetDriverDelaysOpenEnded(dataService, settings, userCulture, userRoleIds,
-                                                         driverLoginProcess.EmployeeId, out fault);
-                        if (null != fault)
+                        ////////////////////////////////////////////////
+                        // 8) Check for open ended delays 
+                        CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                                     driverLoginProcess, employeeMaster, driverStatus, ref driverHistoryInsertCount);
+                        /*
+                        if (CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                                     driverLoginProcess, employeeMaster))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            break;
-                        }
-                        //Even though no entries were found, the list was not null. Now also checking if count > 0.
-                        if (driverDelays != null && driverDelays.Count > 0)
-                        {
-                            log.Debug("SRTEST:GetDriverDelaysOpenEnded");
-                            //driverDelays is a list of driver delays that have no end date/time sorted by open datetime in descending order
-                            //Starting with the last record, set the end date/time to the login date/time
-                            //Then for each additional delay, set the end date/time to the previous delays start date/time
-                            //Usually only there will be no open-ended delays or perhaps just one.
-                            driverDelays[0].DelayEndDateTime = driverLoginProcess.LoginDateTime;
-                            for (int i = 1; i < driverDelays.Count; i++)
-                            {
-                                driverDelays[i].DelayEndDateTime = driverDelays[i - 1].DelayStartDateTime;
-                            }
-
-                            var driverDelayRecordType = (DriverDelayRecordType)
-                                dataService.RecordTypes.Single(x => x.TypeName == "DriverDelay");
-                            var driverDelayChangeSet = (ChangeSet<string, DriverDelay>)
-                                driverDelayRecordType.GetNewChangeSet();
-
-                            foreach (var driverDelay in driverDelays)
-                            {
-                                //For testing
-                                log.DebugFormat("SRTEST:TripNumber:{0} DelayCode:{1} Reason:{2} Start:{3} End:{4}",
-                                                                    driverDelay.TripNumber,
-                                                                    driverDelay.DelayCode,
-                                                                    driverDelay.DelayReason,
-                                                                    driverDelay.DelayStartDateTime,
-                                                                    driverDelay.DelayEndDateTime);
-
-                                driverDelayChangeSet.AddUpdate(driverDelay.Id, driverDelay);
-                            }
-                            var driverDelayChangeSetResult = driverDelayRecordType.ProcessChangeSet(dataService,
-                                driverDelayChangeSet, settings);
-                            if (driverDelayChangeSetResult.FailedCreates.Any() ||
-                                driverDelayChangeSetResult.FailedUpdates.Any() ||
-                                driverDelayChangeSetResult.FailedDeletions.Any())
-                            {
-                                var s = "Could not update open ended driver delays";
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                                break;
-                            }
-
-                            // 8b) Add "Back On Duty" flag  to DriverStatus and Driver History tables.
-                            // For the last open-ended delay that we added an end time, record a back on duty
-                            // status in the DriverStatus and DriverHistory tables
+                            // 8b) Add "Back On Duty" flag to Driver History table.
+                            // For the last open-ended delay that we added an end time, record a back on duty status in the DriverHistory table.
                             // The driver is logging in, so in effect he is back on duty, no longer on delay.
+                            // No need to actually add it to the DriverStatus table since we will be adding a
+                            // status of login very shortly and he did not actually click on back on duty. 
                             // Users viewing the driver history wanted to know where the back on duty was.
-                            // We still need to do this even if there was no trip number
-                            // The driver can go on delay without being on a trip. 
-                            // In that case the trip number in the table is #driverid
+                            // We still need to do this even if there was no trip number because the driver can go on delay without being on a trip. 
+                            // In that case the trip number in the DriverDelay table is #driverid
                             driverStatus.Status = DriverStatusSRConstants.BackOnDuty;
-                            scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
-                            if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
-                            {
-                                var s = "Could not update driver status";
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                                break;
-                            }
-                            if (!InsertDriverHistory(dataService, settings, employeeMaster, driverStatus, 
+                            //For testing
+                            log.Debug("SRTEST:Add BackOnDuty to DriverStatus, DriverHistory");
+                            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status{3}",
+                                             driverStatus.EmployeeId,
+                                             driverStatus.TripNumber,
+                                             driverStatus.TripSegNumber,
+                                             driverStatus.Status);
+
+                            //scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
+                            //if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
+                            //{
+                            //    var s = "Could not update driver status";
+                            //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            //    break;
+                            //}
+                            if (!InsertDriverHistory(dataService, settings, employeeMaster, driverStatus,
                                 ++driverHistoryInsertCount, userRoleIds, userCulture, out fault))
                             {
                                 if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
@@ -515,13 +487,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 break;
                             }
                         }
-
+                        */
+                        ////////////////////////////////////////////////
                         // 9) Check for power unit change
                         // There has to be a trip number and trip segment number...
                         if (null != driverLoginProcess.TripNumber && null != driverLoginProcess.TripSegNumber)
                         {
                             CheckForPowerIdChange(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
-                                                driverLoginProcess, powerMaster,employeeMaster);
+                                                driverLoginProcess, powerMaster, employeeMaster);
                         }
                         // 10) Add/update record to DriverStatus table.
 
@@ -549,6 +522,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         driverStatus.DriverLCID = driverLoginProcess.LocaleCode;
 
                         scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
+                        log.Debug("SRTEST:Saving DriverStatus Record - Login");
                         if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
                         {
                             var s = string.Format("Could not update DriverStatus for Driver {0}.",
@@ -557,8 +531,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
 
+                        ////////////////////////////////////////////////
                         // 11) Add record to DriverHistory table
-                        if (!InsertDriverHistory(dataService, settings, employeeMaster, driverStatus, 
+                        if (!InsertDriverHistory(dataService, settings, employeeMaster, driverStatus,
                                 ++driverHistoryInsertCount, userRoleIds, userCulture, out fault))
                         {
                             if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
@@ -571,19 +546,21 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
 
+                        ////////////////////////////////////////////////
                         // 12) Update PowerMaster table
                         powerMaster.PowerStatus = PowerStatusConstants.InUse;
                         powerMaster.PowerDriverId = driverLoginProcess.EmployeeId;
                         powerMaster.PowerOdometer = driverLoginProcess.Odometer;
                         powerMaster.PowerLastActionDateTime = driverLoginProcess.LoginDateTime;
-                        
+
                         // Trip Number and segment number are not populated at login.
-                        // In fact, we need to remove one if it exists
                         // Only when driver goes enroute.
+                        // In fact, we need to remove one if it exists
                         powerMaster.PowerCurrentTripNumber = null;
                         powerMaster.PowerCurrentTripSegNumber = null;
 
                         scratchChangeSetResult = Common.UpdatePowerMaster(dataService, settings, powerMaster);
+                        log.Debug("SRTEST:Saving PowerMaster Record - Login");
                         if (Common.LogChangeSetFailure(scratchChangeSetResult, powerMaster, log))
                         {
                             var s = string.Format("Could not update Power Master for Power Unit {0}.",
@@ -592,8 +569,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
 
+                        ////////////////////////////////////////////////
                         // 13) Add record to PowerHistory table
-                        if (!InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, 
+                        if (!InsertPowerHistory(dataService, settings, powerMaster, employeeMaster,
                                 ++powerHistoryInsertCount, userRoleIds, userCulture, out fault))
                         {
                             if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
@@ -624,9 +602,73 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // 19) Send Trips
                         // See TripInfoProcess
 
+                        ////////////////////////////////////////////////
                         // 20) Send Container Inventory
+                        var containersOnPowerId = Util.Common.GetContainersForPowerId(dataService, settings, userCulture, userRoleIds,
+                                                  driverLoginProcess.PowerId, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        //For testing
+                        log.Debug("SRTEST:GetContainersForPowerId");
+                        foreach (var container in containersOnPowerId)
+                        {
+                            //This is some of the info that we send back
+                            log.DebugFormat("SRTEST:Container#:{0} Loc:{1} Type:{2} Size:{3} Contents:{4} Trip:{5}-{6}",
+                                             container.ContainerNumber,
+                                             container.ContainerLocation,
+                                             container.ContainerType,
+                                             container.ContainerSize,
+                                             container.ContainerContents,
+                                             container.ContainerCurrentTripNumber,
+                                             container.ContainerCurrentTripSegNumber);
+                        }
 
+                        ////////////////////////////////////////////////
                         // 21) Send dispatcher list for messaging
+                        // Check system pref "DEFSendDispatchersForArea".  
+                        // If preference DEFSendDispatchersForArea is set to Y, then send a list of dispatchers whose terminal id is in the driver's area. 
+                        // Otherwise send a list of dispatchers whose region matches the driver's region.
+                        string prefSendDispatchersForArea = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                       employeeMaster.TerminalId, PrefDriverConstants.DEFSendDispatchersForArea, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+
+                        var usersForMessaging = new List<EmployeeMaster>();
+                        if (prefSendDispatchersForArea == Constants.Yes)
+                        {
+                            usersForMessaging = Util.Common.GetDispatcherListForArea(dataService, settings, userCulture, userRoleIds,
+                                                       employeeMaster.AreaId, out fault);
+                        }
+                        else
+                        {
+                            usersForMessaging = Util.Common.GetDispatcherListForRegion(dataService, settings, userCulture, userRoleIds,
+                                                       employeeMaster.RegionId, out fault);
+                        }
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        //For testing
+                        log.Debug("SRTEST:GetDispatcherList");
+                        foreach (var user in usersForMessaging)
+                        {
+                            log.DebugFormat("SRTEST:LastName:{0} FirstName:{1} SecurityLevel:{2} AllowMessaging:{3} Region:{4} Terminal:{5} Area:{6}",
+                                             user.LastName,
+                                             user.FirstName,
+                                             user.SecurityLevel,
+                                             user.AllowMessaging,
+                                             user.RegionId,
+                                             user.TerminalId,
+                                             user.AreaId);
+                        }
+
 
                         // 22) populate and send the Login message back to the handheld
 
@@ -638,7 +680,53 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         // 26) Send GV Driver NAME Packet to tracker
 
+                        ////////////////////////////////////////////////
                         // 27) Add entry to Event Log - Login Received.
+                        StringBuilder sbComment = new StringBuilder();
+                        sbComment.Append(EventCommentConstants.ReceivedDriverLogin);
+                        sbComment.Append(" HH:");
+                        sbComment.Append(driverStatus.LoginDateTime);
+                        if (null != driverStatus.TripNumber)
+                        { 
+                            sbComment.Append(" Trip:");
+                            sbComment.Append(driverStatus.TripNumber);
+                            sbComment.Append("-");
+                            sbComment.Append(driverStatus.TripSegNumber);
+                        }
+                        sbComment.Append(" Drv:");
+                        sbComment.Append(driverStatus.EmployeeId);
+                        sbComment.Append(" Pwr:");
+                        sbComment.Append(driverStatus.PowerId);
+                        sbComment.Append(" Odom:");
+                        sbComment.Append(driverStatus.Odometer);
+                        string comment = sbComment.ToString().Trim();
+
+                        var eventLog = new EventLog()
+                        {
+                            EventDateTime = driverStatus.LoginDateTime,
+                            EventSeqNo = 0,
+                            EventTerminalId = driverStatus.TerminalId,
+                            EventRegionId = driverStatus.RegionId,
+                            //These are not populated for logins in the current system.
+                            // EventEmployeeId = driverStatus.EmployeeId,
+                            // EventEmployeeName = Common.GetDriverName(employeeMaster),
+                            EventTripNumber = driverStatus.TripNumber,
+                            EventProgram = EventProgramConstants.Services,
+                            //These are not populated for logins in the current system.
+                            //EventScreen = null,
+                            //EventAction = null,
+                            EventComment = comment,
+                        };
+
+                        //scratchChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
+                        log.Debug("SRTEST:Saving EventLog Record - Login");
+                        //if (Common.LogChangeSetFailure(scratchChangeSetResult, eventLog, log))
+                        //{
+                        //    var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                        //                         driverStatus.EmployeeId, EventCommentConstants.ReceivedDriverLogin);
+                        //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        //    break;
+                        //}
 
                     }
                     catch (Exception ex)
@@ -678,6 +766,107 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             return changeSetResult;
         }
         /// <summary>
+        /// Check for open ended delays for this driver
+        /// </summary>
+        public static void CheckForOpenEndedDelays(IDataService dataService, ProcessChangeSetSettings settings,
+               ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
+               DriverLoginProcess driverLoginProcess, EmployeeMaster employeeMaster, DriverStatus driverStatus,  ref int driverHistoryInsertCount)
+        {
+            DataServiceFault fault;
+            string msgKey = key;
+            var driverDelays = Util.Common.GetDriverDelaysOpenEnded(dataService, settings, userCulture, userRoleIds,
+                                             driverLoginProcess.EmployeeId, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return;
+            }
+            //Even though no entries were found, the list was not null. Now also checking if count > 0.
+            if (driverDelays != null && driverDelays.Count > 0)
+            {
+                log.Debug("SRTEST:GetDriverDelaysOpenEnded");
+                //driverDelays is a list of driver delays that have no end date/time sorted by open datetime in descending order
+                //Starting with the last record, set the end date/time to the login date/time
+                //Then for each additional delay, set the end date/time to the previous delays start date/time
+                //Usually only there will be no open-ended delays or perhaps just one.
+
+                //Add 1 second to the action date time, so the BackOnDuty will display after the Login on the Driver History report
+                //and the delay end time will match the driver history
+                System.TimeSpan tSpan = new System.TimeSpan(0, 0, 0, 1);
+                driverDelays[0].DelayEndDateTime = driverLoginProcess.LoginDateTime + tSpan;
+
+                for (int i = 1; i < driverDelays.Count; i++)
+                {
+                    driverDelays[i].DelayEndDateTime = driverDelays[i - 1].DelayStartDateTime;
+                }
+
+                var driverDelayRecordType = (DriverDelayRecordType)
+                    dataService.RecordTypes.Single(x => x.TypeName == "DriverDelay");
+                var driverDelayChangeSet = (ChangeSet<string, DriverDelay>)
+                    driverDelayRecordType.GetNewChangeSet();
+
+                foreach (var driverDelay in driverDelays)
+                {
+                    //For testing
+                    log.DebugFormat("SRTEST:TripNumber:{0} DelayCode:{1} Reason:{2} Start:{3} End:{4}",
+                                                        driverDelay.TripNumber,
+                                                        driverDelay.DelayCode,
+                                                        driverDelay.DelayReason,
+                                                        driverDelay.DelayStartDateTime,
+                                                        driverDelay.DelayEndDateTime);
+
+                    driverDelayChangeSet.AddUpdate(driverDelay.Id, driverDelay);
+                    log.Debug("SRTEST:Saving Delay Record - Login");
+                }
+                var driverDelayChangeSetResult = driverDelayRecordType.ProcessChangeSet(dataService,
+                    driverDelayChangeSet, settings);
+                if (driverDelayChangeSetResult.FailedCreates.Any() ||
+                    driverDelayChangeSetResult.FailedUpdates.Any() ||
+                    driverDelayChangeSetResult.FailedDeletions.Any())
+                {
+                    var s = "Could not update open ended driver delays";
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                    return;
+                }
+
+                // 8b) Add "Back On Duty" flag to Driver History table.
+                // For the last open-ended delay that we added an end time, record a back on duty status in the DriverHistory table.
+                // The driver is logging in, so in effect he is back on duty, no longer on delay.
+                // No need to actually add it to the DriverStatus table since we will be adding a
+                // status of login very shortly and he did not actually click on back on duty. 
+                // Users viewing the driver history wanted to know where the back on duty was.
+                // We still need to do this even if there was no trip number because the driver can go on delay without being on a trip. 
+                // In that case the trip number in the DriverDelay table is #driverid
+                DriverStatus bodDriverStatus = driverStatus;
+                bodDriverStatus.Status = DriverStatusSRConstants.BackOnDuty;
+                //Add 1 second to the action date time, so the BackOnDuty will display after the Login on the Driver History report
+                bodDriverStatus.ActionDateTime = driverStatus.ActionDateTime + tSpan;
+                //The delay code is stored in the DriverStatus table but not in the DriverHistory table, so it is not needed.
+                log.Debug("SRTEST:Add BackOnDuty to DriverHistory");
+                //scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
+                //if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
+                //{
+                //    var s = "Could not update driver status";
+                //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                //    break;
+                //}
+                if (!InsertDriverHistory(dataService, settings, employeeMaster, bodDriverStatus,
+                    ++driverHistoryInsertCount, userRoleIds, userCulture, out fault))
+                {
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        return;
+                    }
+                    return;
+                }
+            }
+            //None found
+            return;
+        }
+
+  
+        /// <summary>
         /// Check for power unit change in the middle of a segment
         /// </summary>
         // If trip segment is partially completed & power unit id from the login is different that the
@@ -687,8 +876,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         // Here I think, we just want to get the last one, since our purpose here is to adjust the power id
         // not to close open-ended entries.
         public static void CheckForPowerIdChange(IDataService dataService, ProcessChangeSetSettings settings,
-               ChangeSetResult<string> changeSetResult,String key, IEnumerable<long> userRoleIds, string userCulture,
-               DriverLoginProcess driverLoginProcess, PowerMaster powerMaster, EmployeeMaster employeeMaster)
+                   ChangeSetResult<string> changeSetResult,String key, IEnumerable<long> userRoleIds, string userCulture,
+                   DriverLoginProcess driverLoginProcess, PowerMaster powerMaster, EmployeeMaster employeeMaster)
         {
             ChangeSetResult<string> scratchChangeSetResult;
             DataServiceFault fault;
@@ -713,7 +902,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                                     driverLoginProcess.PowerId,
                                                     driverLoginProcess.Odometer);
 
-                // if the power unit has changed and tthe trip segment has been started but not finished we have a dilema.
+                // if the power unit has changed and the trip segment has been started but not finished we have a dilema.
                 // What we currently do is set the new power id as the power id entire segment even though the first power id
                 // may have completed part of the trip. 
                 if (driverLoginProcess.PowerId != tripSegment.TripSegPowerId)
@@ -723,6 +912,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     //Update the TripSegment record
                     scratchChangeSetResult = Common.UpdateTripSegment(dataService, settings, tripSegment);
+                    log.Debug("SRTEST:Saving TripSegment Record - Login (Power Unit Change)");
                     if (Common.LogChangeSetFailure(scratchChangeSetResult, tripSegment, log))
                     {
                         var s = string.Format("Could not update TripSegment for TripNumber {0}-{1}.",
@@ -762,6 +952,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     //Update the TripSegmentMileage record
                     scratchChangeSetResult = Common.UpdateTripSegmentMileage(dataService, settings, tripSegmentMileage);
+                    log.Debug("SRTEST:Saving TripSegmentMileage Record - Login (Power Unit Change)");
                     if (Common.LogChangeSetFailure(scratchChangeSetResult, tripSegment, log))
                     {
                         var s = string.Format("Could not update TripSegmentMileage for TripNumber {0}-{1} Seq#{2}.",
@@ -830,6 +1021,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
                 powerSeqNo = powerHistoryMax.PowerSeqNumber + callCountThisTxn;
             }
+            //For testing
+            log.Debug("SRTEST:Add PowerHistory");
+            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} MaxSeq#:{5} callCountThisTxn:{6} Seq#:{7}",
+                             powerMaster.PowerDriverId,
+                             powerMaster.PowerCurrentTripNumber,
+                             powerMaster.PowerCurrentTripSegNumber,
+                             powerMaster.PowerStatus,
+                             powerMaster.PowerLastActionDateTime,
+                             powerHistoryMax.PowerSeqNumber,
+                             callCountThisTxn,
+                             powerSeqNo);
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the TerminalName in the TerminalMaster 
@@ -949,6 +1151,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             var changeSet = (ChangeSet<string, PowerHistory>) recordType.GetNewChangeSet();
             long recordRef = 1;
             changeSet.AddCreate(recordRef, powerHistory, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving PowerHistory - Login");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             if (Common.LogChangeSetFailure(changeSetResult, powerHistory, log))
             {
@@ -969,7 +1172,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="userCulture"></param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
-        private bool InsertDriverHistory(IDataService dataService, ProcessChangeSetSettings settings,
+        private static bool InsertDriverHistory(IDataService dataService, ProcessChangeSetSettings settings,
             EmployeeMaster employeeMaster, DriverStatus driverStatus, int callCountThisTxn,
             IEnumerable<long> userRoleIdsEnumerable, string userCulture, out DataServiceFault fault)
         {
@@ -991,6 +1194,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
                 driverSeqNo = driverHistoryMax.DriverSeqNumber + callCountThisTxn;
             }
+            //For testing
+            log.Debug("SRTEST:Add DriverHistory");
+            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} MaxSeq#:{5} callCountThisTxn:{6} Seq#:{7}",
+                             driverStatus.EmployeeId,
+                             driverStatus.TripNumber,
+                             driverStatus.TripSegNumber,
+                             driverStatus.Status,
+                             driverStatus.ActionDateTime,
+                             driverHistoryMax.DriverSeqNumber,
+                             callCountThisTxn,
+                             driverSeqNo);
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the DriverStatus Description in the CodeTable DRIVERSTATUS 
@@ -1095,6 +1309,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             var changeSet = (ChangeSet<string, DriverHistory>)recordType.GetNewChangeSet();
             long recordRef = 1;
             changeSet.AddCreate(recordRef, driverHistory, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving DriverHistory Record - Login");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             if (Common.LogChangeSetFailure(changeSetResult, driverHistory, log))
             {

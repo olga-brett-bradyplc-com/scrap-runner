@@ -102,7 +102,24 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return errorsDetected;
         }
-
+        ///TABLE INSERTS
+        /// <summary>
+        /// Add/Update an EventLog record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="eventLog"></param>
+        /// <returns>The chageSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<int> UpdateEventLog(IDataService dataService, ProcessChangeSetSettings settings,
+                                              EventLog eventLog)
+        {
+            var recordType = (EventLogRecordType)dataService.RecordTypes.Single(x => x.TypeName == "EventLog");
+            var changeSet = (ChangeSet<int, EventLog>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(eventLog.Id, eventLog);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+        ///TABLE UPDATES
         /// <summary>
         /// Update a PowerMaster record.
         /// </summary>
@@ -111,7 +128,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="powerMaster"></param>
         /// <returns>The chageSetResult.  Caller must inspect for errors.</returns>
         public static ChangeSetResult<string> UpdatePowerMaster(IDataService dataService, ProcessChangeSetSettings settings,
-            PowerMaster powerMaster)
+                                              PowerMaster powerMaster)
         {
             var recordType = (PowerMasterRecordType)dataService.RecordTypes.Single(x => x.TypeName == "PowerMaster");
             var changeSet = (ChangeSet<string, PowerMaster>)recordType.GetNewChangeSet();
@@ -574,7 +591,41 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return containers;
         }
-
+        /// CONTAINERMASTER Table queries
+        /// <summary>
+        ///  Get a list of container master that are on a given power unit..
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="dateTime"></param>
+        /// <param name="powerId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if powerId is null or no entries are found</returns>
+        public static List<ContainerMaster> GetContainersForPowerId(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string powerId, out DataServiceFault fault)
+        {
+            fault = null;
+            var containers = new List<ContainerMaster>();
+            if (null != powerId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<ContainerMaster>()
+                    .Filter(y => y.Property(x => x.ContainerPowerId).EqualTo(powerId))
+                    .OrderBy(x => x.ContainerNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return containers;
+                }
+                containers = queryResult.Records.Cast<ContainerMaster>().ToList();
+            }
+            return containers;
+        }
         /// CUSTOMERDIRECTIONS queries
         /// <summary>
         ///  Get a list of directions for each destination custhostcode to be sent to a given driver.
@@ -898,6 +949,85 @@ namespace Brady.ScrapRunner.DataService.Util
                 employee = (EmployeeMaster)queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
             }
             return employee;
+        }
+        /// EMPLOYEEMASTER Table queries
+        /// <summary>
+        ///  Get a list of users that have access to messaging for the driver's area
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="areaId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if areaId is null or no entries are found</returns>
+        public static List<EmployeeMaster> GetDispatcherListForArea(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string areaId, out DataServiceFault fault)
+        {
+            fault = null;
+            var terminalsInArea = new List<string>();
+            var users = new List<EmployeeMaster>();
+            if (null != areaId)
+            {
+                terminalsInArea = Util.Common.GetTerminalsByArea
+                    (dataService, settings, userCulture, userRoleIds, areaId, out fault);
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<EmployeeMaster>()
+                        .Filter(y => y.Property(x => x.SecurityLevel).NotEqualTo(SecurityLevelConstants.Driver)
+                        .And().Property(x => x.AllowMessaging).EqualTo(Constants.Yes)
+                        .And().Property(x => x.TerminalId).In(terminalsInArea.ToArray()))
+                        .OrderBy(x => x.LastName)
+                        .OrderBy(x => x.FirstName)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return users;
+                }
+                users = queryResult.Records.Cast<EmployeeMaster>().ToList();
+            }
+            return users;
+        }
+        /// EMPLOYEEMASTER Table queries
+        /// <summary>
+        ///  Get a list of users that have access to messaging for the driver's region
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if areaId is null or no entries are found</returns>
+        public static List<EmployeeMaster> GetDispatcherListForRegion(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string regionId, out DataServiceFault fault)
+        {
+            fault = null;
+            var users = new List<EmployeeMaster>();
+            if (null != regionId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<EmployeeMaster>()
+                        .Filter(y => y.Property(x => x.SecurityLevel).NotEqualTo(SecurityLevelConstants.Driver)
+                        .And().Property(x => x.AllowMessaging).EqualTo(Constants.Yes)
+                        .And().Property(x => x.RegionId).EqualTo(regionId))
+                        .OrderBy(x => x.LastName)
+                        .OrderBy(x => x.FirstName)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return users;
+                }
+                users = queryResult.Records.Cast<EmployeeMaster>().ToList();
+            }
+            return users;
         }
         /// POWERMASTER Table queries
         /// <summary>
