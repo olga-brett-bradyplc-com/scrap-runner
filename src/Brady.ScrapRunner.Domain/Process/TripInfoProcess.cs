@@ -20,9 +20,13 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string TripNumber { get; set; }
 
         /// <summary>
-        /// The return value
+        /// The return values
         /// </summary>
         public virtual List<Trip> Trips { get; set; }
+
+        public virtual List<TripSegment> TripSegments { get; set; }
+
+        public virtual List<TripSegmentContainer> TripSegmentContainers { get; set; }
 
         public virtual String Id
         {

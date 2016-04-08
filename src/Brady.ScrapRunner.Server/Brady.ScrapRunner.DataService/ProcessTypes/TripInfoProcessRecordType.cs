@@ -157,6 +157,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Define this or pass this in from somewhere..
                     bool bLogin = true;
                     List<Trip> tripList = new List<Trip>();
+                    List<TripSegment> fullTripSegmentList = new List<TripSegment>();
+                    List<TripSegmentContainer> fullTripSegmentContainerList = new List<TripSegmentContainer>();
                     if (bLogin)
                     {
                         tripList = Util.Common.GetTripsForDriverAtLogin(dataService, settings, userCulture, userRoleIds,
@@ -212,6 +214,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         List<TripSegment> tripSegmentList = new List<TripSegment>();
                         tripSegmentList = Util.Common.GetTripSegments(dataService, settings, userCulture, userRoleIds,
                                           tripInfo.TripNumber, out fault);
+                        fullTripSegmentList.AddRange(tripSegmentList);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -241,6 +244,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         List<TripSegmentContainer> tripContainerList = new List<TripSegmentContainer>();
                         tripContainerList = Util.Common.GetTripContainers(dataService, settings, userCulture, userRoleIds,
                                             tripInfo.TripNumber, out fault);
+                        fullTripSegmentContainerList.AddRange(tripContainerList);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -259,6 +263,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 tripsegcontainer.TripSegContainerSize);
                         }
                     }//end of foreach (Trip tripInfo in tripList)
+
+                    tripInfoProcess.Trips = tripList;
+                    tripInfoProcess.TripSegments = fullTripSegmentList;
+                    tripInfoProcess.TripSegmentContainers = fullTripSegmentContainerList;
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////
                     //Loop through the list of customer host codes
