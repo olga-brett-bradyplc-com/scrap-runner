@@ -40,6 +40,7 @@
   <color name="material_A700">#101010</color>
 
   <color name="material_white">#ffffff</color>
+  <color name="material_orange">#ffac43</color>
   
   <color name="enroute">@color/material_green_500</color>
   <color name="enroute_pressed">@color/material_green_700</color>

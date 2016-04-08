@@ -131,6 +131,7 @@
   </data>
   <data name="Odometer" xml:space="preserve">
     <value>Current Odometer Reading</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="OK" xml:space="preserve">
     <value>Ok</value>
@@ -140,36 +141,45 @@
   </data>
   <data name="PasswordNotEmpty" xml:space="preserve">
     <value>Password is required.</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="SignIn" xml:space="preserve">
     <value>Sign In</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="SignOut" xml:space="preserve">
     <value>Sign Out</value>
   </data>
   <data name="TruckId" xml:space="preserve">
     <value>Truck ID</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="TruckIdRequired" xml:space="preserve">
     <value>A valid truck ID is required</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="UserName" xml:space="preserve">
     <value>Username</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="UserNameNotEmpty" xml:space="preserve">
     <value>Username is required.</value>
   </data>
   <data name="OdometerRequired" xml:space="preserve">
     <value>A current odometer reading is required</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="OdometerOutOfRange" xml:space="preserve">
     <value>Odometer must be between {0} and {1}.</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="TruckIdOutOfRange" xml:space="preserve">
     <value>Truck Id must be less than {0} characters.</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="PasswordOutOfRange" xml:space="preserve">
     <value>Password must be less than {0} characters.</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="UserNameOutOfRange" xml:space="preserve">
     <value>Username must be less than {0} characters.</value>
@@ -273,13 +283,16 @@
     <value>Power Unit ID and Odometer Reading</value>
   </data>
   <data name="PasswordHint" xml:space="preserve">
-    <value>Enter your password</value>
+    <value>Password</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="UserNameHint" xml:space="preserve">
-    <value>Enter your username</value>
+    <value>Employee ID</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="TruckIdNotFound" xml:space="preserve">
     <value>The specified power unit id was found found</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="LoggingIn" xml:space="preserve">
     <value>Logging In</value>
@@ -307,6 +320,7 @@
   </data>
   <data name="OdometerReadingHint" xml:space="preserve">
     <value>Odometer Reading</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="SecondGrossWeight" xml:space="preserve">
     <value>Second Gross</value>
@@ -316,11 +330,15 @@
   </data>
   <data name="TruckIdHint" xml:space="preserve">
     <value>Truck ID</value>
+    <comment>Sign In View</comment>
   </data>
   <data name="CompletingTripSegment" xml:space="preserve">
     <value>Completing Trip Segment</value>
   </data>
   <data name="LoadingTripInformation" xml:space="preserve">
     <value>Loading Trip Information</value>
+  </data>
+  <data name="SignInTitle" xml:space="preserve">
+    <value>ScrapRunner Sign In</value>
   </data>
 </root>
