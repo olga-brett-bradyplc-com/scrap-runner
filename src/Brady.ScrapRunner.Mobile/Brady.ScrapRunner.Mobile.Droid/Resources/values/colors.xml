@@ -5,11 +5,23 @@
   <color name="colorAccent">@color/material_100</color>
   
   <!-- You can generate a material palette from: http://mcg.mbitson.com/#/ -->
+  
   <color name="material_gray_300">#d6d6d6</color>
   <color name="material_gray_700">#515151</color>
   <color name="material_gray_900">#2f2f2f</color>
+
+  <color name="material_blue_300">#5BB1F6</color>  
   <color name="material_blue_500">#2196F3</color>
   <color name="material_blue_700">#1976D2</color>
+
+  <color name="material_red_300">#E32626</color>
+  <color name="material_red_500">#b51717</color>
+  <color name="material_red_700">#7F1010</color>
+
+  <color name="material_green_300">#5BE326</color>
+  <color name="material_green_500">#43b517</color>
+  <color name="material_green_700">#2F7F10</color>
+  
   <color name="accent">#FFC107</color>
 
   <color name="material_50">#b4b4b4</color>
@@ -28,14 +40,15 @@
   <color name="material_A700">#101010</color>
 
   <color name="material_white">#ffffff</color>
+  <color name="material_orange">#ffac43</color>
   
-  <color name="enroute">#43b517</color>
-  <color name="enroute_pressed">#389514</color>
+  <color name="enroute">@color/material_green_500</color>
+  <color name="enroute_pressed">@color/material_green_700</color>
   
-  <color name="directions">#1774b5</color>
-  <color name="directions_pressed">#145495</color>
+  <color name="directions">@color/material_blue_500</color>
+  <color name="directions_pressed">@color/material_blue_700</color>
 
-  <color name="arrive">#b51717</color>
-  <color name="arrive_pressed">#951414</color>
+  <color name="arrive">@color/material_red_500</color>
+  <color name="arrive_pressed">@color/material_red_700</color>
 
 </resources>

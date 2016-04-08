@@ -377,7 +377,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter your password.
+        ///   Looks up a localized string similar to Password.
         /// </summary>
         public static string PasswordHint {
             get {
@@ -503,6 +503,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ScrapRunner Sign In.
+        /// </summary>
+        public static string SignInTitle {
+            get {
+                return ResourceManager.GetString("SignInTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sign Out.
         /// </summary>
         public static string SignOut {
@@ -593,7 +602,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter your username.
+        ///   Looks up a localized string similar to Employee ID.
         /// </summary>
         public static string UserNameHint {
             get {
