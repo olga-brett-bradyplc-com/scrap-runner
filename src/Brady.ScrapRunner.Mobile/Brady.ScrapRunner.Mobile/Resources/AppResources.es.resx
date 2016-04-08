@@ -304,4 +304,7 @@
   <data name="SwitchTripType" xml:space="preserve">
     <value>CAMBIAR</value>
   </data>
+  <data name="SignInTitle" xml:space="preserve">
+    <value>ScrapRunner Registrarse</value>
+  </data>
 </root>
