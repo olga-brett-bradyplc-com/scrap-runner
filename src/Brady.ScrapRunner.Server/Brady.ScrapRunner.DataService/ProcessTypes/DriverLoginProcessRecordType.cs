@@ -152,6 +152,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
 
+                        //TripInfoProcess will return the following lists.
+                        List<ContainerMaster> containersOnPowerIdList = new List<ContainerMaster>();
+                        List<EmployeeMaster> usersForMessagingList = new List<EmployeeMaster>();
                         //
                         // 1) Process information from handheld
                         // NOTE: We might want to validate (or backfill) something like Locale against configured dialects rather than a hardcoded list in validator
@@ -161,7 +164,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // 2) Validate driver id / Get the EmployeeMaster
                         // UserId must be a valid EmployeeId in the EmployeeMaster and SecurityLevel must be DR for driver.
                         var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
-                                                      driverLoginProcess.EmployeeId, out fault);
+                                driverLoginProcess.EmployeeId, out fault);
                         if (null != fault)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -172,6 +175,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Driver ID " + driverLoginProcess.EmployeeId));
                             break;
                         }
+                        driverLoginProcess.TermId = employeeMaster.TerminalId;
+                        driverLoginProcess.RegionId = employeeMaster.RegionId;
+                        driverLoginProcess.AreaId = employeeMaster.AreaId;
+
                         //For testing
                         log.Debug("SRTEST:GetEmployeeDriver");
                         log.DebugFormat("SRTEST:Driver:{0} Terminal:{1} SecurityLevel:{2}",
@@ -445,9 +452,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////
                         // 8) Check for open ended delays 
-                        CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
-                                     driverLoginProcess, employeeMaster, driverStatus, ref driverHistoryInsertCount);
-                        /*
+                        //CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                        //             driverLoginProcess, employeeMaster, driverStatus, ref driverHistoryInsertCount);
+                        
                         if (CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                                      driverLoginProcess, employeeMaster))
                         {
@@ -460,13 +467,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             // We still need to do this even if there was no trip number because the driver can go on delay without being on a trip. 
                             // In that case the trip number in the DriverDelay table is #driverid
                             driverStatus.Status = DriverStatusSRConstants.BackOnDuty;
-                            //For testing
-                            log.Debug("SRTEST:Add BackOnDuty to DriverStatus, DriverHistory");
-                            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status{3}",
-                                             driverStatus.EmployeeId,
-                                             driverStatus.TripNumber,
-                                             driverStatus.TripSegNumber,
-                                             driverStatus.Status);
+                            //Add 1 second to the action date time, so the BackOnDuty will display after the Login on the Driver History report
+                            System.TimeSpan tSpan = new System.TimeSpan(0, 0, 0, 1);
+                            driverStatus.ActionDateTime = driverLoginProcess.LoginDateTime + tSpan;
+                            //The delay code is stored in the DriverStatus table but not in the DriverHistory table, so it is not needed.
+                            log.Debug("SRTEST:Add BackOnDuty to DriverHistory");
 
                             //scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
                             //if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
@@ -487,7 +492,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 break;
                             }
                         }
-                        */
+                        
                         ////////////////////////////////////////////////
                         // 9) Check for power unit change
                         // There has to be a trip number and trip segment number...
@@ -516,9 +521,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         driverStatus.LoginDateTime = driverLoginProcess.LoginDateTime;
                         driverStatus.Odometer = driverLoginProcess.Odometer;
                         driverStatus.LoginProcessedDateTime = DateTime.Now;
-                        driverStatus.ContainerMasterDateTime = driverLoginProcess.ContainerMasterDateTime;
+                       // driverStatus.ContainerMasterDateTime = driverLoginProcess.ContainerMasterDateTime;
                         driverStatus.MdtVersion = driverLoginProcess.PndVer;
-                        driverStatus.TerminalMasterDateTime = driverLoginProcess.TerminalMasterDateTime;
+                       // driverStatus.TerminalMasterDateTime = driverLoginProcess.TerminalMasterDateTime;
                         driverStatus.DriverLCID = driverLoginProcess.LocaleCode;
 
                         scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
@@ -606,6 +611,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // 20) Send Container Inventory
                         var containersOnPowerId = Util.Common.GetContainersForPowerId(dataService, settings, userCulture, userRoleIds,
                                                   driverLoginProcess.PowerId, out fault);
+                        containersOnPowerIdList.AddRange(containersOnPowerId);
+
                         if (null != fault)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -650,6 +657,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             usersForMessaging = Util.Common.GetDispatcherListForRegion(dataService, settings, userCulture, userRoleIds,
                                                        employeeMaster.RegionId, out fault);
                         }
+                        usersForMessagingList.AddRange(usersForMessaging);
                         if (null != fault)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -669,15 +677,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                              user.AreaId);
                         }
 
-
-                        // 22) populate and send the Login message back to the handheld
-
+                        // TODO:
                         // 23) Send GPS Company Info to tracker
-
                         // 24) Send GV Driver START Packet to tracker
-
                         // 25) Send GV Driver CODE Packet to tracker
-
                         // 26) Send GV Driver NAME Packet to tracker
 
                         ////////////////////////////////////////////////
@@ -728,6 +731,19 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //    break;
                         //}
 
+                        // 22) populate and send the Login message back to the mobile device.
+                        driverLoginProcess.UsersForMessaging = usersForMessagingList;
+                        driverLoginProcess.ContainersOnPowerId = containersOnPowerIdList;
+
+                        //For testing... this is information filled in by this driverLoginProcess and should be sent back to the mobile device.
+                        log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1}-{2} DriverStatus:{3} Region:{4} Terminal:{5} Area:{6}",
+                                         driverLoginProcess.EmployeeId,
+                                         driverLoginProcess.TripNumber,
+                                         driverLoginProcess.TripSegNumber,
+                                         driverLoginProcess.DriverStatus,
+                                         driverLoginProcess.RegionId,
+                                         driverLoginProcess.TermId,
+                                         driverLoginProcess.AreaId);
                     }
                     catch (Exception ex)
                     {
@@ -768,9 +784,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <summary>
         /// Check for open ended delays for this driver
         /// </summary>
-        public static void CheckForOpenEndedDelays(IDataService dataService, ProcessChangeSetSettings settings,
+        public bool CheckForOpenEndedDelays(IDataService dataService, ProcessChangeSetSettings settings,
                ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
-               DriverLoginProcess driverLoginProcess, EmployeeMaster employeeMaster, DriverStatus driverStatus,  ref int driverHistoryInsertCount)
+               DriverLoginProcess driverLoginProcess, EmployeeMaster employeeMaster)
         {
             DataServiceFault fault;
             string msgKey = key;
@@ -779,7 +795,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (null != fault)
             {
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                return;
+                return false;
             }
             //Even though no entries were found, the list was not null. Now also checking if count > 0.
             if (driverDelays != null && driverDelays.Count > 0)
@@ -826,43 +842,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 {
                     var s = "Could not update open ended driver delays";
                     changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                    return;
+                    return false;
                 }
-
-                // 8b) Add "Back On Duty" flag to Driver History table.
-                // For the last open-ended delay that we added an end time, record a back on duty status in the DriverHistory table.
-                // The driver is logging in, so in effect he is back on duty, no longer on delay.
-                // No need to actually add it to the DriverStatus table since we will be adding a
-                // status of login very shortly and he did not actually click on back on duty. 
-                // Users viewing the driver history wanted to know where the back on duty was.
-                // We still need to do this even if there was no trip number because the driver can go on delay without being on a trip. 
-                // In that case the trip number in the DriverDelay table is #driverid
-                DriverStatus bodDriverStatus = driverStatus;
-                bodDriverStatus.Status = DriverStatusSRConstants.BackOnDuty;
-                //Add 1 second to the action date time, so the BackOnDuty will display after the Login on the Driver History report
-                bodDriverStatus.ActionDateTime = driverStatus.ActionDateTime + tSpan;
-                //The delay code is stored in the DriverStatus table but not in the DriverHistory table, so it is not needed.
-                log.Debug("SRTEST:Add BackOnDuty to DriverHistory");
-                //scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
-                //if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
-                //{
-                //    var s = "Could not update driver status";
-                //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                //    break;
-                //}
-                if (!InsertDriverHistory(dataService, settings, employeeMaster, bodDriverStatus,
-                    ++driverHistoryInsertCount, userRoleIds, userCulture, out fault))
-                {
-                    if (null != fault)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        return;
-                    }
-                    return;
-                }
+                return true;
             }
             //None found
-            return;
+            return false;
         }
 
   

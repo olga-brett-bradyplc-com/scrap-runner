@@ -32,8 +32,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripNumber);
             StringProperty(x => x.TripSegNumber);
             StringProperty(x => x.DriverStatus);
-            TimeProperty(x => x.ContainerMasterDateTime);
-            TimeProperty(x => x.TerminalMasterDateTime);
+           // TimeProperty(x => x.ContainerMasterDateTime);
+           // TimeProperty(x => x.TerminalMasterDateTime);
 
             ViewDefaults()
             .Property(x => x.EmployeeId)
@@ -51,8 +51,8 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.TripNumber)
             .Property(x => x.TripSegNumber)
             .Property(x => x.DriverStatus)
-            .Property(x => x.ContainerMasterDateTime)
-            .Property(x => x.TerminalMasterDateTime)
+            //.Property(x => x.ContainerMasterDateTime)
+            //.Property(x => x.TerminalMasterDateTime)
 
             .OrderBy(x => x.EmployeeId);
         }
