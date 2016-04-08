@@ -3,30 +3,67 @@
     xmlns:local="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/loginImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/logo_2"
+        android:scaleType="centerInside"
+        android:layout_marginTop="15dp"
+        android:layout_above="@id/center_panel" />
     <LinearLayout
         android:id="@+id/center_panel"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_centerInParent="true">
-        <EditText
-            android:background="@drawable/rounded_edittext_top_states"
+        android:layout_centerInParent="true"
+        android:padding="15dp">
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:padding="4dp"
-            local:MvxBind="Text UserName"
-            local:MvxLang="Hint UserNameHint" />
-        <EditText
-            android:background="@drawable/rounded_edittext_bottom_states"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/employeeIdInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                local:MvxBind="Text UserName"
+                local:MvxLang="Hint UserNameHint"
+                android:hint="Employee ID" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:padding="4dp"
-            android:layout_marginTop="2dp"
-            android:inputType="textPassword"
-            local:MvxBind="Text Password"
-            local:MvxLang="Hint PasswordHint" />
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/passwordInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                local:MvxBind="Text Password"
+                local:MvxLang="Hint PasswordHint" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/powerUnitIdInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                local:MvxBind="Text TruckId"
+                local:MvxLang="Hint TruckIdHint" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/odometerInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                local:MvxBind="Text Odometer"
+                local:MvxLang="Hint OdometerReadingHint" />
+        </android.support.design.widget.TextInputLayout>
         <Button
             local:MvxBind="Click SignInCommand"
             local:MvxLang="Text SignIn"
@@ -34,14 +71,6 @@
             android:layout_height="48dp"
             android:layout_marginTop="4dp" />
     </LinearLayout>
-    <ImageView
-        android:layout_above="@id/center_panel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:src="@drawable/scraprunnertemplogo" />
     <ImageButton
         android:layout_width="48dp"
         android:layout_height="48dp"
