@@ -174,6 +174,61 @@
         public static readonly string LoggedOutDisp = "T"; 
     }
     /// <summary>
+    /// Event Program Contants.  Used by the EventLog table.
+    /// </summary>
+    public static class EventProgramConstants
+    {
+        /// <summary>Services: SERVICES</summary>
+        public static readonly string Services = "SERVICES";
+    }
+    /// <summary>
+    /// Event Comment Contants.  Used by the EventLog table.
+    /// </summary>
+    public static class EventCommentConstants
+    {
+        /// <summary>SentTripToDriver: SENT TRIP TO DRIVER</summary>
+        public static readonly string SentTripToDriver = "SENT TRIP TO DRIVER";
+        /// <summary>SentCancelMsgToDriver: SENT CANCEL MSG TO DRIVER</summary>
+        public static readonly string SentCancelMsgToDriver = "SENT CANCEL MSG TO DRIVER";
+        /// <summary>SentForcedLogoutToDriver: SENT FORCED LOGOUT TO DRIVER</summary>
+        public static readonly string SentForcedLogoutToDriver = "SENT FORCED LOGOUT TO DRIVER";
+        /// <summary>SentMarkDoneToDriver: SENT MARKED DONE TO DRIVER</summary>
+        public static readonly string SentMarkDoneToDriver = "SENT MARKED DONE TO DRIVER";
+        /// <summary>SentReseqTripsToDriver: SENT RESEQ TRIPS TO DRIVER</summary>
+        public static readonly string SentReseqTripsToDriver = "SENT RESEQ TRIPS TO DRIVER";
+        /// <summary>ReceivedDriverAck: RECEIVED DRIVER ACK</summary>
+        public static readonly string ReceivedDriverAck = "RECEIVED DRIVER ACK";
+        /// <summary>ReceivedDriverEnroute: RECEIVED DRIVER ENROUTE</summary>
+        public static readonly string ReceivedDriverEnroute = "RECEIVED DRIVER ENROUTE";
+        /// <summary>DriverOutOfOrder: DRIVER OUT OF ORDER</summary>
+        public static readonly string DriverOutOfOrder = "DRIVER OUT OF ORDER";
+        /// <summary>ReceivedDriverArrive: RECEIVED DRIVER ARRIVE</summary>
+        public static readonly string ReceivedDriverArrive = "RECEIVED DRIVER ARRIVE";
+        /// <summary>ReceivedDriverSLC: RECEIVED DRIVER SLC</summary>
+        public static readonly string ReceivedDriverSLC = "RECEIVED DRIVER SLC";
+        /// <summary>ReceivedDriverFuel: RECEIVED DRIVER FUEL</summary>
+        public static readonly string ReceivedDriverFuel = "RECEIVED DRIVER FUEL";
+        /// <summary>ReceivedDriverDelay: RECEIVED DRIVER DELAY</summary>
+        public static readonly string ReceivedDriverDelay = "RECEIVED DRIVER DELAY";
+        /// <summary>ReceivedDriverBackOnDuty: RECEIVED DRIVER BACK ON DUTY</summary>
+        public static readonly string ReceivedDriverBackOnDuty = "RECEIVED DRIVER BACK ON DUTY";
+        /// <summary>ReceivedDriverSegDoneSts: RECEIVED DRIVER SEG DONE STS</summary>
+        public static readonly string ReceivedDriverSegDoneSts = "RECEIVED DRIVER SEG DONE STS";
+        /// <summary>ReceivedDriverLogin: RECEIVED DRIVER LOGIN</summary>
+        public static readonly string ReceivedDriverLogin = "RECEIVED DRIVER LOGIN";
+        /// <summary>ReceivedDriverLogoff: RECEIVED DRIVER LOGOFF</summary>
+        public static readonly string ReceivedDriverLogoff = "RECEIVED DRIVER LOGOFF";
+        /// <summary>ReceivedDriverSegDone: RECEIVED DRIVER SEG DONE</summary>
+        public static readonly string ReceivedDriverSegDone = "RECEIVED DRIVER SEG DONE";
+        /// <summary>ReceivedDriverOdomUpdate: RECEIVED DRIVER ODOM UPDATE</summary>
+        public static readonly string ReceivedDriverOdomUpdate = "RECEIVED DRIVER ODOM UPDATE";
+        /// <summary>ReceivedDriverCancelSeg: RECEIVED DRIVER CANCEL SEG</summary>
+        public static readonly string ReceivedDriverCancelSeg = "RECEIVED DRIVER CANCEL SEG";
+        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
+        public static readonly string ReceivedDriverAddedSeg = "RECEIVED DRIVER ADDED SEG";
+    }
+
+    /// <summary>
     /// Driver Preference internal codes. From the Preferences table.
     /// </summary>
     public static class PrefDriverConstants
