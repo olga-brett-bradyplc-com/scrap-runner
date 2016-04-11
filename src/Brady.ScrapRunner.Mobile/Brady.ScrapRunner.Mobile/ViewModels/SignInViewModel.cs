@@ -24,32 +24,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class SignInViewModel : BaseViewModel
     {
-        private readonly IMvxSqliteConnectionFactory _sqliteConnectionFactory;
-        private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository;
-        private readonly IRepository<PreferenceModel> _preferencRepository;
-        private readonly IRepository<TripModel> _tripRepository;
-        private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
-        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
-        private readonly DemoDataGenerator _demoDataGenerator;
+        private readonly IDbService _dbService;
+        private readonly IPreferenceService _preferenceService;
+        private readonly ITripService _tripService;
+        private readonly ICustomerService _customerService;
         private readonly IConnectionService<DataServiceClient> _connection;
 
         public SignInViewModel(
-            IRepository<EmployeeMasterModel> employeeMasterRepository,
-            IRepository<PreferenceModel> preferenceRepository,
-            IRepository<TripModel> tripRepository,
-            IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository,
+            IDbService dbService,
+            IPreferenceService preferenceService,
+            ITripService tripService,
+            ICustomerService customerService,
             DemoDataGenerator demoDataGenerator,
             IConnectionService<DataServiceClient> connection,
             IMvxSqliteConnectionFactory sqliteConnectionFactory)
         {
-            _employeeMasterRepository = employeeMasterRepository;
-            _preferencRepository = preferenceRepository;
-            _tripRepository = tripRepository;
-            _tripSegmentRepository = tripSegmentRepository;
-            _tripSegmentContainerRepository = tripSegmentContainerRepository;
-            _demoDataGenerator = demoDataGenerator;
-            _sqliteConnectionFactory = sqliteConnectionFactory;
+            _dbService = dbService;
+            _preferenceService = preferenceService;
+            _tripService = tripService;
+            _customerService = customerService;
 
             _connection = connection;
             Title = AppResources.SignInTitle;
@@ -147,20 +140,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             using (var loginData = UserDialogs.Instance.Loading(AppResources.LoggingIn, maskType: MaskType.Clear))
             {
-                // Using this to create/delete the tables for now
-                // @TODO : Refactor this
-                await _demoDataGenerator.GenerateDemoDataAsync();
+                // Delete/Create necesscary SQLite tables
+                await _dbService.RefreshAll();
 
                 // Check username/password against BWF, and create session if valid
                 IClientSettings clientSettings = new DemoClientSettings();
                 var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
-
-                // 2. Validate that driver exists
-                // @TODO : Move to specialized employee service
-                //var userTask = await _connection.GetConnection().GetAsync<string, EmployeeMaster>(UserName);
-                //if (userTask == null) return false;
-                //await SaveEmployeeAsync(userTask);
 
                 var loginProcessObj = new DriverLoginProcess
                 {
@@ -187,12 +173,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
-                
-                // 3. Lookup preferences
-                // @TODO : Move to specialized preferences service
-                //var preferenceTask = await _connection.GetConnection().QueryAsync(new QueryBuilder<Preference>()
-                //    .Filter(y => y.Property(x => x.TerminalId).EqualTo(userTask.TerminalId)));
-                //await SavePreferencesAsync(preferenceTask.Records);
 
                 loginData.Title = "Loading Preferences";
 
@@ -205,7 +185,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (preferenceProcess.WasSuccessful)
                 {
-                    await SavePreferencesAsync(preferenceProcess.Item.Preferences);
+                    await _preferenceService.UpdatePreferences(preferenceProcess.Item.Preferences);
                 }
                 else
                 {
@@ -225,9 +205,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (tripProcess.WasSuccessful)
                 {
-                    await SaveTripsAsync(tripProcess.Item.Trips);
-                    await SaveTripSegmentsAsync(tripProcess.Item.TripSegments);
-                    await SaveTripSegmentContainersAsync(tripProcess.Item.TripSegmentContainers);
+                    await _tripService.UpdateTrips(tripProcess.Item.Trips);
+                    await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
+                    await _tripService.UpdateTripSegmentContainers(tripProcess.Item.TripSegmentContainers);
+                    await _customerService.UpdateCustomerCommodity(tripProcess.Item.CustomerCommodities);
+                    await _customerService.UpdateCustomerDirections(tripProcess.Item.CustomerDirections);
+                    await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
                 }
                 else
                 {
@@ -238,36 +221,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             }
             return true;
-        }
-
-        private Task SaveEmployeeAsync(EmployeeMaster employeeMaster)
-        {
-            var mapped = AutoMapper.Mapper.Map<EmployeeMaster, EmployeeMasterModel>(employeeMaster);
-            return _employeeMasterRepository.InsertAsync(mapped);
-        }
-
-        private Task SavePreferencesAsync(List<Preference> preferences)
-        {
-            var mapped = AutoMapper.Mapper.Map<IEnumerable<Preference>, IEnumerable<PreferenceModel>>(preferences);
-            return _preferencRepository.InsertRangeAsync(mapped);
-        }
-
-        private Task SaveTripsAsync(List<Trip> trips)
-        {
-            var mapped = AutoMapper.Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(trips);
-            return _tripRepository.InsertRangeAsync(mapped);
-        }
-        
-        private Task SaveTripSegmentsAsync(List<TripSegment> tripSegments)
-        {
-            var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegment>, IEnumerable<TripSegmentModel>>(tripSegments);
-            return _tripSegmentRepository.InsertRangeAsync(mapped);
-        }
-
-        private Task SaveTripSegmentContainersAsync(List<TripSegmentContainer> containers)
-        {
-            var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegmentContainer>, IEnumerable<TripSegmentContainerModel>>(containers);
-            return _tripSegmentContainerRepository.InsertRangeAsync(mapped);
         }
 
         private MvxCommand _settingsCommand;
