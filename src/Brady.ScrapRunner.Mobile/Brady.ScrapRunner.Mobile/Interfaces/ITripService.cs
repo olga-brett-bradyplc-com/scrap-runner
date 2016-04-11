@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.Interfaces
+﻿using Brady.ScrapRunner.Domain.Models;
+
+namespace Brady.ScrapRunner.Mobile.Interfaces
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -6,6 +8,12 @@
 
     public interface ITripService
     {
+        Task UpdateTrips(IEnumerable<Trip> trips);
+
+        Task UpdateTripSegments(IEnumerable<TripSegment> tripSegments);
+
+        Task UpdateTripSegmentContainers(IEnumerable<TripSegmentContainer> tripSegmentContainers);
+
         Task<bool> IsTripSequenceEnforcedAsync();
 
         Task<TripModel> FindTripAsync(string tripNumber);

@@ -10,7 +10,7 @@
         [PrimaryKey]
         public string CompositeKey
         {
-            get { return TripNumber + ";" + TripSegNumber; }
+            get { return string.Format("{0};{1}", TripNumber, TripSegNumber); }
             set { /* NO-OP SETTER */ }
         }
 

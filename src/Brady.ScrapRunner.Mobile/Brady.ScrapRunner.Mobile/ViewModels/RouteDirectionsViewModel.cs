@@ -8,10 +8,10 @@
     public class RouteDirectionsViewModel : BaseViewModel
     {
         private string _custHostCode;
-        private readonly IRepository<CustomerDirectionModel> _repository; 
+        private readonly IRepository<CustomerDirectionsModel> _repository; 
 
         public RouteDirectionsViewModel(
-            IRepository<CustomerDirectionModel> repository
+            IRepository<CustomerDirectionsModel> repository
             )
         {
             _repository = repository;
@@ -27,11 +27,11 @@
         {
             base.Start();
             var directions = await _repository.ToListAsync(cd => cd.CustHostCode == _custHostCode);
-            Directions = new ObservableCollection<CustomerDirectionModel>(directions);
+            Directions = new ObservableCollection<CustomerDirectionsModel>(directions);
         }
 
-        private ObservableCollection<CustomerDirectionModel> _directions = new ObservableCollection<CustomerDirectionModel>(); 
-        public ObservableCollection<CustomerDirectionModel> Directions
+        private ObservableCollection<CustomerDirectionsModel> _directions = new ObservableCollection<CustomerDirectionsModel>(); 
+        public ObservableCollection<CustomerDirectionsModel> Directions
         {
             get { return _directions; }
             set { SetProperty(ref _directions, value); }

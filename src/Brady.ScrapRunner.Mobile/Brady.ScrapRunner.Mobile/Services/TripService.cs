@@ -1,4 +1,5 @@
-﻿using Brady.ScrapRunner.Mobile.Helpers;
+﻿using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Mobile.Helpers;
 
 namespace Brady.ScrapRunner.Mobile.Services
 {
@@ -29,17 +30,63 @@ namespace Brady.ScrapRunner.Mobile.Services
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
         }
 
+        /// <summary>
+        /// Takes a list of trips provided by the server, and inserts into the local Trip SQLite DB
+        /// </summary>
+        /// <param name="trips"></param>
+        /// <returns></returns>
+        public Task UpdateTrips(IEnumerable<Trip> trips)
+        {
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(trips);
+            return _tripRepository.InsertRangeAsync(mapped);
+        }
+
+        /// <summary>
+        /// Takes a list of trip segments provided by the server, and inserts into the local TripSegment SQLite DB
+        /// </summary>
+        /// <param name="tripSegments"></param>
+        /// <returns></returns>
+        public Task UpdateTripSegments(IEnumerable<TripSegment> tripSegments)
+        {
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegment>, IEnumerable<TripSegmentModel>>(tripSegments);
+            return _tripSegmentRepository.InsertRangeAsync(mapped);
+        }
+
+        /// <summary>
+        /// Takes a list of trip segment containers provided by the server, and inserts into local TripSegmentContainer DB
+        /// </summary>
+        /// <param name="tripSegmentContainers"></param>
+        /// <returns></returns>
+        public Task UpdateTripSegmentContainers(IEnumerable<TripSegmentContainer> tripSegmentContainers)
+        {
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegmentContainer>, IEnumerable<TripSegmentContainerModel>>(tripSegmentContainers);
+            return _tripSegmentContainerRepository.InsertRangeAsync(mapped);
+        }
+
+        /// <summary>
+        /// Retrieve whether trip order in enforced via preferences table
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> IsTripSequenceEnforcedAsync()
         {
             var preference = await _preferenceRepository.FindAsync(p => p.Parameter == "DEFEnforceSeqProcess");
             return preference != null && preference.ParameterValue == Constants.Yes;
         }
 
+        /// <summary>
+        /// Find a given trip from the local Trip SQLite DB
+        /// </summary>
+        /// <param name="tripNumber">The trip you want to find</param>
+        /// <returns></returns>
         public async Task<TripModel> FindTripAsync(string tripNumber)
         {
             return await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
         }
 
+        /// <summary>
+        /// Find all valid trips, ordered by TripSequenceNumber, from SQLite Trip DB
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<TripModel>> FindTripsAsync()
         {
             var sortedTrips = await _tripRepository.AsQueryable()
@@ -49,6 +96,10 @@ namespace Brady.ScrapRunner.Mobile.Services
             return sortedTrips;
         }
 
+        /// <summary>
+        /// Find the next trip from the Trip SQLite DB
+        /// </summary>
+        /// <returns></returns>
         public async Task<TripModel> FindNextTripAsync()
         {
             var sortedTrips = await _tripRepository.AsQueryable()
@@ -58,6 +109,11 @@ namespace Brady.ScrapRunner.Mobile.Services
             return sortedTrips.FirstOrDefault();
         }
 
+        /// <summary>
+        /// Find all trip segments for the given trip leg of a trip
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns></returns>
         public async Task<List<TripSegmentModel>> FindNextTripSegmentsAsync(string tripNumber)
         {
             var segments = await _tripSegmentRepository.AsQueryable()
@@ -75,6 +131,12 @@ namespace Brady.ScrapRunner.Mobile.Services
             return segments.TakeWhile(ts => ts.TripSegDestCustHostCode == firstCustomer).ToList();
         }
 
+        /// <summary>
+        /// Find all trip segment containers for the given trip leg.
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNo"></param>
+        /// <returns></returns>
         public async Task<List<TripSegmentContainerModel>> FindNextTripSegmentContainersAsync(string tripNumber, string tripSegNo)
         {
             var containers = await _tripSegmentContainerRepository.AsQueryable()
@@ -88,6 +150,13 @@ namespace Brady.ScrapRunner.Mobile.Services
             return containers;
         }
 
+        /// <summary>
+        /// Find a specific trip segment container
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNo"></param>
+        /// <param name="tripSegContainerSeqNumber"></param>
+        /// <returns></returns>
         public async Task<TripSegmentContainerModel> FindTripSegmentContainer(string tripNumber, string tripSegNo,
             int? tripSegContainerSeqNumber)
         {
@@ -101,6 +170,11 @@ namespace Brady.ScrapRunner.Mobile.Services
             return container.FirstOrDefault();
         }
 
+        /// <summary>
+        /// Complete a given trip; @TODO : This is not implemented correctly?
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns></returns>
         public async Task<int> CompleteTripAsync(string tripNumber)
         {
             var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
@@ -109,6 +183,12 @@ namespace Brady.ScrapRunner.Mobile.Services
             return await Task.FromResult(1);
         }
 
+        /// <summary>
+        /// Complete a given leg of a trip; @TODO : This is not implemented correctly?
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNumber"></param>
+        /// <returns></returns>
         public async Task<int> CompleteTripSegmentAsync(string tripNumber, string tripSegNumber)
         {
             var tripSegment =
@@ -127,5 +207,6 @@ namespace Brady.ScrapRunner.Mobile.Services
             // @TODO : Fix this ...
             return await Task.FromResult(1);
         }
+
     }
 }
