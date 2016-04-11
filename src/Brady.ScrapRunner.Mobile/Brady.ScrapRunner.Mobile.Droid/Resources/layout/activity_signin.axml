@@ -10,6 +10,7 @@
         android:src="@drawable/logo_2"
         android:scaleType="centerInside"
         android:layout_marginTop="15dp"
+        android:padding="10dp"
         android:layout_above="@id/center_panel" />
     <LinearLayout
         android:id="@+id/center_panel"
