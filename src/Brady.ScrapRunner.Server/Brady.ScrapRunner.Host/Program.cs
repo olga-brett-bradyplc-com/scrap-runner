@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.Host
             XmlConfigurator.Configure();
 
             var hostUrl = ConfigurationManager.AppSettings["ExplorerHostUrl"];
-
+            
             var availableLanguageCultures = new List<string> { "en-GB" };
             var availableFormattingCultures = new List<FormattingCulture> {
                 new FormattingCulture ("en-GB", new List<string> {
