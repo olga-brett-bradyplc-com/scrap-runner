@@ -1,6 +1,9 @@
+using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Resources;
 using Microsoft.VisualBasic;
+using MvvmCross.Platform;
 using MvvmCross.Platform.IoC;
+using static MvvmCross.Platform.Mvx;
 
 namespace Brady.ScrapRunner.Mobile
 {
@@ -8,7 +11,6 @@ namespace Brady.ScrapRunner.Mobile
     using AutoMapper;
     using Interfaces;
     using Models;
-    using MvvmCross.Platform;
     using Services;
 
     public class App : MvvmCross.Core.ViewModels.MvxApplication
@@ -25,8 +27,8 @@ namespace Brady.ScrapRunner.Mobile
             // @TODO: Implement a factory to avoid this (http://stackoverflow.com/a/20691906)
             Mvx.RegisterType<IRepository<ContainerMasterModel>,
                 SqliteRepository<ContainerMasterModel>>();
-            Mvx.RegisterType<IRepository<CustomerDirectionModel>,
-                SqliteRepository<CustomerDirectionModel>>();
+            Mvx.RegisterType<IRepository<CustomerDirectionsModel>,
+                SqliteRepository<CustomerDirectionsModel>>();
             Mvx.RegisterType<IRepository<DriverStatusModel>,
                 SqliteRepository<DriverStatusModel>>();
             Mvx.RegisterType<IRepository<EmployeeMasterModel>,
@@ -41,8 +43,12 @@ namespace Brady.ScrapRunner.Mobile
                 SqliteRepository<PreferenceModel>>();
             Mvx.RegisterType<IRepository<PowerMasterModel>,
                 SqliteRepository<PowerMasterModel>>();
+            Mvx.RegisterType<IRepository<CustomerLocationModel>,
+                SqliteRepository<CustomerLocationModel>>();
+            Mvx.RegisterType<IRepository<CustomerCommodityModel>,
+                SqliteRepository<CustomerCommodityModel>>();
 
-            Mvx.RegisterSingleton(Mvx.IocConstruct<DemoDataGenerator>);
+            Mvx.RegisterSingleton(IocConstruct<DemoDataGenerator>);
 
             Mapper.Initialize(cfg =>
             {

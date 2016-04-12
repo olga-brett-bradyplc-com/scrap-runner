@@ -29,7 +29,7 @@
         {
             var asyncConnection = _sqliteConnectionFactory.GetAsyncConnection("scraprunner");
             await asyncConnection.CreateTableAsync<ContainerMasterModel>();
-            await asyncConnection.CreateTableAsync<CustomerDirectionModel>();
+            await asyncConnection.CreateTableAsync<CustomerDirectionsModel>();
             await asyncConnection.CreateTableAsync<DriverStatusModel>();
             await asyncConnection.CreateTableAsync<EmployeeMasterModel>();
             await asyncConnection.CreateTableAsync<PowerMasterModel>();
@@ -37,9 +37,11 @@
             await asyncConnection.CreateTableAsync<TripModel>();
             await asyncConnection.CreateTableAsync<TripSegmentModel>();
             await asyncConnection.CreateTableAsync<TripSegmentContainerModel>();
+            await asyncConnection.CreateTableAsync<CustomerCommodityModel>();
+            await asyncConnection.CreateTableAsync<CustomerLocationModel>();
 
             await asyncConnection.DeleteAllAsync<ContainerMasterModel>();
-            await asyncConnection.DeleteAllAsync<CustomerDirectionModel>();
+            await asyncConnection.DeleteAllAsync<CustomerDirectionsModel>();
             await asyncConnection.DeleteAllAsync<DriverStatusModel>();
             await asyncConnection.DeleteAllAsync<EmployeeMasterModel>();
             await asyncConnection.DeleteAllAsync<PowerMasterModel>();
@@ -47,7 +49,9 @@
             await asyncConnection.DeleteAllAsync<TripModel>();
             await asyncConnection.DeleteAllAsync<TripSegmentModel>();
             await asyncConnection.DeleteAllAsync<TripSegmentContainerModel>();
-//            await GenerateDemoTripDataAsync();
+            await asyncConnection.DeleteAllAsync<CustomerCommodityModel>();
+            await asyncConnection.DeleteAllAsync<CustomerLocationModel>();
+            //            await GenerateDemoTripDataAsync();
         }
 
 //        private async Task GenerateDemoTripDataAsync()
