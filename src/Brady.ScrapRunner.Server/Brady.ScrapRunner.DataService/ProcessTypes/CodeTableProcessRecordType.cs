@@ -97,7 +97,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     DataServiceFault fault;
                     string msgKey = key;
 
-                    CodeTableProcess codetablesProcess = (CodeTableProcess)changeSetResult.GetSuccessfulUpdateForId(key);
+                    var codetablesProcess = (CodeTableProcess)changeSetResult.GetSuccessfulUpdateForId(key);
 
                     // TODO:  Determine userCulture and userRoleIds on a per user basis.
                     string userCulture = "en-GB";
@@ -117,10 +117,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
-                    //
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                     codetablesProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -133,9 +132,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////
                     // Lookup Preference: DEFUseContainerLevel
-                    //
                     string prefUseContainerLevel = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                    employeeMaster.TerminalId, PrefDriverConstants.DEFUseContainerLevel, out fault);
                     if (fault != null)
@@ -143,9 +141,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    // Lookup container changes.  
-                    //
-                    List<CodeTable> codetables = new List<CodeTable>();
+                    ////////////////////////////////////////////////
+                    // Lookup code tables.  
+                    var codetables = new List<CodeTable>();
                     if (prefUseContainerLevel == Constants.Yes)
                     {
                         //This query includes container level
@@ -170,7 +168,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     //Now using log4net.ILog implementation to test results of query.
                     log.Debug("SRTEST:CodeTableProcess");
-                    foreach (CodeTable codetable in codetables)
+                    foreach (var codetable in codetables)
                     {
                         log.DebugFormat("SRTEST:CodeName:{0} CodeValue:{1} CodeDisp1:{2} CodeDisp2:{3} CodeDisp3:{4} CodeDisp4:{5} CodeDisp5:{6} CodeDisp6:{7}",
                                             codetable.CodeName,

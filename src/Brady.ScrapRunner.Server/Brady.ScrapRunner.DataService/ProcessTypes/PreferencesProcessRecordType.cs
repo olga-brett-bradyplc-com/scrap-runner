@@ -112,7 +112,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     DataServiceFault fault;
                     string msgKey = key;
 
-                    PreferencesProcess preferencesProcess = (PreferencesProcess) changeSetResult.GetSuccessfulUpdateForId(key);
+                    var preferencesProcess = (PreferencesProcess) changeSetResult.GetSuccessfulUpdateForId(key);
 
                     // TODO:  Determine userCulture and userRoleIds on a per user basis.
                     string userCulture = "en-GB";
@@ -132,9 +132,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster
-                    //
                     EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   preferencesProcess.EmployeeId, out fault);
                     if (fault != null)
@@ -148,10 +147,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////
                     // Lookup preferences.  
-                    //
-                    List<Preference> preferences = new List<Preference>();
+                    var preferences = new List<Preference>();
                     preferences = Util.Common.GetPreferenceByTerminal(dataService, settings, userCulture, userRoleIds,
                                                   employeeMaster.TerminalId, out fault);
                     if (fault != null)
@@ -165,10 +163,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     employeeMaster.TerminalId,
                                     employeeMaster.SecurityLevel);
 
-                    //
+                    ////////////////////////////////////////////////
                     // Lookup TerminalMaster for two "additional" preferences 
-                    //
-                    TerminalMaster terminalMaster = Util.Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+                    var terminalMaster = Util.Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
                                                   employeeMaster.TerminalId, out fault);
                     if (fault != null)
                     {
@@ -181,11 +178,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     terminalMaster.TimeZoneFactor,
                                     terminalMaster.DaylightSavings);
 
-                    //
+                    ////////////////////////////////////////////////
                     // Filter for the 30some properties of interst.
                     // Suppliment with the two additional timezone preferences
                     // Return preferences
-                    //
                     string[] propNamesDesired = {
                         PrefDriverConstants.DEFEnforceSeqProcess,
                         PrefDriverConstants.DEFMinAutoTriggerDone,
@@ -248,7 +244,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     preferencesProcess.Preferences = preferenceList;
                     //For testing
                     log.Debug("SRTEST:PreferenceProcess - Preferences");
-                    foreach (Preference preference in preferenceList)
+                    foreach (var preference in preferenceList)
                     {
                         log.DebugFormat("SRTEST:TerminalId:{0} Parameter:{1} ParameterValue:{2}",
                                     preference.TerminalId,
@@ -282,8 +278,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             settings.Session = null;
 
             return changeSetResult;
-        }
-
-       
+        }     
     }
 }
