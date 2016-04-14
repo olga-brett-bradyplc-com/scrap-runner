@@ -16,6 +16,7 @@ using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using NHibernate;
 using NHibernate.Util;
+using Brady.ScrapRunner.DataService.Util;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -56,9 +57,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
-   
+
         /// <summary>
-        /// This is the "real" method implementation.
+        /// Perform the container change processing.
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="changeSet"></param>
@@ -81,10 +82,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 settings.Session = session;
             }
 
-            // Running the base process changeset first in this case.
-            // This should gain the benefit of validators, auditing, security, piplines, etc.
-            // However, it looks like we are losing some user input in the base.ProcessChangeSet
-            // from a reretrieve or the sparse NHibernate mapping?
+            // Running the base process changeset first in this case.  This should give up the benefit of validators, 
+            // auditing, security, pipelines, etc.  Note however, we will lose non-persisted user input values which 
+            // will not be propagated through into the changeSetResult.
             ChangeSetResult<string> changeSetResult = base.ProcessChangeSet(dataService, changeSet, settings);
 
             // If no problems, we are free to process.
@@ -103,7 +103,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     string userCulture = "en-GB";
                     IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
-                    // It appears, in the gernal case, I may need to backfill any additional user input values other than driverID.
+                    // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
                     ContainerChangeProcess backfillContainerChangeProcess;
                     if (changeSet.Update.TryGetValue(key, out backfillContainerChangeProcess))
@@ -117,10 +117,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
-                    //
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   containersProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -133,51 +132,99 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////////////
                     // Lookup Preference: DEFAllowAnyContainer
-                    //
                     string prefAllowAnyContainer = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
-                                                  Constants.SYSTEM_TERMINALID, PrefSystemConstants.DEFAllowAnyContainer, out fault);
+                                                  Constants.SystemTerminalId, PrefSystemConstants.DEFAllowAnyContainer, out fault);
                     if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    // Lookup container changes.  
-                    //
-                    List<ContainerChange> containerchanges = new List<ContainerChange> ();
-                    if (prefAllowAnyContainer == Constants.Yes)
+                    ////////////////////////////////////////////////////////
+                    // Lookup container changes or entire container master
+                    if (containersProcess.LastContainerMasterUpdate == null)
                     {
-                        containerchanges = Util.Common.GetContainerChanges(dataService, settings, userCulture, userRoleIds,
-                          containersProcess.LastContainerMasterUpdate, out fault);
+                        // If no date is provided, we would probably want to get the entire Container list
+                        // from the ContainerMaster table instead of the ContainerChange table.
+                        log.Debug("SRTEST:ContainerChange Date Not Provided.");
                     }
                     else
                     {
-                        containerchanges = Util.Common.GetContainerChangesByRegion(dataService, settings, userCulture, userRoleIds,
-                          containersProcess.LastContainerMasterUpdate, employeeMaster.RegionId, out fault);
-                    }
-                    if (fault != null)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
+                        //Since the date is provided, get the container changes since the last container update was provided to this driver.
+                        List<ContainerChange> containerchanges = new List<ContainerChange>();
+                        if (prefAllowAnyContainer == Constants.Yes)
+                        {
+                            containerchanges = Util.Common.GetContainerChanges(dataService, settings, userCulture, userRoleIds,
+                              containersProcess.LastContainerMasterUpdate, out fault);
+                        }
+                        else
+                        {
+                            containerchanges = Util.Common.GetContainerChangesByRegion(dataService, settings, userCulture, userRoleIds,
+                              containersProcess.LastContainerMasterUpdate, employeeMaster.RegionId, out fault);
+                        }
+                        if (fault != null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
 
-                    // Don't forget to actually backfill the ContainerProcess object contained within 
-                    // the ChangeSetResult that exits this method and is returned to the caller.
-                    containersProcess.Containers = containerchanges;
+                        // Don't forget to actually backfill the ContainerProcess object contained within 
+                        // the ChangeSetResult that exits this method and is returned to the caller.
+                        containersProcess.Containers = containerchanges;
 
-                    //Now using log4net.ILog implementation to test results of query.
-                    log.Debug("SRTEST:ContainerChangeProcess");
-                    foreach (ContainerChange container in containerchanges)
-                    {
-                        log.DebugFormat("SRTEST:ContainerNumber:{0} Type:{1} Size:{2} Date:{3} Flag:{4} TerminalId:{5} BarCode:{6}", 
-                                        container.ContainerNumber, 
-                                        container.ContainerType,
-                                        container.ContainerSize,
-                                        container.ActionDate,
-                                        container.ActionFlag,
-                                        container.TerminalId,
-                                        container.ContainerBarCodeNo);
+                        //Now using log4net.ILog implementation to test results of query.
+                        log.Debug("SRTEST:ContainerChangeProcess");
+                        foreach (var container in containerchanges)
+                        {
+                            log.DebugFormat("SRTEST:ContainerNumber:{0} Type:{1} Size:{2} Date:{3} Flag:{4} TerminalId:{5} BarCode:{6}",
+                                            container.ContainerNumber,
+                                            container.ContainerType,
+                                            container.ContainerSize,
+                                            container.ActionDate,
+                                            container.ActionFlag,
+                                            container.TerminalId,
+                                            container.ContainerBarCodeNo);
+                        }
+                        ////////////////////////////////////////////////
+                        //Now update the ContainerMasterDateTime in the DriverStatus record
+                        //If there is no record yet, I guess we will have to add one.
+                        var driverStatus = Util.Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
+                                                    containersProcess.EmployeeId, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+
+                        // If no driver status record is found create one to add
+                        if (null == driverStatus)
+                        {
+                            driverStatus = new DriverStatus()
+                            {
+                                EmployeeId = containersProcess.EmployeeId,
+                            };
+                        }
+                        //Now there is a driverStatus
+                        //For testing
+                        log.Debug("SRTEST:GetDriverStatus");
+                        log.DebugFormat("SRTEST:DriverId:{0} LastContainerMasterUpdate:{1}",
+                                                            driverStatus.EmployeeId,
+                                                            driverStatus.ContainerMasterDateTime);
+                        driverStatus.ContainerMasterDateTime = DateTime.Now;
+                        changeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
+
+                        log.DebugFormat("SRTEST:Saving DriverStatus Record: DriverId:{0} ContainerMasterUpdate:{1}",
+                                    driverStatus.EmployeeId,
+                                    driverStatus.ContainerMasterDateTime);
+
+                        if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
+                        {
+                            var s = string.Format("Could not update DriverStatus for Driver {0}.",
+                                                  containersProcess.EmployeeId);
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            break;
+                        }
                     }
                 }
             }

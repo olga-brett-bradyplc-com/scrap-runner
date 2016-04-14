@@ -14,19 +14,19 @@
         /// REASONCODES SR# is Scale Reference Number
         /// Useage: To prevent this reason code from being sent to the driver
         /// </summary>
-        public static readonly string NOTAVLSCALREFNO = "SR#";
+        public static readonly string ScaleRefNotAvailable = "SR#";
 
         /// <summary>
         /// SYSTEM_TERMINALID "0000" is the TerminalId for system preferences
         /// Useage: To retrieve system preferences
         /// </summary>
-        public static readonly string SYSTEM_TERMINALID = "0000";
+        public static readonly string SystemTerminalId = "0000";
 
         /// <summary>
         /// TSS_FIRSTSEGNUMBER "01" is the first segment number
         /// Useage: To retrieve first trip segment
         /// </summary>
-        public static readonly string TSS_FIRSTSEGNUMBER = "01";
+        public static readonly string FirstSegment = "01";
     }
 
     public static class BasicTripTypeConstants
@@ -130,7 +130,7 @@
     {
         public static readonly string Done = "SD";
         public static readonly string Pending = "P";
-        public static readonly string EnRoute = "EN";
+        public static readonly string Enroute = "EN";
         public static readonly string Arrive = "AR";
         public static readonly string Canceled = "XX";
         public static readonly string StateCrossing = "SC";
@@ -149,7 +149,7 @@
         /// <summary>LoggedOut: O</summary>
         public static readonly string LoggedOut     = "O";
         /// <summary>EnRoute: E</summary>
-        public static readonly string EnRoute       = "E";
+        public static readonly string Enroute       = "E";
         /// <summary>Arrive: A</summary>
         public static readonly string Arrive        = "A";
         /// <summary>Done: D</summary>
