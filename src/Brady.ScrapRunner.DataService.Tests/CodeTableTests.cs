@@ -132,7 +132,7 @@ namespace Brady.ScrapRunner.DataService.Tests
             var filteredcodetables =
                 from entry in codetables
                 where (entry.CodeDisp5 == regionId || entry.CodeDisp5 == null)
-                && (entry.CodeValue != Constants.NOTAVLSCALREFNO)
+                && (entry.CodeValue != Constants.ScaleRefNotAvailable)
                 select entry;
 
             foreach (CodeTable codeTableInstance in filteredcodetables)
@@ -296,7 +296,7 @@ namespace Brady.ScrapRunner.DataService.Tests
         {
             var codeTableQuery = new QueryBuilder<CodeTable>()
                 .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ReasonCodes)
-                .And().Property(x => x.CodeValue).NotEqualTo(Constants.NOTAVLSCALREFNO))
+                .And().Property(x => x.CodeValue).NotEqualTo(Constants.ScaleRefNotAvailable))
                 .OrderBy(x => x.CodeValue);
             string queryString = codeTableQuery.GetQuery();
             QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
