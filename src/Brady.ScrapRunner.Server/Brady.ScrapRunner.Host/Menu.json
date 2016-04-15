@@ -18,6 +18,10 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/ContainerChangeProcess"
         },
         {
+          "text": "DriverArriveProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverArriveProcess"
+        },
+        {
           "text": "DriverEnrouteProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverEnrouteProcess"
         },

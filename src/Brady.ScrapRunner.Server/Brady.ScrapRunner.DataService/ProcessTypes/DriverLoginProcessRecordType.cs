@@ -524,6 +524,18 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                        // driverStatus.TerminalMasterDateTime = driverLoginProcess.TerminalMasterDateTime;
                         driverStatus.DriverLCID = driverLoginProcess.LocaleCode;
 
+                        ////////////////////////////////////////////////
+                        //Calculate driver's cumulative time which is the sum of standard drive and stop minutes
+                        //for all incomplete trip segments 
+                        var tripSegList = Util.Common.GetTripSegmentsIncompleteForDriver(dataService, settings, userCulture, userRoleIds,
+                                            driverLoginProcess.EmployeeId, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        driverStatus.DriverCumMinutes = Util.Common.GetDriverCumulativeTime(tripSegList);
+
                         //Do the update
                         scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
                         log.Debug("SRTEST:Saving DriverStatus Record - Login");
@@ -777,6 +789,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             else
             {
                 transaction.Commit();
+                log.Debug("SRTEST:Transaction Committed- Login");
                 // We need to notify that data has changed for any types we have updated
                 // We always need to notify for the current type
                 dataService.NotifyOfExternalChangesToData();
@@ -1014,16 +1027,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             //For testing
             log.Debug("SRTEST:Add PowerHistory");
-            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} MaxSeq#:{5} callCountThisTxn:{6} Seq#:{7}",
+            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
                              powerMaster.PowerDriverId,
                              powerMaster.PowerCurrentTripNumber,
                              powerMaster.PowerCurrentTripSegNumber,
                              powerMaster.PowerStatus,
                              powerMaster.PowerLastActionDateTime,
-                             powerHistoryMax.PowerSeqNumber,
-                             callCountThisTxn,
                              powerSeqNo);
-
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the TerminalName in the TerminalMaster 
             var powerTerminalMaster = Util.Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
@@ -1187,14 +1197,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             //For testing
             log.Debug("SRTEST:Add DriverHistory");
-            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} MaxSeq#:{5} callCountThisTxn:{6} Seq#:{7}",
+            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
                              driverStatus.EmployeeId,
                              driverStatus.TripNumber,
                              driverStatus.TripSegNumber,
                              driverStatus.Status,
                              driverStatus.ActionDateTime,
-                             driverHistoryMax.DriverSeqNumber,
-                             callCountThisTxn,
                              driverSeqNo);
 
             //////////////////////////////////////////////////////////////////////////////////////
