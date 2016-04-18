@@ -7,4 +7,6 @@
   <string name="odometer_reading">Odometer Reading</string>
   <string name="continue_text">Continue</string>
   <string name="change_language">Change Language</string>
+  <string name="drawer_open">Open</string>
+  <string name="drawer_close">Close</string>
 </resources>

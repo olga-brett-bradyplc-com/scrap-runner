@@ -1,36 +1,32 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-
 using Android.App;
-using Android.Content;
-using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Droid.Views;
+using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Platform.WeakSubscription;
 
-namespace Brady.ScrapRunner.Mobile.Droid.Views
+namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    [Activity(Label = "ScaleDetailView")]
-    public class ScaleDetailView : BaseActivity<ScaleDetailViewModel>
+    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame)]
+    [Register("brady.scraprunner.mobile.droid.fragments.ScaleDetailFragment")]
+    public class ScaleDetailFragment : BaseFragment<ScaleDetailViewModel>
     {
         private IDisposable _containersToken;
         private IDisposable _grossTimeToken;
         private IDisposable _tareTimeToken;
         private IDisposable _secondGrossTimeToken;
 
-        protected override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_scaledetail);
+        protected override int FragmentId => Resource.Layout.fragment_scaledetail;
+        protected override bool NavMenuEnabled => true;
 
-            var listGrouping = FindViewById<MvxListView>(Resource.Id.ScaleDetailListView);
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.ScaleDetailListView);
             if (ViewModel.Containers != null)
                 listGrouping.ItemsSource = ViewModel.Containers;
 
@@ -40,7 +36,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             _secondGrossTimeToken = ViewModel.WeakSubscribe(() => ViewModel.SecondGrossTime, OnSecondGrossTimeChanged);
         }
 
-        public override void OnDetachedFromWindow()
+        public override void OnDestroyView()
         {
             if (_containersToken == null) return;
             _containersToken.Dispose();
@@ -57,30 +53,32 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             if (_secondGrossTimeToken == null) return;
             _secondGrossTimeToken.Dispose();
             _secondGrossTimeToken = null;
+
+            base.OnDestroyView();
         }
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
         {
-            var listGrouping = FindViewById<MvxListView>(Resource.Id.ScaleDetailListView);
+            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.ScaleDetailListView);
             if (ViewModel.Containers != null)
                 listGrouping.ItemsSource = ViewModel.Containers;
         }
 
         private void OnGrossTimeChanged(object sender, PropertyChangedEventArgs args)
         {
-            var button = FindViewById<Button>(Resource.Id.grossButton);
+            var button = View.FindViewById<Button>(Resource.Id.grossButton);
             button.Text = "Gross : " + ViewModel.GrossTime;
         }
 
         private void OnTareTimeChanged(object sender, PropertyChangedEventArgs args)
         {
-            var button = FindViewById<Button>(Resource.Id.tareButton);
+            var button = View.FindViewById<Button>(Resource.Id.tareButton);
             button.Text = "Tare : " + ViewModel.GrossTime;
         }
 
         private void OnSecondGrossTimeChanged(object sender, PropertyChangedEventArgs args)
         {
-            var button = FindViewById<Button>(Resource.Id.secondGrossButton);
+            var button = View.FindViewById<Button>(Resource.Id.secondGrossButton);
             button.Text = "Second Gross : " + ViewModel.GrossTime;
         }
     }
