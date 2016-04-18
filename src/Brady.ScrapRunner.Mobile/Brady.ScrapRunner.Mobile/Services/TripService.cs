@@ -178,7 +178,8 @@ namespace Brady.ScrapRunner.Mobile.Services
         public async Task<int> CompleteTripAsync(string tripNumber)
         {
             var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
-            await _tripRepository.DeleteAsync(trip);
+            trip.TripStatus = TripStatusConstants.Done;
+            await _tripRepository.UpdateAsync(trip);
 
             return await Task.FromResult(1);
         }
@@ -194,15 +195,8 @@ namespace Brady.ScrapRunner.Mobile.Services
             var tripSegment =
                 await _tripSegmentRepository.FindAsync(
                         ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
-            var tripSegmentContainers = _tripSegmentContainerRepository.AsQueryable()
-                .Where(tscm => tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNumber)
-                .ToListAsync();
-
-            await _tripSegmentRepository.DeleteAsync(tripSegment);
-            foreach( var container in tripSegmentContainers.Result)
-            {
-                await _tripSegmentContainerRepository.DeleteAsync(container);
-            }
+            tripSegment.TripSegStatus = TripSegStatusConstants.Done;
+            await _tripSegmentRepository.UpdateAsync(tripSegment);
 
             // @TODO : Fix this ...
             return await Task.FromResult(1);

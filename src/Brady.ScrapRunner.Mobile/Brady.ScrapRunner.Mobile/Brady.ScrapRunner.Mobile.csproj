@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="AppStart.cs" />
     <Compile Include="Converters\DateTimeValueConverter.cs" />
     <Compile Include="CustomLanguageBindingParser.cs" />
     <Compile Include="Helpers\Grouping.cs" />
@@ -81,6 +82,8 @@
     <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\MenuViewModel.cs" />
     <Compile Include="ViewModels\ScaleDetailViewModel.cs" />
     <Compile Include="ViewModels\ScaleSummaryViewModel.cs" />
     <Compile Include="ViewModels\TransactionConfirmationViewModel.cs" />

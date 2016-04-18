@@ -78,83 +78,87 @@
     <Reference Include="Mono.Android.Export" />
     <Reference Include="mscorlib" />
     <Reference Include="MvvmCross.Binding, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Binding.4.0.0\lib\MonoAndroid\MvvmCross.Binding.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.1\lib\MonoAndroid\MvvmCross.Binding.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Binding.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Binding.4.0.0\lib\MonoAndroid\MvvmCross.Binding.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.1\lib\MonoAndroid\MvvmCross.Binding.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Core, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Core.4.0.0\lib\MonoAndroid\MvvmCross.Core.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Core.4.1.0\lib\MonoAndroid\MvvmCross.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Core.4.0.0\lib\MonoAndroid\MvvmCross.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Core.4.1.0\lib\MonoAndroid\MvvmCross.Droid.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MvvmCross.Droid.Shared, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Shared.4.1.2\lib\MonoAndroid\MvvmCross.Droid.Shared.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.Design, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.Design.4.0.1\lib\MonoAndroid403\MvvmCross.Droid.Support.Design.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.Design.4.1.1\lib\MonoAndroid403\MvvmCross.Droid.Support.Design.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.V4, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V4.4.0.1\lib\MonoAndroid403\MvvmCross.Droid.Support.V4.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V4.4.1.1\lib\MonoAndroid403\MvvmCross.Droid.Support.V4.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.V7.AppCompat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.AppCompat.4.0.2\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.AppCompat.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.AppCompat.4.1.2\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.AppCompat.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.V7.Fragging, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.Fragging.4.0.1\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.Fragging.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.Fragging.4.1.1\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.Fragging.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.V7.RecyclerView, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.RecyclerView.4.0.1\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.RecyclerView.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.RecyclerView.4.1.0\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.RecyclerView.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Localization, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Binding.4.0.0\lib\MonoAndroid\MvvmCross.Localization.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.1\lib\MonoAndroid\MvvmCross.Localization.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Platform, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Platform.4.0.0\lib\MonoAndroid\MvvmCross.Platform.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Platform.4.1.0\lib\MonoAndroid\MvvmCross.Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Platform.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Platform.4.0.0\lib\MonoAndroid\MvvmCross.Platform.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Platform.4.1.0\lib\MonoAndroid\MvvmCross.Platform.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Color, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Color.4.0.0\lib\MonoAndroid\MvvmCross.Plugins.Color.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Color.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Color.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Color.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Color.4.0.0\lib\MonoAndroid\MvvmCross.Plugins.Color.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Color.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Color.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Json, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Json.4.0.0\lib\MonoAndroid\MvvmCross.Plugins.Json.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Json.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Messenger, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Messenger.4.0.0\lib\MonoAndroid\MvvmCross.Plugins.Messenger.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Messenger.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Messenger.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Sqlite, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.SQLitePCL.4.0.0\lib\MonoAndroid\MvvmCross.Plugins.Sqlite.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.SQLitePCL.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Sqlite.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Sqlite.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.SQLitePCL.4.0.0\lib\MonoAndroid\MvvmCross.Plugins.Sqlite.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.SQLitePCL.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Sqlite.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Visibility, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Visibility.4.0.0\lib\MonoAndroid\MvvmCross.Plugins.Visibility.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Visibility.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Visibility.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Visibility.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Visibility.4.0.0\lib\MonoAndroid\MvvmCross.Plugins.Visibility.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Visibility.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Visibility.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -182,15 +186,15 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
     <Reference Include="Xamarin.Android.Support.Design, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Android.Support.Design.23.1.1.0\lib\MonoAndroid403\Xamarin.Android.Support.Design.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.Design.23.1.1.1\lib\MonoAndroid403\Xamarin.Android.Support.Design.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v4, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Android.Support.v4.23.1.1.0\lib\MonoAndroid403\Xamarin.Android.Support.v4.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.v4.23.1.1.1\lib\MonoAndroid403\Xamarin.Android.Support.v4.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.AppCompat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Android.Support.v7.AppCompat.23.1.1.0\lib\MonoAndroid403\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.v7.AppCompat.23.1.1.1\lib\MonoAndroid403\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.CardView, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -198,7 +202,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.RecyclerView, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Android.Support.v7.RecyclerView.23.1.1.0\lib\MonoAndroid403\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.v7.RecyclerView.23.1.1.1\lib\MonoAndroid403\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ZXing.Net.Mobile.Core, Version=2.0.4.46, Culture=neutral, processorArchitecture=MSIL">
@@ -229,18 +233,20 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="SplashScreen.cs" />
-    <Compile Include="Views\BaseActivity.cs" />
-    <Compile Include="Views\ChangeLanguageView.cs" />
-    <Compile Include="Views\PowerUnitView.cs" />
-    <Compile Include="Views\RouteDetailView.cs" />
-    <Compile Include="Views\RouteSummaryView.cs" />
-    <Compile Include="Views\ScaleDetailView.cs" />
-    <Compile Include="Views\ScaleSummaryView.cs" />
-    <Compile Include="Views\SettingsView.cs" />
-    <Compile Include="Views\SignInView.cs" />
-    <Compile Include="Views\TransactionConfirmationView.cs" />
-    <Compile Include="Views\TransactionDetailView.cs" />
-    <Compile Include="Views\TransactionSummaryView.cs" />
+    <Compile Include="Fragments\BaseFragment.cs" />
+    <Compile Include="Activities\MainActivity.cs" />
+    <Compile Include="Fragments\ChangeLanguageFragment.cs" />
+    <Compile Include="Fragments\MenuFragment.cs" />
+    <Compile Include="Fragments\PowerUnitFragment.cs" />
+    <Compile Include="Fragments\RouteDetailFragment.cs" />
+    <Compile Include="Fragments\RouteSummaryFragment.cs" />
+    <Compile Include="Fragments\ScaleDetailFragment.cs" />
+    <Compile Include="Fragments\ScaleSummaryFragment.cs" />
+    <Compile Include="Fragments\SettingsFragment.cs" />
+    <Compile Include="Fragments\SignInFragment.cs" />
+    <Compile Include="Fragments\TransactionConfirmationFragment.cs" />
+    <Compile Include="Fragments\TransactionDetailFragment.cs" />
+    <Compile Include="Fragments\TransactionSummaryFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -252,25 +258,25 @@
     <AndroidResource Include="Resources\layout\activity_splash.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\activity_signin.axml">
+    <AndroidResource Include="Resources\layout\fragment_signin.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\toolbar.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\activity_settings.axml">
+    <AndroidResource Include="Resources\layout\fragment_settings.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\activity_powerunit.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\activity_routesummary.axml">
+    <AndroidResource Include="Resources\layout\fragment_routesummary.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\item_trip.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\activity_routedetail.axml">
+    <AndroidResource Include="Resources\layout\fragment_routedetail.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\item_tripsegment.axml">
@@ -279,19 +285,19 @@
     <AndroidResource Include="Resources\layout\item_tripsegment_listitem.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\activity_transactionsummary.axml">
+    <AndroidResource Include="Resources\layout\fragment_transactionsummary.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\activity_transactiondetail.axml">
+    <AndroidResource Include="Resources\layout\fragment_transactiondetail.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\activity_scalesummary.axml">
+    <AndroidResource Include="Resources\layout\fragment_scalesummary.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\activity_scaledetail.axml">
+    <AndroidResource Include="Resources\layout\fragment_scaledetail.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\activity_transactionconfirmation.axml">
+    <AndroidResource Include="Resources\layout\fragment_transactionconfirmation.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\item_transactions.axml">
@@ -312,12 +318,25 @@
     <AndroidResource Include="Resources\layout\item_scaledetail_listitem.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\activity_changelanguage.axml">
+    <AndroidResource Include="Resources\layout\fragment_changelanguage.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\item_locale.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\activity_main.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\menu\navigation_drawer.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\fragment_navigation.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\fragment_navigation_header.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\SplashScreen.axml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\icon.png" />
@@ -511,9 +530,6 @@
     <AndroidResource Include="Resources\drawable-xxxhdpi\ic_loupe_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable\splash.png" />
-  </ItemGroup>
-  <ItemGroup>
     <AndroidResource Include="Resources\values\strings.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -597,6 +613,31 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\logo_2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\navigation_header_background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values\SplashStyle.xml" />
+    <AndroidResource Include="Resources\drawable\splash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\user_icon_header_navigation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-hdpi\ic_person_outline_white_48dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-mdpi\ic_person_outline_white_48dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_person_outline_white_48dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_person_outline_white_48dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_person_outline_white_48dp.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
