@@ -41,14 +41,23 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             _previousMenuItem = menuItem;
 
+            Navigate(menuItem.ItemId);
+
             return true;
         }
 
-        private async Task Navigate(IMenuItem itemId)
+        private async Task Navigate(int itemId)
         {
             var baseActivity = ((MainActivity) Activity);
+            baseActivity.DrawerLayout.CloseDrawers();
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
 
-            await Task.Delay(TimeSpan.FromMilliseconds(250));
+            switch (itemId)
+            {
+                case Resource.Id.nav_logout:
+                    ViewModel.LogoutCommand.Execute();
+                    break;
+            }
         }
     }
 }

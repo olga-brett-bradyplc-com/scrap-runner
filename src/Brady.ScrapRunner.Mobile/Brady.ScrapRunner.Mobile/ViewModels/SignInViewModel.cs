@@ -27,8 +27,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IPreferenceService preferenceService,
             ITripService tripService,
             ICustomerService customerService,
-            IConnectionService<DataServiceClient> connection,
-            IMvxSqliteConnectionFactory sqliteConnectionFactory)
+            IConnectionService<DataServiceClient> connection)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -103,12 +102,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             try
             {
-                //var signInResult = await SignInDemoDataAsync();
                 var signInResult = await SignInAsync();
                 if (!signInResult)
-                {
                     return;
-                }
+
                 Close(this);
                 ShowViewModel<RouteSummaryViewModel>();
             }

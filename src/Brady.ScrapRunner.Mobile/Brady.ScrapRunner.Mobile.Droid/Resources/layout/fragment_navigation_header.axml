@@ -3,25 +3,32 @@
     xmlns:local="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="160dp"
+    android:background="@drawable/navigation_header_background"
     android:padding="16dp">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/text_container"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:id="@+id/navigation_user_text_text_container">
         <TextView
             android:id="@+id/text_view_fullname"
-            android:singleLine="true"
+            android:textColor="#fff"
             android:textStyle="bold"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Example menu implementation" />
+            android:text="Steve Hartman" />
         <TextView
-            android:id="@+id/text_view_username"
-            android:singleLine="true"
-            android:layout_width="match_parent"
+            android:id="@+id/text_view_yard"
+            android:textColor="#fff"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Test test test" />
+            android:text="Fond Du Lac Yard" />
+        <TextView
+            android:id="@+id/text_view_truck"
+            android:textColor="#fff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Truck 001" />
     </LinearLayout>
 </RelativeLayout>
