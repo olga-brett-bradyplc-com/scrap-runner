@@ -16,6 +16,7 @@ using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using NHibernate;
 using NHibernate.Util;
+using Brady.ScrapRunner.DataService.Util;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -117,10 +118,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
-                    //
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   terminalsProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -133,9 +133,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////
                     // Lookup Preference: DEFSendOnlyYardsForArea
-                    //
                     string prefSendOnlyYardsForArea = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                  employeeMaster.TerminalId, PrefDriverConstants.DEFSendOnlyYardsForArea, out fault);
                     if (fault != null)
@@ -143,40 +142,91 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    // Lookup container changes.  
-                    //
-                    List<TerminalChange> terminalchanges = new List<TerminalChange>();
-                    if (prefSendOnlyYardsForArea == Constants.Yes)
+                    ////////////////////////////////////////////////////////
+                    // Lookup terminal changes or entire terminal master
+                    if (terminalsProcess.LastTerminalChangeUpdate == null)
                     {
-                        terminalchanges = Util.Common.GetTerminalChangesByArea(dataService, settings, userCulture, userRoleIds,
-                          terminalsProcess.LastTerminalChangeUpdate, employeeMaster.AreaId, out fault);
+                        // If no date is provided, we would probably want to get the entire Terminal list
+                        // from the TerminalMaster table instead of the TerminalChange table.
+                        log.Debug("SRTEST:TerminalChange Date Not Provided.");
                     }
                     else
                     {
-                        terminalchanges = Util.Common.GetTerminalChangesByRegion(dataService, settings, userCulture, userRoleIds,
-                          terminalsProcess.LastTerminalChangeUpdate, employeeMaster.RegionId, out fault);
-                    }
-                    if (fault != null)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
+                        //Since the date is provided, get the terminal changes since the last terminal update was provided to this driver.
+                        var terminalchanges = new List<TerminalChange>();
+                        if (prefSendOnlyYardsForArea == Constants.Yes)
+                        {
+                            terminalchanges = Util.Common.GetTerminalChangesByArea(dataService, settings, userCulture, userRoleIds,
+                              terminalsProcess.LastTerminalChangeUpdate, employeeMaster.AreaId, out fault);
+                        }
+                        else
+                        {
+                            terminalchanges = Util.Common.GetTerminalChangesByRegion(dataService, settings, userCulture, userRoleIds,
+                              terminalsProcess.LastTerminalChangeUpdate, employeeMaster.RegionId, out fault);
+                        }
+                        if (fault != null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
 
-                    // Don't forget to actually backfill the TerminalProcess object contained within 
-                    // the ChangeSetResult that exits this method and is returned to the caller.
-                    terminalsProcess.Terminals = terminalchanges;
+                        // Don't forget to actually backfill the TerminalProcess object contained within 
+                        // the ChangeSetResult that exits this method and is returned to the caller.
+                        terminalsProcess.Terminals = terminalchanges;
 
-                    //Now using log4net.ILog implementation to test results of query.
-                    log.Debug("SRTEST:TerminalChangeProcess");
-                    foreach (TerminalChange terminal in terminalchanges)
-                    {
-                        log.DebugFormat("SRTEST:TerminalId:{0} RegionId:{1} Yard:{2} {3} ChgDateTime:{4} ChgActionFlag:{5}",
-                                        terminal.TerminalId,
-                                        terminal.RegionId,
-                                        terminal.CustHostCode,
-                                        terminal.CustName,
-                                        terminal.ChgDateTime,
-                                        terminal.ChgActionFlag);
+                        //Now using log4net.ILog implementation to test results of query.
+                        log.Debug("SRTEST:TerminalChangeProcess");
+                        foreach (var terminal in terminalchanges)
+                        {
+                            log.DebugFormat("SRTEST:TerminalId:{0} RegionId:{1} Yard:{2} {3} ChgDateTime:{4} ChgActionFlag:{5}",
+                                            terminal.TerminalId,
+                                            terminal.RegionId,
+                                            terminal.CustHostCode,
+                                            terminal.CustName,
+                                            terminal.ChgDateTime,
+                                            terminal.ChgActionFlag);
+                        }
+                        ////////////////////////////////////////////////
+                        //Now update the TerminalMasterDateTime in the DriverStatus record
+                        //If there is no record yet, I guess we will have to add one.
+                        var driverStatus = Util.Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
+                                                    terminalsProcess.EmployeeId, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+
+                        // If no driver status record is found create one to add
+                        if (null == driverStatus)
+                        {
+                            driverStatus = new DriverStatus()
+                            {
+                                EmployeeId = terminalsProcess.EmployeeId,
+                            };
+                        }
+                        //Now there is a driverStatus
+                        //For testing
+                        log.Debug("SRTEST:GetDriverStatus");
+                        log.DebugFormat("SRTEST:DriverId:{0} LastTerminalMasterUpdate:{1}",
+                                                            driverStatus.EmployeeId,
+                                                            driverStatus.TerminalMasterDateTime);
+
+                        driverStatus.TerminalMasterDateTime = DateTime.Now;
+
+                        changeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
+
+                        log.DebugFormat("SRTEST:Saving DriverStatus Record: DriverId:{0} TerminalMasterUpdate:{1}",
+                                                            driverStatus.EmployeeId,
+                                                            driverStatus.TerminalMasterDateTime);
+
+                        if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
+                        {
+                            var s = string.Format("Could not update DriverStatus for Driver {0}.",
+                                                  terminalsProcess.EmployeeId);
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            break;
+                        }
                     }
                 }
             }

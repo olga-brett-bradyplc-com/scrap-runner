@@ -14,7 +14,7 @@ namespace Brady.ScrapRunner.Domain.Models
     public class CustomerDirections : IHaveCompositeId,IEquatable<CustomerDirections>
     {
         public virtual string CustHostCode { get; set; }
-        public virtual int DirectionsSeqNo { get; set; }
+        public virtual short DirectionsSeqNo { get; set; }
         public virtual string DirectionsDesc { get; set; }
 
         public virtual string Id

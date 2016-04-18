@@ -32,7 +32,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             return new CustomerDirections
             {
                 CustHostCode = identityValues[0],
-                DirectionsSeqNo = int.Parse(identityValues[1])
+                DirectionsSeqNo = short.Parse(identityValues[1])
             };
         }
 

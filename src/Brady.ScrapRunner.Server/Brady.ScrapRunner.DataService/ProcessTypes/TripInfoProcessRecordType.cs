@@ -17,6 +17,8 @@ using BWF.DataServices.Metadata.Models;
 using NHibernate;
 using NHibernate.Util;
 using System.Text;
+using Brady.ScrapRunner.DataService.RecordTypes;
+using Brady.ScrapRunner.Domain.Enums;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -106,7 +108,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     DataServiceFault fault;
                     string msgKey = key;
 
-                    TripInfoProcess tripInfoProcess = (TripInfoProcess)changeSetResult.GetSuccessfulUpdateForId(key);
+                    var tripInfoProcess = (TripInfoProcess)changeSetResult.GetSuccessfulUpdateForId(key);
 
                     // TODO:  Determine userCulture and userRoleIds on a per user basis.
                     string userCulture = "en-GB";
@@ -138,10 +140,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     List<CustomerCommodity> fullCustomerCommodityList = new List<CustomerCommodity>();
                     List<CustomerLocation> fullCustomerLocationList = new List<CustomerLocation>();
 
-                    //
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
-                    //
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   tripInfoProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -154,9 +155,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////
                     // Lookup Preference: DEFCommodSelection
-                    //
                     string prefCommodSelection = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                   employeeMaster.TerminalId, PrefDriverConstants.DEFCommodSelection, out fault);
                     if (fault != null)
@@ -164,8 +164,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
+
+                    ////////////////////////////////////////////////
                     // Lookup trip  
-                    //
                     if (bLogin)
                     {
                         tripList = Util.Common.GetTripsForDriverAtLogin(dataService, settings, userCulture, userRoleIds,
@@ -181,8 +182,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    List<string> customersInTrips = new List<string>();
-                    foreach (Trip tripInfo in tripList)
+                    var customersInTrips = new List<string>();
+                    foreach (var tripInfo in tripList)
                     {
                         //For testing
                         log.Debug("SRTEST:TripInfoProcess - Trip");
@@ -198,8 +199,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the reference numbers
-                        List<TripReferenceNumber> tripReferenceNumberList = new List<TripReferenceNumber>();
-                        tripReferenceNumberList = Util.Common.GetTripReferenceNumbers(dataService, settings, userCulture, userRoleIds,
+                        var tripReferenceNumberList = Util.Common.GetTripReferenceNumbers(dataService, settings, userCulture, userRoleIds,
                                             tripInfo.TripNumber, out fault);
                         fullTripReferenceNumberList.AddRange(tripReferenceNumberList);
                         if (fault != null)
@@ -209,18 +209,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         //For testing
                         log.Debug("SRTEST:TripInfoProcess - Trip Reference Numbers");
-                        foreach (TripReferenceNumber tripreference in tripReferenceNumberList)
+                        foreach (var tripreference in tripReferenceNumberList)
                         {
-                      
+
                             log.DebugFormat("SRTEST:TripNumber:{0} RefNumber:{1} Desc:{2}",
                                             tripreference.TripNumber,
                                             tripreference.TripRefNumber,
                                             tripreference.TripRefNumberDesc);
                         }
                         ////////////////////////////////////////////////////////////////////////////////////////////////
-                        //For each trip, get the segments
-                        List<TripSegment> tripSegmentList = new List<TripSegment>();
-                        tripSegmentList = Util.Common.GetTripSegments(dataService, settings, userCulture, userRoleIds,
+                        //For each trip, get the incomplete segments
+                        var tripSegmentList = Util.Common.GetTripSegmentsIncomplete(dataService, settings, userCulture, userRoleIds,
                                           tripInfo.TripNumber, out fault);
                         fullTripSegmentList.AddRange(tripSegmentList);
                         if (fault != null)
@@ -230,7 +229,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         //For testing
                         log.Debug("SRTEST:TripInfoProcess - Trip Segment");
-                        foreach (TripSegment tripsegment in tripSegmentList)
+                        foreach (var tripsegment in tripSegmentList)
                         {
                             ////////////////////////////////////////////////////////////////////////////////////////////////
                             //For each segment get the dest cust host code. 
@@ -249,7 +248,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the containers for all of the segments
-                        List<TripSegmentContainer> tripContainerList = new List<TripSegmentContainer>();
+                        var tripContainerList = new List<TripSegmentContainer>();
                         tripContainerList = Util.Common.GetTripContainers(dataService, settings, userCulture, userRoleIds,
                                             tripInfo.TripNumber, out fault);
                         fullTripSegmentContainerList.AddRange(tripContainerList);
@@ -260,7 +259,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         //For testing
                         log.Debug("SRTEST:TripInfoProcess - Trip Containers");
-                        foreach (TripSegmentContainer tripsegcontainer in tripContainerList)
+                        foreach (var tripsegcontainer in tripContainerList)
                         {
                             log.DebugFormat("SRTEST:TripNumber:{0} SegNumber:{1} SeqNumber:{2} ContainerNumber:{3} Type:{4} Size:{5}",
                                 tripsegcontainer.TripNumber,
@@ -276,10 +275,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Loop through the list of customer host codes
                     //Get the directions to each customer host code 
                     log.Debug("SRTEST:TripInfoProcess - Customer Directions");
-                    foreach (string custHostCode in customersInTrips)
+                    foreach (var custHostCode in customersInTrips)
                     {
-                        List<CustomerDirections> custDirectionsList = new List<CustomerDirections>();
-                        custDirectionsList = Util.Common.GetCustomerDirections(dataService, settings, userCulture, userRoleIds,
+                        var custDirectionsList = Util.Common.GetCustomerDirections(dataService, settings, userCulture, userRoleIds,
                                              custHostCode, out fault);
                         fullCustomerDirectionsList.AddRange(custDirectionsList);
                         if (fault != null)
@@ -288,9 +286,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
                         if (custDirectionsList.Count > 0)
-                        { 
+                        {
                             StringBuilder sbDirections = new StringBuilder();
-                            foreach (CustomerDirections customerDirections in custDirectionsList)
+                            foreach (var customerDirections in custDirectionsList)
                             {
                                 sbDirections.Append(customerDirections.DirectionsDesc.Trim());
                                 sbDirections.Append(" ");
@@ -308,10 +306,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //Loop through the list of customer host codes
                         //if DefCommodSelection = Y, set the commodities for each customer
                         log.Debug("SRTEST:TripInfoProcess - Customer Commodities");
-                        foreach (string custHostCode in customersInTrips)
+                        foreach (var custHostCode in customersInTrips)
                         {
-                            List<CustomerCommodity> custCommodityList = new List<CustomerCommodity>();
-                            custCommodityList = Util.Common.GetCustomerCommodities(dataService, settings, userCulture, userRoleIds,
+                            var custCommodityList = Util.Common.GetCustomerCommodities(dataService, settings, userCulture, userRoleIds,
                                                   custHostCode, out fault);
                             fullCustomerCommodityList.AddRange(custCommodityList);
                             if (fault != null)
@@ -319,12 +316,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                                 break;
                             }
-                            foreach (CustomerCommodity customerCommodity in custCommodityList)
+                            foreach (var customerCommodity in custCommodityList)
                             {
-                                 log.DebugFormat("SRTEST:HostCode:{0} Code:{1} Desc:{2}",
-                                                customerCommodity.CustHostCode,
-                                                customerCommodity.CustCommodityCode,
-                                                customerCommodity.CustCommodityDesc);
+                                log.DebugFormat("SRTEST:HostCode:{0} Code:{1} Desc:{2}",
+                                               customerCommodity.CustHostCode,
+                                               customerCommodity.CustCommodityCode,
+                                               customerCommodity.CustCommodityDesc);
                             }
                         }
                     }
@@ -332,10 +329,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Loop through the list of customer host codes
                     //Get the locations for each customer
                     log.Debug("SRTEST:TripInfoProcess - Customer Locations");
-                    foreach (string custHostCode in customersInTrips)
+                    foreach (var custHostCode in customersInTrips)
                     {
-                        List<CustomerLocation> custLocationsList = new List<CustomerLocation>();
-                        custLocationsList = Util.Common.GetCustomerLocations(dataService, settings, userCulture, userRoleIds,
+                        var custLocationsList = Util.Common.GetCustomerLocations(dataService, settings, userCulture, userRoleIds,
                                             custHostCode, out fault);
                         fullCustomerLocationList.AddRange(custLocationsList);
                         if (fault != null)
@@ -343,7 +339,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
-                        foreach (CustomerLocation customerLocation in custLocationsList)
+                        foreach (var customerLocation in custLocationsList)
                         {
 
                             log.DebugFormat("SRTEST:HostCode:{0} Location:{1}",
@@ -358,9 +354,26 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     tripInfoProcess.CustomerDirections = fullCustomerDirectionsList;
                     tripInfoProcess.CustomerLocations = fullCustomerLocationList;
                     tripInfoProcess.CustomerCommodities = fullCustomerCommodityList;
+
+                    //Now that we have sent all the trips, update the TripSendFlag in the Trip table
+                    //so that the trips will not be sent again.
+                    //If the trip is modified, SR will set the flag back to Ready status.
+                    //If the driver logs in again, he will get trips in Ready status or SentToDriver status. 
+                    //l.
+                    var tripRecordType = (TripRecordType)dataService.RecordTypes.Single(x => x.TypeName == "Trip");
+                    var tripChangeSet = (ChangeSet<string, Trip>)tripRecordType.GetNewChangeSet();
+                    foreach (var trip in tripList)
+                    {
+                        trip.TripSendFlag = TripSendFlagValue.SentToDriver;
+                        tripChangeSet.AddUpdate(trip.Id, trip);
+
+                        log.DebugFormat("SRTEST:Saving Trip Record:{0} TripSendFlag:{1}",
+                                       trip.TripNumber,
+                                       TripSendFlagValue.SentToDriver);
+                    }
+                    changeSetResult = tripRecordType.ProcessChangeSet(dataService, tripChangeSet, settings);
                 }
             }
-
             // If our local session variable is set then it is our session/txn to deal with
             // otherwise we simply return the result.
             if (session == null)
