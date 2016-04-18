@@ -45,6 +45,7 @@ namespace Brady.ScrapRunner.DataService.Mappings
             Property(x => x.ContainerLocation);
             Property(x => x.ContainerLastActionDateTime);
             Property(x => x.ContainerDaysAtSite);
+            Property(x => x.ContainerPendingMoveDateTime);
             Property(x => x.ContainerTripNumber);
             Property(x => x.ContainerTripSegNumber);
             Property(x => x.ContainerTripSegType);

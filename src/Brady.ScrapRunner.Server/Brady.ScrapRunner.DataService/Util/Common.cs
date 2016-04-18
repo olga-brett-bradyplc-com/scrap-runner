@@ -9,6 +9,7 @@ using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.PortableClients;
+using BWF.DataServices.Support.NHibernate.Abstract;
 using log4net;
 using Brady.ScrapRunner.Domain.Enums;
 using BWF.DataServices.Metadata.Fluent.Enums;
@@ -120,6 +121,582 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return errorsDetected;
         }
+        /// <summary>
+        /// Insert a ContainerHistory record.
+        ///  Note:  caller must handle faults.  E.G. if( handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="containerMaster"></param>
+        /// <param name="employeeMaster"></param>
+        /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="fault"></param>
+        /// <returns>true if success</returns>
+        public static bool InsertContainerHistory(IDataService dataService, ProcessChangeSetSettings settings,
+            ContainerMaster containerMaster,  int callCountThisTxn,
+            IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log, out DataServiceFault fault)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+
+            // Note this is a commited snapshot read, a not dirty value, thus we have to keep do our own bookkeeping
+            // to support multiple inserts in one txn: callCountThisTxn
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the last container history record for this container id to get the last sequence number used
+            var containerHistoryMax = Common.GetContainerHistoryLast(dataService, settings, userCulture, userRoleIds,
+                                  containerMaster.ContainerNumber, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            int containerSeqNo = callCountThisTxn;
+            if (containerHistoryMax != null)
+            {
+                containerSeqNo = containerHistoryMax.ContainerSeqNumber + callCountThisTxn;
+            }
+            //For testing
+            log.Debug("SRTEST:Add ContainerHistory");
+            log.DebugFormat("SRTEST:ContainerNumber:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
+                             containerMaster.ContainerNumber,
+                             containerMaster.ContainerCurrentTripNumber,
+                             containerMaster.ContainerCurrentTripSegNumber,
+                             containerMaster.ContainerStatus,
+                             containerMaster.ContainerLastActionDateTime,
+                             containerSeqNo);
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the TerminalName in the TerminalMaster 
+            var containerTerminalMaster = Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+                                          containerMaster.ContainerTerminalId, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string containerTerminalName = containerTerminalMaster?.TerminalName;
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the CurrentTerminalName in the TerminalMaster 
+            var containerCurrentTerminalMaster = Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+                                          containerMaster.ContainerCurrentTerminalId, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string containerCurrentTerminalName = containerTerminalMaster?.TerminalName;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the RegionName in the RegionMaster 
+            var containerRegionMaster = Common.GetRegion(dataService, settings, userCulture, userRoleIds,
+                                          containerMaster.ContainerRegionId, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string containerRegionName = containerRegionMaster?.RegionName;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the ContainerStatus Description in the CodeTable CONTAINERSTATUS 
+            var codeTableContainerStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                    CodeTableNameConstants.ContainerStatus, containerMaster.ContainerStatus, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string containerStatusDesc = codeTableContainerStatus?.CodeDisp1;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the ContainerContents Description in the CodeTable CONTENTSTATUS 
+            var codeTableContainerContents = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                    CodeTableNameConstants.ContentStatus, containerMaster.ContainerContents, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string containerContentsDesc = codeTableContainerContents?.CodeDisp1;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //If there is a host code, look up the Customer record to get the
+            // customer information. 
+            var containerCustomerMaster = new CustomerMaster();
+            if (null != containerCustomerMaster.CustHostCode)
+            {
+                containerCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                                      containerMaster.ContainerCustHostCode, out fault);
+                if (null != fault)
+                {
+                    return false;
+                }
+            }
+            //////////////////////////////////////////////////////////////////////////////////////
+            //If there is a customer type, look up the description in the CodeTable CUSTOMERTYPE
+            //Generally, for logins, this information should be null
+            var codeTableCustomerType = new CodeTable();
+            if (null != containerMaster.ContainerCustType)
+            {
+                codeTableCustomerType = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                      CodeTableNameConstants.CustomerType, containerMaster.ContainerCustType, out fault);
+                if (null != fault)
+                {
+                    return false;
+                }
+            }
+            string containerCustTypeDesc = codeTableCustomerType?.CodeDisp1;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the Basic Trip Type Description in the TripTypeBasic table 
+            var tripTypeBasic = Common.GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
+                                containerMaster.ContainerCurrentTripSegType, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string tripTypeBasicDesc = tripTypeBasic?.TripTypeDesc;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the LastActionDateTime in the ContainerMaster table 
+            //This will be the original value, since change has not been committed.
+            var origContainerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
+                                containerMaster.ContainerNumber, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            int daysAtSite = (containerMaster?.ContainerLastActionDateTime.Value.Date 
+                   - origContainerMaster?.ContainerLastActionDateTime.Value.Date).Value.Days;
+
+            var containerHistory = new ContainerHistory()
+            {
+                ContainerNumber = containerMaster.ContainerNumber,
+                ContainerSeqNumber = containerSeqNo,
+                ContainerType = containerMaster.ContainerType,
+                ContainerSize = containerMaster.ContainerSize,
+                ContainerUnits = containerMaster.ContainerUnits,
+                ContainerLength = containerMaster.ContainerLength,
+                ContainerCustType = containerMaster.ContainerCustType,
+                ContainerCustTypeDesc = containerCustTypeDesc,
+                ContainerTerminalId = containerMaster.ContainerTerminalId,
+                ContainerTerminalName = containerTerminalName,
+                ContainerRegionId = containerMaster.ContainerRegionId,
+                ContainerRegionName = containerRegionName,
+                ContainerLocation = containerMaster.ContainerLocation,
+                ContainerLastActionDateTime = containerMaster.ContainerLastActionDateTime,
+                ContainerDaysAtSite = daysAtSite,
+                ContainerPendingMoveDateTime = containerMaster.ContainerPendingMoveDateTime,
+                ContainerTripNumber = containerMaster.ContainerCurrentTripNumber,
+                ContainerTripSegNumber = containerMaster.ContainerCurrentTripSegNumber,
+                ContainerTripSegType = containerMaster.ContainerCurrentTripSegType,
+                ContainerTripSegTypeDesc = tripTypeBasicDesc,
+                ContainerStatus = containerMaster.ContainerStatus,
+                ContainerStatusDesc = containerStatusDesc,
+                ContainerContents = containerMaster.ContainerContents,
+                ContainerContentsDesc = containerContentsDesc,
+                ContainerCommodityCode = containerMaster.ContainerCommodityCode,
+                ContainerCommodityDesc = containerMaster.ContainerCommodityDesc,
+                ContainerComments = containerMaster.ContainerComments,
+                ContainerPowerId = containerMaster.ContainerPowerId,
+                ContainerShortTerm = containerMaster.ContainerShortTerm,
+                ContainerCustHostCode = containerMaster.ContainerCustHostCode,
+                ContainerCustName = containerCustomerMaster?.CustName,
+                ContainerCustAddress1 = containerCustomerMaster?.CustAddress1,
+                ContainerCustAddress2 = containerCustomerMaster?.CustAddress2,
+                ContainerCustCity = containerCustomerMaster?.CustCity,
+                ContainerCustState = containerCustomerMaster?.CustState,
+                ContainerCustZip = containerCustomerMaster?.CustZip,
+                ContainerCustCountry = containerCustomerMaster?.CustCountry,
+                ContainerCustCounty = containerCustomerMaster?.CustCounty,
+                ContainerCustTownship = containerCustomerMaster?.CustTownship,
+                ContainerCustPhone1 = containerCustomerMaster?.CustPhone1,
+                ContainerLevel = containerMaster.ContainerLevel,
+                ContainerLatitude = containerMaster.ContainerLatitude,
+                ContainerLongitude = containerMaster.ContainerLongitude,
+                ContainerNotes = containerMaster.ContainerNotes,
+                ContainerCurrentTerminalId = containerMaster.ContainerCurrentTerminalId,
+                ContainerCurrentTerminalName = containerCurrentTerminalName,
+                ContainerWidth = containerMaster.ContainerWidth,
+                ContainerHeight = containerMaster.ContainerHeight
+
+            };
+
+            // Insert ContainerHistory 
+            var recordType = (ContainerHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "ContainerHistory");
+            var changeSet = (ChangeSet<string, ContainerHistory>)recordType.GetNewChangeSet();
+            long recordRef = 1;
+            changeSet.AddCreate(recordRef, containerHistory, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving ContainerHistory");
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            if (Common.LogChangeSetFailure(changeSetResult, containerHistory, log))
+            {
+                return false;
+            }
+            return true;
+        }
+        /// <summary>
+        /// Insert a PowerHistory record.
+        ///  Note:  caller must handle faults.  E.G. if( handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="powerMaster"></param>
+        /// <param name="employeeMaster"></param>
+        /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="fault"></param>
+        /// <returns>true if success</returns>
+        public static bool InsertPowerHistory(IDataService dataService, ProcessChangeSetSettings settings,
+            PowerMaster powerMaster, EmployeeMaster employeeMaster, int callCountThisTxn,
+            IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log, out DataServiceFault fault)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+
+            // Note this is a commited snapshot read, a not dirty value, thus we have to keep do our own bookkeeping
+            // to support multiple inserts in one txn: callCountThisTxn
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the last power history record for this power id to get the last sequence number used
+            var powerHistoryMax = Common.GetPowerHistoryLast(dataService, settings, userCulture, userRoleIds,
+                                  powerMaster.PowerId, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            int powerSeqNo = callCountThisTxn;
+            if (powerHistoryMax != null)
+            {
+                powerSeqNo = powerHistoryMax.PowerSeqNumber + callCountThisTxn;
+            }
+            //For testing
+            log.Debug("SRTEST:Add PowerHistory");
+            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
+                             powerMaster.PowerDriverId,
+                             powerMaster.PowerCurrentTripNumber,
+                             powerMaster.PowerCurrentTripSegNumber,
+                             powerMaster.PowerStatus,
+                             powerMaster.PowerLastActionDateTime,
+                             powerSeqNo);
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the TerminalName in the TerminalMaster 
+            var powerTerminalMaster = Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+                                          powerMaster.PowerTerminalId, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string powerTerminalName = powerTerminalMaster?.TerminalName;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the RegionName in the RegionMaster 
+            var powerRegionMaster = Common.GetRegion(dataService, settings, userCulture, userRoleIds,
+                                          powerMaster.PowerRegionId, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string powerRegionName = powerRegionMaster?.RegionName;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the PowerStatus Description in the CodeTable POWERUNITSTATUS 
+            var codeTablePowerStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                    CodeTableNameConstants.PowerUnitStatus, powerMaster.PowerStatus, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string powerStatusDesc = codeTablePowerStatus?.CodeDisp1;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //If there is a host code, look up the Customer record to get the
+            // customer information. 
+            //Generally, for logins, this information should be null
+            var powerCustomerMaster = new CustomerMaster();
+            if (null != powerMaster.PowerCustHostCode)
+            {
+                powerCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                                      powerMaster.PowerCustHostCode, out fault);
+                if (null != fault)
+                {
+                    return false;
+                }
+            }
+            //////////////////////////////////////////////////////////////////////////////////////
+            //If there is a customer type, look up the description in the CodeTable CUSTOMERTYPE
+            //Generally, for logins, this information should be null
+            var codeTableCustomerType = new CodeTable();
+            if (null != powerMaster.PowerCustType)
+            {
+                codeTableCustomerType = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                      CodeTableNameConstants.CustomerType, powerMaster.PowerCustType, out fault);
+                if (null != fault)
+                {
+                    return false;
+                }
+            }
+            string powerCustTypeDesc = codeTableCustomerType?.CodeDisp1;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the Basic Trip Type Description in the TripTypeBasic table 
+            var tripTypeBasic = Common.GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
+                                powerMaster.PowerCurrentTripSegType, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string tripTypeBasicDesc = tripTypeBasic?.TripTypeDesc;
+
+            var powerHistory = new PowerHistory()
+            {
+                PowerId = powerMaster.PowerId,
+                PowerSeqNumber = powerSeqNo,
+                PowerType = powerMaster.PowerType,
+                PowerDesc = powerMaster.PowerDesc,
+                PowerSize = powerMaster.PowerSize,
+                PowerLength = powerMaster.PowerLength,
+                PowerTareWeight = powerMaster.PowerTareWeight,
+                PowerCustType = powerMaster.PowerCustType,
+                PowerCustTypeDesc = powerCustTypeDesc,
+                PowerTerminalId = powerMaster.PowerTerminalId,
+                PowerTerminalName = powerTerminalName,
+                PowerRegionId = powerMaster.PowerRegionId,
+                PowerRegionName = powerRegionName,
+                PowerLocation = powerMaster.PowerLocation,
+                PowerStatus = powerMaster.PowerStatus,
+                PowerDateOutOfService = powerMaster.PowerDateOutOfService,
+                PowerDateInService = powerMaster.PowerDateInService,
+                PowerDriverId = powerMaster.PowerDriverId,
+                PowerDriverName = Common.GetDriverName(employeeMaster),
+                PowerOdometer = powerMaster.PowerOdometer,
+                PowerComments = powerMaster.PowerComments,
+                MdtId = powerMaster.MdtId,
+                PrimaryPowerType = null,
+                PowerCustHostCode = powerMaster.PowerCustHostCode,
+                PowerCustName = powerCustomerMaster?.CustName,
+                PowerCustAddress1 = powerCustomerMaster?.CustAddress1,
+                PowerCustAddress2 = powerCustomerMaster?.CustAddress2,
+                PowerCustCity = powerCustomerMaster?.CustCity,
+                PowerCustState = powerCustomerMaster?.CustState,
+                PowerCustZip = powerCustomerMaster?.CustZip,
+                PowerCustCountry = powerCustomerMaster?.CustCountry,
+                PowerCustCounty = powerCustomerMaster?.CustCounty,
+                PowerCustTownship = powerCustomerMaster?.CustTownship,
+                PowerCustPhone1 = powerCustomerMaster?.CustPhone1,
+                PowerLastActionDateTime = powerMaster.PowerLastActionDateTime,
+                PowerStatusDesc = powerStatusDesc,
+                PowerCurrentTripNumber = powerMaster.PowerCurrentTripNumber,
+                PowerCurrentTripSegNumber = powerMaster.PowerCurrentTripSegNumber,
+                PowerCurrentTripSegType = powerMaster.PowerCurrentTripSegType,
+                PowerCurrentTripSegTypeDesc = tripTypeBasicDesc
+            };
+
+            // Insert PowerHistory 
+            var recordType = (PowerHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "PowerHistory");
+            var changeSet = (ChangeSet<string, PowerHistory>)recordType.GetNewChangeSet();
+            long recordRef = 1;
+            changeSet.AddCreate(recordRef, powerHistory, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving PowerHistory");
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            if (Common.LogChangeSetFailure(changeSetResult, powerHistory, log))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Insert a DriverHistory record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="employeeMaster"></param>
+        /// <param name="driverStatus"></param>
+        /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="fault"></param>
+        /// <returns>true if success</returns>
+        public static bool InsertDriverHistory(IDataService dataService, ProcessChangeSetSettings settings,
+            DriverStatus driverStatus, EmployeeMaster employeeMaster, int callCountThisTxn,
+            IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log, out DataServiceFault fault)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+
+            // Note this is a commited snapshot read, a not dirty value, thus we have to keep do our own bookkeeping
+            // to support multiple inserts in one txn: callCountThisTxn
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the last driver history record for this trip and driver to get the last sequence number used
+            var driverHistoryMax = Common.GetDriverHistoryLast(dataService, settings, userCulture, userRoleIds,
+                                    driverStatus.EmployeeId, driverStatus.TripNumber, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            int driverSeqNo = callCountThisTxn;
+            if (driverHistoryMax != null)
+            {
+                driverSeqNo = driverHistoryMax.DriverSeqNumber + callCountThisTxn;
+            }
+            //For testing
+            log.Debug("SRTEST:Add DriverHistory");
+            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
+                             driverStatus.EmployeeId,
+                             driverStatus.TripNumber,
+                             driverStatus.TripSegNumber,
+                             driverStatus.Status,
+                             driverStatus.ActionDateTime,
+                             driverSeqNo);
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the Basic Trip Type Description in the TripTypeBasic table 
+            var tripTypeBasic = Common.GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
+                                driverStatus.TripSegType, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string tripTypeBasicDesc = tripTypeBasic?.TripTypeDesc;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the TripAssignStatus Description in the CodeTable TRIPASSIGNSTATUS 
+            var codeTableTripAssignStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                    CodeTableNameConstants.TripAssignStatus, driverStatus.TripAssignStatus, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string tripAssignStatusDesc = codeTableTripAssignStatus?.CodeDisp1;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the TripStatus Description in the CodeTable TRIPSTATUS 
+            var codeTableTripStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                    CodeTableNameConstants.TripStatus, driverStatus.TripStatus, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string tripStatusDesc = codeTableTripStatus?.CodeDisp1;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the TripSegStatus Description in the CodeTable TRIPSEGSTATUS 
+            var codeTableTripSegStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                    CodeTableNameConstants.TripSegStatus, driverStatus.TripSegStatus, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string tripSegStatusDesc = codeTableTripSegStatus?.CodeDisp1;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the DriverStatus Description in the CodeTable DRIVERSTATUS 
+            var codeTableDriverStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                    CodeTableNameConstants.DriverStatus, driverStatus.Status, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string driverStatusDesc = codeTableDriverStatus?.CodeDisp1;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the TerminalName in the TerminalMaster 
+            var driverTerminalMaster = Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+                                          driverStatus.TerminalId, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string driverTerminalName = driverTerminalMaster?.TerminalName;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the RegionName in the RegionMaster 
+            var driverRegionMaster = Common.GetRegion(dataService, settings, userCulture, userRoleIds,
+                                          driverStatus.RegionId, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            string driverRegionName = driverRegionMaster?.RegionName;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //If there is a trip number and segment number, look up the TripSegment record to get the
+            //destination customer information. (Instead of the cutomer master).
+            //Unless the driver is logging in in the middle of the trip, we want this to be null
+            var driverTripSegment = new TripSegment();
+            if (null != driverStatus.TripNumber && null != driverStatus.TripSegNumber)
+            {
+                driverTripSegment = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
+                                              driverStatus.TripNumber, driverStatus.TripSegNumber, out fault);
+                if (null != fault)
+                {
+                    return false;
+                }
+            }
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //if there is no trip number, construct a number to use that consists of the driver status + driverid
+            string tripNumber = driverStatus.TripNumber;
+            if (null == driverStatus.TripNumber)
+            {
+                tripNumber = driverStatus.Status + driverStatus.EmployeeId;
+            }
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            var driverHistory = new DriverHistory()
+            {
+                EmployeeId = driverStatus.EmployeeId,
+                TripNumber = tripNumber,
+                DriverSeqNumber = driverSeqNo,
+                TripSegNumber = driverStatus.TripSegNumber,
+                TripSegType = driverStatus.TripSegType,
+                TripSegTypeDesc  = tripTypeBasicDesc,
+                TripAssignStatus  = driverStatus.TripAssignStatus,
+                TripAssignStatusDesc  = tripAssignStatusDesc,
+                TripStatus  = driverStatus.TripStatus,
+                TripStatusDesc  = tripStatusDesc,
+                TripSegStatus  = driverStatus.TripSegStatus,
+                TripSegStatusDesc = tripSegStatusDesc,
+                DriverStatus = driverStatus.Status,
+                DriverStatusDesc = driverStatusDesc,
+                DriverName = Common.GetDriverName(employeeMaster),
+                TerminalId = driverStatus.TerminalId,
+                TerminalName = driverTerminalName,
+                RegionId = driverStatus.RegionId,
+                RegionName = driverRegionName,
+                PowerId = driverStatus.PowerId,
+                // DriverArea =,
+                MDTId = driverStatus.MDTId,
+                LoginDateTime = driverStatus.LoginDateTime,
+                ActionDateTime = driverStatus.ActionDateTime,
+                DriverCumMinutes = driverStatus.DriverCumMinutes,
+                Odometer = driverStatus.Odometer,
+                DestCustType = driverTripSegment.TripSegDestCustType,
+                DestCustTypeDesc = driverTripSegment.TripSegDestCustTypeDesc,
+                DestCustHostCode = driverTripSegment.TripSegDestCustHostCode,
+                DestCustName = driverTripSegment.TripSegDestCustName,
+                DestCustAddress1 = driverTripSegment.TripSegDestCustAddress1,
+                DestCustAddress2 = driverTripSegment.TripSegDestCustAddress2,
+                DestCustCity = driverTripSegment.TripSegDestCustCity,
+                DestCustState = driverTripSegment.TripSegDestCustState,
+                DestCustZip = driverTripSegment.TripSegDestCustZip,
+                DestCustCountry = driverTripSegment.TripSegDestCustCountry,
+                GPSAutoGeneratedFlag = driverStatus.GPSAutoGeneratedFlag,
+                GPSXmitFlag = driverStatus.GPSXmitFlag,
+                MdtVersion = driverStatus.MdtVersion
+            };
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            // Insert DriverHistory 
+            var recordType = (DriverHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "DriverHistory");
+            var changeSet = (ChangeSet<string, DriverHistory>)recordType.GetNewChangeSet();
+            long recordRef = 1;
+            changeSet.AddCreate(recordRef, driverHistory, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving DriverHistory Record");
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            if (Common.LogChangeSetFailure(changeSetResult, driverHistory, log))
+            {
+                return false;
+            }
+            return true;
+        }
+
         ///TABLE INSERTS
         /// <summary>
         /// Add/Update an EventLog record.
@@ -553,6 +1130,7 @@ namespace Brady.ScrapRunner.DataService.Util
             codeTableEntry = queryResult.Records.Cast<CodeTable>().FirstOrDefault();
             return codeTableEntry;
         }
+ 
         /// COMMODITYMASTER Table queries
         /// <summary>
         /// Get a list of all commodities with the universal flag set to Y.
@@ -661,6 +1239,43 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return containers;
         }
+        /// CONTAINERHISTORY Table  queries
+        /// <summary>
+        ///  Get the last container history record for a given power id 
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="containerNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty ContainerHistory if containerNumber is null or no entry is found</returns>
+        public static ContainerHistory GetContainerHistoryLast(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string containerNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var containerHistory = new ContainerHistory();
+            if (null != containerNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<ContainerHistory>().Top(1)
+                             .Filter(t => t.Property(p => p.ContainerNumber).EqualTo(containerNumber))
+                             .OrderBy(p => p.ContainerSeqNumber, Direction.Descending)
+                             .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return containerHistory;
+                }
+                containerHistory = (ContainerHistory)queryResult.Records.Cast<ContainerHistory>().FirstOrDefault();
+            }
+            return containerHistory;
+        }
+        
         /// CONTAINERMASTER Table queries
         /// <summary>
         ///  Get a a container master record for a given container number.
@@ -673,7 +1288,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="containerNumber"></param>
         /// <param name="fault"></param>
         /// <returns>An empty ContainerMaster if containerNumber is null or record does not exist for containerNumber</returns>
-        public static ContainerMaster GetContainer(IDataService dataService, ProcessChangeSetSettings settings,
+public static ContainerMaster GetContainer(IDataService dataService, ProcessChangeSetSettings settings,
              string userCulture, IEnumerable<long> userRoleIds, string containerNumber, out DataServiceFault fault)
         {
             fault = null;
@@ -1074,7 +1689,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var users = new List<EmployeeMaster>();
             if (null != areaId)
             {
-                terminalsInArea = Util.Common.GetTerminalsByArea
+                terminalsInArea = Common.GetTerminalsByArea
                     (dataService, settings, userCulture, userRoleIds, areaId, out fault);
                 Query query = new Query
                 {
@@ -1144,7 +1759,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="userRoleIds"></param>
         /// <param name="powerId"></param>
         /// <param name="fault"></param>
-        /// <returns>An empty DriverHistory if driverId or tripNumber is null or no entry is found</returns>
+        /// <returns>An empty PowerHistory if powerId is null or no entry is found</returns>
         public static PowerHistory GetPowerHistoryLast(IDataService dataService, ProcessChangeSetSettings settings,
              string userCulture, IEnumerable<long> userRoleIds, string powerId, out DataServiceFault fault)
         {
@@ -1449,7 +2064,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var terminals = new List<TerminalChange>();
             if (null != dateTime && null != areaId)
             {
-                terminalsInArea = Util.Common.GetTerminalsByArea
+                terminalsInArea = Common.GetTerminalsByArea
                     (dataService, settings, userCulture, userRoleIds, areaId, out fault);
                 Query query = new Query
                 {
