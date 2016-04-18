@@ -21,7 +21,7 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string PowerId { get; set; }
 
         ///The odometer from the phone.
-        public virtual int Odometer { get; set; }
+        public virtual int? Odometer { get; set; }
 
         ///Currently the locale code from the phone. Driver can change settings.
         /// TODO: Q: Is this really a device preference or could/should it be a user preference perhaps via membership?

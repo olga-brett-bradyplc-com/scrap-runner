@@ -2,47 +2,48 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using Android.App;
 using Android.Content;
-using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
+using Android.Runtime;
 using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Views.Animations;
 using Android.Widget;
+using Brady.ScrapRunner.Mobile.Droid.Activities;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.ViewModels;
-using MvvmCross.Binding.Droid.Binders;
-using MvvmCross.Binding.Droid.Views;
+using MvvmCross.Binding.Droid.BindingContext;
+using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Platform.WeakSubscription;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 
-namespace Brady.ScrapRunner.Mobile.Droid.Views
+namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    [Activity(Label = "Route Detail")]
-    public class RouteDetailView : BaseActivity<RouteDetailViewModel>
+    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame)]
+    [Register("brady.scraprunner.mobile.droid.fragments.RouteDetailFragment")]
+    public class RouteDetailFragment : BaseFragment<RouteDetailViewModel>
     {
-
         private IDisposable _containersToken;
         private IDisposable _currentStatusToken;
 
-        protected override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_routedetail);
-            
+        protected override int FragmentId => Resource.Layout.fragment_routedetail;
+        protected override bool NavMenuEnabled => true;
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {   
             if(ViewModel.Containers != null)
                 LoadContainers(ViewModel.Containers);
 
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
             _currentStatusToken = ViewModel.WeakSubscribe(() => ViewModel.CurrentStatus, OnCurrentStatusChanged);
+            
         }
 
-        protected override void OnDestroy()
+        public override void OnDestroyView()
         {
+            base.OnDestroyView();
+
             if (_containersToken != null)
             {
                 _containersToken.Dispose();
@@ -54,8 +55,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
                 _currentStatusToken.Dispose();
                 _currentStatusToken = null;
             }
-
-            base.OnDestroy();
         }
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
@@ -65,26 +64,26 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
 
         private void OnCurrentStatusChanged(object sender, PropertyChangedEventArgs args)
         {
-            var layout = FindViewById<TextView>(Resource.Id.TripCompanyName);
-            var toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            var layout = View.FindViewById<TextView>(Resource.Id.TripCompanyName);
+            var toolbar = View.FindViewById<Toolbar>(Resource.Id.toolbar);
 
-            var directionsButton = FindViewById<Button>(Resource.Id.DirectionsButton);
-            var enrouteButton = FindViewById<Button>(Resource.Id.EnrouteButton);
-            var arriveButton = FindViewById<Button>(Resource.Id.ArriveButton);
-            var buttonLayout = FindViewById<LinearLayout>(Resource.Id.transactionButtonLayout);
+            var directionsButton = View.FindViewById<Button>(Resource.Id.DirectionsButton);
+            var enrouteButton = View.FindViewById<Button>(Resource.Id.EnrouteButton);
+            var arriveButton = View.FindViewById<Button>(Resource.Id.ArriveButton);
+            var buttonLayout = View.FindViewById<LinearLayout>(Resource.Id.transactionButtonLayout);
 
             // @TODO: Add animations, etc., 
             switch (ViewModel.CurrentStatus)
             {
                 case "EN":
-                    layout.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.enroute)));
-                    toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.enroute)));
+                    layout.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
+                    toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
                     enrouteButton.Visibility = ViewStates.Invisible;
                     arriveButton.Visibility = ViewStates.Visible;
                     break;
                 case "AR":
-                    layout.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.arrive)));
-                    toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(this, Resource.Color.arrive)));
+                    layout.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
+                    toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
                     arriveButton.Visibility = ViewStates.Invisible;
                     directionsButton.SetX(directionsButton.GetX() + 135);
                     buttonLayout.Visibility = ViewStates.Visible;
@@ -94,11 +93,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
 
         private void LoadContainers(ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> data)
         {
+            var inflatorService = (LayoutInflater)((MainActivity)Activity)?.GetSystemService(Context.LayoutInflaterService);
             foreach (var element in data)
             {
-                var mainLayout = FindViewById<LinearLayout>(Resource.Id.content_layout);
-                LayoutInflater inflatorService = (LayoutInflater)this.GetSystemService(Context.LayoutInflaterService);
-                var tripSegmentLayout = inflatorService.Inflate(Resource.Layout.item_tripsegment, mainLayout) as LinearLayout;
+                var mainLayout = View.FindViewById<LinearLayout>(Resource.Id.content_layout);
+                var tripSegmentLayout = inflatorService?.Inflate(Resource.Layout.item_tripsegment, mainLayout) as LinearLayout;
 
                 var tempTitle = tripSegmentLayout.FindViewById<TextView>(Resource.Id.cardViewTitle);
                 tempTitle.Text = element.Key.TripSegTypeDesc;

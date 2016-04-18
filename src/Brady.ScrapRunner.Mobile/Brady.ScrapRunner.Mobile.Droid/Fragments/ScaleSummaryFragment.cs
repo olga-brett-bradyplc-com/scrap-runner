@@ -1,41 +1,38 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-
 using Android.App;
-using Android.Content;
-using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
-using Android.Widget;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Droid.Views;
+using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Platform.WeakSubscription;
 
-namespace Brady.ScrapRunner.Mobile.Droid.Views
+namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    [Activity(Label = "ScaleSummaryView")]
-    public class ScaleSummaryView : BaseActivity<ScaleSummaryViewModel>
+    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame)]
+    [Register("brady.scraprunner.mobile.droid.fragments.ScaleSummaryFragment")]
+    public class ScaleSummaryFragment : BaseFragment<ScaleSummaryViewModel>
     {
         private IDisposable _containersToken;
 
-        protected override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_scalesummary);
+        protected override int FragmentId => Resource.Layout.fragment_scalesummary;
+        protected override bool NavMenuEnabled => true;
 
-            var listGrouping = FindViewById<MvxListView>(Resource.Id.ScaleSummaryListView);
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.ScaleSummaryListView);
             if (ViewModel.Containers != null)
                 listGrouping.ItemsSource = ViewModel.Containers;
 
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
         }
 
-        public override void OnDetachedFromWindow()
+        public override void OnDestroyView()
         {
+            base.OnDestroyView();
+
             if (_containersToken == null) return;
             _containersToken.Dispose();
             _containersToken = null;
@@ -43,7 +40,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
         {
-            var listGrouping = FindViewById<MvxListView>(Resource.Id.ScaleSummaryListView);
+            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.ScaleSummaryListView);
             if (ViewModel.Containers != null)
                 listGrouping.ItemsSource = ViewModel.Containers;
         }

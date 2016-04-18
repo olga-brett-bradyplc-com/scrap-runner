@@ -1,26 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
-using Brady.ScrapRunner.Domain.Process;
+﻿using Brady.ScrapRunner.Domain.Process;
+using BWF.DataServices.PortableClients;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Acr.UserDialogs;
+using Brady.ScrapRunner.Mobile.Interfaces;
+using MvvmCross.Core.ViewModels;
+using MvvmCross.Plugins.Sqlite;
+using Brady.ScrapRunner.Mobile.Resources;
+using Brady.ScrapRunner.Mobile.Services;
+using Brady.ScrapRunner.Mobile.Validators;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using BWF.DataServices.PortableClients;
-    using BWF.DataServices.PortableClients.Interfaces;
-    using MvvmCross.Localization;
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Acr.UserDialogs;
-    using Domain.Models;
-    using Interfaces;
-    using Models;
-    using MvvmCross.Core.ViewModels;
-    using MvvmCross.Plugins.Sqlite;
-    using Resources;
-    using Services;
-    using Validators;
 
     public class SignInViewModel : BaseViewModel
     {
@@ -35,7 +27,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IPreferenceService preferenceService,
             ITripService tripService,
             ICustomerService customerService,
-            DemoDataGenerator demoDataGenerator,
             IConnectionService<DataServiceClient> connection,
             IMvxSqliteConnectionFactory sqliteConnectionFactory)
         {
@@ -82,8 +73,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        private int _odometer;
-        public int Odometer
+        private int? _odometer;
+        public int? Odometer
         {
             get { return _odometer; }
             set
@@ -138,7 +129,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task<bool> SignInAsync()
         {
-            using (var loginData = UserDialogs.Instance.Loading(AppResources.LoggingIn, maskType: MaskType.Clear))
+            using (var loginData = UserDialogs.Instance.Loading(AppResources.LoggingIn, maskType: MaskType.Black))
             {
                 // Delete/Create necesscary SQLite tables
                 await _dbService.RefreshAll();
@@ -229,7 +220,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private void ExecuteSettingsCommand()
         {
             ShowViewModel<SettingsViewModel>();
-            Close(this);
         }
     }
 }

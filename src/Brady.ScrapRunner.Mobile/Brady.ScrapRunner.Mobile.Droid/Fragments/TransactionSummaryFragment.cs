@@ -1,47 +1,45 @@
-using System.Linq;
+using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
-using Android.Support.Design.Widget;
+using Android.App;
+using Android.OS;
+using Android.Runtime;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
-using Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView;
-using Brady.ScrapRunner.Mobile.Models;
-using MvvmCross.Binding.BindingContext;
+using Brady.ScrapRunner.Mobile.Droid.Activities;
+using Brady.ScrapRunner.Mobile.ViewModels;
+using MvvmCross.Binding.Droid.BindingContext;
+using MvvmCross.Binding.Droid.Views;
 using MvvmCross.Binding.ExtensionMethods;
-using MvvmCross.Core.Platform;
+using MvvmCross.Droid.Shared.Attributes;
+using MvvmCross.Platform.WeakSubscription;
 using ZXing.Mobile;
 
-namespace Brady.ScrapRunner.Mobile.Droid.Views
+namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    using System;
-    using System.ComponentModel;
-    using Android.App;
-    using Android.OS;
-    using ViewModels;
-    using MvvmCross.Binding.Droid.Views;
-    using MvvmCross.Platform.WeakSubscription;
-
-    [Activity(Label = "Transaction Summary View")]
-    public class TransactionSummaryView : BaseActivity<TransactionSummaryViewModel>
+    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame)]
+    [Register("brady.scraprunner.mobile.droid.fragments.TransactionSummaryFragment")]
+    public class TransactionSummaryFragment : BaseFragment<TransactionSummaryViewModel>
     {
         private IDisposable _containersToken;
         private IDisposable _currentTransactionToken;
         private ZXingScannerFragment _scannerFragment;
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override int FragmentId => Resource.Layout.fragment_transactionsummary;
+        protected override bool NavMenuEnabled => true;
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
-            base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_transactionsummary);
-            MobileBarcodeScanner.Initialize(Application);
+            MobileBarcodeScanner.Initialize(Activity.Application);
 
             _scannerFragment = new ZXingScannerFragment();
 
-            SupportFragmentManager.BeginTransaction()
+            Activity.SupportFragmentManager.BeginTransaction()
                 .Replace(Resource.Id.camera_fragment, _scannerFragment)
                 .Commit();
 
-            var listGrouping = FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
-
+            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
             if (ViewModel.Containers != null)
             {
                 listGrouping.ItemsSource = ViewModel.Containers;
@@ -50,8 +48,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
         }
 
-        public override void OnDetachedFromWindow()
+        public override void OnDestroyView()
         {
+            base.OnDestroyView();
+
             if (_containersToken == null) return;
             _containersToken.Dispose();
             _containersToken = null;
@@ -61,27 +61,27 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             _currentTransactionToken = null;
         }
 
-        protected override async void OnResume()
+        public override async void OnResume()
         {
             base.OnResume();
             await Task.Delay(1000);
-            
+
             Scan();
         }
 
-        protected override void OnPause()
+        public override void OnPause()
         {
             _scannerFragment.StopScanning();
             base.OnPause();
         }
 
-        private void VibrateDevice()
-        {
-            var vibrateService = (Vibrator) GetSystemService(VibratorService);
-            if (vibrateService == null) return;
-            if (vibrateService.HasVibrator)
-                vibrateService.Vibrate(300);
-        }
+        //private void VibrateDevice()
+        //{
+        //    var vibrateService = (Vibrator)Activity.GetSystemService(Context.VibratorService);
+        //    if (vibrateService == null) return;
+        //    if (vibrateService.HasVibrator)
+        //        vibrateService.Vibrate(300);
+        //}
 
         private void Scan()
         {
@@ -89,7 +89,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
             {
                 if (string.IsNullOrEmpty(result?.Text))
                 {
-                    Toast.MakeText(this, "Could not read bar code", ToastLength.Long).Show();
+                    Toast.MakeText(Activity, "Could not read bar code", ToastLength.Long).Show();
                     return;
                 }
 
@@ -97,7 +97,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
 
                 ViewModel.TransactionScannedCommand.Execute(result.Text);
                 _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
-                VibrateDevice();
+                //VibrateDevice();
 
                 // Assume transaction did not complete
                 if (ViewModel.CurrentTransaction.TripSegContainerActionDateTime == currentActionDateTime)
@@ -108,16 +108,18 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
                 // Assume the transaction was successfully entered
                 else
                 {
-                    RunOnUiThread(() =>
+                    Activity.RunOnUiThread(() =>
                     {
-                        var listGrouping = FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
+                        var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
+                        var temp = listGrouping.Adapter.ItemsSource.ElementAt(0);
+                        var temp2 = listGrouping.ItemsSource.ElementAt(0);
                         var listItem = listGrouping.FindViewById<TextView>(Resource.Id.tripContainerInfo);
                         listItem.SetText(listItem.Text.Replace("<NO NUMBER>", result.Text), TextView.BufferType.Normal);
 
                         var listImage = listGrouping.FindViewById<ImageView>(Resource.Id.arrow_image);
                         listImage.SetImageResource(Resource.Drawable.ic_check_circle_green_36dp);
 
-                        Toast.MakeText(this, "Scanned: " + result.Text, ToastLength.Short).Show();
+                        Toast.MakeText(Activity, "Scanned: " + result.Text, ToastLength.Short).Show();
                     });
                 }
 
@@ -126,7 +128,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Views
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
         {
-            var listGrouping = FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
+            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
             if (ViewModel.Containers != null)
             {
                 listGrouping.ItemsSource = ViewModel.Containers;
