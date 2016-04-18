@@ -24,6 +24,24 @@ namespace Brady.ScrapRunner.DataService.Util
     {
 
         /// <summary>
+        /// Return driver's cumulative time in minutes.
+        /// </summary>
+        /// <param name="tripSegList"></param>
+        /// <returns>null if tripSegList is null </returns>
+        public static int GetDriverCumulativeTime(List<TripSegment> tripSegList)
+        {
+            int driverTime = 0;
+            if (null != tripSegList)
+            {
+                foreach (var segment in tripSegList)
+                {
+                    driverTime += segment.TripSegStandardDriveMinutes.GetValueOrDefault();
+                    driverTime += segment.TripSegStandardStopMinutes.GetValueOrDefault();
+                }
+            }
+            return driverTime;
+        }
+        /// <summary>
         /// Return "LastName, FirstName" or as much as possible from the provided EmployeeMaster object.
         /// </summary>
         /// <param name="employeeMaster"></param>
@@ -136,6 +154,25 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
+        ///TABLE UPDATES
+        /// <summary>
+        /// Update a CustomerMaster record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="customerMaster"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdateCustomerMaster(IDataService dataService, ProcessChangeSetSettings settings,
+                                              CustomerMaster customerMaster)
+        {
+            var recordType = (CustomerMasterRecordType)dataService.RecordTypes.Single(x => x.TypeName == "CustomerMaster");
+            var changeSet = (ChangeSet<string, CustomerMaster>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(customerMaster.Id, customerMaster);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+
         ///TABLE UPDATES
         /// <summary>
         /// Update a PowerMaster record.
@@ -1754,7 +1791,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="tripNumber"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if tripNumber is null or no entries are found</returns>
-        public static List<TripSegment> GetTripSegments(IDataService dataService, ProcessChangeSetSettings settings,
+        public static List<TripSegment> GetTripSegmentsIncomplete(IDataService dataService, ProcessChangeSetSettings settings,
               string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
         {
             fault = null;
@@ -1778,6 +1815,44 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegments;
         }
+        /// TRIPSEGMENT queries
+        /// <summary>
+        ///  Get a list of incomplete trip segments for the trips assigned to a driver.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if tripNumber is null or no entries are found</returns>
+        public static List<TripSegment> GetTripSegmentsIncompleteForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string driverId, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripSegments = new List<TripSegment>();
+            if (null != driverId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripSegment>()
+                    .Filter(y => y.Property(x => x.TripSegDriverId).EqualTo(driverId)
+                    .And().Property(x => x.TripSegStatus).In(TripSegStatusConstants.Pending, TripSegStatusConstants.Missed))
+                    .OrderBy(x => x.TripNumber)
+                    .OrderBy(x => x.TripSegNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripSegments;
+                }
+                tripSegments = queryResult.Records.Cast<TripSegment>().ToList();
+            }
+            return tripSegments;
+        }
+
         /// TRIPSEGMENTCONTAINER queries
         /// <summary>
         ///  Get a list of trip segment containers to be sent to a given driver for a given trip.
@@ -1890,79 +1965,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentContainer;
         }
-        /// TRIPSEGMENTCONTAINER Table  queries
-        /// <summary>
-        ///  Gets the first trip segment container record for a given trip and segment with no container number.
-        ///  Caller needs to check if the fault is non-null before using the returned list.
-        /// </summary>
-        /// <param name="dataService"></param>
-        /// <param name="settings"></param>
-        /// <param name="userCulture"></param>
-        /// <param name="userRoleIds"></param>
-        /// <param name="tripNumber"></param>
-        /// <param name="tripSegNumber"></param>
-        /// <param name="fault"></param>
-        /// <returns>An empty TripSegmentContainer if tripNumber,tripSegNumber or tripSegContainer is null or no record is found</returns>
-        public static TripSegmentContainer GetTripSegmentContainerFirstNull(IDataService dataService, ProcessChangeSetSettings settings,
-                      string userCulture, IEnumerable<long> userRoleIds, string tripNumber, string tripSegNumber, out DataServiceFault fault)
-        {
-            fault = null;
-            var tripSegmentContainer = new TripSegmentContainer();
-            if (null != tripNumber && null != tripSegNumber)
-            {
-                Query query = new Query
-                {
-                    CurrentQuery = new QueryBuilder<TripSegmentContainer>()
-                    .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripNumber)
-                    .And().Property(x => x.TripSegNumber).EqualTo(tripSegNumber)
-                    .And().Property(p => p.TripSegContainerNumber).IsNull())
-                    .GetQuery()
-                };
-                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                if (null != fault)
-                {
-                    return tripSegmentContainer;
-                }
-                tripSegmentContainer = queryResult.Records.Cast<TripSegmentContainer>().FirstOrDefault();
-            }
-            return tripSegmentContainer;
-        }
-        /// TRIPSEGMENTCONTAINER Table  queries
-        /// <summary>
-        ///  Gets the first trip segment container record for a given trip and segment.
-        ///  Caller needs to check if the fault is non-null before using the returned list.
-        /// </summary>
-        /// <param name="dataService"></param>
-        /// <param name="settings"></param>
-        /// <param name="userCulture"></param>
-        /// <param name="userRoleIds"></param>
-        /// <param name="tripNumber"></param>
-        /// <param name="tripSegNumber"></param>
-        /// <param name="fault"></param>
-        /// <returns>An empty TripSegmentContainer if tripNumber,tripSegNumber or tripSegContainer is null or no record is found</returns>
-        public static TripSegmentContainer GetTripSegmentContainerFirst(IDataService dataService, ProcessChangeSetSettings settings,
-                      string userCulture, IEnumerable<long> userRoleIds, string tripNumber, string tripSegNumber, out DataServiceFault fault)
-        {
-            fault = null;
-            var tripSegmentContainer = new TripSegmentContainer();
-            if (null != tripNumber && null != tripSegNumber)
-            {
-                Query query = new Query
-                {
-                    CurrentQuery = new QueryBuilder<TripSegmentContainer>()
-                    .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripNumber)
-                    .And().Property(x => x.TripSegNumber).EqualTo(tripSegNumber))
-                    .GetQuery()
-                };
-                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-                if (null != fault)
-                {
-                    return tripSegmentContainer;
-                }
-                tripSegmentContainer = queryResult.Records.Cast<TripSegmentContainer>().FirstOrDefault();
-            }
-            return tripSegmentContainer;
-        }
+  
         /// TRIPSEGMENTCONTAINER Table  queries
         /// <summary>
         ///  Gets the last trip segment container record for a given trip and segment.

@@ -199,8 +199,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the reference numbers
-                        var tripReferenceNumberList = new List<TripReferenceNumber>();
-                        tripReferenceNumberList = Util.Common.GetTripReferenceNumbers(dataService, settings, userCulture, userRoleIds,
+                        var tripReferenceNumberList = Util.Common.GetTripReferenceNumbers(dataService, settings, userCulture, userRoleIds,
                                             tripInfo.TripNumber, out fault);
                         fullTripReferenceNumberList.AddRange(tripReferenceNumberList);
                         if (fault != null)
@@ -219,9 +218,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                             tripreference.TripRefNumberDesc);
                         }
                         ////////////////////////////////////////////////////////////////////////////////////////////////
-                        //For each trip, get the segments
-                        var tripSegmentList = new List<TripSegment>();
-                        tripSegmentList = Util.Common.GetTripSegments(dataService, settings, userCulture, userRoleIds,
+                        //For each trip, get the incomplete segments
+                        var tripSegmentList = Util.Common.GetTripSegmentsIncomplete(dataService, settings, userCulture, userRoleIds,
                                           tripInfo.TripNumber, out fault);
                         fullTripSegmentList.AddRange(tripSegmentList);
                         if (fault != null)
@@ -279,8 +277,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     log.Debug("SRTEST:TripInfoProcess - Customer Directions");
                     foreach (var custHostCode in customersInTrips)
                     {
-                        var custDirectionsList = new List<CustomerDirections>();
-                        custDirectionsList = Util.Common.GetCustomerDirections(dataService, settings, userCulture, userRoleIds,
+                        var custDirectionsList = Util.Common.GetCustomerDirections(dataService, settings, userCulture, userRoleIds,
                                              custHostCode, out fault);
                         fullCustomerDirectionsList.AddRange(custDirectionsList);
                         if (fault != null)
@@ -311,8 +308,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         log.Debug("SRTEST:TripInfoProcess - Customer Commodities");
                         foreach (var custHostCode in customersInTrips)
                         {
-                            var custCommodityList = new List<CustomerCommodity>();
-                            custCommodityList = Util.Common.GetCustomerCommodities(dataService, settings, userCulture, userRoleIds,
+                            var custCommodityList = Util.Common.GetCustomerCommodities(dataService, settings, userCulture, userRoleIds,
                                                   custHostCode, out fault);
                             fullCustomerCommodityList.AddRange(custCommodityList);
                             if (fault != null)
@@ -335,8 +331,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     log.Debug("SRTEST:TripInfoProcess - Customer Locations");
                     foreach (var custHostCode in customersInTrips)
                     {
-                        var custLocationsList = new List<CustomerLocation>();
-                        custLocationsList = Util.Common.GetCustomerLocations(dataService, settings, userCulture, userRoleIds,
+                        var custLocationsList = Util.Common.GetCustomerLocations(dataService, settings, userCulture, userRoleIds,
                                             custHostCode, out fault);
                         fullCustomerLocationList.AddRange(custLocationsList);
                         if (fault != null)
