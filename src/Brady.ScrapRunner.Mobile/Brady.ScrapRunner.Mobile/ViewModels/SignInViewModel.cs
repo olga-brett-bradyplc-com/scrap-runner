@@ -193,12 +193,26 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (tripProcess.WasSuccessful)
                 {
-                    await _tripService.UpdateTrips(tripProcess.Item.Trips);
-                    await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
-                    await _tripService.UpdateTripSegmentContainers(tripProcess.Item.TripSegmentContainers);
-                    await _customerService.UpdateCustomerCommodity(tripProcess.Item.CustomerCommodities);
-                    await _customerService.UpdateCustomerDirections(tripProcess.Item.CustomerDirections);
-                    await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
+                    
+                    // @TODO : Should we throw an error/alert dialog to the end user if any of these fail?
+
+                    if( tripProcess.Item?.Trips?.Count > 0 )
+                        await _tripService.UpdateTrips(tripProcess.Item.Trips);
+
+                    if(tripProcess.Item?.TripSegments?.Count > 0)
+                        await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
+
+                    if(tripProcess.Item?.TripSegmentContainers?.Count > 0)
+                        await _tripService.UpdateTripSegmentContainers(tripProcess.Item.TripSegmentContainers);
+
+                    if(tripProcess.Item?.CustomerCommodities?.Count > 0)
+                        await _customerService.UpdateCustomerCommodity(tripProcess.Item.CustomerCommodities);
+
+                    if(tripProcess.Item?.CustomerDirections?.Count > 0)
+                        await _customerService.UpdateCustomerDirections(tripProcess.Item.CustomerDirections);
+
+                    if(tripProcess.Item?.CustomerLocations?.Count > 0)
+                        await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
                 }
                 else
                 {
