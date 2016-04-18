@@ -1,24 +1,25 @@
 ﻿using AutoMapper;
-using Brady.ScrapRunner.Domain;
-using Brady.ScrapRunner.Domain.Models;
-using Brady.ScrapRunner.Domain.Process;
-using BWF.DataServices.Core.Concrete.ChangeSets;
-using BWF.DataServices.Metadata.Attributes.Actions;
-using BWF.DataServices.Support.NHibernate.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Brady.ScrapRunner.DataService.Interfaces;
-using Brady.ScrapRunner.DataService.Validators;
+using System.Text;
+using NHibernate;
+using NHibernate.Util;
+using BWF.DataServices.Core.Concrete.ChangeSets;
+using BWF.DataServices.Metadata.Attributes.Actions;
+using BWF.DataServices.Support.NHibernate.Abstract;
 using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
-using NHibernate;
-using NHibernate.Util;
-using System.Text;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
+using Brady.ScrapRunner.DataService.Interfaces;
+using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.RecordTypes;
 using Brady.ScrapRunner.Domain.Enums;
+using Brady.ScrapRunner.DataService.Util;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -107,6 +108,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 {
                     DataServiceFault fault;
                     string msgKey = key;
+                    ChangeSetResult<string> scratchChangeSetResult;
 
                     var tripInfoProcess = (TripInfoProcess)changeSetResult.GetSuccessfulUpdateForId(key);
 
@@ -142,7 +144,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
-                    var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   tripInfoProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -157,7 +159,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Lookup Preference: DEFCommodSelection
-                    string prefCommodSelection = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                    string prefCommodSelection = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                   employeeMaster.TerminalId, PrefDriverConstants.DEFCommodSelection, out fault);
                     if (fault != null)
                     {
@@ -169,12 +171,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     // Lookup trip  
                     if (bLogin)
                     {
-                        tripList = Util.Common.GetTripsForDriverAtLogin(dataService, settings, userCulture, userRoleIds,
+                        tripList = Common.GetTripsForDriverAtLogin(dataService, settings, userCulture, userRoleIds,
                           tripInfoProcess.EmployeeId, out fault);
                     }
                     else
                     {
-                        tripList = Util.Common.GetTripsForDriver(dataService, settings, userCulture, userRoleIds,
+                        tripList = Common.GetTripsForDriver(dataService, settings, userCulture, userRoleIds,
                           tripInfoProcess.EmployeeId, out fault);
                     }
                     if (fault != null)
@@ -199,7 +201,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the reference numbers
-                        var tripReferenceNumberList = Util.Common.GetTripReferenceNumbers(dataService, settings, userCulture, userRoleIds,
+                        var tripReferenceNumberList = Common.GetTripReferenceNumbers(dataService, settings, userCulture, userRoleIds,
                                             tripInfo.TripNumber, out fault);
                         fullTripReferenceNumberList.AddRange(tripReferenceNumberList);
                         if (fault != null)
@@ -219,7 +221,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the incomplete segments
-                        var tripSegmentList = Util.Common.GetTripSegmentsIncomplete(dataService, settings, userCulture, userRoleIds,
+                        var tripSegmentList = Common.GetTripSegmentsIncomplete(dataService, settings, userCulture, userRoleIds,
                                           tripInfo.TripNumber, out fault);
                         fullTripSegmentList.AddRange(tripSegmentList);
                         if (fault != null)
@@ -249,7 +251,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the containers for all of the segments
                         var tripContainerList = new List<TripSegmentContainer>();
-                        tripContainerList = Util.Common.GetTripContainers(dataService, settings, userCulture, userRoleIds,
+                        tripContainerList = Common.GetTripContainers(dataService, settings, userCulture, userRoleIds,
                                             tripInfo.TripNumber, out fault);
                         fullTripSegmentContainerList.AddRange(tripContainerList);
                         if (fault != null)
@@ -277,7 +279,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     log.Debug("SRTEST:TripInfoProcess - Customer Directions");
                     foreach (var custHostCode in customersInTrips)
                     {
-                        var custDirectionsList = Util.Common.GetCustomerDirections(dataService, settings, userCulture, userRoleIds,
+                        var custDirectionsList = Common.GetCustomerDirections(dataService, settings, userCulture, userRoleIds,
                                              custHostCode, out fault);
                         fullCustomerDirectionsList.AddRange(custDirectionsList);
                         if (fault != null)
@@ -308,7 +310,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         log.Debug("SRTEST:TripInfoProcess - Customer Commodities");
                         foreach (var custHostCode in customersInTrips)
                         {
-                            var custCommodityList = Util.Common.GetCustomerCommodities(dataService, settings, userCulture, userRoleIds,
+                            var custCommodityList = Common.GetCustomerCommodities(dataService, settings, userCulture, userRoleIds,
                                                   custHostCode, out fault);
                             fullCustomerCommodityList.AddRange(custCommodityList);
                             if (fault != null)
@@ -331,7 +333,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     log.Debug("SRTEST:TripInfoProcess - Customer Locations");
                     foreach (var custHostCode in customersInTrips)
                     {
-                        var custLocationsList = Util.Common.GetCustomerLocations(dataService, settings, userCulture, userRoleIds,
+                        var custLocationsList = Common.GetCustomerLocations(dataService, settings, userCulture, userRoleIds,
                                             custHostCode, out fault);
                         fullCustomerLocationList.AddRange(custLocationsList);
                         if (fault != null)
@@ -359,19 +361,22 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //so that the trips will not be sent again.
                     //If the trip is modified, SR will set the flag back to Ready status.
                     //If the driver logs in again, he will get trips in Ready status or SentToDriver status. 
-                    //l.
-                    var tripRecordType = (TripRecordType)dataService.RecordTypes.Single(x => x.TypeName == "Trip");
-                    var tripChangeSet = (ChangeSet<string, Trip>)tripRecordType.GetNewChangeSet();
                     foreach (var trip in tripList)
                     {
                         trip.TripSendFlag = TripSendFlagValue.SentToDriver;
-                        tripChangeSet.AddUpdate(trip.Id, trip);
 
+                        scratchChangeSetResult = Common.UpdateTrip(dataService, settings, trip);
                         log.DebugFormat("SRTEST:Saving Trip Record:{0} TripSendFlag:{1}",
                                        trip.TripNumber,
                                        TripSendFlagValue.SentToDriver);
+                        if (Common.LogChangeSetFailure(scratchChangeSetResult, trip, log))
+                        {
+                            var s = string.Format("Could not update Trip for TripSendFlagValue: {0}.", TripSendFlagValue.SentToDriver);
+                            scratchChangeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            break;
+                        }
+
                     }
-                    changeSetResult = tripRecordType.ProcessChangeSet(dataService, tripChangeSet, settings);
                 }
             }
             // If our local session variable is set then it is our session/txn to deal with
