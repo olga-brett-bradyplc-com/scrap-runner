@@ -97,7 +97,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     DataServiceFault fault;
                     string msgKey = key;
 
-                    CommodityMasterProcess commodityMasterProcess = (CommodityMasterProcess)changeSetResult.GetSuccessfulUpdateForId(key);
+                    var commodityMasterProcess = (CommodityMasterProcess)changeSetResult.GetSuccessfulUpdateForId(key);
 
                     // TODO:  Determine userCulture and userRoleIds on a per user basis.
                     string userCulture = "en-GB";
@@ -117,10 +117,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
-                    //
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                     commodityMasterProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -133,9 +132,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //
+                    ////////////////////////////////////////////////
                     // Lookup Preference: DEFSendMasterCommodities
-                    //
                     string prefSendMasterCommodities = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                     employeeMaster.TerminalId, PrefDriverConstants.DEFSendMasterCommodities, out fault);
                     if (fault != null)
@@ -143,9 +141,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    // Lookup container changes.  
-                    //
-                    List<CommodityMaster> commoditymasters = new List<CommodityMaster>();
+                    ////////////////////////////////////////////////
+                    // Lookup universal commodities.  
+                   var commoditymasters = new List<CommodityMaster>();
                     if (prefSendMasterCommodities == Constants.Yes)
                     {
                         //This query includes container level
@@ -164,7 +162,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     //Now using log4net.ILog implementation to test results of query.
                     log.Debug("SRTEST:CommodityMasterProcess");
-                    foreach (CommodityMaster commoditymaster in commoditymasters)
+                    foreach (var commoditymaster in commoditymasters)
                     {
                         log.DebugFormat("SRTEST:CommodityCode:{0} Desc:{1} InactiveFlag:{2} UniversalFlag:{3}",
                                         commoditymaster.CommodityCode,

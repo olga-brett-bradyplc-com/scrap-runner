@@ -12,7 +12,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         public CustomerDirectionsDeletionValidator()
         {
             RuleFor(x => x.CustHostCode).NotEmpty();
-            RuleFor(x => x.DirectionsSeqNo).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.DirectionsSeqNo).GreaterThanOrEqualTo<CustomerDirections,short>(0);
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)

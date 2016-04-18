@@ -52,7 +52,9 @@
     <Compile Include="Metadata\ContainerQuantityMetadata.cs" />
     <Compile Include="Metadata\ControlNumberMasterMetadata.cs" />
     <Compile Include="Metadata\CustomerDirectionsMetadata.cs" />
+    <Compile Include="Metadata\DriverArriveProcessMetadata.cs" />
     <Compile Include="Metadata\DriverEfficiencyMetadata.cs" />
+    <Compile Include="Metadata\DriverEnrouteProcessMetadata.cs" />
     <Compile Include="Metadata\PreferencesProcessMetadata.cs" />
     <Compile Include="Metadata\DriverMasterMetadata.cs" />
     <Compile Include="Metadata\DriverLoginProcessMetadata.cs" />
@@ -163,6 +165,8 @@
     <Compile Include="Process\CodeTableProcess.cs" />
     <Compile Include="Process\CommodityMasterProcess.cs" />
     <Compile Include="Process\ContainerChangeProcess.cs" />
+    <Compile Include="Process\DriverArriveProcess.cs" />
+    <Compile Include="Process\DriverEnrouteProcess.cs" />
     <Compile Include="Process\DriverLoginProcess.cs" />
     <Compile Include="Process\PreferencesProcess.cs" />
     <Compile Include="Process\TerminalChangeProcess.cs" />
