@@ -102,6 +102,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     DataServiceFault fault;
                     string msgKey = key;
 
+                    int tripSegmentMileageCount = 0;
+                    int containerHistoryInsertCount = 0;
+                    int driverHistoryInsertCount = 0;
+                    int powerHistoryInsertCount = 0;
+
                     var driverArriveProcess = (DriverArriveProcess)changeSetResult.GetSuccessfulUpdateForId(key);
 
                     // TODO:  Determine userCulture and userRoleIds on a per user basis.
@@ -208,7 +213,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                                   driverArriveProcess.PowerId, out fault);
                     if (null != containersOnPowerId && containersOnPowerId.Count() > 0)
                     {
-                        int containerHistoryInsertCount = 0;
                         //For each container, update the ContainerMaster and the TripSegmentContainer table
                         foreach (var containerOnPowerId in containersOnPowerId)
                         {
@@ -390,6 +394,38 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //Update the TripSegmentMileage record.
+                    //Normally for arrives, there should be an open-ended record to update 
+                    var tripSegmentMileage = Common.GetTripSegmentMileageOpenEndedLast(dataService, settings, userCulture, userRoleIds,
+                                        driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    if (null == tripSegmentMileage)
+                    {
+                        Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
+                            tripSegmentRecord, containersOnPowerId, true, tripSegmentMileageCount, out fault);
+                        log.DebugFormat("SRTEST:Adding TripSegmentMileage Record for Trip:{0}-{1} - Arrive.",
+                                        driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber);
+                    }
+                    else
+                    {
+                        //Do the update
+                        changeSetResult = Common.UpdateTripSegmentMileageFromSegment
+                            (dataService, settings, tripSegmentMileage, tripSegmentRecord, containersOnPowerId);
+                        log.DebugFormat("SRTEST:Saving TripSegmentMileage Record for Trip:{0}-{1} - Arrive.",
+                                        driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber);
+                        if (Common.LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
+                        {
+                            var s = string.Format("Could not update TripSegmentMileage for Trip:{0}-{1}.",
+                                  driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber);
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            break;
+                        }
+                    }
+                    ////////////////////////////////////////////////
                     //Update the odometers of subsequent trip segments with the same destination.
                     string hostcode = null;
                     foreach (var nextTripSegmentRecord in tripSegList)
@@ -417,7 +453,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                     break;
                                 }
-                                
+                                //Also add a TripMileage record for the next segment if the destination host code is
+                                //the same as the current segment.
+                                Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
+                                    nextTripSegmentRecord, containersOnPowerId, true, tripSegmentMileageCount, out fault);
+                                log.DebugFormat("SRTEST:Adding TripSegmentMileage Record for Trip:{0}-{1} - Arrive.",
+                                                nextTripSegmentRecord.TripNumber, nextTripSegmentRecord.TripSegNumber);
+
                                 //Keep looking for more segments with the same destination. There can be more.
 
                             }
@@ -430,87 +472,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
-                    //Update the TripSegmentMileage record.
-                    //Normally for arrives, there should be an open-ended record to update 
-                    var tripSegmentMileage = Common.GetTripSegmentMileageOpenEndedLast(dataService, settings, userCulture, userRoleIds,
-                                        driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber, out fault);
-                   if (null != fault)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
-                    if (null == tripSegmentMileage)
-                    {
-                        //Set up a new record
-                        tripSegmentMileage = new TripSegmentMileage();
-
-                        tripSegmentMileage.TripNumber = driverArriveProcess.TripNumber;
-                        tripSegmentMileage.TripSegNumber = driverArriveProcess.TripSegNumber;
-
-                        //Look up the last trip segment mileage for this trip and segment to calculate the next sequence number
-                        var tripSegmentMileageMax = Common.GetTripSegmentMileageLast(dataService, settings, userCulture, userRoleIds,
-                                                driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber, out fault);
-                        if (null != fault)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            break;
-                        }
-                        if (null == tripSegmentMileageMax)
-                        {
-                            tripSegmentMileage.TripSegMileageSeqNumber = 0;
-                        }
-                        else
-                        {
-                            tripSegmentMileage.TripSegMileageSeqNumber = ++tripSegmentMileageMax.TripSegMileageSeqNumber;
-                        }
-                        //We need to set a start odometer
-                        tripSegmentMileage.TripSegMileageOdometerStart = driverArriveProcess.Odometer;
-                    }
-                    tripSegmentMileage.TripSegMileageOdometerEnd = driverArriveProcess.Odometer;
-                    //We don't need to set State and Country. It should have been already set. But just in case....
-                    if (null == tripSegmentMileage.TripSegMileageState)
-                        tripSegmentMileage.TripSegMileageState = tripSegmentRecord.TripSegDestCustState;
-                    if (null == tripSegmentMileage.TripSegMileageCountry)
-                        tripSegmentMileage.TripSegMileageCountry = tripSegmentRecord.TripSegDestCustCountry;
-                    tripSegmentMileage.TripSegMileagePowerId = tripSegmentRecord.TripSegPowerId;
-                    tripSegmentMileage.TripSegMileageDriverId = tripSegmentRecord.TripSegDriverId;
-                    tripSegmentMileage.TripSegMileageDriverName = tripSegmentRecord.TripSegDriverName;
-
-                    //Set the loaded flag
-                    tripSegmentMileage.TripSegLoadedFlag = Constants.No;
-                    //If any container on the truck is loaded, these miles are loaded miles
-                    var loaded = from item in containersOnPowerId
-                                 where item.ContainerContents == ContainerContentsConstants.Loaded
-                                 select item;
-                    if (null != loaded && loaded.Count() > 0)
-                    {
-                        tripSegmentMileage.TripSegLoadedFlag = Constants.Yes;
-                    }
-                    else
-                    {
-                        //Also consider the miles to be loaded miles if the driver is dropping a full container,
-                        //unloading a container, or driving to an independent scale.
-                        var types = new List<string> {BasicTripTypeConstants.DropFull,
-                                                  BasicTripTypeConstants.Scale,
-                                                  BasicTripTypeConstants.Unload };
-                        if (types.Contains(tripSegmentRecord.TripSegType))
-                            tripSegmentMileage.TripSegLoadedFlag = Constants.Yes;
-                    }
-
-                    //Do the update
-                    changeSetResult = Common.UpdateTripSegmentMileage(dataService, settings, tripSegmentMileage);
-                    log.DebugFormat("SRTEST:Saving TripSegmentMileage Record for Trip:{0}-{1} - Arrive.",
-                                    driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber);
-                    if (Common.LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
-                    {
-                        var s = string.Format("Could not update TripSegmentMileage for Trip:{0}-{1}.",
-                              driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber);
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                        break;
-                    }
-
-                    //Update Primary Container Information if this is the first TripSegment.
-                    //but only if the container number in the TripSegmentContainer record is not null. 
+                    //Update Trip Record.  Update Primary Container Information if this is the first TripSegment.
+                    //But only if the container number in the TripSegmentContainer record is not null. 
                     if (tripSegmentRecord.TripSegNumber == Constants.FirstSegment &&
                         null != tripSegmentRecord.TripSegPrimaryContainerNumber)
                     {
@@ -593,7 +556,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Add record to the DriverHistory table.
-                    int driverHistoryInsertCount = 0;
                     if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
                         ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
@@ -640,7 +602,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Add record to PowerHistory table. 
-                    int powerHistoryInsertCount = 0;
                     if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster,
                         ++powerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
@@ -700,7 +661,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     sbComment.Append(" Pwr:");
                     sbComment.Append(driverArriveProcess.PowerId);
                     sbComment.Append(" State:");
-                    sbComment.Append(tripSegmentMileage.TripSegMileageState);
+                    sbComment.Append(tripSegmentRecord.TripSegDestCustState);
                     sbComment.Append(" Odom:");
                     sbComment.Append(driverArriveProcess.Odometer);
                     string comment = sbComment.ToString().Trim();
