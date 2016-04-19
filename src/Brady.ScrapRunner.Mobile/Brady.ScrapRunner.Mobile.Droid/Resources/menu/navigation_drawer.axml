@@ -3,50 +3,81 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:local="http://schemas.android.com/apk/res-auto">
 
-  <item android:title="Home">
+  <item
+    android:title="Current Actions">
     <menu>
       <item
           android:id="@+id/nav_routesummary"
+          android:icon="@drawable/ic_assignment_black_36dp"
           android:title="Route Summary" />
       <item
-        android:id="@+id/nav_changepowerunit"
-        android:title="Change Power Unit" />
+          android:id="@+id/nav_changepowerunit"
+          android:icon="@drawable/ic_directions_bus_black_36dp"
+          android:title="Change Power Unit" />
       <item
-        android:id="@+id/nav_fuelentry"
-        android:title="Fuel Entry" />
+          android:id="@+id/nav_fuelentry"
+          android:icon="@drawable/ic_local_gas_station_black_36dp"
+          android:title="Fuel Entry" />
       <item
           android:id="@+id/nav_loadcontainer"
+          android:icon="@drawable/ic_swap_vert_black_36dp"
           android:title="Load/Drop Container" />
+      <item
+          android:id="@+id/nav_takepicture"
+          android:title="Take Picture"
+          android:icon="@drawable/ic_add_a_photo_black_36dp" />
+      <item
+          android:id="@+id/nav_changereturnyard"
+          android:title="Change Return To Yard"
+          android:icon="@drawable/ic_redo_black_36dp" />
+      <item
+          android:id="@+id/nav_addreturnyard"
+          android:title="Add Return To Yard"
+          android:icon="@drawable/ic_queue_black_36dp" />
+      <item
+          android:id="@+id/nav_unabletoprocess"
+          android:title="Unable To Process"
+          android:icon="@drawable/ic_block_black_36dp"/>
     </menu>
   </item>
   
-  <item android:title="Messages">
+  <item 
+    android:title="Messages"
+    android:icon="@drawable/ic_email_black_36dp">
     <menu>
       <item
           android:id="@+id/nav_messages"
+          android:icon="@drawable/ic_forum_black_36dp"
           android:title="Messages" />
       <item
         android:id="@+id/nav_composemessage"
+        android:icon="@drawable/ic_chat_black_36dp"
         android:title="Compose Message" />
     </menu>
   </item>
 
-  <item android:title="Utilities/Log Out">
+  <item 
+    android:title="Utilities">
     <menu>
       <item
           android:id="@+id/nav_helpcenter"
+          android:icon="@drawable/ic_help_black_36dp"
           android:title="Help Center" />
       <item
         android:id="@+id/nav_setup"
+        android:icon="@drawable/ic_phonelink_setup_black_36dp"
         android:title="Setup" />
       <item
         android:id="@+id/nav_aboutscraprunner"
+        android:icon="@drawable/ic_info_black_36dp"
         android:title="About ScrapRunner" />
       <item
         android:id="@+id/nav_reportproblem"
+        android:icon="@drawable/ic_report_problem_black_36dp"
         android:title="Report A Problem" />
       <item
         android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_phonelink_erase_black_36dp"
         android:title="Log Out" />
     </menu>
   </item>
