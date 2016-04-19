@@ -1,6 +1,8 @@
 ﻿namespace Brady.ScrapRunner.Mobile.Services
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Interfaces;
     using MvvmCross.Platform;
     using MvvmCross.Platform.Core;
@@ -9,6 +11,8 @@
     public class LocationService : ILocationService
     {
         private readonly IMvxLocationWatcher _locationWatcher;
+        private readonly List<MvxGeoLocation> _locationPath = new List<MvxGeoLocation>();
+        private bool _isMoving;
 
         public LocationService(IMvxLocationWatcher locationWatcher)
         {
@@ -40,6 +44,14 @@
 
         private void OnLocationChange(MvxGeoLocation location)
         {
+            if (_locationPath.Count == 0)
+            {
+                _locationPath.Add(location);
+                return;
+            }
+            var previousLocation = _locationPath.Last();
+            // @TODO: Finish implementing point collecting logic.
+            // @TODO: Add support for _isMoving. GPS transmissions to the server will be throttled in this mode.
         }
 
         private void OnLocationError(MvxLocationError locationError)
