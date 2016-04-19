@@ -41,6 +41,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.ContainerLocation);
             TimeProperty(x => x.ContainerLastActionDateTime);
             IntegerProperty(x => x.ContainerDaysAtSite);
+            TimeProperty(x => x.ContainerPendingMoveDateTime);
             StringProperty(x => x.ContainerTripNumber);
             StringProperty(x => x.ContainerTripSegNumber);
             StringProperty(x => x.ContainerTripSegType);
@@ -90,6 +91,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.ContainerLocation)
                 .Property(x => x.ContainerLastActionDateTime)
                 .Property(x => x.ContainerDaysAtSite)
+                .Property(x => x.ContainerPendingMoveDateTime)
                 .Property(x => x.ContainerTripNumber)
                 .Property(x => x.ContainerTripSegNumber)
                 .Property(x => x.ContainerTripSegType)

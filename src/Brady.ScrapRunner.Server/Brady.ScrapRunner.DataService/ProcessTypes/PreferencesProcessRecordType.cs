@@ -1,22 +1,22 @@
 ﻿using AutoMapper;
-using Brady.ScrapRunner.Domain;
-using Brady.ScrapRunner.Domain.Models;
-using Brady.ScrapRunner.Domain.Process;
-using BWF.DataServices.Core.Concrete.ChangeSets;
-using BWF.DataServices.Metadata.Attributes.Actions;
-using BWF.DataServices.Support.NHibernate.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Brady.ScrapRunner.DataService.Interfaces;
-using Brady.ScrapRunner.DataService.Validators;
+using NHibernate;
+using NHibernate.Util;
+using BWF.DataServices.Core.Concrete.ChangeSets;
+using BWF.DataServices.Metadata.Attributes.Actions;
+using BWF.DataServices.Support.NHibernate.Abstract;
 using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
-using NHibernate;
-using NHibernate.Util;
-using BWF.DataServices.PortableClients;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
+using Brady.ScrapRunner.DataService.Interfaces;
+using Brady.ScrapRunner.DataService.Validators;
+using Brady.ScrapRunner.DataService.Util;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -134,7 +134,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster
-                    EmployeeMaster employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    EmployeeMaster employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   preferencesProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -150,7 +150,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     // Lookup preferences.  
                     var preferences = new List<Preference>();
-                    preferences = Util.Common.GetPreferenceByTerminal(dataService, settings, userCulture, userRoleIds,
+                    preferences = Common.GetPreferenceByTerminal(dataService, settings, userCulture, userRoleIds,
                                                   employeeMaster.TerminalId, out fault);
                     if (fault != null)
                     {
@@ -165,7 +165,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Lookup TerminalMaster for two "additional" preferences 
-                    var terminalMaster = Util.Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+                    var terminalMaster = Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
                                                   employeeMaster.TerminalId, out fault);
                     if (fault != null)
                     {

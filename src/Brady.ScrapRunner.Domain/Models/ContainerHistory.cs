@@ -28,6 +28,7 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string ContainerLocation { get; set; }
         public virtual DateTime? ContainerLastActionDateTime { get; set; }
         public virtual int? ContainerDaysAtSite { get; set; }
+        public virtual DateTime? ContainerPendingMoveDateTime { get; set; }
         public virtual string ContainerTripNumber { get; set; }
         public virtual string ContainerTripSegNumber { get; set; }
         public virtual string ContainerTripSegType { get; set; }

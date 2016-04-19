@@ -1,26 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
-using Brady.ScrapRunner.Domain.Process;
+﻿using Brady.ScrapRunner.Domain.Process;
+using BWF.DataServices.PortableClients;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Acr.UserDialogs;
+using Brady.ScrapRunner.Mobile.Interfaces;
+using MvvmCross.Core.ViewModels;
+using MvvmCross.Plugins.Sqlite;
+using Brady.ScrapRunner.Mobile.Resources;
+using Brady.ScrapRunner.Mobile.Services;
+using Brady.ScrapRunner.Mobile.Validators;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using BWF.DataServices.PortableClients;
-    using BWF.DataServices.PortableClients.Interfaces;
-    using MvvmCross.Localization;
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Acr.UserDialogs;
-    using Domain.Models;
-    using Interfaces;
-    using Models;
-    using MvvmCross.Core.ViewModels;
-    using MvvmCross.Plugins.Sqlite;
-    using Resources;
-    using Services;
-    using Validators;
 
     public class SignInViewModel : BaseViewModel
     {
@@ -35,9 +27,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IPreferenceService preferenceService,
             ITripService tripService,
             ICustomerService customerService,
-            DemoDataGenerator demoDataGenerator,
-            IConnectionService<DataServiceClient> connection,
-            IMvxSqliteConnectionFactory sqliteConnectionFactory)
+            IConnectionService<DataServiceClient> connection)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -82,8 +72,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        private int _odometer;
-        public int Odometer
+        private int? _odometer;
+        public int? Odometer
         {
             get { return _odometer; }
             set
@@ -112,12 +102,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             try
             {
-                //var signInResult = await SignInDemoDataAsync();
                 var signInResult = await SignInAsync();
                 if (!signInResult)
-                {
                     return;
-                }
+
                 Close(this);
                 ShowViewModel<RouteSummaryViewModel>();
             }
@@ -138,7 +126,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task<bool> SignInAsync()
         {
-            using (var loginData = UserDialogs.Instance.Loading(AppResources.LoggingIn, maskType: MaskType.Clear))
+            using (var loginData = UserDialogs.Instance.Loading(AppResources.LoggingIn, maskType: MaskType.Black))
             {
                 // Delete/Create necesscary SQLite tables
                 await _dbService.RefreshAll();
@@ -205,12 +193,26 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (tripProcess.WasSuccessful)
                 {
-                    await _tripService.UpdateTrips(tripProcess.Item.Trips);
-                    await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
-                    await _tripService.UpdateTripSegmentContainers(tripProcess.Item.TripSegmentContainers);
-                    await _customerService.UpdateCustomerCommodity(tripProcess.Item.CustomerCommodities);
-                    await _customerService.UpdateCustomerDirections(tripProcess.Item.CustomerDirections);
-                    await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
+                    
+                    // @TODO : Should we throw an error/alert dialog to the end user if any of these fail?
+
+                    if( tripProcess.Item?.Trips?.Count > 0 )
+                        await _tripService.UpdateTrips(tripProcess.Item.Trips);
+
+                    if(tripProcess.Item?.TripSegments?.Count > 0)
+                        await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
+
+                    if(tripProcess.Item?.TripSegmentContainers?.Count > 0)
+                        await _tripService.UpdateTripSegmentContainers(tripProcess.Item.TripSegmentContainers);
+
+                    if(tripProcess.Item?.CustomerCommodities?.Count > 0)
+                        await _customerService.UpdateCustomerCommodity(tripProcess.Item.CustomerCommodities);
+
+                    if(tripProcess.Item?.CustomerDirections?.Count > 0)
+                        await _customerService.UpdateCustomerDirections(tripProcess.Item.CustomerDirections);
+
+                    if(tripProcess.Item?.CustomerLocations?.Count > 0)
+                        await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
                 }
                 else
                 {
@@ -229,7 +231,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private void ExecuteSettingsCommand()
         {
             ShowViewModel<SettingsViewModel>();
-            Close(this);
         }
     }
 }

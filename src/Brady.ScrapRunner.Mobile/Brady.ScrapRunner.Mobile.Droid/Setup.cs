@@ -1,19 +1,20 @@
 using System.Collections.Generic;
 using Android.Views;
 using MvvmCross.Binding.Parse.Binding.Lang;
+using MvvmCross.Droid.Shared.Presenter;
+using MvvmCross.Droid.Views;
 using MvvmCross.Localization;
 using MvvmCross.Platform;
 using MvvmCross.Platform.Converters;
 using MvvmCross.Platform.IoC;
+using System.Net;
+using System.Reflection;
+using Android.Content;
+using MvvmCross.Core.ViewModels;
+using MvvmCross.Droid.Platform;
 
 namespace Brady.ScrapRunner.Mobile.Droid
 {
-    using System.Net;
-    using System.Reflection;
-    using Android.Content;
-    using MvvmCross.Core.ViewModels;
-    using MvvmCross.Droid.Platform;
-
     public class Setup : MvxAndroidSetup
     {
         public Setup(Context applicationContext) : base(applicationContext)
@@ -23,6 +24,16 @@ namespace Brady.ScrapRunner.Mobile.Droid
         {
             return new App();
         }
+
+        protected override IEnumerable<Assembly> AndroidViewAssemblies => new List<Assembly>(base.AndroidViewAssemblies)
+        {
+            typeof(Android.Support.V7.Widget.Toolbar).Assembly,
+            typeof(Android.Support.V7.Widget.RecyclerView).Assembly,
+            typeof(Android.Support.V4.Widget.DrawerLayout).Assembly,
+            typeof(Android.Support.V4.View.ViewPager).Assembly,
+            typeof(Android.Support.Design.Widget.FloatingActionButton).Assembly,
+            typeof(Android.Support.Design.Widget.NavigationView).Assembly
+        };
 
         protected override IDictionary<string, string> ViewNamespaceAbbreviations
         {
@@ -34,24 +45,25 @@ namespace Brady.ScrapRunner.Mobile.Droid
             }
         }
 
+        protected override IMvxAndroidViewPresenter CreateViewPresenter()
+        {
+            var mvxFragmentsPresenter = new MvxFragmentsPresenter(AndroidViewAssemblies);
+            Mvx.RegisterSingleton<IMvxAndroidViewPresenter>(mvxFragmentsPresenter);
+            return mvxFragmentsPresenter;
+        }
+
         protected override void FillViewTypes(IMvxTypeCache<View> cache)
         {
             base.FillViewTypes(cache);
             cache.AddAssembly(typeof(Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView.BindableGroupListView).Assembly);
         }
+
         protected override void FillValueConverters(IMvxValueConverterRegistry registry)
         {
             base.FillValueConverters(registry);
             registry.AddOrOverwrite("Language", new MvxLanguageConverter());
         }
-        protected override IEnumerable<Assembly> AndroidViewAssemblies => new List<Assembly>(base.AndroidViewAssemblies)
-        {
-            typeof(Android.Support.V7.Widget.Toolbar).Assembly,
-            typeof(Android.Support.V7.Widget.RecyclerView).Assembly,
-            typeof(Android.Support.V4.Widget.DrawerLayout).Assembly,
-            typeof(Android.Support.V4.View.ViewPager).Assembly,
-            typeof(Android.Support.Design.Widget.FloatingActionButton).Assembly
-        };
+
         protected override void InitializeLastChance()
         {
             base.InitializeLastChance();

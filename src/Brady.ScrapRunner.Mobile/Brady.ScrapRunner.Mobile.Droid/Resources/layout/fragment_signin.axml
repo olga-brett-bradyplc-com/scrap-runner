@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:background="@drawable/loginsplash800x1280_4"
     android:layout_height="match_parent">
     <ImageView
         android:id="@+id/loginImageView"
@@ -10,6 +11,7 @@
         android:src="@drawable/logo_2"
         android:scaleType="centerInside"
         android:layout_marginTop="15dp"
+        android:padding="10dp"
         android:layout_above="@id/center_panel" />
     <LinearLayout
         android:id="@+id/center_panel"

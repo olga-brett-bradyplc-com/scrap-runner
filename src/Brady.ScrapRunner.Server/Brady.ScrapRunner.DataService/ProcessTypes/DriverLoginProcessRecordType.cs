@@ -1,26 +1,24 @@
 ﻿using AutoMapper;
-using Brady.ScrapRunner.Domain.Models;
-using BWF.DataServices.Core.Concrete.ChangeSets;
-using BWF.DataServices.Metadata.Attributes.Actions;
-using BWF.DataServices.Support.NHibernate.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Brady.ScrapRunner.DataService.Interfaces;
-using Brady.ScrapRunner.DataService.RecordTypes;
-using Brady.ScrapRunner.DataService.Util;
-using Brady.ScrapRunner.DataService.Validators;
-using Brady.ScrapRunner.Domain;
-using Brady.ScrapRunner.Domain.Process;
+using System.Text;
+using NHibernate;
+using NHibernate.Util;
+using BWF.DataServices.Core.Concrete.ChangeSets;
+using BWF.DataServices.Metadata.Attributes.Actions;
+using BWF.DataServices.Support.NHibernate.Abstract;
 using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
-using BWF.DataServices.Metadata.Fluent.Enums;
 using BWF.DataServices.Metadata.Models;
-using BWF.DataServices.PortableClients;
-using NHibernate;
-using NHibernate.Util;
-using System.Text;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
+using Brady.ScrapRunner.DataService.Interfaces;
+using Brady.ScrapRunner.DataService.Validators;
+using Brady.ScrapRunner.DataService.Util;
+using Brady.ScrapRunner.DataService.RecordTypes;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -161,7 +159,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ////////////////////////////////////////////////
                         // 2) Validate driver id / Get the EmployeeMaster
                         // UserId must be a valid EmployeeId in the EmployeeMaster and SecurityLevel must be DR for driver.
-                        var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                        var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                 driverLoginProcess.EmployeeId, out fault);
                         if (null != fault)
                         {
@@ -191,7 +189,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // 4b) Check system pref "DEFAllowAnyPowerUnit".  
                         // If preference prefAllowAnyPowerUnit is set to Y, then allow any power unit to be valid
                         // Otherwise the power unit's region must match the driver's region. This is the norm.
-                        string prefAllowAnyPowerUnit = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                        string prefAllowAnyPowerUnit = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                        Constants.SystemTerminalId, PrefSystemConstants.DEFAllowAnyPowerUnit, out fault);
                         if (null != fault)
                         {
@@ -205,12 +203,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         var powerMaster = new PowerMaster();
                         if (prefAllowAnyPowerUnit == Constants.Yes)
                         {
-                            powerMaster = Util.Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
+                            powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
                                                       driverLoginProcess.PowerId, out fault);
                         }
                         else
                         {
-                            powerMaster = Util.Common.GetPowerUnitForRegion(dataService, settings, userCulture, userRoleIds,
+                            powerMaster = Common.GetPowerUnitForRegion(dataService, settings, userCulture, userRoleIds,
                                                       driverLoginProcess.PowerId, employeeMaster.RegionId, out fault);
                         }
                         if (null != fault)
@@ -263,7 +261,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (driverLoginProcess.OverrideFlag != Constants.Yes && powerMaster.PowerOdometer != null)
                         {
                             //Get the preference DEFOdomWarnRange which is an integer representing the + or - range, typically 5 
-                            string prefOdomWarnRange = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                            string prefOdomWarnRange = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                         employeeMaster.TerminalId, PrefDriverConstants.DEFOdomWarnRange, out fault);
                             if (null != fault)
                             {
@@ -294,7 +292,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////
                         //Get the driver status record for the driver. If one does not exist, eventually add one.
-                        var driverStatus = Util.Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
+                        var driverStatus = Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
                                                     driverLoginProcess.EmployeeId, out fault);
                         if (null != fault)
                         {
@@ -355,7 +353,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //If he is done, we want the mobile device to position the app at the start of his next segment.
                             if (DriverStatusSRConstants.Done == driverStatus.Status)
                             {
-                                var nextTripSegment = Util.Common.GetNextIncompleteTripSegment(dataService, settings, userCulture, userRoleIds,
+                                var nextTripSegment = Common.GetNextIncompleteTripSegment(dataService, settings, userCulture, userRoleIds,
                                                               driverStatus.TripNumber, out fault);
                                 if (null != fault)
                                 {
@@ -416,7 +414,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     DriverStatusSRConstants.Fuel != driverStatus.Status)
                                 {
                                     // Update Trip in progress flag in the trip table to 'N'
-                                    var trip = Util.Common.GetTrip(dataService, settings, userCulture, userRoleIds,
+                                    var trip = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
                                                                 driverStatus.TripNumber, out fault);
                                     if (null != fault)
                                     {
@@ -478,8 +476,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             //    break;
                             //}
-                            if (!InsertDriverHistory(dataService, settings, employeeMaster, driverStatus,
-                                ++driverHistoryInsertCount, userRoleIds, userCulture, out fault))
+                            if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
+                                ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                             {
                                 if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
                                 {
@@ -499,10 +497,37 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             CheckForPowerIdChange(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                                                 driverLoginProcess, powerMaster, employeeMaster);
                         }
-                        // 10) Add/update record to DriverStatus table.
+                        ////////////////////////////////////////////////
+                        // Get the Trip record
+                        var tripRecord = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
+                                                      driverLoginProcess.TripNumber, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        if (null == tripRecord)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " + driverLoginProcess.TripNumber));
+                            break;
+                        }
+                        ////////////////////////////////////////////////
+                        // Get the TripSegment record
+                        var tripSegmentRecord = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
+                                                      driverLoginProcess.TripNumber, driverLoginProcess.TripSegNumber,out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        if (null == tripRecord)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " 
+                                + driverLoginProcess.TripNumber + "-" + driverLoginProcess.TripSegNumber));
+                            break;
+                        }
 
-                        //These fields in the DriverStatus table are not used:
-                        //     TripSegType, TripAssignStatus.TripStatus, TripSegStatus,DriverArea,RFIDFlag
+                        // 10) Add/update record to DriverStatus table.
                         //These fields are not affected by the login process:
                         //     DriverCumMinutes, GPSAutoGeneratedFlag, DelayCode, PrevDriverStatus, GPSXmitFlag, SendHHLogoffFlag
                         //This field is used by router and is no longer needed: RouteTo
@@ -511,6 +536,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         driverStatus.TripNumber = driverLoginProcess.TripNumber;
                         driverStatus.TripSegNumber = driverLoginProcess.TripSegNumber;
                         driverStatus.Status = DriverStatusSRConstants.LoggedIn;
+                        driverStatus.TripStatus = tripRecord.TripStatus;
+                        driverStatus.TripAssignStatus = tripRecord.TripAssignStatus;
+                        driverStatus.TripSegStatus = tripSegmentRecord.TripSegStatus;
+                        driverStatus.TripSegType = tripSegmentRecord.TripSegType;
                         driverStatus.TerminalId = employeeMaster.TerminalId;
                         driverStatus.RegionId = employeeMaster.RegionId;
                         driverStatus.PowerId = driverLoginProcess.PowerId;
@@ -527,14 +556,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ////////////////////////////////////////////////
                         //Calculate driver's cumulative time which is the sum of standard drive and stop minutes
                         //for all incomplete trip segments 
-                        var tripSegList = Util.Common.GetTripSegmentsIncompleteForDriver(dataService, settings, userCulture, userRoleIds,
+                        var tripSegList = Common.GetTripSegmentsIncompleteForDriver(dataService, settings, userCulture, userRoleIds,
                                             driverLoginProcess.EmployeeId, out fault);
                         if (null != fault)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
-                        driverStatus.DriverCumMinutes = Util.Common.GetDriverCumulativeTime(tripSegList);
+                        driverStatus.DriverCumMinutes = Common.GetDriverCumulativeTime(tripSegList);
 
                         //Do the update
                         scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
@@ -549,8 +578,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////
                         // 11) Add record to DriverHistory table
-                        if (!InsertDriverHistory(dataService, settings, employeeMaster, driverStatus,
-                                ++driverHistoryInsertCount, userRoleIds, userCulture, out fault))
+                        if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
+                                ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                         {
                             if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
                             {
@@ -573,6 +602,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // In fact, we need to remove one if it exists.
                         powerMaster.PowerCurrentTripNumber = null;
                         powerMaster.PowerCurrentTripSegNumber = null;
+                        powerMaster.PowerCurrentTripSegType = null;
 
                         scratchChangeSetResult = Common.UpdatePowerMaster(dataService, settings, powerMaster);
                         log.Debug("SRTEST:Saving PowerMaster Record - Login");
@@ -586,8 +616,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////
                         // 13) Add record to PowerHistory table
-                        if (!InsertPowerHistory(dataService, settings, powerMaster, employeeMaster,
-                                ++powerHistoryInsertCount, userRoleIds, userCulture, out fault))
+                        if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster,
+                                ++powerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                         {
                             if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
                             {
@@ -602,7 +632,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                          ////////////////////////////////////////////////
                         // 20) Send Container Inventory
                         //Get a list of container on the power id
-                        var containersOnPowerId = Util.Common.GetContainersForPowerId(dataService, settings, userCulture, userRoleIds,
+                        var containersOnPowerId = Common.GetContainersForPowerId(dataService, settings, userCulture, userRoleIds,
                                                   driverLoginProcess.PowerId, out fault);
                         //This will be sent back to the driver
                         containersOnPowerIdList.AddRange(containersOnPowerId);
@@ -632,7 +662,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // Check system pref "DEFSendDispatchersForArea".  
                         // If preference DEFSendDispatchersForArea is set to Y, then send a list of dispatchers whose terminal id is in the driver's area. 
                         // Otherwise send a list of dispatchers whose region matches the driver's region.
-                        string prefSendDispatchersForArea = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                        string prefSendDispatchersForArea = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                        employeeMaster.TerminalId, PrefDriverConstants.DEFSendDispatchersForArea, out fault);
                         if (null != fault)
                         {
@@ -644,13 +674,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (prefSendDispatchersForArea == Constants.Yes)
                         {
                             //Get just the users whose default terminal id is in the driver's area.
-                            usersForMessaging = Util.Common.GetDispatcherListForArea(dataService, settings, userCulture, userRoleIds,
+                            usersForMessaging = Common.GetDispatcherListForArea(dataService, settings, userCulture, userRoleIds,
                                                        employeeMaster.AreaId, out fault);
                         }
                         else
                         {
                             //Get just the users whose region id is the same as the driver's region.
-                            usersForMessaging = Util.Common.GetDispatcherListForRegion(dataService, settings, userCulture, userRoleIds,
+                            usersForMessaging = Common.GetDispatcherListForRegion(dataService, settings, userCulture, userRoleIds,
                                                        employeeMaster.RegionId, out fault);
                         }
                         //This will be sent back to the driver
@@ -785,6 +815,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedDeletions.Any())
             {
                 transaction.Rollback();
+                log.Debug("SRTEST:Transaction Rollback - Login");
             }
             else
             {
@@ -809,7 +840,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             DataServiceFault fault;
             string msgKey = key;
-            var driverDelays = Util.Common.GetDriverDelaysOpenEnded(dataService, settings, userCulture, userRoleIds,
+            var driverDelays = Common.GetDriverDelaysOpenEnded(dataService, settings, userCulture, userRoleIds,
                                              driverLoginProcess.EmployeeId, out fault);
             if (null != fault)
             {
@@ -887,7 +918,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             DataServiceFault fault;
             string msgKey = key;
             //Get the current trip segment if open-ended
-            var tripSegment = Util.Common.GetTripSegmentOpenEnded(dataService, settings, userCulture, userRoleIds,
+            var tripSegment = Common.GetTripSegmentOpenEnded(dataService, settings, userCulture, userRoleIds,
                                     driverLoginProcess.TripNumber, driverLoginProcess.TripSegNumber, out fault);
             if (null != fault)
             {
@@ -927,7 +958,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 }
             }
             //Get the last open-ended trip segment mileage 
-            var tripSegmentMileage = Util.Common.GetTripSegmentMileageOpenEndedLast(dataService, settings, userCulture, userRoleIds,
+            var tripSegmentMileage = Common.GetTripSegmentMileageOpenEndedLast(dataService, settings, userCulture, userRoleIds,
                                     driverLoginProcess.TripNumber, driverLoginProcess.TripSegNumber, out fault);
             if (null != fault)
             {
@@ -987,334 +1018,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 log.ErrorFormat("Fault occured: {0} during login request: {1}", fault.Message, driverLoginProcess);
             }
             return faultDetected;
-        }
-
-
-        /// <summary>
-        /// Insert a PowerHistory record.
-        ///  Note:  caller must handle faults.  E.G. if( handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
-        /// </summary>
-        /// <param name="dataService"></param>
-        /// <param name="settings"></param>
-        /// <param name="powerMaster"></param>
-        /// <param name="employeeMaster"></param>
-        /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
-        /// <param name="userRoleIdsEnumerable"></param>
-        /// <param name="userCulture"></param>
-        /// <param name="fault"></param>
-        /// <returns>true if success</returns>
-        private bool InsertPowerHistory(IDataService dataService, ProcessChangeSetSettings settings,
-            PowerMaster powerMaster, EmployeeMaster employeeMaster, int callCountThisTxn,
-            IEnumerable<long> userRoleIdsEnumerable, string userCulture, out DataServiceFault fault)
-        {
-            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
-
-            // Note this is a commited snapshot read, a not dirty value, thus we have to keep do our own bookkeeping
-            // to support multiple inserts in one txn: callCountThisTxn
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the last power history record for this power id to get the last sequence number used
-            var powerHistoryMax = Util.Common.GetPowerHistoryLast(dataService, settings, userCulture, userRoleIds,
-                                  powerMaster.PowerId, out fault);
-            if (null != fault)
-            {
-                return false;
-            }
-            int powerSeqNo = callCountThisTxn;
-            if (powerHistoryMax != null)
-            {
-                powerSeqNo = powerHistoryMax.PowerSeqNumber + callCountThisTxn;
-            }
-            //For testing
-            log.Debug("SRTEST:Add PowerHistory");
-            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
-                             powerMaster.PowerDriverId,
-                             powerMaster.PowerCurrentTripNumber,
-                             powerMaster.PowerCurrentTripSegNumber,
-                             powerMaster.PowerStatus,
-                             powerMaster.PowerLastActionDateTime,
-                             powerSeqNo);
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the TerminalName in the TerminalMaster 
-            var powerTerminalMaster = Util.Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
-                                          powerMaster.PowerTerminalId, out fault);
-            if (null != fault)
-            {
-                return false;
-            }
-            string powerTerminalName = powerTerminalMaster?.TerminalName;
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the RegionName in the RegionMaster 
-            var powerRegionMaster = Util.Common.GetRegion(dataService, settings, userCulture, userRoleIds,
-                                          powerMaster.PowerRegionId, out fault);
-            if (null != fault)
-            {
-                return false;
-            }
-            string powerRegionName = powerRegionMaster?.RegionName;
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the PowerStatus Description in the CodeTable POWERUNITSTATUS 
-            var codeTablePowerStatus = Util.Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
-                                    CodeTableNameConstants.PowerUnitStatus, powerMaster.PowerStatus, out fault);
-            if (null != fault)
-            {
-                return false;
-            }
-            string powerStatusDesc = codeTablePowerStatus?.CodeDisp1;
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //If there is a host code, look up the Customer record to get the
-            // customer information. 
-            //Generally, for logins, this information should be null
-            var powerCustomerMaster = new CustomerMaster();
-            if (null != powerMaster.PowerCustHostCode)
-            {
-                powerCustomerMaster = Util.Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
-                                      powerMaster.PowerCustHostCode, out fault);
-                if (null != fault)
-                {
-                    return false;
-                }
-            }
-            //////////////////////////////////////////////////////////////////////////////////////
-            //If there is a customer type, look up the description in the CodeTable CUSTOMERTYPE
-            //Generally, for logins, this information should be null
-            var codeTableCustomerType = new CodeTable();
-            if (null != powerMaster.PowerCustType)
-            {
-                codeTableCustomerType = Util.Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
-                                      CodeTableNameConstants.CustomerType, powerMaster.PowerCustType, out fault);
-                if (null != fault)
-                {
-                    return false;
-                }
-            }
-            string powerCustTypeDesc = codeTableCustomerType?.CodeDisp1;
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the Basic Trip Type Description in the TripTypeBasic table 
-            var tripTypeBasic = Util.Common.GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
-                                powerMaster.PowerCurrentTripSegType, out fault);
-            if (null != fault)
-            {
-                return false;
-            }
-            string tripTypeBasicDesc = tripTypeBasic?.TripTypeDesc;
-
-            var powerHistory = new PowerHistory()
-            {
-                PowerId = powerMaster.PowerId,
-                PowerSeqNumber = powerSeqNo,
-                PowerType = powerMaster.PowerType,
-                PowerDesc = powerMaster.PowerDesc,
-                PowerSize = powerMaster.PowerSize,
-                PowerLength = powerMaster.PowerLength,
-                PowerTareWeight = powerMaster.PowerTareWeight,
-                PowerCustType = powerMaster.PowerCustType,
-                PowerCustTypeDesc = powerCustTypeDesc,
-                PowerTerminalId = powerMaster.PowerTerminalId,
-                PowerTerminalName = powerTerminalName,
-                PowerRegionId = powerMaster.PowerRegionId,
-                PowerRegionName = powerRegionName,
-                PowerLocation = powerMaster.PowerLocation,
-                PowerStatus = powerMaster.PowerStatus,
-                PowerDateOutOfService = powerMaster.PowerDateOutOfService,
-                PowerDateInService = powerMaster.PowerDateInService,
-                PowerDriverId = powerMaster.PowerDriverId,
-                PowerDriverName = Common.GetDriverName(employeeMaster), 
-                PowerOdometer = powerMaster.PowerOdometer,
-                PowerComments = powerMaster.PowerComments,
-                MdtId = powerMaster.MdtId,
-                PrimaryPowerType = null,
-                PowerCustHostCode = powerMaster.PowerCustHostCode,
-                PowerCustName = powerCustomerMaster?.CustName,
-                PowerCustAddress1 = powerCustomerMaster?.CustAddress1,
-                PowerCustAddress2 = powerCustomerMaster?.CustAddress2,
-                PowerCustCity = powerCustomerMaster?.CustCity,
-                PowerCustState = powerCustomerMaster?.CustState,
-                PowerCustZip = powerCustomerMaster?.CustZip,
-                PowerCustCountry = powerCustomerMaster?.CustCountry,
-                PowerCustCounty = powerCustomerMaster?.CustCounty,
-                PowerCustTownship = powerCustomerMaster?.CustTownship,
-                PowerCustPhone1 = powerCustomerMaster?.CustPhone1,
-                PowerLastActionDateTime = powerMaster.PowerLastActionDateTime,
-                PowerStatusDesc = powerStatusDesc,
-                PowerCurrentTripNumber = powerMaster.PowerCurrentTripNumber,
-                PowerCurrentTripSegNumber = powerMaster.PowerCurrentTripSegNumber,
-                PowerCurrentTripSegType = powerMaster.PowerCurrentTripSegType,
-                PowerCurrentTripSegTypeDesc = tripTypeBasicDesc
-            };
-
-            // Insert PowerHistory 
-            var recordType = (PowerHistoryRecordType) dataService.RecordTypes.Single(x => x.TypeName == "PowerHistory");
-            var changeSet = (ChangeSet<string, PowerHistory>) recordType.GetNewChangeSet();
-            long recordRef = 1;
-            changeSet.AddCreate(recordRef, powerHistory, userRoleIds, userRoleIds);
-            log.Debug("SRTEST:Saving PowerHistory - Login");
-            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, powerHistory, log))
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Insert a DriverHistory record.
-        /// </summary>
-        /// <param name="dataService"></param>
-        /// <param name="settings"></param>
-        /// <param name="employeeMaster"></param>
-        /// <param name="driverStatus"></param>
-        /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
-        /// <param name="userRoleIdsEnumerable"></param>
-        /// <param name="userCulture"></param>
-        /// <param name="fault"></param>
-        /// <returns>true if success</returns>
-        private static bool InsertDriverHistory(IDataService dataService, ProcessChangeSetSettings settings,
-            EmployeeMaster employeeMaster, DriverStatus driverStatus, int callCountThisTxn,
-            IEnumerable<long> userRoleIdsEnumerable, string userCulture, out DataServiceFault fault)
-        {
-            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
-
-            // Note this is a commited snapshot read, a not dirty value, thus we have to keep do our own bookkeeping
-            // to support multiple inserts in one txn: callCountThisTxn
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the last driver history record for this trip and driver to get the last sequence number used
-            var driverHistoryMax = Util.Common.GetDriverHistoryLast(dataService, settings, userCulture, userRoleIds,
-                                    driverStatus.EmployeeId, driverStatus.TripNumber, out fault);
-            if (null != fault)
-            {
-                return false;
-            }
-            int driverSeqNo = callCountThisTxn;
-            if (driverHistoryMax != null)
-            {
-                driverSeqNo = driverHistoryMax.DriverSeqNumber + callCountThisTxn;
-            }
-            //For testing
-            log.Debug("SRTEST:Add DriverHistory");
-            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
-                             driverStatus.EmployeeId,
-                             driverStatus.TripNumber,
-                             driverStatus.TripSegNumber,
-                             driverStatus.Status,
-                             driverStatus.ActionDateTime,
-                             driverSeqNo);
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the DriverStatus Description in the CodeTable DRIVERSTATUS 
-            var codeTableDriverStatus = Util.Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
-                                    CodeTableNameConstants.DriverStatus, driverStatus.Status, out fault);
-            if (null != fault)
-            {
-                return false;
-            }
-            string driverStatusDesc = codeTableDriverStatus?.CodeDisp1;
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the TerminalName in the TerminalMaster 
-            var driverTerminalMaster = Util.Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
-                                          driverStatus.TerminalId, out fault);
-            if (null != fault)
-            {
-                return false;
-            }
-            string driverTerminalName = driverTerminalMaster?.TerminalName;
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the RegionName in the RegionMaster 
-            var driverRegionMaster = Util.Common.GetRegion(dataService, settings, userCulture, userRoleIds,
-                                          driverStatus.RegionId, out fault);
-            if (null != fault)
-            {
-                return false;
-            }
-            string driverRegionName = driverRegionMaster?.RegionName;
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //If there is a trip number and segment number, look up the TripSegment record to get the
-            //destination customer information. (Instead of the cutomer master).
-            //Unless the driver is logging in in the middle of the trip, we want this to be null
-            var driverTripSegment = new TripSegment();
-            if (null != driverStatus.TripNumber && null != driverStatus.TripSegNumber)
-            {
-                driverTripSegment = Util.Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
-                                              driverStatus.TripNumber, driverStatus.TripSegNumber, out fault);
-                if (null != fault)
-                {
-                    return false;
-                }
-            }
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            //if there is no trip number, construct a number to use that consists of the driver status + driverid
-            string tripNumber = driverStatus.TripNumber;
-            if (null == driverStatus.TripNumber)
-            {
-                tripNumber = driverStatus.Status + driverStatus.EmployeeId;
-            }
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            var driverHistory = new DriverHistory()
-            {
-                EmployeeId = driverStatus.EmployeeId,
-                TripNumber = tripNumber,
-                DriverSeqNumber = driverSeqNo,
-                TripSegNumber = driverStatus.TripSegNumber,
-                // TripSegType = tripSegment.TripSegType,
-                // TripSegTypeDesc  = tripSegment.TripSegTypeDesc,
-                // TripAssignStatus  = trip.TripAssignStatus,
-                // TripAssignStatusDesc  = trip.TripAssignStatusDedsc,
-                // TripStatus  = trip.TripStatus,
-                // TripStatusDesc  = trip.TripStatusDesc,
-                // TripSegStatus  = tripSegment.TripSegStatus,
-                // TripSegStatusDesc = tripSegment.TripSegStatusDesc,
-                DriverStatus = driverStatus.Status,
-                DriverStatusDesc = driverStatusDesc,
-                DriverName = Common.GetDriverName(employeeMaster),
-                TerminalId = driverStatus.TerminalId,
-                TerminalName = driverTerminalName,
-                RegionId = driverStatus.RegionId,
-                RegionName = driverRegionName,
-                PowerId = driverStatus.PowerId,
-                // DriverArea =,
-                MDTId = driverStatus.MDTId,
-                LoginDateTime = driverStatus.LoginDateTime,
-                ActionDateTime = driverStatus.ActionDateTime,
-                DriverCumMinutes = driverStatus.DriverCumMinutes,
-                Odometer = driverStatus.Odometer,
-                DestCustType = driverTripSegment.TripSegDestCustType,
-                DestCustTypeDesc = driverTripSegment.TripSegDestCustTypeDesc,
-                DestCustHostCode = driverTripSegment.TripSegDestCustHostCode,
-                DestCustName = driverTripSegment.TripSegDestCustName,
-                DestCustAddress1 = driverTripSegment.TripSegDestCustAddress1,
-                DestCustAddress2 = driverTripSegment.TripSegDestCustAddress2,
-                DestCustCity = driverTripSegment.TripSegDestCustCity,
-                DestCustState = driverTripSegment.TripSegDestCustState,
-                DestCustZip = driverTripSegment.TripSegDestCustZip,
-                DestCustCountry = driverTripSegment.TripSegDestCustCountry,
-                GPSAutoGeneratedFlag = driverStatus.GPSAutoGeneratedFlag,
-                GPSXmitFlag = driverStatus.GPSXmitFlag,
-                MdtVersion = driverStatus.MdtVersion
-            };
-
-            //////////////////////////////////////////////////////////////////////////////////////
-            // Insert DriverHistory 
-            var recordType = (DriverHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "DriverHistory");
-            var changeSet = (ChangeSet<string, DriverHistory>)recordType.GetNewChangeSet();
-            long recordRef = 1;
-            changeSet.AddCreate(recordRef, driverHistory, userRoleIds, userRoleIds);
-            log.Debug("SRTEST:Saving DriverHistory Record - Login");
-            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, driverHistory, log))
-            {
-                return false;
-            }
-            return true;
         }
 
     }

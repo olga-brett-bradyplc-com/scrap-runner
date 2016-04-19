@@ -1,21 +1,21 @@
 ﻿using AutoMapper;
-using Brady.ScrapRunner.Domain;
-using Brady.ScrapRunner.Domain.Models;
-using Brady.ScrapRunner.Domain.Process;
-using BWF.DataServices.Core.Concrete.ChangeSets;
-using BWF.DataServices.Metadata.Attributes.Actions;
-using BWF.DataServices.Support.NHibernate.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Brady.ScrapRunner.DataService.Interfaces;
-using Brady.ScrapRunner.DataService.Validators;
+using NHibernate;
+using NHibernate.Util;
+using BWF.DataServices.Core.Concrete.ChangeSets;
+using BWF.DataServices.Metadata.Attributes.Actions;
+using BWF.DataServices.Support.NHibernate.Abstract;
 using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
-using NHibernate;
-using NHibernate.Util;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
+using Brady.ScrapRunner.DataService.Interfaces;
+using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.Util;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
@@ -96,6 +96,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 {
                     DataServiceFault fault;
                     string msgKey = key;
+                    ChangeSetResult<string> scratchChangeSetResult;
 
                     ContainerChangeProcess containersProcess = (ContainerChangeProcess)changeSetResult.GetSuccessfulUpdateForId(key);
 
@@ -119,7 +120,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
-                    var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   containersProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -134,7 +135,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////////////
                     // Lookup Preference: DEFAllowAnyContainer
-                    string prefAllowAnyContainer = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                    string prefAllowAnyContainer = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                   Constants.SystemTerminalId, PrefSystemConstants.DEFAllowAnyContainer, out fault);
                     if (fault != null)
                     {
@@ -155,12 +156,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         List<ContainerChange> containerchanges = new List<ContainerChange>();
                         if (prefAllowAnyContainer == Constants.Yes)
                         {
-                            containerchanges = Util.Common.GetContainerChanges(dataService, settings, userCulture, userRoleIds,
+                            containerchanges = Common.GetContainerChanges(dataService, settings, userCulture, userRoleIds,
                               containersProcess.LastContainerMasterUpdate, out fault);
                         }
                         else
                         {
-                            containerchanges = Util.Common.GetContainerChangesByRegion(dataService, settings, userCulture, userRoleIds,
+                            containerchanges = Common.GetContainerChangesByRegion(dataService, settings, userCulture, userRoleIds,
                               containersProcess.LastContainerMasterUpdate, employeeMaster.RegionId, out fault);
                         }
                         if (fault != null)
@@ -189,7 +190,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ////////////////////////////////////////////////
                         //Now update the ContainerMasterDateTime in the DriverStatus record
                         //If there is no record yet, I guess we will have to add one.
-                        var driverStatus = Util.Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
+                        var driverStatus = Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
                                                     containersProcess.EmployeeId, out fault);
                         if (null != fault)
                         {
@@ -212,17 +213,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                                             driverStatus.EmployeeId,
                                                             driverStatus.ContainerMasterDateTime);
                         driverStatus.ContainerMasterDateTime = DateTime.Now;
-                        changeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
+                        scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
 
                         log.DebugFormat("SRTEST:Saving DriverStatus Record: DriverId:{0} ContainerMasterUpdate:{1}",
                                     driverStatus.EmployeeId,
                                     driverStatus.ContainerMasterDateTime);
 
-                        if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
+                        if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
                         {
                             var s = string.Format("Could not update DriverStatus for Driver {0}.",
                                                   containersProcess.EmployeeId);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            scratchChangeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
                     }

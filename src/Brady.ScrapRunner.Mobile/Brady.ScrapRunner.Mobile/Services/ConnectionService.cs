@@ -3,6 +3,7 @@ using System.Net;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using BWF.DataServices.PortableClients;
 using BWF.DataServices.PortableClients.Interfaces;
+using MvvmCross.Platform.Core;
 
 namespace Brady.ScrapRunner.Mobile.Services
 {

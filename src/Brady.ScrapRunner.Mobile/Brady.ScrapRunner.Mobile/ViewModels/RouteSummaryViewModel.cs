@@ -12,8 +12,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         private readonly ITripService _tripService; 
 
-        public RouteSummaryViewModel(
-            ITripService tripService)
+        public RouteSummaryViewModel(ITripService tripService)
         {
             _tripService = tripService;
             Title = AppResources.RouteSummary;
@@ -46,8 +45,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public void ExecuteRouteSelectedCommand(TripModel selectedTrip)
         {
+            Close(this);
             ShowViewModel<RouteDetailViewModel>(new {tripNumber = selectedTrip.TripNumber});
-            SelectedTrip = null;
         }
     }
 }

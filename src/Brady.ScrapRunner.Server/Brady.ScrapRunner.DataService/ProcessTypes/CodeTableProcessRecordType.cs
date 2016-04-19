@@ -1,20 +1,21 @@
 ﻿using AutoMapper;
-using Brady.ScrapRunner.Domain;
-using Brady.ScrapRunner.Domain.Models;
-using Brady.ScrapRunner.Domain.Process;
-using BWF.DataServices.Core.Concrete.ChangeSets;
-using BWF.DataServices.Metadata.Attributes.Actions;
-using BWF.DataServices.Support.NHibernate.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Brady.ScrapRunner.DataService.Interfaces;
-using Brady.ScrapRunner.DataService.Validators;
+using NHibernate;
+using BWF.DataServices.Core.Concrete.ChangeSets;
+using BWF.DataServices.Metadata.Attributes.Actions;
+using BWF.DataServices.Support.NHibernate.Abstract;
 using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
-using NHibernate;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
+using Brady.ScrapRunner.DataService.Interfaces;
+using Brady.ScrapRunner.DataService.Validators;
+using Brady.ScrapRunner.DataService.Util;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -119,7 +120,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
-                    var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                     codetablesProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -134,7 +135,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Lookup Preference: DEFUseContainerLevel
-                    string prefUseContainerLevel = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                    string prefUseContainerLevel = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                    employeeMaster.TerminalId, PrefDriverConstants.DEFUseContainerLevel, out fault);
                     if (fault != null)
                     {
@@ -147,13 +148,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (prefUseContainerLevel == Constants.Yes)
                     {
                         //This query includes container level
-                        codetables = Util.Common.GetCodeTablesIncLevelForDriver(dataService, settings, userCulture, userRoleIds,
+                        codetables = Common.GetCodeTablesIncLevelForDriver(dataService, settings, userCulture, userRoleIds,
                                         employeeMaster.RegionId, out fault);
                     }
                     else
                     {
                         //This query does not include container level
-                        codetables = Util.Common.GetCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
+                        codetables = Common.GetCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
                                         employeeMaster.RegionId, out fault);
                     }
                     if (fault != null)

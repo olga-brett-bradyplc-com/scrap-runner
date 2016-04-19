@@ -1,6 +1,7 @@
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Resources;
 using Microsoft.VisualBasic;
+using MvvmCross.Core.ViewModels;
 using MvvmCross.Platform;
 using MvvmCross.Platform.IoC;
 using static MvvmCross.Platform.Mvx;
@@ -47,16 +48,17 @@ namespace Brady.ScrapRunner.Mobile
                 SqliteRepository<CustomerLocationModel>>();
             Mvx.RegisterType<IRepository<CustomerCommodityModel>,
                 SqliteRepository<CustomerCommodityModel>>();
-
-            Mvx.RegisterSingleton(IocConstruct<DemoDataGenerator>);
+            
 
             Mapper.Initialize(cfg =>
             {
                 cfg.AddProfile<ScrapRunnerMapperProfile>();
             });
 
-            //Mvx.RegisterSingleton(new ResxTextProvider(AppResources.ResourceManager));
-            RegisterAppStart<ViewModels.SignInViewModel>();
+            Mvx.ConstructAndRegisterSingleton<IMvxAppStart, AppStart>();
+            var appStart = Mvx.Resolve<IMvxAppStart>();
+
+            RegisterAppStart(appStart);
         }
     }
 }

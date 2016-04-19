@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu 
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:local="http://schemas.android.com/apk/res-auto">
+
+  <item android:title="Home">
+    <menu>
+      <item
+          android:id="@+id/nav_routesummary"
+          android:title="Route Summary" />
+      <item
+        android:id="@+id/nav_changepowerunit"
+        android:title="Change Power Unit" />
+      <item
+        android:id="@+id/nav_fuelentry"
+        android:title="Fuel Entry" />
+      <item
+          android:id="@+id/nav_loadcontainer"
+          android:title="Load/Drop Container" />
+    </menu>
+  </item>
+  
+  <item android:title="Messages">
+    <menu>
+      <item
+          android:id="@+id/nav_messages"
+          android:title="Messages" />
+      <item
+        android:id="@+id/nav_composemessage"
+        android:title="Compose Message" />
+    </menu>
+  </item>
+
+  <item android:title="Utilities/Log Out">
+    <menu>
+      <item
+          android:id="@+id/nav_helpcenter"
+          android:title="Help Center" />
+      <item
+        android:id="@+id/nav_setup"
+        android:title="Setup" />
+      <item
+        android:id="@+id/nav_aboutscraprunner"
+        android:title="About ScrapRunner" />
+      <item
+        android:id="@+id/nav_reportproblem"
+        android:title="Report A Problem" />
+      <item
+        android:id="@+id/nav_logout"
+        android:title="Log Out" />
+    </menu>
+  </item>
+
+</menu>

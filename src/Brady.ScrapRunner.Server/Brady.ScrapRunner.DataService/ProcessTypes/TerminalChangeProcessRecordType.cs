@@ -1,21 +1,21 @@
 ﻿using AutoMapper;
-using Brady.ScrapRunner.Domain;
-using Brady.ScrapRunner.Domain.Models;
-using Brady.ScrapRunner.Domain.Process;
-using BWF.DataServices.Core.Concrete.ChangeSets;
-using BWF.DataServices.Metadata.Attributes.Actions;
-using BWF.DataServices.Support.NHibernate.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Brady.ScrapRunner.DataService.Interfaces;
-using Brady.ScrapRunner.DataService.Validators;
+using NHibernate;
+using NHibernate.Util;
+using BWF.DataServices.Core.Concrete.ChangeSets;
+using BWF.DataServices.Metadata.Attributes.Actions;
+using BWF.DataServices.Support.NHibernate.Abstract;
 using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
-using NHibernate;
-using NHibernate.Util;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
+using Brady.ScrapRunner.DataService.Interfaces;
+using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.Util;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
@@ -97,6 +97,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 {
                     DataServiceFault fault;
                     string msgKey = key;
+                    ChangeSetResult<string> scratchChangeSetResult;
 
                     TerminalChangeProcess terminalsProcess = (TerminalChangeProcess)changeSetResult.GetSuccessfulUpdateForId(key);
 
@@ -120,7 +121,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
-                    var employeeMaster = Util.Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
+                    var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   terminalsProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
@@ -135,7 +136,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Lookup Preference: DEFSendOnlyYardsForArea
-                    string prefSendOnlyYardsForArea = Util.Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                    string prefSendOnlyYardsForArea = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                  employeeMaster.TerminalId, PrefDriverConstants.DEFSendOnlyYardsForArea, out fault);
                     if (fault != null)
                     {
@@ -156,12 +157,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         var terminalchanges = new List<TerminalChange>();
                         if (prefSendOnlyYardsForArea == Constants.Yes)
                         {
-                            terminalchanges = Util.Common.GetTerminalChangesByArea(dataService, settings, userCulture, userRoleIds,
+                            terminalchanges = Common.GetTerminalChangesByArea(dataService, settings, userCulture, userRoleIds,
                               terminalsProcess.LastTerminalChangeUpdate, employeeMaster.AreaId, out fault);
                         }
                         else
                         {
-                            terminalchanges = Util.Common.GetTerminalChangesByRegion(dataService, settings, userCulture, userRoleIds,
+                            terminalchanges = Common.GetTerminalChangesByRegion(dataService, settings, userCulture, userRoleIds,
                               terminalsProcess.LastTerminalChangeUpdate, employeeMaster.RegionId, out fault);
                         }
                         if (fault != null)
@@ -189,7 +190,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ////////////////////////////////////////////////
                         //Now update the TerminalMasterDateTime in the DriverStatus record
                         //If there is no record yet, I guess we will have to add one.
-                        var driverStatus = Util.Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
+                        var driverStatus = Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
                                                     terminalsProcess.EmployeeId, out fault);
                         if (null != fault)
                         {
@@ -214,17 +215,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         driverStatus.TerminalMasterDateTime = DateTime.Now;
 
-                        changeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
+                        scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
 
                         log.DebugFormat("SRTEST:Saving DriverStatus Record: DriverId:{0} TerminalMasterUpdate:{1}",
                                                             driverStatus.EmployeeId,
                                                             driverStatus.TerminalMasterDateTime);
 
-                        if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
+                        if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
                         {
                             var s = string.Format("Could not update DriverStatus for Driver {0}.",
                                                   terminalsProcess.EmployeeId);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            scratchChangeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
                     }

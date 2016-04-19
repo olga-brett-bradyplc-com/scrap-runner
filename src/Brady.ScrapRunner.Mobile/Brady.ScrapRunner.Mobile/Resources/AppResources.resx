@@ -341,4 +341,20 @@
   <data name="SignInTitle" xml:space="preserve">
     <value>ScrapRunner Sign In</value>
   </data>
+  <data name="LogOutMessage" xml:space="preserve">
+    <value>Are you sure you want to log out of ScrapRunner?</value>
+    <comment>MenuViewModel</comment>
+  </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>Log Out</value>
+    <comment>MenuViewModel</comment>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+    <comment>MenuViewModel</comment>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+    <comment>MenuViewModel</comment>
+  </data>
 </root>
