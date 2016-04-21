@@ -1,4 +1,5 @@
-﻿using Brady.ScrapRunner.Mobile.Interfaces;
+﻿using Brady.ScrapRunner.Mobile.Enums;
+using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
 
@@ -34,6 +35,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             //Level = container.TripSegContainerLevel;
             //Notes = container.TripSegContainerComment ?? "";
             //ReferenceNumber = container.TripSegContainerReferenceNumber;
+
+            MenuFilter = MenuFilterEnum.OnTransaction;
 
             base.Start();
         }

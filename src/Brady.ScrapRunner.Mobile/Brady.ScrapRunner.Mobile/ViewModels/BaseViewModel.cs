@@ -1,6 +1,7 @@
 ﻿using MvvmCross.Localization;
 using System.ComponentModel;
 using System.Collections.Generic;
+using Brady.ScrapRunner.Mobile.Enums;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -33,6 +34,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             get { return _subTitle; }
             set { SetProperty(ref _subTitle, value); }
+        }
+
+        private MenuFilterEnum _menuFilter;
+        public MenuFilterEnum MenuFilter
+        {
+            get { return _menuFilter; }
+            set { SetProperty(ref _menuFilter, value); }
         }
 
         protected ValidationResult Validate<TValidator, TType>(TType type) where TValidator : AbstractValidator<TType>, new()

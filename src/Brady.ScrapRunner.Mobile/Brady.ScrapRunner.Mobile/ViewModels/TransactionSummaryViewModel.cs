@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using Brady.ScrapRunner.Mobile.Enums;
 using BWF.DataServices.Metadata.Models;
 using MvvmCross.Binding.ExtensionMethods;
 using Splat;
@@ -55,6 +56,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 // Set the very first trip segment container as the default current transaction
                 CurrentTransaction = Containers.FirstOrDefault().FirstOrDefault();
             }
+
+            MenuFilter = MenuFilterEnum.OnTrip; // Make sure we reset in case coming back from transaction detail
 
             base.Start();
         }
