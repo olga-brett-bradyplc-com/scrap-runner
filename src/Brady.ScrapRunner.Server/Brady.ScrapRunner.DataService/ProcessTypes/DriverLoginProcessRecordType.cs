@@ -111,6 +111,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         DataServiceFault fault;
                         string msgKey = key;
                         ChangeSetResult<string> scratchChangeSetResult;
+
                         int powerHistoryInsertCount = 0;
                         int driverHistoryInsertCount = 0;
 
