@@ -31,13 +31,12 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         protected override bool NavMenuEnabled => true;
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
-        {   
-            if(ViewModel.Containers != null)
+        {
+            if (ViewModel.Containers != null)
                 LoadContainers(ViewModel.Containers);
 
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
             _currentStatusToken = ViewModel.WeakSubscribe(() => ViewModel.CurrentStatus, OnCurrentStatusChanged);
-            
         }
 
         public override void OnDestroyView()

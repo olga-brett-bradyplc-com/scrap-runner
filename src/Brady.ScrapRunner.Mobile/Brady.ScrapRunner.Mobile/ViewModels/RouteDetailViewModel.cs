@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Brady.ScrapRunner.Mobile.Enums;
 using Brady.ScrapRunner.Mobile.Helpers;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
@@ -81,6 +82,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     }
                 }
             }
+
+            MenuFilter = MenuFilterEnum.NotOnTrip; // Reset for when we start a new trip segment
 
             base.Start();
         }
@@ -174,6 +177,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (confirm)
             {
                 CurrentStatus = "EN"; //DriverStatusConstants.EnRoute;
+                MenuFilter = MenuFilterEnum.OnTrip;
             }
         }
 
