@@ -39,6 +39,7 @@
     <Compile Include="AppStart.cs" />
     <Compile Include="Converters\DateTimeValueConverter.cs" />
     <Compile Include="CustomLanguageBindingParser.cs" />
+    <Compile Include="Enums\MenuFilterEnum.cs" />
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\ICustomerService.cs" />
     <Compile Include="Interfaces\IDbService.cs" />
