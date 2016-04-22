@@ -22,12 +22,20 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverArriveProcess"
         },
         {
+          "text": "DriverContainerDoneProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverContainerDoneProcess"
+        },
+        {
           "text": "DriverEnrouteProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverEnrouteProcess"
         },
         {
           "text": "DriverLoginProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLoginProcess"
+        },
+        {
+          "text": "DriverSegmentDoneProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverSegmentDoneProcess"
         },
         {
           "text": "PreferencesProcess",

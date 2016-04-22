@@ -26,6 +26,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     /// <summary>
     /// The process for logging in a driver.  Call this process "withoutrequery".
     /// </summary>
+    // The mobile device will also call these processes:
+    //    ContainerChangeProcess for container master updates.
+    //    TerminalChangeProcess for terminal master updates.
+    //    CommodityMasterProcess for universal commodities.
+    //    PreferencesProcess for driver preferences.
+    //    CodeTableProcess for code table values.
+    //    TripInfoProcess for trips dispatched to the driver.
     /// 
     /// Note this processes is relatively independent of the "trivial" backing query and results
     /// are simply built up in memory.  As such, make this service call using the form of 
@@ -62,8 +69,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="persistChanges"></param>
         /// <returns></returns>
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService, string token, string username,
-            ChangeSet<string, DriverLoginProcess> changeSet,
-            bool persistChanges)
+                        ChangeSet<string, DriverLoginProcess> changeSet, bool persistChanges)
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
@@ -76,14 +82,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="settings"></param>
         /// <returns></returns>
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService,
-            ChangeSet<string, DriverLoginProcess> changeSet, ProcessChangeSetSettings settings)
+                        ChangeSet<string, DriverLoginProcess> changeSet, ProcessChangeSetSettings settings)
         {
 
             ISession session = null;
             ITransaction transaction = null;
 
-            // If session isn't passed in and changes are being persisted
-            // then open a new session
+            // If session isn't passed in and changes are being persisted then open a new session
             if (settings.Session == null && settings.PersistChanges)
             {
                 var srRepository = (ISRRepository) repository;
@@ -152,13 +157,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //TripInfoProcess will return the following lists.
                         List<ContainerMaster> containersOnPowerIdList = new List<ContainerMaster>();
                         List<EmployeeMaster> usersForMessagingList = new List<EmployeeMaster>();
-                        //
-                        // 1) Process information from handheld
-                        // NOTE: We might want to validate (or backfill) something like Locale against configured dialects rather than a hardcoded list in validator
-                        //
 
                         ////////////////////////////////////////////////
-                        // 2) Validate driver id / Get the EmployeeMaster
+                        // Validate driver id / Get the EmployeeMaster
                         // UserId must be a valid EmployeeId in the EmployeeMaster and SecurityLevel must be DR for driver.
                         var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                 driverLoginProcess.EmployeeId, out fault);
@@ -182,12 +183,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                          employeeMaster.EmployeeId,
                                          employeeMaster.TerminalId,
                                          employeeMaster.SecurityLevel);
-                        //
-                        // 3) Lookup preferences.  
-                        // See PreferencesProcess.
-                        //
 
-                        // 4b) Check system pref "DEFAllowAnyPowerUnit".  
+                        ////////////////////////////////////////////////
+                        // Preferences:  Lookup the system preference "DEFAllowAnyPowerUnit".  
                         // If preference prefAllowAnyPowerUnit is set to Y, then allow any power unit to be valid
                         // Otherwise the power unit's region must match the driver's region. This is the norm.
                         string prefAllowAnyPowerUnit = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
@@ -199,7 +197,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
 
                         ////////////////////////////////////////////////
-                        // 4a) Validate PowerId
+                        // Get the PowerMaster record
                         // PowerId must be a valid PowerId in the PowerMaster 
                         var powerMaster = new PowerMaster();
                         if (prefAllowAnyPowerUnit == Constants.Yes)
@@ -233,7 +231,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                          powerMaster.PowerRegionId);
 
                         ////////////////////////////////////////////////
-                        // 4c) Check power unit status: Scheduled for the shop? PS_SHOP = "S"
+                        // Check power unit status: Scheduled for the shop? PS_SHOP = "S"
                         if (PowerStatusConstants.Shop == powerMaster.PowerStatus)
                         {
                             var s = string.Format("Do not use Power unit {0}.  It is scheduled for the shop. ", driverLoginProcess.PowerId);
@@ -243,7 +241,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
 
                         ////////////////////////////////////////////////
-                        // 4d) Is unit in use by another driver? PS_INUSE = "I"
+                        // Is unit in use by another driver? PS_INUSE = "I"
                         if (powerMaster.PowerStatus == PowerStatusConstants.InUse &&
                             powerMaster.PowerDriverId != employeeMaster.EmployeeId)
                         {
@@ -255,9 +253,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
 
                         ////////////////////////////////////////////////
-                        // 4e) If no odometer record for this unit, accept as sent by the handheld.  
-                        // 4f) If overrride flag = "Y", accept as sent by the handheld.  
-                        // 4g) Odometer tolerance checks.
+                        // If no odometer record for this unit, accept as sent by the handheld.  
+                        // If overrride flag = "Y", accept as sent by the handheld.  
+                        // Otherwise lookup the preference to determine the acceptable range of values for the tolerance check.
                         // If the override flag is not set, and the odometer is within the range preference then accept the odometer 
                         if (driverLoginProcess.OverrideFlag != Constants.Yes && powerMaster.PowerOdometer != null)
                         {
@@ -292,7 +290,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
 
                         ////////////////////////////////////////////////
-                        //Get the driver status record for the driver. If one does not exist, eventually add one.
+                        //Get the driver status record for the driver. If one does not exist (which is common), add one.
                         var driverStatus = Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
                                                     driverLoginProcess.EmployeeId, out fault);
                         if (null != fault)
@@ -318,7 +316,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                                             driverStatus.TripNumber,
                                                             driverStatus.TripSegNumber);
 
-                        // 5) Validate Duplicate login?  Assuming we don't need this at this time.
+                        ////////////////////////////////////////////////
+                        // Validate Duplicate login?  Assuming we don't need this at this time.
                         //    if (driverStatus.PowerId == driverLoginProcess.PowerId &&
                         //        driverStatus.Odometer == driverLoginProcess.Odometer)
                         //    {
@@ -331,7 +330,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //    }
 
                         ////////////////////////////////////////////////
-                        // 6) Determine current trip number, segment, and driver status
+                        //Determine current trip number, segment, and driver status
                         //The purpose of the current trip info is, if the driver logs out and back in again in the
                         //middle of a trip, the mobile device can position the app on the current segment.
                         //This is to prevent the driver from having to re-enter information that he has already completed.
@@ -402,7 +401,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             driverStatus.Status = driverStatus.PrevDriverStatus ?? driverStatus.Status;
 
                             ////////////////////////////////////////////////
-                            // 7) Update Trip in progress flag in the trip table
+                            //Update Trip Record: Set the "trip in progress" flag in the trip table
                             if (driverStatus.TripNumber != null &&
                                 driverStatus.TripSegNumber == Constants.FirstSegment)
                             {
@@ -433,6 +432,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     {
                                         trip.TripInProgressFlag = Constants.No;
 
+                                        // Use scratchChangeSetResult so information can still be returned to the mobile app
                                         scratchChangeSetResult = Common.UpdateTrip(dataService, settings, trip);
                                         log.Debug("SRTEST:Saving Trip Record - TripInProgressFlag");
                                         if (Common.LogChangeSetFailure(scratchChangeSetResult, trip, log))
@@ -448,14 +448,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }//end of else if (null == driverStatus.TripNumber)
 
                         ////////////////////////////////////////////////
-                        // 8) Check for open ended delays 
+                        //Check for open ended delays 
                         //CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                         //             driverLoginProcess, employeeMaster, driverStatus, ref driverHistoryInsertCount);
                         
                         if (CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                                      driverLoginProcess, employeeMaster))
                         {
-                            // 8b) Add "Back On Duty" flag to Driver History table.
+                            // Add "Back On Duty" flag to Driver History table.
                             // For the last open-ended delay that we added an end time, record a back on duty status in the DriverHistory table.
                             // The driver is logging in, so in effect he is back on duty, no longer on delay.
                             // No need to actually add it to the DriverStatus table since we will be adding a
@@ -470,13 +470,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //The delay code is stored in the DriverStatus table but not in the DriverHistory table, so it is not needed.
                             log.Debug("SRTEST:Add BackOnDuty to DriverHistory");
 
-                            //scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
-                            //if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
-                            //{
-                            //    var s = "Could not update driver status";
-                            //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                            //    break;
-                            //}
                             if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
                                 ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                             {
@@ -491,13 +484,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         
                         ////////////////////////////////////////////////
-                        // 9) Check for power unit change
+                        // Check for power unit change
                         // There has to be a trip number and trip segment number...
                         if (null != driverLoginProcess.TripNumber && null != driverLoginProcess.TripSegNumber)
                         {
                             CheckForPowerIdChange(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                                                 driverLoginProcess, powerMaster, employeeMaster);
                         }
+
                         ////////////////////////////////////////////////
                         // Get the Trip record
                         var tripRecord = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
@@ -512,6 +506,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " + driverLoginProcess.TripNumber));
                             break;
                         }
+
                         ////////////////////////////////////////////////
                         // Get the TripSegment record
                         var tripSegmentRecord = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
@@ -521,22 +516,23 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
-                        if (null == tripRecord)
+                        if (null == tripSegmentRecord)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " 
                                 + driverLoginProcess.TripNumber + "-" + driverLoginProcess.TripSegNumber));
                             break;
                         }
 
-                        // 10) Add/update record to DriverStatus table.
+                        ////////////////////////////////////////////////
+                        //Update the DriverStatus table. 
                         //These fields are not affected by the login process:
                         //     DriverCumMinutes, GPSAutoGeneratedFlag, DelayCode, PrevDriverStatus, GPSXmitFlag, SendHHLogoffFlag
                         //This field is used by router and is no longer needed: RouteTo
 
-                        // Now set the new values in the driverstatus table:
+                        // Set the new values in the driverstatus table:
+                        driverStatus.Status = DriverStatusSRConstants.LoggedIn;
                         driverStatus.TripNumber = driverLoginProcess.TripNumber;
                         driverStatus.TripSegNumber = driverLoginProcess.TripSegNumber;
-                        driverStatus.Status = DriverStatusSRConstants.LoggedIn;
                         driverStatus.TripStatus = tripRecord.TripStatus;
                         driverStatus.TripAssignStatus = tripRecord.TripAssignStatus;
                         driverStatus.TripSegStatus = tripSegmentRecord.TripSegStatus;
@@ -549,16 +545,18 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         driverStatus.LoginDateTime = driverLoginProcess.LoginDateTime;
                         driverStatus.Odometer = driverLoginProcess.Odometer;
                         driverStatus.LoginProcessedDateTime = DateTime.Now;
-                       // driverStatus.ContainerMasterDateTime = driverLoginProcess.ContainerMasterDateTime;
                         driverStatus.MdtVersion = driverLoginProcess.PndVer;
-                       // driverStatus.TerminalMasterDateTime = driverLoginProcess.TerminalMasterDateTime;
                         driverStatus.DriverLCID = driverLoginProcess.LocaleCode;
+
+                        //These will be updated by different processes.
+                        // driverStatus.ContainerMasterDateTime = driverLoginProcess.ContainerMasterDateTime;
+                        // driverStatus.TerminalMasterDateTime = driverLoginProcess.TerminalMasterDateTime;
 
                         ////////////////////////////////////////////////
                         //Calculate driver's cumulative time which is the sum of standard drive and stop minutes
                         //for all incomplete trip segments 
                         var tripSegList = Common.GetTripSegmentsIncompleteForDriver(dataService, settings, userCulture, userRoleIds,
-                                            driverLoginProcess.EmployeeId, out fault);
+                                          driverLoginProcess.EmployeeId, out fault);
                         if (null != fault)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -567,6 +565,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         driverStatus.DriverCumMinutes = Common.GetDriverCumulativeTime(tripSegList);
 
                         //Do the update
+                        // Use scratchChangeSetResult so information can still be returned to the mobile app
                         scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
                         log.Debug("SRTEST:Saving DriverStatus Record - Login");
                         if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
@@ -578,7 +577,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
 
                         ////////////////////////////////////////////////
-                        // 11) Add record to DriverHistory table
+                        // Add record to DriverHistory table
                         if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
                                 ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                         {
@@ -593,18 +592,19 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
 
                         ////////////////////////////////////////////////
-                        // 12) Update PowerMaster table
+                        // Update PowerMaster table
                         powerMaster.PowerStatus = PowerStatusConstants.InUse;
                         powerMaster.PowerDriverId = driverLoginProcess.EmployeeId;
                         powerMaster.PowerOdometer = driverLoginProcess.Odometer;
                         powerMaster.PowerLastActionDateTime = driverLoginProcess.LoginDateTime;
 
                         // Trip Number and segment number are not populated at login. Only when driver goes enroute.
-                        // In fact, we need to remove one if it exists.
+                        // In fact, we need to remove this information if it exists.
                         powerMaster.PowerCurrentTripNumber = null;
                         powerMaster.PowerCurrentTripSegNumber = null;
                         powerMaster.PowerCurrentTripSegType = null;
 
+                        // Use scratchChangeSetResult so information can still be returned to the mobile app
                         scratchChangeSetResult = Common.UpdatePowerMaster(dataService, settings, powerMaster);
                         log.Debug("SRTEST:Saving PowerMaster Record - Login");
                         if (Common.LogChangeSetFailure(scratchChangeSetResult, powerMaster, log))
@@ -616,7 +616,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
 
                         ////////////////////////////////////////////////
-                        // 13) Add record to PowerHistory table
+                        // Add record to PowerHistory table
                         if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster,
                                 ++powerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                         {
@@ -630,89 +630,16 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
 
-                         ////////////////////////////////////////////////
-                        // 20) Send Container Inventory
-                        //Get a list of container on the power id
-                        var containersOnPowerId = Common.GetContainersForPowerId(dataService, settings, userCulture, userRoleIds,
-                                                  driverLoginProcess.PowerId, out fault);
-                        //This will be sent back to the driver
-                        containersOnPowerIdList.AddRange(containersOnPowerId);
-
-                        if (null != fault)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            break;
-                        }
-                        //For testing
-                        log.Debug("SRTEST:GetContainersForPowerId");
-                        foreach (var container in containersOnPowerId)
-                        {
-                            //This is some of the info that we send back
-                            log.DebugFormat("SRTEST:Container#:{0} Loc:{1} Type:{2} Size:{3} Contents:{4} Trip:{5}-{6}",
-                                             container.ContainerNumber,
-                                             container.ContainerLocation,
-                                             container.ContainerType,
-                                             container.ContainerSize,
-                                             container.ContainerContents,
-                                             container.ContainerCurrentTripNumber,
-                                             container.ContainerCurrentTripSegNumber);
-                        }
-
+ 
                         ////////////////////////////////////////////////
-                        // 21) Send dispatcher list for messaging
-                        // Check system pref "DEFSendDispatchersForArea".  
-                        // If preference DEFSendDispatchersForArea is set to Y, then send a list of dispatchers whose terminal id is in the driver's area. 
-                        // Otherwise send a list of dispatchers whose region matches the driver's region.
-                        string prefSendDispatchersForArea = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
-                                                       employeeMaster.TerminalId, PrefDriverConstants.DEFSendDispatchersForArea, out fault);
-                        if (null != fault)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            break;
-                        }
-                        //Get a list of users that can access messaging. This isn't just dispatchers.
-                        var usersForMessaging = new List<EmployeeMaster>();
-                        if (prefSendDispatchersForArea == Constants.Yes)
-                        {
-                            //Get just the users whose default terminal id is in the driver's area.
-                            usersForMessaging = Common.GetDispatcherListForArea(dataService, settings, userCulture, userRoleIds,
-                                                       employeeMaster.AreaId, out fault);
-                        }
-                        else
-                        {
-                            //Get just the users whose region id is the same as the driver's region.
-                            usersForMessaging = Common.GetDispatcherListForRegion(dataService, settings, userCulture, userRoleIds,
-                                                       employeeMaster.RegionId, out fault);
-                        }
-                        //This will be sent back to the driver
-                        usersForMessagingList.AddRange(usersForMessaging);
-                        if (null != fault)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            break;
-                        }
-                        //For testing
-                        log.Debug("SRTEST:GetDispatcherList");
-                        foreach (var user in usersForMessaging)
-                        {
-                            log.DebugFormat("SRTEST:LastName:{0} FirstName:{1} SecurityLevel:{2} AllowMessaging:{3} Region:{4} Terminal:{5} Area:{6}",
-                                             user.LastName,
-                                             user.FirstName,
-                                             user.SecurityLevel,
-                                             user.AllowMessaging,
-                                             user.RegionId,
-                                             user.TerminalId,
-                                             user.AreaId);
-                        }
-
                         // TODO:
-                        // 23) Send GPS Company Info to tracker
-                        // 24) Send GV Driver START Packet to tracker
-                        // 25) Send GV Driver CODE Packet to tracker
-                        // 26) Send GV Driver NAME Packet to tracker
+                        // Send GPS Company Info to tracker
+                        // Send GV Driver START Packet to tracker
+                        // Send GV Driver CODE Packet to tracker
+                        // Send GV Driver NAME Packet to tracker
 
                         ////////////////////////////////////////////////
-                        // 27) Add entry to Event Log - Login Received.
+                        // Add entry to Event Log - Login Received.
                         StringBuilder sbComment = new StringBuilder();
                         sbComment.Append(EventCommentConstants.ReceivedDriverLogin);
                         sbComment.Append(" HH:");
@@ -760,7 +687,84 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //    break;
                         //}
 
-                        // 22) populate and send the Login message back to the mobile device.
+                        ////////////////////////////////////////////////
+                        // Send Container Inventory
+                        //Get a list of container on the power id
+                        var containersOnPowerId = Common.GetContainersForPowerId(dataService, settings, userCulture, userRoleIds,
+                                                  driverLoginProcess.PowerId, out fault);
+                        //This will be sent back to the driver
+                        containersOnPowerIdList.AddRange(containersOnPowerId);
+
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        //For testing
+                        log.Debug("SRTEST:GetContainersForPowerId");
+                        foreach (var container in containersOnPowerId)
+                        {
+                            //This is some of the info that we send back
+                            log.DebugFormat("SRTEST:Container#:{0} Loc:{1} Type:{2} Size:{3} Contents:{4} Trip:{5}-{6}",
+                                             container.ContainerNumber,
+                                             container.ContainerLocation,
+                                             container.ContainerType,
+                                             container.ContainerSize,
+                                             container.ContainerContents,
+                                             container.ContainerCurrentTripNumber,
+                                             container.ContainerCurrentTripSegNumber);
+                        }
+
+                        ////////////////////////////////////////////////
+                        // Send dispatcher list for messaging
+                        // Check system preference: "DEFSendDispatchersForArea".  
+                        // If preference DEFSendDispatchersForArea is set to Y, then send a list of dispatchers whose terminal id is in the driver's area. 
+                        // Otherwise send a list of dispatchers whose region matches the driver's region.
+                        string prefSendDispatchersForArea = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                       employeeMaster.TerminalId, PrefDriverConstants.DEFSendDispatchersForArea, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+
+                        //Get a list of users that can access messaging. This isn't just dispatchers.
+                        var usersForMessaging = new List<EmployeeMaster>();
+                        if (prefSendDispatchersForArea == Constants.Yes)
+                        {
+                            //Get just the users whose default terminal id is in the driver's area.
+                            usersForMessaging = Common.GetDispatcherListForArea(dataService, settings, userCulture, userRoleIds,
+                                                       employeeMaster.AreaId, out fault);
+                        }
+                        else
+                        {
+                            //Get just the users whose region id is the same as the driver's region.
+                            usersForMessaging = Common.GetDispatcherListForRegion(dataService, settings, userCulture, userRoleIds,
+                                                       employeeMaster.RegionId, out fault);
+                        }
+                        //This will be sent back to the driver
+                        usersForMessagingList.AddRange(usersForMessaging);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        //For testing
+                        log.Debug("SRTEST:GetDispatcherList");
+                        foreach (var user in usersForMessaging)
+                        {
+                            log.DebugFormat("SRTEST:LastName:{0} FirstName:{1} SecurityLevel:{2} AllowMessaging:{3} Region:{4} Terminal:{5} Area:{6}",
+                                             user.LastName,
+                                             user.FirstName,
+                                             user.SecurityLevel,
+                                             user.AllowMessaging,
+                                             user.RegionId,
+                                             user.TerminalId,
+                                             user.AreaId);
+                        }
+
+                        ////////////////////////////////////////////////
+                        // Populate and send the Login message back to the mobile device.
                         driverLoginProcess.UsersForMessaging = usersForMessagingList;
                         driverLoginProcess.ContainersOnPowerId = containersOnPowerIdList;
 
@@ -774,25 +778,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                          driverLoginProcess.TermId,
                                          driverLoginProcess.AreaId);
 
-                        //The mobile device will also call these processes:
-
-                        // 14) Send container master updates
-                        // See ContainerChangeProcess.
-
-                        // 15) Send terminal master updates
-                        // See TerminalChangeProcess.
-
-                        // 16) Send Universal Commodities
-                        // See CommodityMasterProcess.
-
-                        // 17) Send preferences (after some filtering)
-                        // See PreferencesProcess.
-
-                        // 18) Send Code list
-                        // See CodeTableProcess.
-
-                        // 19) Send Trips
-                        // See TripInfoProcess
                     }
                     catch (Exception ex)
                     {
