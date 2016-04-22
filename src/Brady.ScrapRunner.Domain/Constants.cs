@@ -28,7 +28,13 @@
         /// </summary>
         public static readonly string FirstSegment = "01";
     }
-
+    public static class ActionTypeConstants
+    {
+        public static readonly string Done = "D";
+        public static readonly string Review = "R";
+        public static readonly string Exception = "E";
+        public static readonly string None = "N";
+    }
     public static class BasicTripTypeConstants
     {
         public static readonly string Bobtail = "BT";
@@ -117,6 +123,19 @@
         public static readonly string Hauler      = "H";
         public static readonly string Landfill    = "L";
         public static readonly string XferStation = "T";
+    }
+    public static class CustomerAutoReceiptConstants
+    {
+        //customer receives receipt by email
+        public static readonly string EmailReceipt = "E";
+        //customer receives receipt by driver
+        public static readonly string DriverReceipt = "D";
+        //notify driver to pick up customer paperwork
+        public static readonly string DriverPUPaperwork = "P";
+        //customer receives receipt by driver and driver to pick up customer paperwork
+        public static readonly string DriverReceiptPUPaperwork = "B";
+        //none of the above
+        public static readonly string None = "N";
     }
 
     public static class DelayTypeConstants
