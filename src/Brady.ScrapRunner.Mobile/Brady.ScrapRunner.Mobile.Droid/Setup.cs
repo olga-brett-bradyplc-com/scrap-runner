@@ -15,6 +15,9 @@ using MvvmCross.Droid.Platform;
 
 namespace Brady.ScrapRunner.Mobile.Droid
 {
+    using Interfaces;
+    using Services;
+
     public class Setup : MvxAndroidSetup
     {
         public Setup(Context applicationContext) : base(applicationContext)
@@ -72,6 +75,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
             ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 #endif
             Mvx.RegisterType<IMvxLanguageBindingParser, CustomLanguageBindingParser>();
+            Mvx.LazyConstructAndRegisterSingleton<INetworkAvailabilityService>(() => new NetworkAvailabilityServiceAndroid());
         }
     }
 }
