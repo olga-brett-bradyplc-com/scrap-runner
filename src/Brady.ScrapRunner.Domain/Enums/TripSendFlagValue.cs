@@ -5,6 +5,33 @@ using Newtonsoft.Json;
 namespace Brady.ScrapRunner.Domain.Enums
 {
     [JsonConverter(typeof(RichEnumConverter))]
+    //Trip Send Auto Receipt Flag Values
+    public enum TripSendAutoReceiptValue
+    {
+        /// <summary>
+        /// 0 - No auto email receipt.
+        /// </summary>
+        [RichEnum("No Receipt", "NoReceipt")]
+        NoReceipt = 0,
+
+        /// <summary>
+        /// 1 - Receipt ready to be sent.
+        /// </summary>
+        [RichEnum("Receipt Ready", "ReceiptReady")]
+        ReceiptReady = 1,
+
+        /// <summary>
+        /// 2 - Receipt sent.
+        /// </summary>
+        [RichEnum("Receipt Sent", "ReceiptSent")]
+        ReceiptSent = 2,
+
+        /// <summary>
+        /// 3 - Receipt not sent.
+        /// </summary>
+        [RichEnum("Receipt Not Sent", "ReceiptNotSent")]
+        ReceiptNotSent = 3
+    }
     public enum TripSendFlagValue
     {
         /// <summary>

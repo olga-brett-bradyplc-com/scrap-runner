@@ -1,4 +1,5 @@
-﻿using BWF.DataServices.Metadata.Interfaces;
+﻿using Brady.ScrapRunner.Domain.Enums;
+using BWF.DataServices.Metadata.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,7 +79,7 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripSegDriverModified { get; set; }
         public virtual string TripSegPowerAssetNumber { get; set; }
         public virtual string TripSegExtendedFlag { get; set; }
-        public virtual int? TripSegSendReceiptFlag { get; set; }
+        public virtual TripSendAutoReceiptValue TripSegSendReceiptFlag { get; set; }
 
         public virtual string Id
         {

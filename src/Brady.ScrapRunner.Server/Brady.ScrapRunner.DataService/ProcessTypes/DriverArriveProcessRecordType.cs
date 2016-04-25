@@ -59,8 +59,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="persistChanges"></param>
         /// <returns></returns>
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService, string token, string username,
-            ChangeSet<string, DriverArriveProcess> changeSet,
-            bool persistChanges)
+                        ChangeSet<string, DriverArriveProcess> changeSet, bool persistChanges)
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
@@ -72,13 +71,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="settings"></param>
         /// <returns></returns>
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService,
-            ChangeSet<string, DriverArriveProcess> changeSet, ProcessChangeSetSettings settings)
+                        ChangeSet<string, DriverArriveProcess> changeSet, ProcessChangeSetSettings settings)
         {
             ISession session = null;
             ITransaction transaction = null;
 
-            // If session isn't passed in and changes are being persisted
-            // then open a new session
+            // If session isn't passed in and changes are being persisted then open a new session
             if (settings.Session == null && settings.PersistChanges)
             {
                 var srRepository = (ISRRepository)repository;
@@ -123,13 +121,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     else
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Unable to process arrive for DriverId: " + driverArriveProcess.EmployeeId));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Unable to process arrive for DriverId: " 
+                                        + driverArriveProcess.EmployeeId));
                         break;
                     }
+
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
-                                                  driverArriveProcess.EmployeeId, out fault);
+                                         driverArriveProcess.EmployeeId, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -137,9 +137,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == employeeMaster)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid DriverId: " + driverArriveProcess.EmployeeId));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid DriverId: " 
+                                        + driverArriveProcess.EmployeeId));
                         break;
                     }
+
                     ////////////////////////////////////////////////
                     // Get the Trip record
                     var tripRecord = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
@@ -151,7 +153,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == tripRecord)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " + driverArriveProcess.TripNumber));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " 
+                                        + driverArriveProcess.TripNumber));
                         break;
                     }
 
@@ -196,7 +199,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     //Get a list of all containers for the segment
                     var tripSegContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
-                                        driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber, out fault);
+                                               driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -209,15 +212,18 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Update Container Status for all containers on the power unit.
+                    //Note that we may not have any container numbers at the arrive because the driver may not have
+                    //loaded any containers (on the app) before he left the yard.
+                    //The power id field in the ContainerMaster determines what containers are on the power unit.
                     var containersOnPowerId = Common.GetContainersForPowerId(dataService, settings, userCulture, userRoleIds,
-                                                  driverArriveProcess.PowerId, out fault);
+                                              driverArriveProcess.PowerId, out fault);
                     if (null != containersOnPowerId && containersOnPowerId.Count() > 0)
                     {
                         //For each container, update the ContainerMaster and the TripSegmentContainer table
                         foreach (var containerOnPowerId in containersOnPowerId)
                         {
                             var containerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
-                                                          containerOnPowerId.ContainerNumber, out fault);
+                                                  containerOnPowerId.ContainerNumber, out fault);
                             if (null != fault)
                             {
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -225,11 +231,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             }
                             if (null == containerMaster)
                             {
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid ContainerNumber: " + containerOnPowerId.ContainerNumber));
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid ContainerNumber: " 
+                                                + containerOnPowerId.ContainerNumber));
                                 break;
                             }
-                            //PowerId already set. Container is still on the power id.
+                            //PowerId already set. Container is still on the power id. Do not change.
                             //containerMaster.ContainerPowerId = driverArriveProcess.PowerId;
+
+                            //Set the container status. It has either arrived at a yard or a customer site.
                             if (tripSegmentRecord.TripSegDestCustType == CustomerTypeConstants.Yard)
                             {
                                 containerMaster.ContainerStatus = ContainerStatusConstants.Yard;
@@ -239,11 +248,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 containerMaster.ContainerStatus = ContainerStatusConstants.CustomerSite;
                                 containerMaster.ContainerPrevCustHostCode = tripSegmentRecord.TripSegDestCustHostCode;
                             }
+
                             containerMaster.ContainerCurrentTripNumber = driverArriveProcess.TripNumber;
                             containerMaster.ContainerCurrentTripSegNumber = driverArriveProcess.TripSegNumber;
                             containerMaster.ContainerLastActionDateTime = driverArriveProcess.ActionDateTime;
                             containerMaster.ContainerCustHostCode = tripSegmentRecord.TripSegDestCustHostCode;
                             containerMaster.ContainerCustType = tripSegmentRecord.TripSegDestCustType;
+
                             //Remove these since container has not yet been set down, still on the move.
                             containerMaster.ContainerPendingMoveDateTime = null;
                             containerMaster.ContainerLocation = null;
@@ -264,13 +275,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                             ////////////////////////////////////////////////
                             //Add record to Container History. 
-                            ////////////////////////////////////////////////
-                            //Add record to Container History. 
                             if (!Common.InsertContainerHistory(dataService, settings, containerMaster, 
                                 ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                             {
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                                log.ErrorFormat("InsertContainerHistory failed: {0} during enorute request: {1}", fault.Message, driverArriveProcess);
+                                log.ErrorFormat("InsertContainerHistory failed: {0} during arrive request: {1}", fault.Message, driverArriveProcess);
                                 break;
                             }
 
@@ -299,7 +308,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 //Look up the last trip segment container for this trip and segment
                                 //Use this to calculate the next sequence number.
                                 var tripSegmentContainerMax = Common.GetTripSegmentContainerLast(dataService, settings, userCulture, userRoleIds,
-                                                        driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber, out fault);
+                                                              driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber, out fault);
                                 if (null != fault)
                                 {
                                     changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -340,7 +349,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     //Update the TripSegment record.
                     //On first segment, remove previously recorded Trip Segment times and odometers.
-                    //Since driver may have gone enroute/arrived, logged out and has gone enroutearrive again
+                    //Since driver may have gone enroute/arrived, logged out and now has gone enroute/arrive again
                     if (tripSegmentRecord.TripSegNumber == Constants.FirstSegment)
                     {
                         tripSegmentRecord.TripSegEndDateTime = null;
@@ -350,16 +359,24 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     tripSegmentRecord.TripSegPowerId = driverArriveProcess.PowerId;
                     tripSegmentRecord.TripSegDriverId = driverArriveProcess.EmployeeId;
                     tripSegmentRecord.TripSegDriverName = Common.GetDriverName(employeeMaster);
-                    //Driver has arrived. Drive time ends. Stop time begins.
-                    tripSegmentRecord.TripSegActualDriveEndDateTime = driverArriveProcess.ActionDateTime;
-                    tripSegmentRecord.TripSegActualStopStartDateTime = driverArriveProcess.ActionDateTime;
                     tripSegmentRecord.TripSegOdometerEnd = driverArriveProcess.Odometer;
                     tripSegmentRecord.TripSegEndLatitude = driverArriveProcess.Latitude;
                     tripSegmentRecord.TripSegEndLongitude = driverArriveProcess.Longitude;
 
+                    //Driver has arrived. Drive time ends. Stop time begins.
+                    tripSegmentRecord.TripSegActualDriveEndDateTime = driverArriveProcess.ActionDateTime;
+                    tripSegmentRecord.TripSegActualStopStartDateTime = driverArriveProcess.ActionDateTime;
+
                     //Calculate the drive minutes:DriveEndDateTime - DriveStartDateTime
-                    tripSegmentRecord.TripSegActualDriveMinutes = 
-                       (tripSegmentRecord.TripSegActualDriveEndDateTime - tripSegmentRecord.TripSegActualDriveStartDateTime).Value.Minutes;
+                    if (tripSegmentRecord.TripSegActualDriveStartDateTime != null && tripSegmentRecord.TripSegActualDriveEndDateTime != null)
+                    {
+                        tripSegmentRecord.TripSegActualDriveMinutes = (int)(tripSegmentRecord.TripSegActualDriveEndDateTime.Value.Subtract
+                               (tripSegmentRecord.TripSegActualDriveStartDateTime.Value).TotalMinutes);
+                    }
+                    else
+                    {
+                        tripSegmentRecord.TripSegActualDriveMinutes = 0;
+                    }
 
                     //Update TripSegment Primary Container Information from first TripSegmentContainer information. 
                     //Use the list instead of requerying the database. Values are not yet saved.
@@ -405,6 +422,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == tripSegmentMileage)
                     {
+                        //If there is no open-ended mileage record to update, add a complete one with start and end odometers.
+                        //Pass in true to set both starting and ending odometers.
                         Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
                             tripSegmentRecord, containersOnPowerId, true, tripSegmentMileageCount, out fault);
                         log.DebugFormat("SRTEST:Adding TripSegmentMileage Record for Trip:{0}-{1} - Arrive.",
@@ -432,8 +451,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         if (nextTripSegmentRecord.TripSegNumber == driverArriveProcess.TripSegNumber)
                         {
+                            //This is our current destination customer.
                             hostcode = nextTripSegmentRecord.TripSegDestCustHostCode;
                         }
+                        //Look for subsequent segments with the same destination customer.
                         //The first string follows the second string in the sort order.
                         else if (1 == nextTripSegmentRecord.TripSegNumber.CompareTo(driverArriveProcess.TripSegNumber))
                         {
@@ -494,6 +515,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         tripRecord.TripInProgressFlag = Constants.Yes;
 
+                        //Do the update
                         changeSetResult = Common.UpdateTrip(dataService, settings, tripRecord);
                         log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Arrive.",
                                         tripRecord.TripNumber);
@@ -505,6 +527,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
                     }
+
                     ////////////////////////////////////////////////
                     //Update the DriverStatus table. 
                     var driverStatus = Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
@@ -532,8 +555,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     driverStatus.ActionDateTime = driverArriveProcess.ActionDateTime;
                     driverStatus.Odometer = driverArriveProcess.Odometer;
                     driverStatus.GPSAutoGeneratedFlag = driverArriveProcess.GPSAutoFlag;
-                    if (null == driverArriveProcess.Latitude ||
-                        null == driverArriveProcess.Longitude)
+                    if (null == driverArriveProcess.Latitude || null == driverArriveProcess.Longitude)
                     {
                         driverStatus.GPSXmitFlag = Constants.No;
                     }
@@ -560,7 +582,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        log.ErrorFormat("InsertDriverHistory failed: {0} during enorute request: {1}", fault.Message, driverArriveProcess);
+                        log.ErrorFormat("InsertDriverHistory failed: {0} during arrive request: {1}", fault.Message, driverArriveProcess);
                         break;
                     }
 
@@ -575,7 +597,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (powerMaster == null)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid PowerId: " + driverArriveProcess.PowerId));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid PowerId: " 
+                                        + driverArriveProcess.PowerId));
                         break;
                     }
 
@@ -584,6 +607,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     powerMaster.PowerCurrentTripNumber = driverArriveProcess.TripNumber;
                     powerMaster.PowerCurrentTripSegNumber = driverArriveProcess.TripSegNumber;
                     powerMaster.PowerCurrentTripSegType = tripSegmentRecord.TripSegType;
+
                     //Set these to the trip destination host code and type.
                     powerMaster.PowerCustHostCode = tripSegmentRecord.TripSegDestCustHostCode;
                     powerMaster.PowerCustType = tripSegmentRecord.TripSegDestCustType;
@@ -614,26 +638,26 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Update CustomerMaster.  If driver auto-arrived, update auto-arrive flag for the destination customer.
                     if (driverArriveProcess.GPSAutoFlag == Constants.Yes)
                     {
-                        var customerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                        var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
                                                    tripSegmentRecord.TripSegDestCustHostCode, out fault);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
-                        if (customerMaster == null)
+                        if (destCustomerMaster == null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid CustHostCode: "
                                               + tripSegmentRecord.TripSegDestCustHostCode));
                             break;
                         }
-                        customerMaster.CustAutoGPSFlag = driverArriveProcess.GPSAutoFlag;
+                        destCustomerMaster.CustAutoGPSFlag = driverArriveProcess.GPSAutoFlag;
 
                         //Do the update
-                        changeSetResult = Common.UpdateCustomerMaster(dataService, settings, customerMaster);
+                        changeSetResult = Common.UpdateCustomerMaster(dataService, settings, destCustomerMaster);
                         log.DebugFormat("SRTEST:Saving CustomerMaster Record for CustHostCode:{0} - Arrive.",
                                         tripSegmentRecord.TripSegDestCustHostCode);
-                        if (Common.LogChangeSetFailure(changeSetResult, customerMaster, log))
+                        if (Common.LogChangeSetFailure(changeSetResult, destCustomerMaster, log))
                         {
                             var s = string.Format("Could not update CustomerMaster for CustHostCode:{0}.",
                                                   tripSegmentRecord.TripSegDestCustHostCode);
@@ -644,7 +668,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Send GPS Location Status packet to tracker. (NOT USED)
-
 
                     ////////////////////////////////////////////////
                     //Add entry to Event Log – Arrive. 
@@ -694,13 +717,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //    break;
                     //}
 
-
                     ////////////////////////////////////////////////
                     // Check if trip is out of order. 
                     // If trip is out or order, resequence his trips.
                     // Normally we would then send a resequence trips message to  driver.
                     // TODO
-
 
                 } //end of foreach...
             }//end of if (!changeSetResult.Failed...
