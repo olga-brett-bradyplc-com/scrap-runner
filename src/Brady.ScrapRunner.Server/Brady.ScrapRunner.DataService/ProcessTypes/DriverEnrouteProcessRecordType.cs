@@ -415,9 +415,25 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //If this is not the first segment, set the TripSegEndDateTime for the previous segment
                     if (tripSegmentRecord.TripSegNumber != Constants.FirstSegment)
                     {
-                        //TODO
-                    }
+                        //TODO: test
+                        var previousTripSegment = (from item in tripSegList
+                                                   where -1 == item.TripSegNumber.CompareTo(driverEnrouteProcess.TripSegNumber)
+                                                   select item).LastOrDefault();
 
+                        previousTripSegment.TripSegEndDateTime = driverEnrouteProcess.ActionDateTime;
+
+                        //Do the update
+                        changeSetResult = Common.UpdateTripSegment(dataService, settings, previousTripSegment);
+                        log.DebugFormat("SRTEST:Saving previous TripSegment Record for Trip:{0}-{1} - Enroute.",
+                                        previousTripSegment.TripNumber, previousTripSegment.TripSegNumber);
+                        if (Common.LogChangeSetFailure(changeSetResult, previousTripSegment, log))
+                        {
+                            var s = string.Format("Could not update previous TripSegment for Trip:{0}-{1}.",
+                                previousTripSegment.TripNumber, previousTripSegment.TripSegNumber);
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            break;
+                        }
+                    }
 
                     ////////////////////////////////////////////////
                     //Update the TripSegmentMileage record.
@@ -487,6 +503,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     tripRecord.TripInProgressFlag = Constants.Yes;
 
+                    //Do the update
                     changeSetResult = Common.UpdateTrip(dataService, settings, tripRecord);
                     log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Enroute.",
                                     tripRecord.TripNumber);

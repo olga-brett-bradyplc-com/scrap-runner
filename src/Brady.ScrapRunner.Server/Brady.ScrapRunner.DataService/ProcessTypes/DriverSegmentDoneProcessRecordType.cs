@@ -242,13 +242,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     tripSegmentRecord.TripSegEndLongitude = driverSegmentDoneProcess.Longitude;
 
                     //Driver has completed segment. Stop time ends.
-                    //If this is not his last segment, do not set Segment end time.  Wait until driver goes enroute on next segment.
                     tripSegmentRecord.TripSegActualStopEndDateTime = driverSegmentDoneProcess.ActionDateTime;
-                    //TODO If last segment...
-                    {
-                        tripSegmentRecord.TripSegEndDateTime = driverSegmentDoneProcess.ActionDateTime;
-                    }
-
                     //Calculate the stop minutes: StopEndDateTime - StopStartDateTime
                     if (tripSegmentRecord.TripSegActualStopStartDateTime != null && tripSegmentRecord.TripSegActualStopEndDateTime != null)
                     {
@@ -258,6 +252,22 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     else
                     {
                         tripSegmentRecord.TripSegActualStopMinutes = 0;
+                    }
+
+                    //TODO Test. 
+                    //If this is not his last segment, do not set Segment end time.  Wait until driver goes enroute on next segment.
+                    //If this is the last segment of the trip, set the segment end date/time.
+                    var lastTripSegmentRecord = (from item in tripSegList
+                                             select item).LastOrDefault();
+                    if (null == lastTripSegmentRecord)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: "
+                                        + lastTripSegmentRecord.TripNumber));
+                        break;
+                    }
+                    if (lastTripSegmentRecord.TripSegNumber == driverSegmentDoneProcess.TripSegNumber)
+                    {
+                        tripSegmentRecord.TripSegEndDateTime = driverSegmentDoneProcess.ActionDateTime;
                     }
 
                     //Get the number of containers on this segment
@@ -316,19 +326,19 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (destCustomerMaster.CustAutoRcptSettings.Contains(CustomerAutoReceiptConstants.EmailReceipt) &&
                             destCustomerMaster.CustEMailAddress != null)
                         {
-                            string hostcode = null;
+                            string destHostcode = null;
                             foreach (var nextTripSegmentRecord in tripSegList)
                             {
                                 if (nextTripSegmentRecord.TripSegNumber == driverSegmentDoneProcess.TripSegNumber)
                                 {
                                     //This is our current destination customer.
-                                    hostcode = nextTripSegmentRecord.TripSegDestCustHostCode;
+                                    destHostcode = nextTripSegmentRecord.TripSegDestCustHostCode;
                                 }
                                 //Look for subsequent segments with the same destination customer.
                                 //The first string follows the second string in the sort order.
                                 else if (1 == nextTripSegmentRecord.TripSegNumber.CompareTo(driverSegmentDoneProcess.TripSegNumber))
                                 {
-                                    if (hostcode != nextTripSegmentRecord.TripSegDestCustHostCode)
+                                    if (destHostcode != nextTripSegmentRecord.TripSegDestCustHostCode)
                                     {
                                         //Since destination of the next segment is the not the same as the current segment, send the email.
                                         tripSegmentRecord.TripSegSendReceiptFlag = TripSendAutoReceiptValue.ReceiptReady;
@@ -386,14 +396,53 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     ////////////////////////////////////////////////
                     //Check if next segment is at the same location as current segment
-                    //If so, set TripSegmentStartDateTime for next segment.
-                    //Set TripSegmentDriveStartDateTime, TripSegmentDriveEndDateTime,TripSegmentStopStartDateTime for next segment.
-                    //TODO
-
-                    ////////////////////////////////////////////////
-                    //Update Trip Record.  Update Primary Container Information if this is the first TripSegment.
-                    //Container number in the TripSegmentContainer record should not be null but check anyway.
-                        if (tripSegmentRecord.TripSegNumber == Constants.FirstSegment &&
+                    //If so, set TripSegStartDateTime for next segment.
+                    //Set TripSegActualDriveStartDateTime, TripSegActualDriveEndDateTime,TripSegActualStopStartDateTime for next segment.
+                    //TODO test
+                    string hostcode = null;
+                    foreach (var nextTripSegmentRecord in tripSegList)
+                    {
+                        if (nextTripSegmentRecord.TripSegNumber == driverSegmentDoneProcess.TripSegNumber)
+                        {
+                            //This is our current destination customer.
+                            hostcode = nextTripSegmentRecord.TripSegDestCustHostCode;
+                        }
+                        //Look for subsequent segments with the same destination customer.
+                        //The first string follows the second string in the sort order.
+                        else if (1 == nextTripSegmentRecord.TripSegNumber.CompareTo(driverSegmentDoneProcess.TripSegNumber))
+                        {
+                            if (hostcode == nextTripSegmentRecord.TripSegDestCustHostCode)
+                            {
+                                //Since destination of the next segment is the same as the current segment, set the times.
+                                nextTripSegmentRecord.TripSegStartDateTime = driverSegmentDoneProcess.ActionDateTime;
+                                nextTripSegmentRecord.TripSegActualDriveStartDateTime = driverSegmentDoneProcess.ActionDateTime;
+                                nextTripSegmentRecord.TripSegActualDriveEndDateTime = driverSegmentDoneProcess.ActionDateTime;
+                                nextTripSegmentRecord.TripSegActualStopStartDateTime = driverSegmentDoneProcess.ActionDateTime;
+ 
+                                //Do the update
+                                changeSetResult = Common.UpdateTripSegment(dataService, settings, nextTripSegmentRecord);
+                                log.DebugFormat("SRTEST:Saving next TripSegment Record for Trip:{0}-{1} - Segment Done.",
+                                                nextTripSegmentRecord.TripNumber, nextTripSegmentRecord.TripSegNumber);
+                                if (Common.LogChangeSetFailure(changeSetResult, nextTripSegmentRecord, log))
+                                {
+                                    var s = string.Format("Could not update next TripSegment for Trip:{0}-{1}.",
+                                        nextTripSegmentRecord.TripNumber, nextTripSegmentRecord.TripSegNumber);
+                                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                //Do not look any farther. If trip is a PF-RT-DE where PR and DE are at the same site, 
+                                //we do not want to set any values on the DE segment.
+                                break;
+                            }
+                        }
+                    }//end foreach ...
+                     ////////////////////////////////////////////////
+                     //Update Trip Record.  Update Primary Container Information if this is the first TripSegment.
+                     //Container number in the TripSegmentContainer record should not be null but check anyway.
+                    if (tripSegmentRecord.TripSegNumber == Constants.FirstSegment &&
                         null != tripSegmentRecord.TripSegPrimaryContainerNumber)
                     {
                         tripRecord.TripPrimaryContainerNumber = tripSegmentRecord.TripSegPrimaryContainerNumber;
@@ -548,6 +597,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     sbComment.Append(driverSegmentDoneProcess.EmployeeId);
                     sbComment.Append(" Pwr:");
                     sbComment.Append(driverSegmentDoneProcess.PowerId);
+                    sbComment.Append(" SegType:");
+                    sbComment.Append(tripSegmentRecord.TripSegType);
                     sbComment.Append(" SegStatus:");
                     sbComment.Append(tripSegmentRecord.TripSegStatus);
                     string comment = sbComment.ToString().Trim();
