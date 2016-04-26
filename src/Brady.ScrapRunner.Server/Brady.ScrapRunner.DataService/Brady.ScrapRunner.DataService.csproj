@@ -191,6 +191,7 @@
   <ItemGroup>
     <Compile Include="Concrete\SRDataService.cs" />
     <Compile Include="Concrete\SRRepository.cs" />
+    <Compile Include="Mappings\DriverTripAckProcessMap.cs" />
     <Compile Include="ProcessTypes\DriverSegmentDoneProcessRecordType.cs" />
     <Compile Include="Interfaces\ISRRepository.cs" />
     <Compile Include="Mappings\AreaMasterMap.cs" />
@@ -266,6 +267,7 @@
     <Compile Include="ProcessTypes\DriverEnrouteProcessRecordType.cs" />
     <Compile Include="ProcessTypes\PreferencesProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverLoginProcessRecordType.cs" />
+    <Compile Include="ProcessTypes\DriverTripAckProcessRecordType.cs" />
     <Compile Include="RecordTypes\MessagesRecordType.cs" />
     <Compile Include="ProcessTypes\TerminalChangeProcessRecordType.cs" />
     <Compile Include="ProcessTypes\TripInfoProcessRecordType.cs" />
@@ -355,6 +357,8 @@
     <Compile Include="Validators\DriverEnrouteProcessValidator.cs" />
     <Compile Include="Validators\DriverSegmentDoneProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverSegmentDoneProcessValidator.cs" />
+    <Compile Include="Validators\DriverTripAckProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverTripAckProcessValidator.cs" />
     <Compile Include="Validators\PreferencesProcessValidator.cs" />
     <Compile Include="Validators\PreferencesProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverLoginProcessDeletionValidator.cs" />
