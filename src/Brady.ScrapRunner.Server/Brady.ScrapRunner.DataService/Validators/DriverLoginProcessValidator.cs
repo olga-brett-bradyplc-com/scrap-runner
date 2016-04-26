@@ -26,6 +26,7 @@ namespace Brady.ScrapRunner.DataService.Validators
             RuleFor(x => x.Password).NotEmpty();
             RuleFor(x => x.PowerId).NotEmpty();
             RuleFor(x => x.Odometer).GreaterThan(0);
+            RuleFor(x => x.LoginDateTime).NotEmpty();
             // Here for now, possibly break out as separate call
             //RuleFor(x => x.CodeListVersion).NotEmpty();
             // Here for now, probably break out as separate call
