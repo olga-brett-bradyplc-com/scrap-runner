@@ -59,6 +59,7 @@
     <Compile Include="Models\CustomerDirectionsModel.cs" />
     <Compile Include="Models\EmployeeMasterModel.cs" />
     <Compile Include="Models\PreferenceModel.cs" />
+    <Compile Include="Models\QueueItemModel.cs" />
     <Compile Include="Models\SqliteRepository.cs" />
     <Compile Include="Models\Route.cs" />
     <Compile Include="Models\TransactionDetail.cs" />
