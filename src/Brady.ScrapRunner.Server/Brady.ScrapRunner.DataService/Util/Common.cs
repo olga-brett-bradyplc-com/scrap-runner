@@ -64,6 +64,47 @@ namespace Brady.ScrapRunner.DataService.Util
             return driverName;
         }
         /// <summary>
+        /// Determines if container is still on the truck
+        /// Based on the trip segment type and the SetInYardFlag
+        /// </summary>
+        /// <param name="tripSegType"></param>
+        /// <param name="setInYardFlag"></param>
+        /// <param name="actionType"></param>
+        /// <returns>true if on truck, otherwise false</returns>
+        public static bool IsContainerOnPowerId(string tripSegType, string setInYardFlag, string actionType)
+        {
+            bool onPowerId = true;
+            if (tripSegType == BasicTripTypeConstants.ReturnYard)
+            {
+                if (setInYardFlag == Constants.Yes)
+                {
+                    onPowerId = false;
+                }
+            }
+            else
+            {
+                if (tripSegType == BasicTripTypeConstants.PickupEmpty ||
+                    tripSegType == BasicTripTypeConstants.PickupFull)
+                {
+                    if (actionType == ActionTypeConstants.Exception)
+                    {
+                        //Container was not picked up.
+                        onPowerId = false;
+                    }
+                }
+                if (tripSegType == BasicTripTypeConstants.DropEmpty ||
+                    tripSegType == BasicTripTypeConstants.DropFull)
+                {
+                    if (actionType != ActionTypeConstants.Exception)
+                    {
+                        //Container was dropped.
+                        onPowerId = false;
+                    }
+                }
+            }
+            return onPowerId;
+        }
+        /// <summary>
         /// Determines if the segment is loaded.
         /// If any container on the truck is loaded, segment is loaded
         /// Otherwise if the segment is a drop full, scale, or unload, the segment is loaded
@@ -212,7 +253,7 @@ namespace Brady.ScrapRunner.DataService.Util
             {
                 return false;
             }
-            string containerCurrentTerminalName = containerTerminalMaster?.TerminalName;
+            string containerCurrentTerminalName = containerCurrentTerminalMaster?.TerminalName;
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the RegionName in the RegionMaster 
@@ -248,7 +289,7 @@ namespace Brady.ScrapRunner.DataService.Util
             //If there is a host code, look up the Customer record to get the
             // customer information. 
             var containerCustomerMaster = new CustomerMaster();
-            if (null != containerCustomerMaster.CustHostCode)
+            if (null != containerMaster.ContainerCustHostCode)
             {
                 containerCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
                                       containerMaster.ContainerCustHostCode, out fault);
@@ -291,8 +332,13 @@ namespace Brady.ScrapRunner.DataService.Util
             {
                 return false;
             }
-            int daysAtSite = (containerMaster?.ContainerLastActionDateTime.Value.Date 
-                   - origContainerMaster?.ContainerLastActionDateTime.Value.Date).Value.Days;
+
+            int daysAtSite = 0;
+            if (containerMaster.ContainerLastActionDateTime != null && origContainerMaster.ContainerLastActionDateTime != null)
+            {
+                daysAtSite = (int)(containerMaster.ContainerLastActionDateTime.Value.Subtract
+                                  (origContainerMaster.ContainerLastActionDateTime.Value).TotalDays);
+            }
 
             var containerHistory = new ContainerHistory()
             {
@@ -1376,7 +1422,7 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         /// CONTAINERHISTORY Table  queries
         /// <summary>
-        ///  Get the last container history record for a given power id 
+        ///  Get the last container history record for a given container number
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
         /// <param name="dataService"></param>
@@ -1410,7 +1456,44 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return containerHistory;
         }
-        
+        /// CONTAINERHISTORY Table  queries
+        /// <summary>
+        ///  Get the last container history record for a given container number on a trip
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="containerNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty ContainerHistory if containerNumber is null or no entry is found</returns>
+        public static ContainerHistory GetContainerHistoryLastTrip(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string containerNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var containerHistory = new ContainerHistory();
+            if (null != containerNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<ContainerHistory>().Top(1)
+                             .Filter(t => t.Property(p => p.ContainerNumber).EqualTo(containerNumber)
+                             .And().Property(p => p.ContainerTripNumber).IsNotNull())
+                             .OrderBy(p => p.ContainerSeqNumber, Direction.Descending)
+                             .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return containerHistory;
+                }
+                containerHistory = (ContainerHistory)queryResult.Records.Cast<ContainerHistory>().FirstOrDefault();
+            }
+            return containerHistory;
+        }
+
         /// CONTAINERMASTER Table queries
         /// <summary>
         ///  Get a a container master record for a given container number.
@@ -1423,7 +1506,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="containerNumber"></param>
         /// <param name="fault"></param>
         /// <returns>An empty ContainerMaster if containerNumber is null or record does not exist for containerNumber</returns>
-public static ContainerMaster GetContainer(IDataService dataService, ProcessChangeSetSettings settings,
+        public static ContainerMaster GetContainer(IDataService dataService, ProcessChangeSetSettings settings,
              string userCulture, IEnumerable<long> userRoleIds, string containerNumber, out DataServiceFault fault)
         {
             fault = null;
