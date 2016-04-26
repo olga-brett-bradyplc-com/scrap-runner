@@ -243,6 +243,7 @@
     <Compile Include="Services\NetworkAvailabilityServiceAndroid.cs" />
     <Compile Include="Services\QueueIntentBroadcastReceiver.cs" />
     <Compile Include="Services\QueueIntentService.cs" />
+    <Compile Include="Services\QueueSchedulerAndroid.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="SplashScreen.cs" />
     <Compile Include="Fragments\BaseFragment.cs" />
