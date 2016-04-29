@@ -1,9 +1,13 @@
 ﻿using Brady.ScrapRunner.Domain.Process;
 using BWF.DataServices.PortableClients;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Plugins.Sqlite;
@@ -20,6 +24,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IPreferenceService _preferenceService;
         private readonly ITripService _tripService;
         private readonly ICustomerService _customerService;
+        private readonly IDriverService _driverService;
         private readonly IConnectionService<DataServiceClient> _connection;
 
         public SignInViewModel(
@@ -27,12 +32,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IPreferenceService preferenceService,
             ITripService tripService,
             ICustomerService customerService,
+            IDriverService driverService,
             IConnectionService<DataServiceClient> connection)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
             _tripService = tripService;
             _customerService = customerService;
+            _driverService = driverService;
 
             _connection = connection;
             Title = AppResources.SignInTitle;
@@ -153,7 +160,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (loginProcess.WasSuccessful)
                 {
-                    var temp = loginProcess.Item;
+                    await _driverService.UpdateDriverStatus(new DriverStatus
+                    {
+                        EmployeeId = loginProcess.Item.EmployeeId,
+                        Status = DriverStatusSRConstants.LoggedIn,
+                        TerminalId = loginProcess.Item.TermId,
+                        PowerId = loginProcess.Item.PowerId,
+                        RegionId = loginProcess.Item.RegionId,
+                        MDTId = loginProcess.Item.Mdtid,
+                        LoginDateTime = loginProcess.Item.LoginDateTime,
+                        ActionDateTime = loginProcess.Item.LoginDateTime,
+                        //DriverCumMinutes = loginProcess.Item.DriverCumlMinutes @TODO Should this be sent in login process?
+                        Odometer = loginProcess.Item.Odometer,
+                        LoginProcessedDateTime = loginProcess.Item.LoginDateTime,
+                        DriverLCID = loginProcess.Item.LocaleCode
+                    });
                 }
                 else
                 {
@@ -162,7 +183,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
-                loginData.Title = "Loading Preferences";
+                loginData.Title = AppResources.LoadingPreferences;
 
                 var preferenceObj = new PreferencesProcess
                 {

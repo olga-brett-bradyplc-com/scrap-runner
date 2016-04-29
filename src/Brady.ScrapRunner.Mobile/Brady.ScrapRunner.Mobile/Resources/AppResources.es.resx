@@ -323,4 +323,8 @@
     <value>Si</value>
     <comment>MenuViewModel</comment>
   </data>
+  <data name="LoadingPreferences" xml:space="preserve">
+    <value>Loading Preferences ( spanish )</value>
+    <comment>sign in view</comment>
+  </data>
 </root>
