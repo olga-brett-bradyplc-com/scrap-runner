@@ -120,7 +120,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         int powerHistoryInsertCount = 0;
                         int driverHistoryInsertCount = 0;
 
-                        // TODO: determine these on a case by case basis.
+                        // TODO: Determine userCulture and userRoleIds on a per user basis.
                         string userCulture = "en-GB";
                         IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
@@ -494,14 +494,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////
                         // Get the Trip record
-                        var tripRecord = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
+                        var currentTrip = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
                                                       driverLoginProcess.TripNumber, out fault);
                         if (null != fault)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
-                        if (null == tripRecord)
+                        if (null == currentTrip)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " + driverLoginProcess.TripNumber));
                             break;
@@ -509,14 +509,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////
                         // Get the TripSegment record
-                        var tripSegmentRecord = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
+                        var currentTripSegment = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
                                                       driverLoginProcess.TripNumber, driverLoginProcess.TripSegNumber,out fault);
                         if (null != fault)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
-                        if (null == tripSegmentRecord)
+                        if (null == currentTripSegment)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " 
                                 + driverLoginProcess.TripNumber + "-" + driverLoginProcess.TripSegNumber));
@@ -533,10 +533,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         driverStatus.Status = DriverStatusSRConstants.LoggedIn;
                         driverStatus.TripNumber = driverLoginProcess.TripNumber;
                         driverStatus.TripSegNumber = driverLoginProcess.TripSegNumber;
-                        driverStatus.TripStatus = tripRecord.TripStatus;
-                        driverStatus.TripAssignStatus = tripRecord.TripAssignStatus;
-                        driverStatus.TripSegStatus = tripSegmentRecord.TripSegStatus;
-                        driverStatus.TripSegType = tripSegmentRecord.TripSegType;
+                        driverStatus.TripStatus = currentTrip.TripStatus;
+                        driverStatus.TripAssignStatus = currentTrip.TripAssignStatus;
+                        driverStatus.TripSegStatus = currentTripSegment.TripSegStatus;
+                        driverStatus.TripSegType = currentTripSegment.TripSegType;
                         driverStatus.TerminalId = employeeMaster.TerminalId;
                         driverStatus.RegionId = employeeMaster.RegionId;
                         driverStatus.PowerId = driverLoginProcess.PowerId;
@@ -555,14 +555,21 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ////////////////////////////////////////////////
                         //Calculate driver's cumulative time which is the sum of standard drive and stop minutes
                         //for all incomplete trip segments 
-                        var tripSegList = Common.GetTripSegmentsIncompleteForDriver(dataService, settings, userCulture, userRoleIds,
+                        var incompleteTripSegList = Common.GetTripSegmentsIncompleteForDriver(dataService, settings, userCulture, userRoleIds,
                                           driverLoginProcess.EmployeeId, out fault);
                         if (null != fault)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
-                        driverStatus.DriverCumMinutes = Common.GetDriverCumulativeTime(tripSegList);
+                        if (incompleteTripSegList != null)
+                        {
+                            driverStatus.DriverCumMinutes = Common.GetDriverCumulativeTime(incompleteTripSegList,null);
+                        }
+                        else
+                        {
+                            driverStatus.DriverCumMinutes = 0;
+                        }
 
                         //Do the update
                         // Use scratchChangeSetResult so information can still be returned to the mobile app
@@ -630,13 +637,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
 
- 
+
                         ////////////////////////////////////////////////
-                        // TODO:
-                        // Send GPS Company Info to tracker
-                        // Send GV Driver START Packet to tracker
-                        // Send GV Driver CODE Packet to tracker
-                        // Send GV Driver NAME Packet to tracker
+                        // TODO:Send GPS Company Info to tracker
+                        // TODO:Send GV Driver START Packet to tracker
+                        // TODO:Send GV Driver CODE Packet to tracker
+                        // TODO:Send GV Driver NAME Packet to tracker
 
                         ////////////////////////////////////////////////
                         // Add entry to Event Log - Login Received.

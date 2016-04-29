@@ -23,9 +23,9 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripSegContainerCommodityDesc { get; set; }
         public virtual string TripSegContainerLocation { get; set; }
         public virtual string TripSegContainerShortTerm { get; set; }
-        public virtual long? TripSegContainerWeightGross { get; set; }
-        public virtual long? TripSegContainerWeightGross2nd { get; set; }
-        public virtual long? TripSegContainerWeightTare { get; set; }
+        public virtual int? TripSegContainerWeightGross { get; set; }
+        public virtual int? TripSegContainerWeightGross2nd { get; set; }
+        public virtual int? TripSegContainerWeightTare { get; set; }
         public virtual string TripSegContainerReviewFlag { get; set; }
         public virtual string TripSegContainerReviewReason { get; set; }
         public virtual DateTime? TripSegContainerActionDateTime { get; set; }
@@ -34,8 +34,8 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual DateTime? WeightGross2ndDateTime { get; set; }
         public virtual DateTime? WeightTareDateTime { get; set; }
         public virtual int? TripSegContainerLevel { get; set; }
-        public virtual long? TripSegContainerLatitude { get; set; }
-        public virtual long? TripSegContainerLongitude { get; set; }
+        public virtual int? TripSegContainerLatitude { get; set; }
+        public virtual int? TripSegContainerLongitude { get; set; }
         public virtual string TripSegContainerLoaded { get; set; }
         public virtual string TripSegContainerOnTruck { get; set; }
         public virtual string TripScaleReferenceNumber { get; set; }
