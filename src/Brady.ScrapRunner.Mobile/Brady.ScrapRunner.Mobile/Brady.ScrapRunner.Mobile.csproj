@@ -41,6 +41,7 @@
     <Compile Include="CustomLanguageBindingParser.cs" />
     <Compile Include="Enums\MenuFilterEnum.cs" />
     <Compile Include="Helpers\Grouping.cs" />
+    <Compile Include="Interfaces\IContainerService.cs" />
     <Compile Include="Interfaces\ICustomerService.cs" />
     <Compile Include="Interfaces\IDbService.cs" />
     <Compile Include="Interfaces\IDriverService.cs" />
@@ -73,6 +74,7 @@
     </Compile>
     <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="ScrapRunnerMapperProfile.cs" />
+    <Compile Include="Services\ContainerService.cs" />
     <Compile Include="Services\CustomerService.cs" />
     <Compile Include="Services\DemoDataGenerator.cs" />
     <Compile Include="Services\ConnectionService.cs" />

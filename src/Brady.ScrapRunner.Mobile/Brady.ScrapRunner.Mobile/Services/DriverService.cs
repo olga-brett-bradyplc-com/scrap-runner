@@ -14,7 +14,6 @@ namespace Brady.ScrapRunner.Mobile.Services
 {
     public class DriverService : IDriverService
     {
-
         private readonly IConnectionService<DataServiceClient> _connection;
         private readonly IRepository<DriverStatusModel> _driverStatusRepository;
 
