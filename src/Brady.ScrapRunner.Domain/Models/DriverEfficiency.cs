@@ -31,21 +31,21 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripRegionName { get; set; }
         public virtual string TripReferenceNumber { get; set; }
         public virtual DateTime? TripCompletedDateTime { get; set; }
-        public virtual long? TripActualDriveMinutes { get; set; }
-        public virtual long? TripStandardDriveMinutes { get; set; }
-        public virtual long? TripActualStopMinutes { get; set; }
-        public virtual long? TripStandardStopMinutes { get; set; }
-        public virtual long? TripActualYardMinutes { get; set; }
-        public virtual long? TripStandardYardMinutes { get; set; }
-        public virtual long? TripActualTotalMinutes { get; set; }
-        public virtual long? TripStandardTotalMinutes { get; set; }
-        public virtual long? TripDelayMinutes { get; set; }
+        public virtual int? TripActualDriveMinutes { get; set; }
+        public virtual int? TripStandardDriveMinutes { get; set; }
+        public virtual int? TripActualStopMinutes { get; set; }
+        public virtual int? TripStandardStopMinutes { get; set; }
+        public virtual int? TripActualYardMinutes { get; set; }
+        public virtual int? TripStandardYardMinutes { get; set; }
+        public virtual int? TripActualTotalMinutes { get; set; }
+        public virtual int? TripStandardTotalMinutes { get; set; }
+        public virtual int? TripDelayMinutes { get; set; }
         public virtual string TripPowerId { get; set; }
-        public virtual long? TripOdometerStart { get; set; }
-        public virtual long? TripOdometerEnd { get; set; }
-        public virtual long? TripYardDelayMinutes { get; set; }
-        public virtual long? TripCustDelayMinutes { get; set; }
-        public virtual long? TripLunchBreakDelayMinutes { get; set; }
+        public virtual int? TripOdometerStart { get; set; }
+        public virtual int? TripOdometerEnd { get; set; }
+        public virtual int? TripYardDelayMinutes { get; set; }
+        public virtual int? TripCustDelayMinutes { get; set; }
+        public virtual int? TripLunchBreakDelayMinutes { get; set; }
 
         public virtual string Id
         {

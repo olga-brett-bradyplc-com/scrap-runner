@@ -27,7 +27,16 @@
         /// Useage: To retrieve first trip segment
         /// </summary>
         public static readonly string FirstSegment = "01";
+
+        /// <summary>
+        /// PRO_NOT_SEQ 32766 is an arbitrary large number
+        /// Useage: To exclude trip from being resequenced. Assigned when trip is completed.
+        /// </summary>
+        public static readonly int ExcludeFromSequencing = 32766;
     }
+    /// <summary>
+    /// The Action Type internal codes.  Used in the processing container information.
+    /// </summary>
     public static class ActionTypeConstants
     {
         public static readonly string Done = "D";
@@ -35,6 +44,9 @@
         public static readonly string Exception = "E";
         public static readonly string None = "N";
     }
+    /// <summary>
+    /// The Basic Trip Type internal codes.  Used in the TripTypeBasic table.
+    /// </summary>
     public static class BasicTripTypeConstants
     {
         public static readonly string Bobtail = "BT";
@@ -52,6 +64,9 @@
         public static readonly string YardWork = "YD";
     }
 
+    /// <summary>
+    /// The Code Table Name internal codes.  Used in the CodeTable table.
+    /// </summary>
     public static class CodeTableNameConstants
     {
         public static readonly string AccessorialCodes = "ACCESSORIALCODES";
@@ -85,12 +100,18 @@
         public static readonly string Version = "VERSION";
     }
 
+    /// <summary>
+    /// The Code Table Type internal codes.  Used in the CodeTable table.
+    /// </summary>
     public static class CodeTableTypeConstants
     {
         public static readonly string System = "S";
         public static readonly string User = "U";
     }
 
+    /// <summary>
+    /// The Container Contents internal codes.  Used in the ContainerMaster table.
+    /// </summary>
     public static class ContainerContentsConstants
     {
         public static readonly string Empty = "E";
@@ -99,6 +120,9 @@
         public static readonly string Unknown = "U";
     }
 
+    /// <summary>
+    /// The Container Status internal codes.  Used in the ContainerMaster table.
+    /// </summary>
     public static class ContainerStatusConstants
     {
         public static readonly string Inbound = "I";
@@ -111,7 +135,9 @@
         public static readonly string SpecialProject = "P";
         public static readonly string Contractor = "T";
     }
-
+    /// <summary>
+    /// The Customer Type internal codes.  Used in the CustomerMaster table.
+    /// </summary>
     public static class CustomerTypeConstants
     {
         public static readonly string Supplier    = "S";
@@ -124,6 +150,9 @@
         public static readonly string Landfill    = "L";
         public static readonly string XferStation = "T";
     }
+    /// <summary>
+    /// The Customer Auto Receipt internal codes.  Used in the CustomerMaster table.
+    /// </summary>
     public static class CustomerAutoReceiptConstants
     {
         //customer receives receipt by email
@@ -137,7 +166,9 @@
         //none of the above
         public static readonly string None = "N";
     }
-
+    /// <summary>
+    /// The Delay Type internal codes.  Used in the DriverDelay table.
+    /// </summary>
     public static class DelayTypeConstants
     {
         public static readonly string Customer   = "C";
@@ -157,7 +188,7 @@
     }
 
     /// <summary>
-    /// The Driver Status internal codes.  Used by the DriverStatus table.
+    /// The Driver Status internal codes.  Used in the DriverStatus table.
     /// </summary>
     public static class DriverStatusSRConstants
     {
@@ -177,8 +208,8 @@
         public static readonly string Delay         = "X";
         /// <summary>BackOnDuty: B</summary>
         public static readonly string BackOnDuty    = "B";
-        /// <summary>Still Logged in, but has no more trips.  Idle: Z</summary>
-        public static readonly string Idle          = "Z"; 
+        /// <summary>Still Logged in, but has no more trips.  NoWork: Z</summary>
+        public static readonly string NoWork         = "Z"; 
         /// <summary>Still Logged in, has completed a trip, has more trips.  Available: V</summary>
         public static readonly string Available     = "V";
         /// <summary>StateCrossing: S</summary>
@@ -193,7 +224,7 @@
         public static readonly string LoggedOutDisp = "T"; 
     }
     /// <summary>
-    /// Event Program Contants.  Used by the EventLog table.
+    /// Event Program descriptions.  Used by the EventLog table.
     /// </summary>
     public static class EventProgramConstants
     {
@@ -201,7 +232,7 @@
         public static readonly string Services = "SERVICES";
     }
     /// <summary>
-    /// Event Comment Contants.  Used by the EventLog table.
+    /// The Event Comment descriptions.  Used by the EventLog table.
     /// </summary>
     public static class EventCommentConstants
     {
@@ -612,7 +643,7 @@
         public static readonly string DEFAllowAnyPowerUnit = "DEFAllowAnyPowerUnit";
     }
     /// <summary>
-    /// The Power Status internal codes.  Used by the PowerMaster table.
+    /// The Power Status internal codes.  Used in the PowerMaster table.
     /// </summary>
     public static class PowerStatusConstants
     {
@@ -626,7 +657,7 @@
         public static readonly string Unknown   = "U";
     }
     /// <summary>
-    /// The Security Level internal codes.  Used by the SecurityMaster table.
+    /// The Security Level internal codes.  Used in the SecurityMaster table.
     /// </summary>
     public static class SecurityLevelConstants
     {
@@ -653,6 +684,9 @@
         /// <summary>Gate Check: GT</summary>
         public static readonly string GateCheck = "GT";
     }
+    /// <summary>
+    /// The Trip Assign Status internal codes.  Used in the Trip table.
+    /// </summary>
     public static class TripAssignStatusConstants
     {
         public static readonly string NotDispatched = "N";
@@ -660,7 +694,17 @@
         public static readonly string Acked         = "A";
         public static readonly string Canceled      = "X";
     }
-    
+    /// <summary>
+    /// The Trip Method Of Completion internal codes.  Used in the Trip table.
+    /// </summary>
+    public static class TripMethodOfCompletionConstants
+    {
+        /// <summary>Driver: D</summary>
+        public static readonly string Driver = "D";
+        /// <summary>Manual: M</summary>
+        public static readonly string Manual = "M";
+    }
+
     //Changed to enum TripSendFlagValue
     //public static class TripSendFlagConstants
     //{
@@ -677,7 +721,7 @@
     //    public static readonly int SentToHostError = 11; //Completed, error in sending to host accounting system
     //    public static readonly int NotSentToHost   = 12; //Completed, not sent to host accounting system
     //}
-    
+
     //public static class TripSendReseqFlagConstants
     //{
     //    public static readonly int NotReseq = 0;     //Not Sequenced
@@ -686,6 +730,9 @@
     //    public static readonly int ReseqSent = 3;    //Set when the Reseq Message is sent
     //}
 
+    /// <summary>
+    /// The trip segment status internal codes.  Used in the TripSegment table.
+    /// </summary>
     public static class TripSegStatusConstants
     {
         public static readonly string Done = "D";
@@ -700,7 +747,7 @@
     }
 
     /// <summary>
-    /// The internal status codes used by the ScrapRunner Trip table.
+    /// The trip status internal codes.  Used in the Trip table.
     /// </summary>
     public static class TripStatusConstants
     {

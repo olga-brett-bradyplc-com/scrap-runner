@@ -24,7 +24,6 @@ namespace Brady.ScrapRunner.DataService.Validators
             RuleFor(x => x.TripNumber).NotEmpty();
             RuleFor(x => x.TripSegNumber).NotEmpty();
             RuleFor(x => x.PowerId).NotEmpty();
-            RuleFor(x => x.Odometer).GreaterThan(0);
             RuleFor(x => x.ContainerNumber).NotEmpty();
             RuleFor(x => x.ActionDateTime).NotEmpty();
         }
