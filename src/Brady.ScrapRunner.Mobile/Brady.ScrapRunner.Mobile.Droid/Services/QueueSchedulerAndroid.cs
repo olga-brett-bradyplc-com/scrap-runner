@@ -15,6 +15,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
             calendar.TimeInMillis = Java.Lang.JavaSystem.CurrentTimeMillis();
             calendar.Add(CalendarField.Millisecond, timeoutMillis);
 
+            // InexactRepeating alarms will be batched together across the system for power savings.
+            // Timeouts < 1 minute will often be rounded up to 1 minute.
             var alarmManager = AlarmManager.FromContext(Application.Context);
             alarmManager?.SetInexactRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, timeoutMillis, GetIntent());
         }
