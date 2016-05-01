@@ -141,14 +141,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Get the Trip record
-                    var tripRecord = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
+                    var currentTrip = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
                                      driverContainerDoneProcess.TripNumber, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    if (null == tripRecord)
+                    if (null == currentTrip)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " 
                                         + driverContainerDoneProcess.TripNumber));
@@ -157,7 +157,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Check if trip is complete
-                    if (Common.IsTripComplete(tripRecord))
+                    if (Common.IsTripComplete(currentTrip))
                     {
                         log.DebugFormat("SRTEST:TripNumber:{0} is Complete. Container done processing ends.",
                                         driverContainerDoneProcess.TripNumber);
@@ -165,8 +165,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
-                    //Get a list of all incomplete segments for the trip
-                    var tripSegList = Common.GetTripSegmentsIncomplete(dataService, settings, userCulture, userRoleIds,
+                    //Get a list of all  segments for the trip
+                    var tripSegList = Common.GetTripSegments(dataService, settings, userCulture, userRoleIds,
                                       driverContainerDoneProcess.TripNumber, out fault);
                     if (null != fault)
                     {
@@ -176,10 +176,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Get the current TripSegment record
-                    var tripSegmentRecord = (from item in tripSegList
+                    var currentTripSegment = (from item in tripSegList
                                              where item.TripSegNumber == driverContainerDoneProcess.TripSegNumber
                                              select item).FirstOrDefault();
-                    if (null == tripSegmentRecord)
+                    if (null == currentTripSegment)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripSegment: " +
                             driverContainerDoneProcess.TripNumber + "-" + driverContainerDoneProcess.TripSegNumber));
@@ -197,7 +197,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     // Get the Customer record for the destination cust host code
                     var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
-                                             tripSegmentRecord.TripSegDestCustHostCode, out fault);
+                                             currentTripSegment.TripSegDestCustHostCode, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -206,12 +206,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (null == destCustomerMaster)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid CustHostCode: "
-                                        + tripSegmentRecord.TripSegDestCustHostCode));
+                                        + currentTripSegment.TripSegDestCustHostCode));
                         break;
                     }
                     ////////////////////////////////////////////////
                     //Define the TripSegmentContainer for use later
-                    TripSegmentContainer tripSegmentContainerRecord = new TripSegmentContainer();
+                    TripSegmentContainer tripSegmentContainer = new TripSegmentContainer();
 
                     ////////////////////////////////////////////////
                     //Update Container Information
@@ -239,9 +239,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                                   BasicTripTypeConstants.DropEmpty,
                                                   BasicTripTypeConstants.PickupFull,
                                                   BasicTripTypeConstants.DropEmpty};
-                        if (types.Contains(tripSegmentRecord.TripSegType))
+                        if (types.Contains(currentTripSegment.TripSegType))
                         {
-                            //TODO: Call a separate routine
+                            //TODO: Call a separate routine to process quantity in container number
                         }
                     }
                     else
@@ -250,7 +250,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //ContainerType,ContainerSize,ContainerTerminalId,ContainerRegionId
 
                         //Based on the segment type, container may or may not still be on the PowerId.
-                        if (Common.IsContainerOnPowerId(tripSegmentRecord.TripSegType,
+                        if (Common.IsContainerOnPowerId(currentTripSegment.TripSegType,
                             driverContainerDoneProcess.SetInYardFlag, driverContainerDoneProcess.ActionType))
                         {
                             containerMaster.ContainerPowerId = driverContainerDoneProcess.PowerId;
@@ -261,40 +261,48 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
 
                         //Set the status based on the destination customer type
-                        if (tripSegmentRecord.TripSegDestCustType == CustomerTypeConstants.Yard)
+                        if (currentTripSegment.TripSegDestCustType == CustomerTypeConstants.Yard)
                         {
                             containerMaster.ContainerStatus = ContainerStatusConstants.Yard;
                         }
                         else
                         {
                             containerMaster.ContainerStatus = ContainerStatusConstants.CustomerSite;
-                            containerMaster.ContainerPrevCustHostCode = tripSegmentRecord.TripSegDestCustHostCode;
+                            containerMaster.ContainerPrevCustHostCode = currentTripSegment.TripSegDestCustHostCode;
                         }
                         containerMaster.ContainerCurrentTripNumber = driverContainerDoneProcess.TripNumber;
                         containerMaster.ContainerPrevTripNumber = driverContainerDoneProcess.TripNumber;
                         containerMaster.ContainerCurrentTripSegNumber = driverContainerDoneProcess.TripSegNumber;
-                        containerMaster.ContainerCurrentTripSegType = tripSegmentRecord.TripSegType;
+                        containerMaster.ContainerCurrentTripSegType = currentTripSegment.TripSegType;
                         containerMaster.ContainerLastActionDateTime = driverContainerDoneProcess.ActionDateTime;
-                        containerMaster.ContainerCustHostCode = tripSegmentRecord.TripSegDestCustHostCode;
-                        containerMaster.ContainerCustType = tripSegmentRecord.TripSegDestCustType;
+                        containerMaster.ContainerCustHostCode = currentTripSegment.TripSegDestCustHostCode;
+                        containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
 
-                        //TODO: Check code. 
-                        //Determine when and where this should be set to null
+                        //TODO: Check code. Determine when and where this should be set to null
                         containerMaster.ContainerPendingMoveDateTime = null;
 
+                        //Only update these if there are values present.
+                        if (driverContainerDoneProcess.CommodityCode != null && driverContainerDoneProcess.CommodityDesc != null)
+                        {
+                            containerMaster.ContainerCommodityCode = driverContainerDoneProcess.CommodityCode;
+                            containerMaster.ContainerCommodityDesc = driverContainerDoneProcess.CommodityDesc;
+                        }
+                        if (driverContainerDoneProcess.ContainerLocation != null)
+                        {
+                            containerMaster.ContainerLocation = driverContainerDoneProcess.ContainerLocation;
+                        }
+
                         containerMaster.ContainerContents = driverContainerDoneProcess.ContainerContents;
-                        containerMaster.ContainerCommodityCode = driverContainerDoneProcess.CommodityCode;
-                        containerMaster.ContainerCommodityDesc = driverContainerDoneProcess.CommodityDesc;
-                        containerMaster.ContainerLocation = driverContainerDoneProcess.ContainerLocation;
                         containerMaster.ContainerLevel = driverContainerDoneProcess.ContainerLevel;
                         containerMaster.ContainerLatitude = driverContainerDoneProcess.Latitude;
                         containerMaster.ContainerLongitude = driverContainerDoneProcess.Longitude;
 
+                        //Set this to show the container current yard location.
                         containerMaster.ContainerCurrentTerminalId = destCustomerMaster.ServingTerminalId;
-                        if (tripSegmentRecord.TripSegType == BasicTripTypeConstants.ReturnYard)
-                        {
-                            containerMaster.ContainerInboundTerminalId = destCustomerMaster.ServingTerminalId;
-                        }
+
+                        //The Inbound terminal is only set when the driver goes enroute on a RT segment.
+                        //It is removed when he arrives on a RT segment.
+                        //containerMaster.ContainerInboundTerminalId 
 
                         /////////////////////////////////////////////////
                         //Set the location warning flag
@@ -305,7 +313,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                                       BasicTripTypeConstants.Load,
                                                       BasicTripTypeConstants.Respot};
 
-                        if (types.Contains(tripSegmentRecord.TripSegType))
+                        if (types.Contains(currentTripSegment.TripSegType))
                         {
                             //We need to look in the container history to find the previous trip and the last 
                             //status of the container at the end of that trip.
@@ -333,7 +341,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         //Do the update
                         changeSetResult = Common.UpdateContainerMaster(dataService, settings, containerMaster);
-                        log.DebugFormat("SRTEST:Saving ContainerMaster Record for ContainerNumber:{0} - Arrive.",
+                        log.DebugFormat("SRTEST:Saving ContainerMaster Record for ContainerNumber:{0} - Container Done.",
                                         driverContainerDoneProcess.ContainerNumber);
                         if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
                         {
@@ -360,22 +368,24 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (null != tripSegContainerList && tripSegContainerList.Count() > 0)
                     {
                         //First, try to find a container in the list that matches the container number on the power unit.
-                        tripSegmentContainerRecord = (from item in tripSegContainerList
+                        //Allow for the use of the same container number multiple times on a segment.
+                        tripSegmentContainer = (from item in tripSegContainerList
                                                       where item.TripSegContainerNumber == containerMaster.ContainerNumber
+                                                      && item.TripSegContainerComplete != Constants.Yes
                                                       select item).FirstOrDefault();
-                        if (null == tripSegmentContainerRecord)
+                        if (null == tripSegmentContainer)
                         {
                             //Otherwise find a container record with no container number
-                            tripSegmentContainerRecord = (from item in tripSegContainerList
+                            tripSegmentContainer = (from item in tripSegContainerList
                                                           where item.TripSegContainerNumber == null
                                                           select item).FirstOrDefault();
                         }
                     }
                     //If still not found, then add a new one
-                    if (null == tripSegmentContainerRecord)
+                    if (null == tripSegmentContainer)
                     {
                         //Set up a new record
-                        tripSegmentContainerRecord = new TripSegmentContainer();
+                        tripSegmentContainer = new TripSegmentContainer();
 
                         //Look up the last trip segment container for this trip and segment
                         //Use this to calculate the next sequence number.
@@ -389,113 +399,119 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //Determine the next sequence number
                         if (null == tripSegmentContainerMax)
                         {
-                            tripSegmentContainerRecord.TripSegContainerSeqNumber = 0;
+                            tripSegmentContainer.TripSegContainerSeqNumber = 0;
                         }
                         else
                         {
-                            tripSegmentContainerRecord.TripSegContainerSeqNumber = ++tripSegmentContainerMax.TripSegContainerSeqNumber;
+                            tripSegmentContainer.TripSegContainerSeqNumber = ++tripSegmentContainerMax.TripSegContainerSeqNumber;
                         }
-                        tripSegmentContainerRecord.TripNumber = driverContainerDoneProcess.TripNumber;
-                        tripSegmentContainerRecord.TripSegNumber = driverContainerDoneProcess.TripSegNumber;
+                        tripSegmentContainer.TripNumber = driverContainerDoneProcess.TripNumber;
+                        tripSegmentContainer.TripSegNumber = driverContainerDoneProcess.TripSegNumber;
                     }
                     //Container number from the mobile device is required.
-                    tripSegmentContainerRecord.TripSegContainerNumber = driverContainerDoneProcess.ContainerNumber;
+                    tripSegmentContainer.TripSegContainerNumber = driverContainerDoneProcess.ContainerNumber;
                     
                     //Action Date/Time from the mobile device is required.
-                    tripSegmentContainerRecord.TripSegContainerActionDateTime = driverContainerDoneProcess.ActionDateTime;
+                    tripSegmentContainer.TripSegContainerActionDateTime = driverContainerDoneProcess.ActionDateTime;
                     
                     //Use the type and size from the container master, not the mobile device.
-                    tripSegmentContainerRecord.TripSegContainerType = containerMaster.ContainerType;
-                    tripSegmentContainerRecord.TripSegContainerSize = containerMaster.ContainerSize;
+                    tripSegmentContainer.TripSegContainerType = containerMaster.ContainerType;
+                    tripSegmentContainer.TripSegContainerSize = containerMaster.ContainerSize;
 
                     //Comodity code and description are optional, from driver. May have been filled in by dispatch. 
                     if (driverContainerDoneProcess.CommodityCode != null && driverContainerDoneProcess.CommodityDesc != null)
                     {
-                        tripSegmentContainerRecord.TripSegContainerCommodityCode = driverContainerDoneProcess.CommodityCode;
-                        tripSegmentContainerRecord.TripSegContainerCommodityDesc = driverContainerDoneProcess.CommodityDesc;
+                        tripSegmentContainer.TripSegContainerCommodityCode = driverContainerDoneProcess.CommodityCode;
+                        tripSegmentContainer.TripSegContainerCommodityDesc = driverContainerDoneProcess.CommodityDesc;
                     }
 
                     //Location is optional, from driver. May have been filled in by dispatch. 
                     if (driverContainerDoneProcess.ContainerLocation != null)
                     {
-                        tripSegmentContainerRecord.TripSegContainerLocation = driverContainerDoneProcess.ContainerLocation;
+                        tripSegmentContainer.TripSegContainerLocation = driverContainerDoneProcess.ContainerLocation;
                     }
 
                     //Level is optional, as determined by a preference.
-                    tripSegmentContainerRecord.TripSegContainerLevel = driverContainerDoneProcess.ContainerLevel;
+                    tripSegmentContainer.TripSegContainerLevel = driverContainerDoneProcess.ContainerLevel;
                     
                     //If latitude/longitude not provided from driver, use the lat/lon for the destination customer.
                     if (driverContainerDoneProcess.Latitude == null || driverContainerDoneProcess.Longitude == null)
                     {
-                        tripSegmentContainerRecord.TripSegContainerLatitude = destCustomerMaster.CustLatitude;
-                        tripSegmentContainerRecord.TripSegContainerLongitude = destCustomerMaster.CustLongitude;
+                        tripSegmentContainer.TripSegContainerLatitude = destCustomerMaster.CustLatitude;
+                        tripSegmentContainer.TripSegContainerLongitude = destCustomerMaster.CustLongitude;
                     }
                     else
                     {
-                        tripSegmentContainerRecord.TripSegContainerLatitude = driverContainerDoneProcess.Latitude;
-                        tripSegmentContainerRecord.TripSegContainerLongitude = driverContainerDoneProcess.Longitude;
+                        tripSegmentContainer.TripSegContainerLatitude = driverContainerDoneProcess.Latitude;
+                        tripSegmentContainer.TripSegContainerLongitude = driverContainerDoneProcess.Longitude;
                     }
                     //This indicates whether the container number was scanned or manually (hand-typed) entered.
-                    tripSegmentContainerRecord.TripSegContainerEntryMethod = driverContainerDoneProcess.MethodOfEntry;
+                    tripSegmentContainer.TripSegContainerEntryMethod = driverContainerDoneProcess.MethodOfEntry;
 
                      // The Review Flag and Reason contains either R=Review and the ReviewReason
                     // or E=Exception and the Exception Reason
                     if (driverContainerDoneProcess.ActionType == ActionTypeConstants.Exception ||
                         driverContainerDoneProcess.ActionType == ActionTypeConstants.Review)
                     {
-                        tripSegmentContainerRecord.TripSegContainerReviewFlag = driverContainerDoneProcess.ActionType;
-                        tripSegmentContainerRecord.TripSegContainerReviewReason = driverContainerDoneProcess.ActionCode
+                        tripSegmentContainer.TripSegContainerReviewFlag = driverContainerDoneProcess.ActionType;
+                        tripSegmentContainer.TripSegContainerReviewReason = driverContainerDoneProcess.ActionCode
                             + "-" + driverContainerDoneProcess.ActionDesc;
                     }
                     else
                     {
-                        tripSegmentContainerRecord.TripSegContainerReviewFlag = ActionTypeConstants.None;
+                        tripSegmentContainer.TripSegContainerReviewFlag = ActionTypeConstants.None;
                     }
 
                     // The purpose of this is field to indicate that processing of this container is complete.
                     // We used to remove all trip segment container records that are not complete.
                     // But we are not doing it that way in the new ScrapRunner.
-                    tripSegmentContainerRecord.TripSegContainerComplete = Constants.Yes;
+                    tripSegmentContainer.TripSegContainerComplete = Constants.Yes;
 
                     //For return to yard processing only...
-                    if (tripSegmentRecord.TripSegType == BasicTripTypeConstants.ReturnYard)
+                    if (currentTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard)
                     {
                         //Scale reference number can be captured at gross action or at both gross and tare actions.
-                        tripSegmentContainerRecord.TripScaleReferenceNumber = driverContainerDoneProcess.ScaleReferenceNumber;
+                        tripSegmentContainer.TripScaleReferenceNumber = driverContainerDoneProcess.ScaleReferenceNumber;
                         
                         //The ContainerLoaded flag is based on ContainerContents
                         if (driverContainerDoneProcess.ContainerContents == ContainerContentsConstants.Loaded)
                         {
-                            tripSegmentContainerRecord.TripSegContainerLoaded = Constants.Yes;
+                            tripSegmentContainer.TripSegContainerLoaded = Constants.Yes;
                         }
                         else
                         {
-                            tripSegmentContainerRecord.TripSegContainerLoaded = Constants.No;
+                            tripSegmentContainer.TripSegContainerLoaded = Constants.No;
                         }
 
                         //The TripSegContainerOnTruck is based on the SetInYardFlag flag
                         if (driverContainerDoneProcess.SetInYardFlag == Constants.Yes)
                         {
-                            tripSegmentContainerRecord.TripSegContainerOnTruck = Constants.Yes;
+                            //Set down
+                            tripSegmentContainer.TripSegContainerOnTruck = Constants.No;
+                        }
+                        else
+                        {
+                            //Left on Truck
+                            tripSegmentContainer.TripSegContainerOnTruck = Constants.Yes;
                         }
 
                         //Gross, 2nd gross (optional) and tare times and weights (optional)
-                        tripSegmentContainerRecord.WeightGrossDateTime = driverContainerDoneProcess.Gross1ActionDateTime;
-                        tripSegmentContainerRecord.TripSegContainerWeightGross = driverContainerDoneProcess.Gross1Weight;
-                        tripSegmentContainerRecord.WeightGross2ndDateTime = driverContainerDoneProcess.Gross2ActionDateTime;
-                        tripSegmentContainerRecord.TripSegContainerWeightGross2nd = driverContainerDoneProcess.Gross2Weight;
-                        tripSegmentContainerRecord.WeightTareDateTime = driverContainerDoneProcess.TareActionDateTime;
-                        tripSegmentContainerRecord.TripSegContainerWeightTare = driverContainerDoneProcess.TareWeight;
+                        tripSegmentContainer.WeightGrossDateTime = driverContainerDoneProcess.Gross1ActionDateTime;
+                        tripSegmentContainer.TripSegContainerWeightGross = driverContainerDoneProcess.Gross1Weight;
+                        tripSegmentContainer.WeightGross2ndDateTime = driverContainerDoneProcess.Gross2ActionDateTime;
+                        tripSegmentContainer.TripSegContainerWeightGross2nd = driverContainerDoneProcess.Gross2Weight;
+                        tripSegmentContainer.WeightTareDateTime = driverContainerDoneProcess.TareActionDateTime;
+                        tripSegmentContainer.TripSegContainerWeightTare = driverContainerDoneProcess.TareWeight;
                     }
 
                     //Do the update
-                    changeSetResult = Common.UpdateTripSegmentContainer(dataService, settings, tripSegmentContainerRecord);
-                    log.DebugFormat("SRTEST:Saving TripSegmentContainerRecord for ContainerNumber:{0} - Container Done.",
-                                    tripSegmentContainerRecord.TripSegContainerNumber);
-                    if (Common.LogChangeSetFailure(changeSetResult, tripSegmentContainerRecord, log))
+                    changeSetResult = Common.UpdateTripSegmentContainer(dataService, settings, tripSegmentContainer);
+                    log.DebugFormat("SRTEST:Saving TripSegmentContainer for ContainerNumber:{0} - Container Done.",
+                                    tripSegmentContainer.TripSegContainerNumber);
+                    if (Common.LogChangeSetFailure(changeSetResult, tripSegmentContainer, log))
                     {
-                        var s = string.Format("Could not update TripSegmentContainerRecord for ContainerNumber:{0}.",
-                                    tripSegmentContainerRecord.TripSegContainerNumber);
+                        var s = string.Format("Could not update TripSegmentContainer for ContainerNumber:{0}.",
+                                    tripSegmentContainer.TripSegContainerNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
                     }

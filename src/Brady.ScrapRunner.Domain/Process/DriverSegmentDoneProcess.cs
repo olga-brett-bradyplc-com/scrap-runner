@@ -21,7 +21,7 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string TripSegNumber { get; set; }
 
         /// The ActionDateTime from the phone. Required.
-        public virtual DateTime? ActionDateTime { get; set; }
+        public virtual DateTime ActionDateTime { get; set; }
 
         ///The power id from the phone. Required.
         public virtual string PowerId { get; set; }

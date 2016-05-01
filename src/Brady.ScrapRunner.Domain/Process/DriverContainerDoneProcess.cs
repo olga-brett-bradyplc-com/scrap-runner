@@ -21,13 +21,10 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string TripSegNumber { get; set; }
 
         /// The ActionDateTime. Required.
-        public virtual DateTime? ActionDateTime { get; set; }
+        public virtual DateTime ActionDateTime { get; set; }
 
         ///The power id. Required.
         public virtual string PowerId { get; set; }
-
-        ///The odometer. Required.
-        public virtual int Odometer { get; set; }
 
         /// Container Number.  Required.
         public virtual string ContainerNumber { get; set; }
@@ -51,7 +48,7 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string ContainerContents { get; set; }
 
         /// Container Level.  Optional.
-        public virtual int? ContainerLevel { get; set; }
+        public virtual short? ContainerLevel { get; set; }
 
         /// Latitude of the action.
         public virtual int? Latitude { get; set; }
