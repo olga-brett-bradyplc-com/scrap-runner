@@ -11,12 +11,14 @@ using MvvmCross.Core.ViewModels;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using Services;
+
     public class MenuViewModel : BaseViewModel
     {
-        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IConnectionService<OfflineCapableDataServiceClient> _connection;
         private readonly IQueueScheduler _queueScheduler;
 
-        public MenuViewModel(IConnectionService<DataServiceClient> connection, IQueueScheduler queueScheduler)
+        public MenuViewModel(IConnectionService<OfflineCapableDataServiceClient> connection, IQueueScheduler queueScheduler)
         {
             _connection = connection;
             _queueScheduler = queueScheduler;

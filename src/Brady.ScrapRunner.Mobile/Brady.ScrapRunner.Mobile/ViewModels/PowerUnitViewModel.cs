@@ -18,11 +18,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     using System.Linq;
     using Acr.UserDialogs;
     using MvvmCross.Core.ViewModels;
+    using Services;
     using Validators;
 
     public class PowerUnitViewModel : BaseViewModel
     {
-        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IConnectionService<OfflineCapableDataServiceClient> _connection;
         private readonly IRepository<PowerMasterModel> _powerMasterRepository;
         private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository;
         private readonly IRepository<DriverStatusModel> _driverStatusRepository;
@@ -31,7 +32,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository; 
 
         public PowerUnitViewModel( 
-            IConnectionService<DataServiceClient> connection,
+            IConnectionService<OfflineCapableDataServiceClient> connection,
             IRepository<PowerMasterModel> powerMasterRepository,
             IRepository<EmployeeMasterModel> employeeMasterRepository,
             IRepository<TripModel> tripRepository,

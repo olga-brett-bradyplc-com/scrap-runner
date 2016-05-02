@@ -1,19 +1,16 @@
-﻿using System;
-using System.Net;
-using Brady.ScrapRunner.Mobile.Interfaces;
-using BWF.DataServices.PortableClients;
-using BWF.DataServices.PortableClients.Interfaces;
-using MvvmCross.Platform.Core;
-
-namespace Brady.ScrapRunner.Mobile.Services
+﻿namespace Brady.ScrapRunner.Mobile.Services
 {
-    public class ConnectionService : IConnectionService<DataServiceClient>
+    using BWF.DataServices.PortableClients;
+    using BWF.DataServices.PortableClients.Interfaces;
+    using Interfaces;
+
+    public class ConnectionService : IConnectionService<OfflineCapableDataServiceClient>
     {
         private IDataServiceClient Connection { get; set; }
         
         public bool CreateConnection(string hosturl, string username, string password, string dataService = null)
         {
-            Connection = new DataServiceClient(hosturl, username, password, dataService);
+            Connection = new OfflineCapableDataServiceClient(hosturl, username, password, dataService);
             return true;
         }
 
@@ -26,9 +23,9 @@ namespace Brady.ScrapRunner.Mobile.Services
             }
         }
 
-        public DataServiceClient GetConnection()
+        public OfflineCapableDataServiceClient GetConnection()
         {
-            return (DataServiceClient) Connection;
+            return (OfflineCapableDataServiceClient) Connection;
         }
     }
 }
