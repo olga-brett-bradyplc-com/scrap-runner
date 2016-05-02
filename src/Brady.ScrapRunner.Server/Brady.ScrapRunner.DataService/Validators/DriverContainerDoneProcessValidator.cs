@@ -26,6 +26,7 @@ namespace Brady.ScrapRunner.DataService.Validators
             RuleFor(x => x.PowerId).NotEmpty();
             RuleFor(x => x.ContainerNumber).NotEmpty();
             RuleFor(x => x.ActionDateTime).NotEmpty();
+            RuleFor(x => x.ContainerContents).NotEmpty();
         }
     }
 }
