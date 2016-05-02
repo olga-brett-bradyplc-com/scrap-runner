@@ -2468,10 +2468,11 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
         /// <param name="driverId"></param>
+        /// <param name="tripNumber"></param>
         /// <param name="fault"></param>
         /// <returns>An empty Trip record if tripNumber is null or no record is found</returns>
         public static Trip GetNextTripForDriver(IDataService dataService, ProcessChangeSetSettings settings,
-              string userCulture, IEnumerable<long> userRoleIds, string driverId, out DataServiceFault fault)
+              string userCulture, IEnumerable<long> userRoleIds, string driverId, string tripNumber,out DataServiceFault fault)
         {
             fault = null;
             var trip = new Trip();
@@ -2483,7 +2484,8 @@ namespace Brady.ScrapRunner.DataService.Util
                     .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverId)
                     .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
                     .And().Property(x => x.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
-                    .And().Property(x => x.TripSendFlag).EqualTo(TripSendFlagValue.Ready))
+                    .And().Property(x => x.TripSendFlag).In(TripSendFlagValue.Ready, TripSendFlagValue.SentToDriver)
+                    .And().Property(x => x.TripNumber).NotEqualTo(tripNumber))
                     .OrderBy(x => x.TripSequenceNumber)
                     .GetQuery()
                 };

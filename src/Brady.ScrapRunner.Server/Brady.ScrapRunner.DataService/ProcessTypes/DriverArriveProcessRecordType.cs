@@ -286,10 +286,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
 
                             //Remove these since container has not yet been set down, still on the move.
-                            containerMaster.ContainerPendingMoveDateTime = null;
                             containerMaster.ContainerLocation = null;
                             containerMaster.ContainerLatitude = null;
                             containerMaster.ContainerLongitude = null;
+
+                            //Do not change on an arrive
+                            //containerMaster.ContainerPendingMoveDateTime;
 
                             //Now that the driver has arrived on a RT segment, remove the Inbound terminal.
                             if (currentTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard)
