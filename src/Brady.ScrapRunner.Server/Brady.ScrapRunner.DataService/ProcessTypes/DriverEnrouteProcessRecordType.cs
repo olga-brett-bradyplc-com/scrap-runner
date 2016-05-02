@@ -296,10 +296,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
 
                             //Remove these since container is now on the move
-                            containerMaster.ContainerPendingMoveDateTime = null;
                             containerMaster.ContainerLocation = null;
                             containerMaster.ContainerLatitude = null;
                             containerMaster.ContainerLongitude = null;
+
+                            //Do not change on an enroute
+                            //containerMaster.ContainerPendingMoveDateTime;
 
                             //When the driver goes enroute on a RT segment, set the Inbound terminal to the serving
                             //terminal of the destination customer. This will be removed when the driver arrives.
@@ -553,7 +555,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         currentTrip.TripPrimaryCommodityDesc = currentTripSegment.TripSegPrimaryContainerCommodityDesc;
                         currentTrip.TripPrimaryContainerLocation = currentTripSegment.TripSegPrimaryContainerLocation;
                     }
-                    currentTrip.TripStartedDateTime = currentTripSegment.TripSegStartDateTime;
+                    //Only set the trip start time if this is the first segment
+                    if (currentTripSegment.TripSegNumber == Constants.FirstSegment)
+                    {
+                        currentTrip.TripStartedDateTime = currentTripSegment.TripSegStartDateTime;
+                    }
+
                     if (currentTripSegment.TripSegContainerQty > 1)
                     {
                         currentTrip.TripMultContainerFlag = Constants.Yes;
@@ -563,6 +570,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         currentTrip.TripMultContainerFlag = Constants.No;
                     }
                     currentTrip.TripInProgressFlag = Constants.Yes;
+
+                    //TODO: Set the flag to send the scale notice, if applicable.
+                    //Check if this enroute is returning to yard after picking up or loading a commodity
 
                     //Do the update
                     changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);

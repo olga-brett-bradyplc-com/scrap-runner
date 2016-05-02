@@ -278,8 +278,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         containerMaster.ContainerCustHostCode = currentTripSegment.TripSegDestCustHostCode;
                         containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
 
-                        //TODO: Check code. Determine when and where this should be set to null
-                        containerMaster.ContainerPendingMoveDateTime = null;
+                        //Do not change on an when container is processed. 
+                        //Although it seems like we should, if segment type is PF,PE,LD,UL,RS...
+                        //and action type for this container was not an exception
+                        //but this is not how it is done in the current ScrapRunner.
+                        //containerMaster.ContainerPendingMoveDateTime;
 
                         //Only update these if there are values present.
                         if (driverContainerDoneProcess.CommodityCode != null && driverContainerDoneProcess.CommodityDesc != null)
