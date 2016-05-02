@@ -14,13 +14,18 @@
             CreateMap<Preference, PreferenceModel>();
             CreateMap<PowerMaster, PowerMasterModel>();
             CreateMap<Trip, TripModel>();
-            CreateMap<TripSegment, TripSegmentModel>();
-            CreateMap<CustomerLocation, CustomerLocationModel>();
-            CreateMap<CustomerCommodity, CustomerCommodityModel>();
-            CreateMap<CustomerDirections, CustomerDirectionsModel>();
+            CreateMap<TripSegment, TripSegmentModel>()
+                .ForMember(m => m.CompositeKey, o => o.Ignore());
+            CreateMap<CustomerLocation, CustomerLocationModel>()
+                .ForMember(m => m.CompositeKey, o => o.Ignore());
+            CreateMap<CustomerCommodity, CustomerCommodityModel>()
+                .ForMember(m => m.CompositeKey, o => o.Ignore());
+            CreateMap<CustomerDirections, CustomerDirectionsModel>()
+                .ForMember(m => m.CompositeId, o => o.Ignore());
             // @TODO: TripSegComments cannot be mapped. We are probably using the wrong property here.
             CreateMap<TripSegmentContainer, TripSegmentContainerModel>()
-                .ForMember(tsc => tsc.TripSegComments, opt => opt.Ignore());
+                .ForMember(m => m.TripSegComments, o => o.Ignore())
+                .ForMember(m => m.CompositeKey, o => o.Ignore());
         }
     }
 }
