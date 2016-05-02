@@ -50,21 +50,26 @@
             return _connectionService.GetConnection().KillLiveQueryAsync(queryId);
         }
 
-        public Task<ChangeResultWithItem<T>> CreateAsync<T>(T item, string dataService = null, bool requeryCreated = true)
+        public async Task<ChangeResultWithItem<T>> CreateAsync<T>(T item, string dataService = null, bool requeryCreated = true)
         {
-            // @TODO: Add Offline support
-            return _connectionService.GetConnection().CreateAsync(item, dataService, requeryCreated);
+            if (_networkAvailabilityService.IsNetworkConnectionAvailable())
+            {
+                var response = await _connectionService.GetConnection().CreateAsync(item, dataService, requeryCreated);
+                if (response.WasSuccessful) return response;
+            }
+            var queueItem = GetQueueItemModel(item, QueueItemVerb.Create, dataService);
+            await _queueItemRepository.InsertAsync(queueItem);
+            return new ChangeResultWithItem<T>();
         }
 
         public async Task<ChangeResultWithItem<T>> UpdateAsync<T>(T item, string dataService = null, bool requeryUpdated = true)
         {
             if (_networkAvailabilityService.IsNetworkConnectionAvailable())
             {
-                // @TODO: Don't return if call fails for recoverable reason.
                 var response = await _connectionService.GetConnection().UpdateAsync(item, dataService, requeryUpdated);
-                return response;
+                if (response.WasSuccessful) return response;
             }
-            var queueItem = GetQueueItemModel(item, QueueItemVerb.Delete);
+            var queueItem = GetQueueItemModel(item, QueueItemVerb.Update, dataService);
             await _queueItemRepository.InsertAsync(queueItem);
             return new ChangeResultWithItem<T>();
         }
@@ -117,15 +122,15 @@
             return _connectionService.GetConnection().QueryAsync(queryBuilder, dataService);
         }
 
-        private QueueItemModel GetQueueItemModel<T>(T obj, QueueItemVerb verb)
+        private QueueItemModel GetQueueItemModel<T>(T obj, QueueItemVerb verb, string dataService)
         {
             return new QueueItemModel
             {
                 RecordType = obj.GetType().ToString(),
                 SerializedRecord = _jsonConverter.SerializeObject(obj),
-                Verb = verb
+                Verb = verb,
+                DataService = dataService
             };
-
         }
     }
 }

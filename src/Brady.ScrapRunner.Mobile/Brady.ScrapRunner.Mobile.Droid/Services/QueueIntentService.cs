@@ -13,6 +13,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
     {
         private bool _inProgress;
         private INetworkAvailabilityService _networkAvailabilityService;
+        private IQueueService _queueService;
 
         public override void OnCreate()
         {
@@ -24,6 +25,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                 var setupSingleton = MvxAndroidSetupSingleton.EnsureSingletonAvailable(ApplicationContext);
                 setupSingleton.EnsureInitialized(); // Can rarely throw MvxException.
                 _networkAvailabilityService = Mvx.Resolve<INetworkAvailabilityService>();
+                _queueService = Mvx.Resolve<IQueueService>();
             }
             catch (MvxException)
             {
@@ -32,7 +34,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
             }
         }
 
-        protected override void OnHandleIntent(Intent intent)
+        protected override async void OnHandleIntent(Intent intent)
         {
             if (_inProgress) return;
             if (_networkAvailabilityService == null)
@@ -45,7 +47,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
             {
                 if (!_networkAvailabilityService.IsNetworkConnectionAvailable()) return;
                 _inProgress = true;
-                // @TODO: Try to empty queue here.
+                await _queueService.ProcessQueueAsync();
             }
             finally
             {
