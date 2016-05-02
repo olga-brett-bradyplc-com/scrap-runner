@@ -14,10 +14,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class MenuViewModel : BaseViewModel
     {
         private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IQueueScheduler _queueScheduler;
 
-        public MenuViewModel(IConnectionService<DataServiceClient> connection)
+        public MenuViewModel(IConnectionService<DataServiceClient> connection, IQueueScheduler queueScheduler)
         {
             _connection = connection;
+            _queueScheduler = queueScheduler;
         }
 
         private MvxCommand _logoutCommand;
@@ -30,6 +32,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (logoutDialog)
             {
+                _queueScheduler.Unschedule();
                 _connection.DeleteConnection();
                 ShowViewModel<SignInViewModel>();
             }

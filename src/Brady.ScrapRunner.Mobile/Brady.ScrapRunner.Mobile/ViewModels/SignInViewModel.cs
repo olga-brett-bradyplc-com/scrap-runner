@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using Acr.UserDialogs;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using MvvmCross.Core.ViewModels;
-using MvvmCross.Plugins.Sqlite;
 using Brady.ScrapRunner.Mobile.Resources;
 using Brady.ScrapRunner.Mobile.Services;
 using Brady.ScrapRunner.Mobile.Validators;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using MvvmCross.Platform;
 
     public class SignInViewModel : BaseViewModel
     {
@@ -21,13 +21,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ITripService _tripService;
         private readonly ICustomerService _customerService;
         private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IQueueScheduler _queueScheduler;
 
         public SignInViewModel(
             IDbService dbService,
             IPreferenceService preferenceService,
             ITripService tripService,
             ICustomerService customerService,
-            IConnectionService<DataServiceClient> connection)
+            IConnectionService<DataServiceClient> connection, 
+            IQueueScheduler queueScheduler)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -35,6 +37,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _customerService = customerService;
 
             _connection = connection;
+            _queueScheduler = queueScheduler;
             Title = AppResources.SignInTitle;
             SignInCommand = new MvxCommand(ExecuteSignInCommand, CanExecuteSignInCommand);
         }
@@ -106,12 +109,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (!signInResult)
                     return;
 
+                _queueScheduler.Schedule(60 * 1000);
                 Close(this);
                 ShowViewModel<RouteSummaryViewModel>();
             }
             catch (Exception exception)
             {
-                var message = exception?.InnerException?.Message ?? exception.Message;
+                var message = exception.InnerException?.Message ?? exception.Message;
                 await UserDialogs.Instance.AlertAsync(
                     message, AppResources.Error, AppResources.OK);
             }
@@ -135,6 +139,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 IClientSettings clientSettings = new DemoClientSettings();
                 var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
+                if (!connectionCreated) Mvx.Warning("Failed to create connection.");
 
                 var loginProcessObj = new DriverLoginProcess
                 {
