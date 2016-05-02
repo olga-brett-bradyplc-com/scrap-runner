@@ -84,6 +84,7 @@
     <Compile Include="Services\OfflineCapableDataServiceClient.cs" />
     <Compile Include="Services\PreferenceService.cs" />
     <Compile Include="Services\DbService.cs" />
+    <Compile Include="Services\QueueService.cs" />
     <Compile Include="Services\TripService.cs" />
     <Compile Include="StringResourceConverter.cs" />
     <Compile Include="Validators\OdometerRangeValidator.cs" />

@@ -5,6 +5,6 @@
     public interface IQueueService
     {
         Task ProcessQueueAsync();
-        bool IsEmpty { get; }
+        Task<bool> IsEmptyAsync();
     }
 }
