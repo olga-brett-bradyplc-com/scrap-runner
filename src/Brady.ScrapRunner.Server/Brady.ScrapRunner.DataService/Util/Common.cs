@@ -28,16 +28,20 @@ namespace Brady.ScrapRunner.DataService.Util
         /// Return driver's cumulative time in minutes.
         /// </summary>
         /// <param name="tripSegList"></param>
+        /// <param name="currentTripSegment"></param>
         /// <returns>null if tripSegList is null </returns>
-        public static int GetDriverCumulativeTime(List<TripSegment> tripSegList)
+        public static int GetDriverCumulativeTime(List<TripSegment> tripSegList,TripSegment currentTripSegment)
         {
             int driverTime = 0;
             if (null != tripSegList)
             {
-                foreach (var segment in tripSegList)
+                driverTime = (int)(from t in tripSegList
+                             select (t.TripSegStandardDriveMinutes + t.TripSegStandardStopMinutes)).ToList().Sum();
+
+                if (null != currentTripSegment)
                 {
-                    driverTime += segment.TripSegStandardDriveMinutes.GetValueOrDefault();
-                    driverTime += segment.TripSegStandardStopMinutes.GetValueOrDefault();
+                    driverTime -= (int)currentTripSegment.TripSegStandardDriveMinutes;
+                    driverTime -= (int)currentTripSegment.TripSegStandardStopMinutes;
                 }
             }
             return driverTime;
@@ -323,21 +327,29 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             string tripTypeBasicDesc = tripTypeBasic?.TripTypeDesc;
 
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the LastActionDateTime in the ContainerMaster table 
-            //This will be the original value, since change has not been committed.
-            var origContainerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
-                                containerMaster.ContainerNumber, out fault);
-            if (null != fault)
+            //Only calculate days at site when a container is picked up at a customer site
+            int? daysAtSite = null;
+            if (containerMaster.ContainerCurrentTripSegType == BasicTripTypeConstants.PickupFull ||
+                containerMaster.ContainerCurrentTripSegType == BasicTripTypeConstants.PickupEmpty)
             {
-                return false;
-            }
-
-            int daysAtSite = 0;
-            if (containerMaster.ContainerLastActionDateTime != null && origContainerMaster.ContainerLastActionDateTime != null)
-            {
-                daysAtSite = (int)(containerMaster.ContainerLastActionDateTime.Value.Subtract
-                                  (origContainerMaster.ContainerLastActionDateTime.Value).TotalDays);
+                //Container has to be on the truck (not an exception)
+                if (containerMaster.ContainerPowerId != null)
+                {
+                    //////////////////////////////////////////////////////////////////////////////////////
+                    //Lookup the LastActionDateTime in the ContainerMaster table 
+                    //This will be the original value, since change has not been committed.
+                    var origContainerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
+                                        containerMaster.ContainerNumber, out fault);
+                    if (null != fault)
+                    {
+                        return false;
+                    }
+                    if (origContainerMaster.ContainerLastActionDateTime != null && containerMaster.ContainerLastActionDateTime != null)
+                    {
+                        daysAtSite = (int)(containerMaster.ContainerLastActionDateTime.Value.Subtract
+                                          (origContainerMaster.ContainerLastActionDateTime.Value).TotalDays);
+                    }
+                }
             }
 
             var containerHistory = new ContainerHistory()
@@ -1536,7 +1548,6 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="settings"></param>
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
-        /// <param name="dateTime"></param>
         /// <param name="powerId"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if powerId is null or no entries are found</returns>
@@ -1563,6 +1574,41 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return containers;
         }
+        /// CONTAINERMASTER Table queries
+        /// <summary>
+        ///  Get a list of containers from the container master that are on a given trip number
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="containerNumberList"></param>List of containernumbers
+        /// <param name="fault"></param>
+        /// <returns>An empty list if powerId is null or no entries are found</returns>
+        public static List<ContainerMaster> GetContainersForTrip(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, List<string> containerNumberList, out DataServiceFault fault)
+        {
+            fault = null;
+            var containers = new List<ContainerMaster>();
+            if (null != containerNumberList)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<ContainerMaster>()
+                    .Filter(y => y.Property(x => x.ContainerNumber).In(containerNumberList.ToArray()))
+                    .OrderBy(x => x.ContainerNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return containers;
+                }
+                containers = queryResult.Records.Cast<ContainerMaster>().ToList();
+            }
+            return containers;
+        }
+
         /// CUSTOMERDIRECTIONS queries
         /// <summary>
         ///  Get a list of directions for each destination custhostcode to be sent to a given driver.
@@ -2414,6 +2460,46 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         /// TRIP Table  queries
         /// <summary>
+        ///  Get the next trip record for a given driver id.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty Trip record if tripNumber is null or no record is found</returns>
+        public static Trip GetNextTripForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string driverId, string tripNumber,out DataServiceFault fault)
+        {
+            fault = null;
+            var trip = new Trip();
+            if (null != driverId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Trip>()
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverId)
+                    .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
+                    .And().Property(x => x.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
+                    .And().Property(x => x.TripSendFlag).In(TripSendFlagValue.Ready, TripSendFlagValue.SentToDriver)
+                    .And().Property(x => x.TripNumber).NotEqualTo(tripNumber))
+                    .OrderBy(x => x.TripSequenceNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return trip;
+                }
+                trip = queryResult.Records.Cast<Trip>().FirstOrDefault();
+            }
+            return trip;
+        }
+        /// TRIP Table  queries
+        /// <summary>
         ///  Get the trip record for a given trip number.
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
@@ -2614,6 +2700,42 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         /// TRIPSEGMENT queries
         /// <summary>
+        ///  Get a list of all trip segments for a given trip.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if tripNumber is null or no entries are found</returns>
+        public static List<TripSegment> GetTripSegments(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripSegments = new List<TripSegment>();
+            if (null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripSegment>()
+                    .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripNumber))
+                    .OrderBy(x => x.TripSegNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripSegments;
+                }
+                tripSegments = queryResult.Records.Cast<TripSegment>().ToList();
+            }
+            return tripSegments;
+        }
+   
+        /// TRIPSEGMENT queries
+        /// <summary>
         ///  Get a list of trip segments to be sent to a given driver for a given trip.
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
@@ -2688,7 +2810,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
         /// TRIPSEGMENTCONTAINER queries
         /// <summary>
-        ///  Get a list of trip segment containers to be sent to a given driver for a given trip.
+        ///  Get a list of trip containers  for a given trip.
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
         /// <param name="dataService"></param>
@@ -2702,7 +2824,7 @@ namespace Brady.ScrapRunner.DataService.Util
               string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
         {
             fault = null;
-            var tripSegmentContainers = new List<TripSegmentContainer>();
+            var tripContainers = new List<TripSegmentContainer>();
             if (null != tripNumber)
             {
                 Query query = new Query
@@ -2715,11 +2837,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                 if (null != fault)
                 {
-                    return tripSegmentContainers;
+                    return tripContainers;
                 }
-                tripSegmentContainers = queryResult.Records.Cast<TripSegmentContainer>().ToList();
+                tripContainers = queryResult.Records.Cast<TripSegmentContainer>().ToList();
             }
-            return tripSegmentContainers;
+            return tripContainers;
         }
         /// TRIPSEGMENTCONTAINER queries
         /// <summary>

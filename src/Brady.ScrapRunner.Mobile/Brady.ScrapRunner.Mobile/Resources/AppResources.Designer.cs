@@ -269,6 +269,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loading Preferences.
+        /// </summary>
+        public static string LoadingPreferences {
+            get {
+                return ResourceManager.GetString("LoadingPreferences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading Trip Data.
         /// </summary>
         public static string LoadingTripData {

@@ -18,7 +18,7 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string TripNumber { get; set; }
 
         /// The ActionDateTime from the phone. Required.
-        public virtual DateTime? ActionDateTime { get; set; }
+        public virtual DateTime ActionDateTime { get; set; }
 
         /// Currently this is the driver id. Probably will not be needed in the future.
         public virtual string Mdtid { get; set; }

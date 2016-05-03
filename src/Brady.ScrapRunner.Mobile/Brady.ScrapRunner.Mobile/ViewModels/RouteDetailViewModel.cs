@@ -1,30 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Enums;
 using Brady.ScrapRunner.Mobile.Helpers;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Models;
+using MvvmCross.Core.ViewModels;
+using Brady.ScrapRunner.Mobile.Resources;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using Acr.UserDialogs;
-    using Interfaces;
-    using Models;
-    using MvvmCross.Core.ViewModels;
-    using Resources;
-
-    // This is still a work in progress
+    
     public class RouteDetailViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
+        private readonly IDriverService _driverService;
+
         private string _custHostCode;
         private string _enrouteLabel;
         private string _arriveLabel;
 
-        public RouteDetailViewModel(ITripService tripService)
+        public RouteDetailViewModel(ITripService tripService, IDriverService driverService)
         {
             _tripService = tripService;
+            _driverService = driverService;
             DirectionsCommand = new MvxCommand(ExecuteDrivingDirectionsCommand);
             EnRouteCommand = new MvxCommand(ExecuteEnRouteCommand);
             ArriveCommand = new MvxCommand(ExecuteArriveCommand);
@@ -176,8 +178,32 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmEnrouteTitle);
             if (confirm)
             {
-                CurrentStatus = "EN"; //DriverStatusConstants.EnRoute;
-                MenuFilter = MenuFilterEnum.OnTrip;
+
+                var currentDriver = await _driverService.GetCurrentDriverStatus();
+
+                using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
+                {
+                    var setDriverEnroute = await _driverService.SetDriverEnroute(new DriverEnrouteProcess
+                    {
+                        EmployeeId = currentDriver.EmployeeId,
+                        PowerId = currentDriver.PowerId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = "01",
+                        ActionDateTime = DateTime.Now,
+                        Odometer = currentDriver.Odometer ?? default(int),
+                    });
+
+                    if (setDriverEnroute.WasSuccessful)
+                    {
+                        CurrentStatus = DriverStatusConstants.Enroute;
+                        MenuFilter = MenuFilterEnum.OnTrip;
+                    }
+                    else
+                    {
+                        await UserDialogs.Instance.AlertAsync(setDriverEnroute.Failure.Summary,
+                            AppResources.Error, AppResources.OK);
+                    }
+                }
             }
         }
 
@@ -192,7 +218,30 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmArrivalTitle);
             if (confirm)
             {
-                CurrentStatus = "AR"; //DriverStatusConstants.Arrive;
+                var currentDriver = await _driverService.GetCurrentDriverStatus();
+
+                using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
+                {
+                    var setDriverArrived = await _driverService.SetDriverArrived(new DriverArriveProcess
+                    {
+                        EmployeeId = currentDriver.EmployeeId,
+                        PowerId = currentDriver.PowerId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = "01",
+                        ActionDateTime = DateTime.Now,
+                        Odometer = currentDriver.Odometer ?? default(int),
+                    });
+
+                    if (setDriverArrived.WasSuccessful)
+                    {
+                        CurrentStatus = DriverStatusConstants.Arrive;
+                    }
+                    else
+                    {
+                        await UserDialogs.Instance.AlertAsync(setDriverArrived.Failure.Summary,
+                            AppResources.Error, AppResources.OK);
+                    }
+                }
             }
         }
 
