@@ -42,7 +42,8 @@
         public static readonly string Done = "D";
         public static readonly string Review = "R";
         public static readonly string Exception = "E";
-        public static readonly string None = "N";
+        public static readonly string Load = "L";
+        public static readonly string Dropped = "S";
     }
     /// <summary>
     /// The Basic Trip Type internal codes.  Used in the TripTypeBasic table.
