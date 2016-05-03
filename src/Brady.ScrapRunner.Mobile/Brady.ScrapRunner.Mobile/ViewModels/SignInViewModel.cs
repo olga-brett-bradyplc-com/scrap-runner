@@ -146,20 +146,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
-                var loginProcessObj = new DriverLoginProcess
-                {
-                    EmployeeId = UserName,
-                    Password = Password,
-                    PowerId = TruckId,
-                    Odometer = Odometer,
-                    LocaleCode = 1033,
-                    OverrideFlag = "N",
-                    Mdtid = "Phone",
-                    LoginDateTime = DateTime.Now
-                };
-
-                var loginProcess =
-                    await _connection.GetConnection().UpdateAsync(loginProcessObj, requeryUpdated: false);
+                var loginProcess = await _connection.GetConnection().UpdateAsync(
+                    new DriverLoginProcess {
+                        EmployeeId = UserName,
+                        Password = Password,
+                        PowerId = TruckId,
+                        Odometer = Odometer,
+                        LocaleCode = 1033,
+                        OverrideFlag = "N",
+                        Mdtid = "Phone",
+                        LoginDateTime = DateTime.Now
+                    }, requeryUpdated: false);
 
                 if (loginProcess.WasSuccessful)
                 {
