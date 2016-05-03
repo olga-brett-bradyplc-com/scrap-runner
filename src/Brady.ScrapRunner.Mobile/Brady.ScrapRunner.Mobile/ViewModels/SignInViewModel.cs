@@ -1,9 +1,13 @@
 ﻿using Brady.ScrapRunner.Domain.Process;
 using BWF.DataServices.PortableClients;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Plugins.Sqlite;
@@ -20,6 +24,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IPreferenceService _preferenceService;
         private readonly ITripService _tripService;
         private readonly ICustomerService _customerService;
+        private readonly IDriverService _driverService;
+        private readonly IContainerService _containerService;
         private readonly IConnectionService<DataServiceClient> _connection;
 
         public SignInViewModel(
@@ -27,12 +33,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IPreferenceService preferenceService,
             ITripService tripService,
             ICustomerService customerService,
+            IDriverService driverService,
+            IContainerService containerService,
             IConnectionService<DataServiceClient> connection)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
             _tripService = tripService;
             _customerService = customerService;
+            _driverService = driverService;
+            _containerService = containerService;
 
             _connection = connection;
             Title = AppResources.SignInTitle;
@@ -136,24 +146,37 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
-                var loginProcessObj = new DriverLoginProcess
-                {
-                    EmployeeId = UserName,
-                    Password = Password,
-                    PowerId = TruckId,
-                    Odometer = Odometer,
-                    LocaleCode = 1033,
-                    OverrideFlag = "N",
-                    Mdtid = "Phone",
-                    LoginDateTime = DateTime.Now
-                };
-
-                var loginProcess =
-                    await _connection.GetConnection().UpdateAsync(loginProcessObj, requeryUpdated: false);
+                var loginProcess = await _connection.GetConnection().UpdateAsync(
+                    new DriverLoginProcess {
+                        EmployeeId = UserName,
+                        Password = Password,
+                        PowerId = TruckId,
+                        Odometer = Odometer,
+                        LocaleCode = 1033,
+                        OverrideFlag = "N",
+                        Mdtid = "Phone",
+                        LoginDateTime = DateTime.Now
+                    }, requeryUpdated: false);
 
                 if (loginProcess.WasSuccessful)
                 {
-                    var temp = loginProcess.Item;
+                    await _containerService.UpdateContainerMaster(loginProcess.Item.ContainersOnPowerId);
+
+                    await _driverService.UpdateDriverStatus(new DriverStatus
+                    {
+                        EmployeeId = loginProcess.Item.EmployeeId,
+                        Status = DriverStatusSRConstants.LoggedIn,
+                        TerminalId = loginProcess.Item.TermId,
+                        PowerId = loginProcess.Item.PowerId,
+                        RegionId = loginProcess.Item.RegionId,
+                        MDTId = loginProcess.Item.Mdtid,
+                        LoginDateTime = loginProcess.Item.LoginDateTime,
+                        ActionDateTime = loginProcess.Item.LoginDateTime,
+                        //DriverCumMinutes = loginProcess.Item.DriverCumlMinutes @TODO Should this be sent in login process?
+                        Odometer = loginProcess.Item.Odometer,
+                        LoginProcessedDateTime = loginProcess.Item.LoginDateTime,
+                        DriverLCID = loginProcess.Item.LocaleCode
+                    });
                 }
                 else
                 {
@@ -162,25 +185,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
-                loginData.Title = "Loading Preferences";
+                loginData.Title = AppResources.LoadingPreferences;
 
-                var preferenceObj = new PreferencesProcess
-                {
-                    EmployeeId = UserName
-                };
+                    var preferenceObj = new PreferencesProcess
+                    {
+                        EmployeeId = UserName
+                    };
 
-                var preferenceProcess = await _connection.GetConnection().UpdateAsync(preferenceObj, requeryUpdated: false);
+                    var preferenceProcess = await _connection.GetConnection().UpdateAsync(preferenceObj, requeryUpdated: false);
 
-                if (preferenceProcess.WasSuccessful)
-                {
-                    await _preferenceService.UpdatePreferences(preferenceProcess.Item.Preferences);
-                }
-                else
-                {
-                    await UserDialogs.Instance.AlertAsync(preferenceProcess.Failure.Summary,
-                        AppResources.Error, AppResources.OK);
-                    return false;
-                }
+                    if (preferenceProcess.WasSuccessful)
+                    {
+                        await _preferenceService.UpdatePreferences(preferenceProcess.Item.Preferences);
+                    }
+                    else
+                    {
+                        await UserDialogs.Instance.AlertAsync(preferenceProcess.Failure.Summary,
+                            AppResources.Error, AppResources.OK);
+                        return false;
+                    }
 
                 loginData.Title = AppResources.LoadingTripInformation;
 
@@ -191,35 +214,34 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 var tripProcess = await _connection.GetConnection().UpdateAsync(tripObj, requeryUpdated: false);
 
-                if (tripProcess.WasSuccessful)
-                {
-                    
-                    // @TODO : Should we throw an error/alert dialog to the end user if any of these fail?
+                    if (tripProcess.WasSuccessful)
+                    {
+                        // @TODO : Should we throw an error/alert dialog to the end user if any of these fail?
 
-                    if( tripProcess.Item?.Trips?.Count > 0 )
-                        await _tripService.UpdateTrips(tripProcess.Item.Trips);
+                        if( tripProcess.Item?.Trips?.Count > 0 )
+                            await _tripService.UpdateTrips(tripProcess.Item.Trips);
 
-                    if(tripProcess.Item?.TripSegments?.Count > 0)
-                        await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
+                        if(tripProcess.Item?.TripSegments?.Count > 0)
+                            await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
 
-                    if(tripProcess.Item?.TripSegmentContainers?.Count > 0)
-                        await _tripService.UpdateTripSegmentContainers(tripProcess.Item.TripSegmentContainers);
+                        if(tripProcess.Item?.TripSegmentContainers?.Count > 0)
+                            await _tripService.UpdateTripSegmentContainers(tripProcess.Item.TripSegmentContainers);
 
-                    if(tripProcess.Item?.CustomerCommodities?.Count > 0)
-                        await _customerService.UpdateCustomerCommodity(tripProcess.Item.CustomerCommodities);
+                        if(tripProcess.Item?.CustomerCommodities?.Count > 0)
+                            await _customerService.UpdateCustomerCommodity(tripProcess.Item.CustomerCommodities);
 
-                    if(tripProcess.Item?.CustomerDirections?.Count > 0)
-                        await _customerService.UpdateCustomerDirections(tripProcess.Item.CustomerDirections);
+                        if(tripProcess.Item?.CustomerDirections?.Count > 0)
+                            await _customerService.UpdateCustomerDirections(tripProcess.Item.CustomerDirections);
 
-                    if(tripProcess.Item?.CustomerLocations?.Count > 0)
-                        await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
-                }
-                else
-                {
-                    await UserDialogs.Instance.AlertAsync(tripProcess.Failure.Summary,
-                        AppResources.Error, AppResources.OK);
-                    return false;
-                }
+                        if(tripProcess.Item?.CustomerLocations?.Count > 0)
+                            await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
+                    }
+                    else
+                    {
+                        await UserDialogs.Instance.AlertAsync(tripProcess.Failure.Summary,
+                            AppResources.Error, AppResources.OK);
+                        return false;
+                    }
 
             }
             return true;
