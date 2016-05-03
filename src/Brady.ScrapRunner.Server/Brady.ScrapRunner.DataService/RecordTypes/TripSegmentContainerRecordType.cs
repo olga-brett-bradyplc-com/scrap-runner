@@ -32,7 +32,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             return new TripSegmentContainer
             {
                 TripNumber = identityValues[0],
-                TripSegContainerSeqNumber = int.Parse(identityValues[1]),
+                TripSegContainerSeqNumber = short.Parse(identityValues[1]),
                 TripSegNumber = identityValues[2]
             };
  

@@ -139,14 +139,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Get the Trip record
-                    var tripRecord = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
+                    var currentTrip = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
                                                   driverTripAckProcess.TripNumber, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    if (null == tripRecord)
+                    if (null == currentTrip)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: "
                                         + driverTripAckProcess.TripNumber));
@@ -155,7 +155,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Check if trip is complete
-                    if (Common.IsTripComplete(tripRecord))
+                    if (Common.IsTripComplete(currentTrip))
                     {
                         log.DebugFormat("SRTEST:TripNumber:{0} is Complete. TripAck processing ends.",
                                         driverTripAckProcess.TripNumber);
@@ -163,26 +163,26 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     //Set the Trip assign status to A=Acknowledged.
-                    tripRecord.TripAssignStatus = TripAssignStatusConstants.Acked;
+                    currentTrip.TripAssignStatus = TripAssignStatusConstants.Acked;
 
                     //Lookup the TripAssignStatus Description in the CodeTable TRIPASSIGNSTATUS 
                     var codeTableTripAssignStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
-                                                 CodeTableNameConstants.TripAssignStatus, tripRecord.TripAssignStatus, out fault);
+                                                 CodeTableNameConstants.TripAssignStatus, currentTrip.TripAssignStatus, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    tripRecord.TripAssignStatusDesc = codeTableTripAssignStatus?.CodeDisp1;
+                    currentTrip.TripAssignStatusDesc = codeTableTripAssignStatus?.CodeDisp1;
 
                     //Do the update
-                    changeSetResult = Common.UpdateTrip(dataService, settings, tripRecord);
+                    changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
                     log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Trip Ack.",
-                                    tripRecord.TripNumber);
-                    if (Common.LogChangeSetFailure(changeSetResult, tripRecord, log))
+                                    currentTrip.TripNumber);
+                    if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
                     {
                         var s = string.Format("Could not update Trip for Trip:{0}.",
-                            tripRecord.TripNumber);
+                            currentTrip.TripNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
                     }
@@ -194,6 +194,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     sbComment.Append(driverTripAckProcess.ActionDateTime);
                     sbComment.Append(" Trip:");
                     sbComment.Append(driverTripAckProcess.TripNumber);
+                    sbComment.Append(" Drv:");
+                    sbComment.Append(driverTripAckProcess.EmployeeId);
                     string comment = sbComment.ToString().Trim();
 
                     var eventLog = new EventLog()

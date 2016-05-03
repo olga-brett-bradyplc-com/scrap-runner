@@ -58,7 +58,7 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string DriverStatus { get; set; }
         
         /// The LoginDateTime from the phone.  (Q: Why shoud we trust the client or whe do we backfill on server side?)
-        public virtual DateTime? LoginDateTime { get; set; }
+        public virtual DateTime LoginDateTime { get; set; }
 
         /// The ContainerMasterDateTime from the phone. Will now be sent to ContainerChangeProcess. 
         ///public virtual DateTime? ContainerMasterDateTime { get; set; }
