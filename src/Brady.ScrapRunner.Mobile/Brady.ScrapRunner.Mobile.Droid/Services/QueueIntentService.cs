@@ -36,11 +36,16 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
 
         protected override async void OnHandleIntent(Intent intent)
         {
-            if (_inProgress) return;
+            if (_inProgress)
+            {
+                Mvx.Warning("QueueIntentService.OnHandleIntent: Operation is still in progress.");
+                return;
+            }
             if (_networkAvailabilityService == null)
             {
                 // If MvxException was caught in OnCreate() then MvvmCross IoC won't work. 
                 // Just exit and try again next time.
+                Mvx.Warning("QueueIntentService.OnHandleIntent: Failed to resolve INetworkAvailabilityService");
                 return;
             }
             try

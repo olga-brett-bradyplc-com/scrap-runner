@@ -25,6 +25,8 @@
             _dataServiceClient = new DataServiceClient(hosturl, username, password, dataService);
         }
 
+        public IDataServiceClient DataServiceClient => _dataServiceClient;
+
         public void Dispose()
         {
             _dataServiceClient.Dispose();
