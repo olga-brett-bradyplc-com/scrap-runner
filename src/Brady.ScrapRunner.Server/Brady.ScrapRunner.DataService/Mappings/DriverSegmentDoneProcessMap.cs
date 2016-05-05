@@ -11,7 +11,7 @@ using Brady.ScrapRunner.Domain.Process;
 namespace Brady.ScrapRunner.DataService.Mappings
 {
     /// <summary>
-    /// DriverContainerDoneProcess mapping to NHibernate.
+    /// DriverContainerActionProcess mapping to NHibernate.
     /// </summary>
     public class DriverSegmentDoneProcessMap : ClassMapping<DriverSegmentDoneProcess>
     {

@@ -996,9 +996,24 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-
         /// <summary>
-        /// Update a UpdateTripSegmentMileage record using TripSegment information.
+        /// Delete a TripSegmentContainer record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="tripSegmentContainer"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> DeleteTripSegmentContainer(IDataService dataService, ProcessChangeSetSettings settings,
+            TripSegmentContainer tripSegmentContainer)
+        {
+            var recordType = (TripSegmentContainerRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegmentContainer");
+            var changeSet = (ChangeSet<string, TripSegmentContainer>)recordType.GetNewChangeSet();
+            changeSet.AddDelete(tripSegmentContainer.Id);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+        /// <summary>
+        /// Update a TripSegmentMileage record using TripSegment information.
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
@@ -1023,6 +1038,22 @@ namespace Brady.ScrapRunner.DataService.Util
             var recordType = (TripSegmentMileageRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegmentMileage");
             var changeSet = (ChangeSet<string, TripSegmentMileage>)recordType.GetNewChangeSet();
             changeSet.AddUpdate(tripSegmentMileage.Id, tripSegmentMileage);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+        /// <summary>
+        /// Delete a TripSegmentMileage record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="tripSegmentMileage"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> DeleteTripSegmentMileage(IDataService dataService, ProcessChangeSetSettings settings,
+            TripSegmentMileage tripSegmentMileage)
+        {
+            var recordType = (TripSegmentMileageRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegmentMileage");
+            var changeSet = (ChangeSet<string, TripSegmentMileage>)recordType.GetNewChangeSet();
+            changeSet.AddDelete(tripSegmentMileage.Id);
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
@@ -1082,60 +1113,10 @@ namespace Brady.ScrapRunner.DataService.Util
             return terminals;
         }
 
-        /// CODETABLE Table queries
-        /// <summary>
-        /// Get a list of all codetable values (excluding ContainerLevels) that are sent to the driver at login.
-        /// CONTAINERSIZE,CONTAINERTYPE,DELAYCODES,EXCEPTIONCODES,REASONCODES
-        /// Note: CONTAINERLEVEL is optional, based on a  preference:DEFUseContainerLevel
-        ///  Caller needs to check if the fault is non-null before using the returned list.
-        /// </summary>
-        /// <param name="dataService"></param>
-        /// <param name="settings"></param>
-        /// <param name="userCulture"></param>
-        /// <param name="userRoleIds"></param>
-        /// <param name="regionId"></param>
-        /// <param name="fault"></param>
-        /// <returns>An empty list if no entries are found</returns>
-        public static List<CodeTable> GetCodeTablesForDriver(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, string regionId, out DataServiceFault fault)
-        {
-            fault = null;
-            var codetables = new List<CodeTable>();
-            Query query = new Query
-            {
-                //Under construction...
-                CurrentQuery = new QueryBuilder<CodeTable>()
-                    .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerType)
-                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerSize)
-                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.DelayCodes)
-                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ExceptionCodes)
-                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ReasonCodes))
-                    .OrderBy(x => x.CodeName)
-                    .OrderBy(x => x.CodeValue)
-                    .GetQuery()
-            };
-            var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
-            if (null != fault)
-            {
-                return codetables;
-            }
-            codetables = queryResult.Records.Cast<CodeTable>().ToList();
-
-            //Filter the results
-            //If a region id is in the CodeDisp5 field, make sure it matches the region id for the user
-            //Also for reason codes, do not send the reason code SR#
-            var filteredcodetables =
-                from entry in codetables
-                where (entry.CodeDisp5 == regionId || entry.CodeDisp5 == null)
-                && (entry.CodeValue != Constants.ScaleRefNotAvailable)
-                select entry;
-
-            return filteredcodetables.Cast<CodeTable>().ToList();
-        }
 
         /// CODETABLE Table queries
         /// <summary>
-        /// Get a list of all codetable values (including ContainerLevels) that are sent to the driver at login.
+        /// Get a list of all codetable values that are sent to the driver at login.
         /// CONTAINERSIZE,CONTAINERTYPE,DELAYCODES,EXCEPTIONCODES,REASONCODES,CONTAINERLEVEL
         /// Note: CONTAINERLEVEL is optional, based on a  preference:DEFUseContainerLevel
         /// Caller needs to check if the fault is non-null before using the returned list.
@@ -1145,10 +1126,12 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
         /// <param name="regionId"></param>
+        /// <param name="prefDefCountry"></param>
+        /// <param name="prefUseContainerLevel"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if no entries are found</returns>
-        public static List<CodeTable> GetCodeTablesIncLevelForDriver(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, string regionId, out DataServiceFault fault)
+        public static List<CodeTable> GetCodeTablesForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string regionId, string prefDefCountry, string prefUseContainerLevel, out DataServiceFault fault)
         {
             fault = null;
             var codetables = new List<CodeTable>();
@@ -1160,7 +1143,8 @@ namespace Brady.ScrapRunner.DataService.Util
                     .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.DelayCodes)
                     .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ExceptionCodes)
                     .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ReasonCodes)
-                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerLevel))
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerLevel)
+                    .Or().Property(x => x.CodeName).EqualTo(Constants.StatesPrefix + prefDefCountry))
                     .OrderBy(x => x.CodeName)
                     .OrderBy(x => x.CodeValue)
                     .GetQuery()
@@ -1181,9 +1165,18 @@ namespace Brady.ScrapRunner.DataService.Util
                 && (entry.CodeValue != Constants.ScaleRefNotAvailable)
                 select entry;
 
+            //If the preference to use container level is not set, then remove container levels from the list
+            if (prefUseContainerLevel != Constants.Yes ||
+                prefUseContainerLevel == null)
+            {
+                filteredcodetables =
+                    from entry in filteredcodetables
+                    where (entry.CodeName != CodeTableNameConstants.ContainerLevel)
+                    select entry;
+            }
             return filteredcodetables.Cast<CodeTable>().ToList();
         }
-        
+
         /// CODETABLE Table queries
         /// <summary>
         /// Get a list of all CONTAINERLEVEL codetable values.
@@ -1289,6 +1282,42 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             containerTypeSizes = queryResult.Records.Cast<CodeTable>().ToList();
             return containerTypeSizes;
+        }
+        /// CODETABLE Table queries
+        /// <summary>
+        /// Get a list of all STATES... codetable values for a country.
+        /// Codetable is the prefix STATES flollowed by the 3 character country code
+        /// Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
+        /// <param name="country"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if no entries are found</returns>
+        public static List<CodeTable> GetStateCodesForCountry(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string regionId, string country, out DataServiceFault fault)
+        {
+            fault = null;
+            var states = new List<CodeTable>();
+            Query query = new Query
+            {
+                CurrentQuery = new QueryBuilder<CodeTable>()
+                    .Filter(y => y.Property(x => x.CodeName).EqualTo(Constants.StatesPrefix+country)
+                    .And(x => x.CodeDisp5).EqualTo(regionId)
+                    .Or(x => x.CodeDisp5).IsNull())
+                    .OrderBy(x => x.CodeValue)
+                    .GetQuery()
+            };
+            var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+            if (null != fault)
+            {
+                return states;
+            }
+            states = queryResult.Records.Cast<CodeTable>().ToList();
+            return states;
         }
         /// CODETABLE Table queries
         /// <summary>
@@ -1478,10 +1507,11 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
         /// <param name="containerNumber"></param>
+        /// <param name="currentTripNumber"></param>
         /// <param name="fault"></param>
         /// <returns>An empty ContainerHistory if containerNumber is null or no entry is found</returns>
         public static ContainerHistory GetContainerHistoryLastTrip(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, string containerNumber, out DataServiceFault fault)
+             string userCulture, IEnumerable<long> userRoleIds, string containerNumber, string currentTripNumber, out DataServiceFault fault)
         {
             fault = null;
             var containerHistory = new ContainerHistory();
@@ -1491,7 +1521,8 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     CurrentQuery = new QueryBuilder<ContainerHistory>().Top(1)
                              .Filter(t => t.Property(p => p.ContainerNumber).EqualTo(containerNumber)
-                             .And().Property(p => p.ContainerTripNumber).IsNotNull())
+                             .And().Property(p => p.ContainerTripNumber).IsNotNull()
+                             .And().Property(p => p.ContainerTripNumber).NotEqualTo(currentTripNumber))
                              .OrderBy(p => p.ContainerSeqNumber, Direction.Descending)
                              .GetQuery()
                 };
@@ -2880,7 +2911,45 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentContainers;
         }
-
+        /// TRIPSEGMENTCONTAINER queries
+        /// <summary>
+        ///  Get a list of incomplete trip segment containers for a given trip and segment.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if tripNumber or triSegNumber is null or no entries are found</returns>
+        public static List<TripSegmentContainer> GetTripSegmentContainersIncomplete(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string tripNumber, string tripSegNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripSegmentContainers = new List<TripSegmentContainer>();
+            if (null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripSegmentContainer>()
+                    .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripNumber)
+                    .And().Property(x => x.TripSegNumber).EqualTo(tripSegNumber)
+                    .And().Parenthesis(z => z.Property(x => x.TripSegContainerComplete)
+                        .NotEqualTo(Constants.Yes).Or(x => x.TripSegContainerComplete).IsNull()))
+                    .OrderBy(x => x.TripSegContainerSeqNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripSegmentContainers;
+                }
+                tripSegmentContainers = queryResult.Records.Cast<TripSegmentContainer>().ToList();
+            }
+            return tripSegmentContainers;
+        }
         /// TRIPSEGMENTCONTAINER Table  queries
         /// <summary>
         ///  Gets the trip segment container record for a given trip, segment, and container.
@@ -2996,7 +3065,43 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentMileage;
         }
-
+        /// TRIPSEGMENTMILEAGE Table  queries
+        /// <summary>
+        ///  Gets the trip segment mileage records for a given trip and segment.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if tripNumber or tripSegNumber is null or no entries are found</returns>
+        public static List<TripSegmentMileage> GetTripSegmentMileage(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string tripNumber, string tripSegNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripSegmentMileage = new List<TripSegmentMileage>();
+            if (null != tripNumber && null != tripSegNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripSegmentMileage>()
+                        .Filter(t => t.Property(p => p.TripNumber).EqualTo(tripNumber).And()
+                        .Property(p => p.TripSegNumber).EqualTo(tripSegNumber))
+                        .OrderBy(p => p.TripSegMileageSeqNumber)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripSegmentMileage;
+                }
+                tripSegmentMileage = queryResult.Records.Cast<TripSegmentMileage>().ToList();
+            }
+            return tripSegmentMileage;
+        }
         /// TRIPSEGMENTMILEAGE Table  queries
         /// <summary>
         ///  Gets the last open-ended trip segment mileage record for a given trip and segment.

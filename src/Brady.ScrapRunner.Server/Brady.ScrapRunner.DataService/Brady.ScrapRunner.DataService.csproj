@@ -205,7 +205,7 @@
     <Compile Include="Mappings\ControlNumberMasterMap.cs" />
     <Compile Include="Mappings\CustomerDirectionsMap.cs" />
     <Compile Include="Mappings\DriverArriveProcessMap.cs" />
-    <Compile Include="Mappings\DriverContainerDoneProcessMap.cs" />
+    <Compile Include="Mappings\DriverContainerActionProcessMap.cs" />
     <Compile Include="Mappings\DriverEfficiencyMap.cs" />
     <Compile Include="Mappings\DriverEnrouteProcessMap.cs" />
     <Compile Include="Mappings\DriverSegmentDoneProcessMap.cs" />
@@ -263,7 +263,7 @@
     <Compile Include="ProcessTypes\CommodityMasterProcessRecordType.cs" />
     <Compile Include="ProcessTypes\ContainerChangeProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverArriveProcessRecordType.cs" />
-    <Compile Include="ProcessTypes\DriverContainerDoneProcessRecordType.cs" />
+    <Compile Include="ProcessTypes\DriverContainerActionProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverEnrouteProcessRecordType.cs" />
     <Compile Include="ProcessTypes\PreferencesProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverLoginProcessRecordType.cs" />
@@ -349,8 +349,8 @@
     <Compile Include="Validators\CustomerDirectionsValidator.cs" />
     <Compile Include="Validators\DriverArriveProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverArriveProcessValidator.cs" />
-    <Compile Include="Validators\DriverContainerDoneProcessDeletionValidator.cs" />
-    <Compile Include="Validators\DriverContainerDoneProcessValidator.cs" />
+    <Compile Include="Validators\DriverContainerActionProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverContainerActionProcessValidator.cs" />
     <Compile Include="Validators\DriverEfficiencyDeletionValidator.cs" />
     <Compile Include="Validators\DriverEfficiencyValidator.cs" />
     <Compile Include="Validators\DriverEnrouteProcessDeletionValidator.cs" />

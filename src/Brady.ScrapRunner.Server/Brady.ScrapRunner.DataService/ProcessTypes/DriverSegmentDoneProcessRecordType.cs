@@ -214,6 +214,35 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //Get a list of incomplete containers for the segment
+                    var incompleteTripSegContainerList = Common.GetTripSegmentContainersIncomplete(dataService, settings, userCulture, userRoleIds,
+                                               driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    if (incompleteTripSegContainerList != null)
+                    {
+                        foreach (var incompleteTripSegmentContainer in incompleteTripSegContainerList)
+                        {
+                            //TODO: Do the delete. DeleteTripSegmentContainer throws an exception
+                            //changeSetResult = Common.DeleteTripSegmentContainer(dataService, settings, incompleteTripSegmentContainer);
+                            log.DebugFormat("SRTEST:Deleting TripSegmentContainer Record for Trip:{0}-{1} Container:{2}- Segment Done.",
+                                            incompleteTripSegmentContainer.TripNumber, incompleteTripSegmentContainer.TripSegNumber,
+                                            incompleteTripSegmentContainer.TripSegContainerNumber);
+                            if (Common.LogChangeSetFailure(changeSetResult, incompleteTripSegmentContainer, log))
+                            {
+                                var s = string.Format("Could not update TripSegmentContainer for Trip:{0}-{1} Container:{2}.",
+                                        incompleteTripSegmentContainer.TripNumber, incompleteTripSegmentContainer.TripSegNumber,
+                                        incompleteTripSegmentContainer.TripSegContainerNumber);
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                break;
+                            }
+                        }
+                    }
+
+                    ////////////////////////////////////////////////
                     //Get a list of all containers for the segment
                     var tripSegContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
                                                driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber, out fault);
@@ -222,6 +251,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
+                    //Delete any containers that have not been completed.
+                    //var incompleteTripSegContainerList = (from c in tripSegContainerList
+                    //                                     where (c.TripSegContainerComplete == null
+                    //                                     || c.TripSegContainerComplete != Constants.Yes)
+                    //                                     select c).ToList();
+
+                    ////////////////////////////////////////////////
+                    //Include just the complete containers in the list
+                    tripSegContainerList = (from c in tripSegContainerList
+                                           where c.TripSegContainerComplete == Constants.Yes
+                                           select c).ToList();
 
                     ////////////////////////////////////////////////
                     // Get the Customer record for the destination cust host code
@@ -644,9 +684,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //}
 
                     ////////////////////////////////////////////////
-                    //TODO:Calculate driver's cumulative time which is the sum of standard drive and stop minutes
-                    //for all incomplete trip segments 
-                    //Cannot requery db because changes have not been committed.
+                    //Update the driver's cumulative time which is the sum of standard drive and stop minutes for all 
+                    //incomplete trip segments.Cannot requery db because changes have not been committed.
                     //Just subtract the std stop and drive times for this completed segment from the existing cumulative time.
                     driverStatus.DriverCumMinutes -= (int)currentTripSegment.TripSegStandardDriveMinutes;
                     driverStatus.DriverCumMinutes -= (int)currentTripSegment.TripSegStandardStopMinutes;
