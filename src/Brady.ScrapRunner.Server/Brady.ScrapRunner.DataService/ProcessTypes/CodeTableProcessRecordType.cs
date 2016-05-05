@@ -121,7 +121,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
-                                                    codetablesProcess.EmployeeId, out fault);
+                                         codetablesProcess.EmployeeId, out fault);
                     if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -143,20 +143,21 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
                     ////////////////////////////////////////////////
+                    // Lookup Preference: DEFCountry
+                    string prefDefCountry = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                   employeeMaster.TerminalId, PrefDriverConstants.DEFCountry, out fault);
+                    if (fault != null)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+
+                    ////////////////////////////////////////////////
                     // Lookup code tables.  
                     var codetables = new List<CodeTable>();
-                    if (prefUseContainerLevel == Constants.Yes)
-                    {
-                        //This query includes container level
-                        codetables = Common.GetCodeTablesIncLevelForDriver(dataService, settings, userCulture, userRoleIds,
-                                        employeeMaster.RegionId, out fault);
-                    }
-                    else
-                    {
-                        //This query does not include container level
-                        codetables = Common.GetCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
-                                        employeeMaster.RegionId, out fault);
-                    }
+                    //This query does not include container level
+                    codetables = Common.GetCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
+                                    employeeMaster.RegionId, prefDefCountry, prefUseContainerLevel,out fault);
                     if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -168,18 +169,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     codetablesProcess.CodeTables = codetables;
 
                     //Now using log4net.ILog implementation to test results of query.
-                    log.Debug("SRTEST:CodeTableProcess");
+                    log.DebugFormat("SRTEST:CodeTableProcess Region:{0} Terminal:{1} Driver:{2}",
+                                    employeeMaster.RegionId, employeeMaster.TerminalId, codetablesProcess.EmployeeId);
                     foreach (var codetable in codetables)
                     {
                         log.DebugFormat("SRTEST:CodeName:{0} CodeValue:{1} CodeDisp1:{2} CodeDisp2:{3} CodeDisp3:{4} CodeDisp4:{5} CodeDisp5:{6} CodeDisp6:{7}",
-                                            codetable.CodeName,
-                                            codetable.CodeValue,
-                                            codetable.CodeDisp1,
-                                            codetable.CodeDisp2,
-                                            codetable.CodeDisp3,
-                                            codetable.CodeDisp4,
-                                            codetable.CodeDisp5,
-                                            codetable.CodeDisp6);
+                                       codetable.CodeName,codetable.CodeValue,codetable.CodeDisp1,codetable.CodeDisp2,codetable.CodeDisp3,
+                                       codetable.CodeDisp4,codetable.CodeDisp5,codetable.CodeDisp6);
                     }
                 }
             }

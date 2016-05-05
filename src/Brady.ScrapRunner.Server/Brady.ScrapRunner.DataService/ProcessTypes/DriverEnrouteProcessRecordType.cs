@@ -377,9 +377,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             tripSegmentContainer.TripSegContainerNumber = containerOnPowerId.ContainerNumber;
                             tripSegmentContainer.TripSegContainerType = containerOnPowerId.ContainerType;
                             tripSegmentContainer.TripSegContainerSize = containerOnPowerId.ContainerSize;
-                            tripSegmentContainer.TripSegContainerCommodityCode = containerOnPowerId.ContainerCommodityCode;
-                            tripSegmentContainer.TripSegContainerCommodityDesc = containerOnPowerId.ContainerCommodityDesc;
                             tripSegmentContainer.TripSegContainerActionDateTime = driverEnrouteProcess.ActionDateTime;
+
+                            //Not applicable on an enroute.
+                            //tripSegmentContainer.TripSegContainerCommodityCode = containerOnPowerId.ContainerCommodityCode;
+                            //tripSegmentContainer.TripSegContainerCommodityDesc = containerOnPowerId.ContainerCommodityDesc;
 
                             //Do the update
                             changeSetResult = Common.UpdateTripSegmentContainer(dataService, settings, tripSegmentContainer);
@@ -505,6 +507,24 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         //TODO: Delete any existing trip segment mileage records for this segment
                         //Driver might be starting this trip again. Maybe he went enroute/arrived, logged out and is now going enroute again.
+                        var oldTripSegmentMileageList = Common.GetTripSegmentMileage(dataService, settings, userCulture, userRoleIds,
+                                                driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber, out fault);
+                        foreach (var oldTripSegmentMileage in oldTripSegmentMileageList)
+                        {
+                            //TODO: Do the delete. DeleteTripSegmentMileage throws an exception
+                            //changeSetResult = Common.DeleteTripSegmentMileage(dataService, settings, oldTripSegmentMileage);
+                            log.DebugFormat("SRTEST:Deleting TripSegmentMileage Record for Trip:{0}-{1} Seq:{2}- Enroute.",
+                                            oldTripSegmentMileage.TripNumber, oldTripSegmentMileage.TripSegNumber,
+                                            oldTripSegmentMileage.TripSegMileageSeqNumber);
+                            if (Common.LogChangeSetFailure(changeSetResult, oldTripSegmentMileage, log))
+                            {
+                                var s = string.Format("Could not update TripSegmentContainer for Trip:{0}-{1} Seq:{2}.",
+                                        oldTripSegmentMileage.TripNumber, oldTripSegmentMileage.TripSegNumber,
+                                        oldTripSegmentMileage.TripSegMileageSeqNumber);
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                break;
+                            }
+                        }
                     }
 
                     //Normally for enroutes, we need to add a mileage record, but just in case there is an open-ended

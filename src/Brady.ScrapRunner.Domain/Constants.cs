@@ -33,6 +33,12 @@
         /// Useage: To exclude trip from being resequenced. Assigned when trip is completed.
         /// </summary>
         public static readonly int ExcludeFromSequencing = 32766;
+
+        /// <summary>
+        /// States prefix for codetables STATESUSA, STATESMEX, STATESCAN
+        /// Useage: Prefix for states codetable values.
+        /// </summary>
+        public static readonly string StatesPrefix = "STATES";
     }
     /// <summary>
     /// The Action Type internal codes.  Used in the processing container information.
@@ -277,6 +283,8 @@
         public static readonly string ReceivedDriverCancelSeg = "RECEIVED DRIVER CANCEL SEG";
         /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
         public static readonly string ReceivedDriverAddedSeg = "RECEIVED DRIVER ADDED SEG";
+        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
+        public static readonly string ReceivedDriverContainerAction = "RECEIVED DRIVER CONTAINER ACTION";
     }
 
     /// <summary>

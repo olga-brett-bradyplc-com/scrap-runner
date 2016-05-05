@@ -11,23 +11,20 @@ namespace Brady.ScrapRunner.Domain.Process
     ///
     public class DriverSegmentDoneProcess : IHaveId<string>, IEquatable<DriverSegmentDoneProcess>
     {
-        ///The driver id from the phone.
+        ///The driver.  Required.
         public virtual string EmployeeId { get; set; }
 
-        /// Trip Number from the phone.  Required.
+        /// Trip Number.  Required.
         public virtual string TripNumber { get; set; }
 
-        /// Trip Segment Number from the phone.  Required.
+        /// Trip Segment Number.  Required.
         public virtual string TripSegNumber { get; set; }
 
-        /// The ActionDateTime from the phone. Required.
+        /// The ActionDateTime. Required.
         public virtual DateTime ActionDateTime { get; set; }
 
-        ///The power id from the phone. Required.
+        ///The power id. Required.
         public virtual string PowerId { get; set; }
-
-        ///The odometer from the phone. Required.
-        public virtual int Odometer { get; set; }
 
         /// Latitude of the segment done.
         public virtual int? Latitude { get; set; }
@@ -89,7 +86,6 @@ namespace Brady.ScrapRunner.Domain.Process
             sb.Append(", TripSegNumber:" + TripSegNumber);
             sb.Append(", ActionDateTime:" + ActionDateTime);
             sb.Append(", PowerId:" + PowerId);
-            sb.Append(", Odometer:" + Odometer);
             sb.Append("}");
             return sb.ToString();
         }

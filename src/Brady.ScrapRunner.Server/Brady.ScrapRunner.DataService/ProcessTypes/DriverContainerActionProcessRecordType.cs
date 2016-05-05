@@ -181,6 +181,53 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
                     }
+                    ////////////////////////////////////////////////
+                    //Add entry to Event Log – Container Action. 
+                    StringBuilder sbComment = new StringBuilder();
+                    sbComment.Append(EventCommentConstants.ReceivedDriverContainerAction);
+                    sbComment.Append(" HH:");
+                    sbComment.Append(driverContainerActionProcess.ActionDateTime);
+                    sbComment.Append(" Trip:");
+                    sbComment.Append(driverContainerActionProcess.TripNumber);
+                    sbComment.Append("-");
+                    sbComment.Append(driverContainerActionProcess.TripSegNumber);
+                    sbComment.Append(" Drv:");
+                    sbComment.Append(driverContainerActionProcess.EmployeeId);
+                    sbComment.Append(" Pwr:");
+                    sbComment.Append(driverContainerActionProcess.PowerId);
+                    sbComment.Append(" Container:");
+                    sbComment.Append(driverContainerActionProcess.ContainerNumber);
+                    sbComment.Append(" Action:");
+                    sbComment.Append(driverContainerActionProcess.ActionType);
+                    string comment = sbComment.ToString().Trim();
+
+                    var eventLog = new EventLog()
+                    {
+                        EventDateTime = driverContainerActionProcess.ActionDateTime,
+                        EventSeqNo = 0,
+                        EventTerminalId = employeeMaster.TerminalId,
+                        EventRegionId = employeeMaster.RegionId,
+                        //These are not populated for logins in the current system.
+                        // EventEmployeeId = driverStatus.EmployeeId,
+                        // EventEmployeeName = Common.GetDriverName(employeeMaster),
+                        EventTripNumber = driverContainerActionProcess.TripNumber,
+                        EventProgram = EventProgramConstants.Services,
+                        //These are not populated for enroutes in the current system.
+                        //EventScreen = null,
+                        //EventAction = null,
+                        EventComment = comment,
+                    };
+
+                    ChangeSetResult<int> eventChangeSetResult;
+                    eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
+                    log.Debug("SRTEST:Saving EventLog Record - Container Action");
+                    //if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
+                    //{
+                    //    var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                    //                         driverStatus.EmployeeId, EventCommentConstants.ReceivedDriverLogin);
+                    //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                    //    break;
+                    //}
 
                 }//end of foreach 
             }//end of if (!changeSetResult.Failed...
@@ -517,29 +564,26 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                 /////////////////////////////////////////////////
                 //Set the location warning flag
+                //ToDo: The location warning flag needs to be tested.
                 containerMaster.LocationWarningFlag = null;
                 var types = new List<string> {BasicTripTypeConstants.DropFull,
-                                                      BasicTripTypeConstants.DropEmpty,
-                                                      BasicTripTypeConstants.Unload,
-                                                      BasicTripTypeConstants.Load,
-                                                      BasicTripTypeConstants.Respot};
+                                              BasicTripTypeConstants.DropEmpty,
+                                              BasicTripTypeConstants.Respot};
 
                 if (types.Contains(currentTripSegment.TripSegType))
                 {
                     //We need to look in the container history to find the previous trip and the last 
                     //status of the container at the end of that trip.
-                    //GetContainerPreviousTrip(sContNum, sTripNum, sPrevContainerStatus, sPrevTripNum, sPrevCustHostCode);
-
                     var containerLastTrip = Common.GetContainerHistoryLastTrip(dataService, settings, userCulture, userRoleIds,
-                                  driverContainerActionProcess.ContainerNumber, out fault);
+                        driverContainerActionProcess.ContainerNumber, driverContainerActionProcess.TripNumber, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         return false;
                     }
                     var statuses = new List<string> {ContainerStatusConstants.CustomerSite,
-                                                             ContainerStatusConstants.Contractor,
-                                                             ContainerStatusConstants.SpecialProject };
+                                                     ContainerStatusConstants.Contractor,
+                                                     ContainerStatusConstants.SpecialProject};
                     if (statuses.Contains(containerLastTrip.ContainerStatus))
                     {
                         containerMaster.LocationWarningFlag = Constants.Yes;
@@ -643,7 +687,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
 
             //Level is optional, as determined by a preference.
-            tripSegmentContainer.TripSegContainerLevel = driverContainerActionProcess.ContainerLevel;
+            if (driverContainerActionProcess.ContainerLevel != null)
+            {
+                tripSegmentContainer.TripSegContainerLevel = driverContainerActionProcess.ContainerLevel;
+            }
 
             //If latitude/longitude not provided from driver, use the lat/lon for the destination customer.
             if (driverContainerActionProcess.Latitude == null || driverContainerActionProcess.Longitude == null)
@@ -679,11 +726,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             tripSegmentContainer.TripSegContainerComplete = Constants.Yes;
 
             //For return to yard processing only...
-            if (currentTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard)
+            if (currentTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard ||
+                currentTripSegment.TripSegType == BasicTripTypeConstants.Scale)
             {
                 //Scale reference number can be captured at gross action or at both gross and tare actions.
-                tripSegmentContainer.TripScaleReferenceNumber = driverContainerActionProcess.ScaleReferenceNumber;
-
+                if (driverContainerActionProcess.ScaleReferenceNumber != null)
+                {
+                    tripSegmentContainer.TripScaleReferenceNumber = driverContainerActionProcess.ScaleReferenceNumber;
+                }
                 //The ContainerLoaded flag is based on ContainerContents
                 if (driverContainerActionProcess.ContainerContents == ContainerContentsConstants.Loaded)
                 {
