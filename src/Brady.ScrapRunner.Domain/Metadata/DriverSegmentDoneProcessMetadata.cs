@@ -22,7 +22,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripSegNumber);
             TimeProperty(x => x.ActionDateTime);
             StringProperty(x => x.PowerId);
-            IntegerProperty(x => x.Odometer);
             IntegerProperty(x => x.Latitude);
             IntegerProperty(x => x.Longitude);
             StringProperty(x => x.DriverGenerated);
@@ -35,7 +34,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.TripSegNumber)
             .Property(x => x.ActionDateTime)
             .Property(x => x.PowerId)
-            .Property(x => x.Odometer)
             .Property(x => x.Latitude)
             .Property(x => x.Longitude)
             .Property(x => x.DriverGenerated)
