@@ -41,6 +41,7 @@
     <Compile Include="CustomLanguageBindingParser.cs" />
     <Compile Include="Enums\MenuFilterEnum.cs" />
     <Compile Include="Helpers\Grouping.cs" />
+    <Compile Include="Interfaces\ICodeTableService.cs" />
     <Compile Include="Interfaces\IContainerService.cs" />
     <Compile Include="Interfaces\ICustomerService.cs" />
     <Compile Include="Interfaces\IDbService.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="Interfaces\IClientSettings.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
     <Compile Include="Interfaces\ITripService.cs" />
+    <Compile Include="Models\CodeTableModel.cs" />
     <Compile Include="Models\CustomerCommodityModel.cs" />
     <Compile Include="Models\CustomerLocationModel.cs" />
     <Compile Include="Models\DriverStatusModel.cs" />
@@ -74,6 +76,7 @@
     </Compile>
     <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="ScrapRunnerMapperProfile.cs" />
+    <Compile Include="Services\CodeTableService.cs" />
     <Compile Include="Services\ContainerService.cs" />
     <Compile Include="Services\CustomerService.cs" />
     <Compile Include="Services\DemoDataGenerator.cs" />
@@ -89,6 +92,7 @@
     <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
+    <Compile Include="ViewModels\FuelEntryViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
     <Compile Include="ViewModels\ScaleDetailViewModel.cs" />
@@ -106,7 +110,9 @@
     <Compile Include="ViewModels\BaseViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\AppResources.es.resx" />
+    <EmbeddedResource Include="Resources\AppResources.es.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\AppResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>

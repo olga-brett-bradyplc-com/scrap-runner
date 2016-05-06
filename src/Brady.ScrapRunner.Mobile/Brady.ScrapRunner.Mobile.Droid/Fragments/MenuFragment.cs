@@ -9,6 +9,7 @@ using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Droid.BindingContext;
 using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Droid.Support.V4;
+using MvvmCross.Platform.Core;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
@@ -61,6 +62,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             {
                 case Resource.Id.nav_logout:
                     ViewModel.LogoutCommand.Execute();
+                    break;
+                case Resource.Id.nav_fuelentry:
+                    ViewModel.FuelEntryCommand.Execute();
                     break;
             }
         }
