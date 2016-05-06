@@ -38,6 +38,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.DropTableAsync<TripSegmentContainerModel>();
             await asyncConnection.DropTableAsync<CustomerCommodityModel>();
             await asyncConnection.DropTableAsync<CustomerLocationModel>();
+            await asyncConnection.DropTableAsync<CodeTableModel>();
 
             await asyncConnection.CreateTableAsync<ContainerMasterModel>();
             await asyncConnection.CreateTableAsync<CustomerDirectionsModel>();
@@ -50,6 +51,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.CreateTableAsync<TripSegmentContainerModel>();
             await asyncConnection.CreateTableAsync<CustomerCommodityModel>();
             await asyncConnection.CreateTableAsync<CustomerLocationModel>();
+            await asyncConnection.CreateTableAsync<CodeTableModel>();
 
             //await asyncConnection.DeleteAllAsync<ContainerMasterModel>();
             //await asyncConnection.DeleteAllAsync<CustomerDirectionsModel>();
@@ -63,6 +65,6 @@ namespace Brady.ScrapRunner.Mobile.Services
             //await asyncConnection.DeleteAllAsync<CustomerCommodityModel>();
             //await asyncConnection.DeleteAllAsync<CustomerLocationModel>();
         }
-        
+
     }
 }

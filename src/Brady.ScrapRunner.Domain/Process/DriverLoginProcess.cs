@@ -72,8 +72,8 @@ namespace Brady.ScrapRunner.Domain.Process
         //Preferences.  Not implemented see PreferencesProcess.
         //public virtual List<Preference> Preferences { get; set; }
 
-        //CodeTable. Not implemented see CodeTableProcess.
-        //public virtual List<CodeTable> CodeTables { get; set; }
+        //CodeTable. see CodeTableProcess.
+        public virtual List<CodeTable> CodeTables { get; set; }
 
         // Trip Info. Not implemented see TripInfoProcess.
         // a. Send Trip Information for each trip
