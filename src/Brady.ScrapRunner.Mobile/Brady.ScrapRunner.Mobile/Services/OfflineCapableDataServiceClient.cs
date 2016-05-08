@@ -94,26 +94,31 @@
 
         public Task<Titem> GetAsync<Tid, Titem>(Tid id, string dataService = null)
         {
+            // This method doesn't support offline queueing.
             return _dataServiceClient.GetAsync<Tid, Titem>(id, dataService);
         }
 
         public Task<Titem> GetAsync<Titem>(long id, string dataService = null)
         {
+            // This method doesn't support offline queueing.
             return _dataServiceClient.GetAsync<Titem>(id, dataService);
         }
 
         public Task<Titem> GetAsync<Titem>(int id, string dataService = null)
         {
+            // This method doesn't support offline queueing.
             return _dataServiceClient.GetAsync<Titem>(id, dataService);
         }
 
         public Task<QueryResult> QueryAsync(string query, string dataService = null)
         {
+            // This method doesn't support offline queueing.
             return _dataServiceClient.QueryAsync(query, dataService);
         }
 
         public Task<QueryResult<T>> QueryAsync<T>(QueryBuilder<T> queryBuilder, string dataService = null)
         {
+            // This method doesn't support offline queueing.
             return _dataServiceClient.QueryAsync(queryBuilder, dataService);
         }
     }
