@@ -615,6 +615,64 @@ namespace Brady.ScrapRunner.DataService.Util
             return true;
         }
         /// <summary>
+        /// Insert a PowerFuel record.
+        ///  Note:  caller must handle faults.  
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="powerFuel"></param>
+        /// <param name="callCountThisTxn">Start with 1 and increment if multiple inserts are desired.</param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="fault"></param>
+        /// <returns>true if success</returns>
+        public static bool InsertPowerFuel(IDataService dataService, ProcessChangeSetSettings settings,
+             IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log,
+             PowerFuel powerFuel, int callCountThisTxn, out DataServiceFault fault)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the last power record for this trip and segment number to get the last sequence number used
+            var powerFuelMax = Common.GetPowerFuelLast(dataService, settings, userCulture, userRoleIds,
+                               powerFuel.PowerId, powerFuel.TripNumber, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            powerFuel.PowerFuelSeqNumber = callCountThisTxn;
+            if (powerFuelMax != null)
+            {
+                powerFuel.PowerFuelSeqNumber = ++powerFuelMax.PowerFuelSeqNumber + callCountThisTxn;
+            }
+              
+            //For testing
+            log.Debug("SRTEST:Add PowerFuel");
+            log.DebugFormat("SRTEST:PowerId:{0} TripNumber:{1}-{2} Date:{3} State:{4} Amt:{5} Seq#:{5}",
+                             powerFuel.PowerId,
+                             powerFuel.TripNumber,
+                             powerFuel.TripSegNumber,
+                             powerFuel.PowerDateOfFuel,
+                             powerFuel.PowerState,
+                             powerFuel.PowerGallons,
+                             powerFuel.PowerFuelSeqNumber);
+
+
+            // Insert PowerFuel 
+            var recordType = (PowerFuelRecordType)dataService.RecordTypes.Single(x => x.TypeName == "PowerFuel");
+            var changeSet = (ChangeSet<string, PowerFuel>)recordType.GetNewChangeSet();
+            long recordRef = 1;
+            changeSet.AddCreate(recordRef, powerFuel, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving PowerFuel");
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            if (Common.LogChangeSetFailure(changeSetResult, powerFuel, log))
+            {
+                return false;
+            }
+            return true;
+        }
+        /// <summary>
         /// Insert a PowerHistory record.
         ///  Note:  caller must handle faults.  E.G. if( handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
         /// </summary>
@@ -2043,6 +2101,42 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return users;
         }
+        /// <summary>
+        /// Get the last power fuel record for powerid and tripnumber/driver id
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="powerId"></param>
+        /// <param name="tripNumberOrEmployeeId"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static PowerFuel GetPowerFuelLast(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string powerId, string tripNumberOrEmployeeId, out DataServiceFault fault)
+        {
+            fault = null;
+            var powerFuel = new PowerFuel();
+            if (null != powerId && null != tripNumberOrEmployeeId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<PowerFuel>()
+                        .Filter(t => t.Property(p => p.PowerId).EqualTo(powerId).And()
+                        .Property(p => p.TripNumber).EqualTo(tripNumberOrEmployeeId))
+                        .OrderBy(p => p.PowerFuelSeqNumber, Direction.Descending)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return powerFuel;
+                }
+                powerFuel = queryResult.Records.Cast<PowerFuel>().FirstOrDefault();
+            }
+            return powerFuel;
+        }
+
         /// POWERHISTORY Table  queries
         /// <summary>
         ///  Get the last power history record for a given power id 
