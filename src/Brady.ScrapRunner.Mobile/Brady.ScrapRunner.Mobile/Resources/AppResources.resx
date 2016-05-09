@@ -361,4 +361,12 @@
     <value>Loading Preferences</value>
     <comment>sign in view</comment>
   </data>
+  <data name="FinishTripLabel" xml:space="preserve">
+    <value>Complete Trip</value>
+    <comment>RouteDetail</comment>
+  </data>
+  <data name="YardScaleLabel" xml:space="preserve">
+    <value>Yard/Scale</value>
+    <comment>RouteDetail</comment>
+  </data>
 </root>

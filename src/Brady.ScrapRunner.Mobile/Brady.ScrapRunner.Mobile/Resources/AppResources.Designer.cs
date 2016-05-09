@@ -233,6 +233,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Complete Trip.
+        /// </summary>
+        public static string FinishTripLabel {
+            get {
+                return ResourceManager.GetString("FinishTripLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Gross.
         /// </summary>
         public static string GrossWeight {
@@ -670,6 +679,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string YardScaleDetail {
             get {
                 return ResourceManager.GetString("YardScaleDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yard/Scale.
+        /// </summary>
+        public static string YardScaleLabel {
+            get {
+                return ResourceManager.GetString("YardScaleLabel", resourceCulture);
             }
         }
         

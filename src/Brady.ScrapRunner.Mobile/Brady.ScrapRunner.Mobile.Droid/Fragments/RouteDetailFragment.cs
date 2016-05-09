@@ -20,7 +20,7 @@ using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame)]
+    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame, true)]
     [Register("brady.scraprunner.mobile.droid.fragments.RouteDetailFragment")]
     public class RouteDetailFragment : BaseFragment<RouteDetailViewModel>
     {

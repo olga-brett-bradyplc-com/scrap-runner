@@ -313,7 +313,7 @@
   </data>
   <data name="LogOut" xml:space="preserve">
     <value>Log Out (Spanish)</value>
-    <comment>MenuViewModel</comment>
+    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
   </data>
   <data name="No" xml:space="preserve">
     <value>No</value>
@@ -325,6 +325,14 @@
   </data>
   <data name="LoadingPreferences" xml:space="preserve">
     <value>Loading Preferences ( spanish )</value>
-    <comment>sign in view</comment>
+    <comment>NEEDS TRANSLATION; sign in view</comment>
+  </data>
+  <data name="FinishTripLabel" xml:space="preserve">
+    <value>Complete Trip ( spanish )</value>
+    <comment>NEEDS TRANSLATION; RouteDetail</comment>
+  </data>
+  <data name="YardScaleLabel" xml:space="preserve">
+    <value>Yard/Scale ( spanish )</value>
+    <comment>NEEDS TRANSLATION; RouteDetail</comment>
   </data>
 </root>

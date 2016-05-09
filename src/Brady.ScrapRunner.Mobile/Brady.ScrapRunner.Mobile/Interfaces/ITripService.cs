@@ -1,4 +1,5 @@
-﻿using Brady.ScrapRunner.Domain.Models;
+﻿using System;
+using Brady.ScrapRunner.Domain.Models;
 
 namespace Brady.ScrapRunner.Mobile.Interfaces
 {
@@ -14,6 +15,12 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task UpdateTripSegmentContainers(IEnumerable<TripSegmentContainer> tripSegmentContainers);
 
+        Task<bool> IsTripLegTransactionAsync(string tripNumber);
+
+        Task<bool> IsTripLegScaleAsync(string tripNumber);
+
+        Task<bool> IsTripLegNoScreenAsync(string tripNumber);
+
         Task<bool> IsTripSequenceEnforcedAsync();
 
         Task<TripModel> FindTripAsync(string tripNumber);
@@ -28,6 +35,14 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<TripSegmentContainerModel> FindTripSegmentContainer(string tripNumber, string tripSegNo,
             int? tripSegContainerSeqNumber);
+
+        Task<int> UpdateTripSegmentContainerWeightTimesAsync(string tripNumber, string tripSegNo,
+            string tripSegContainerNumber, DateTime? gsWt, DateTime? gs2Wt, DateTime? trWt);
+
+        Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo,
+            string tripSegContainerNumber, double? latitude, double? longitude);
+
+        Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo, string tripSegContainerNumber);
 
         Task<int> CompleteTripAsync(string tripNumber);
 
