@@ -1,4 +1,6 @@
 ﻿using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
+using BWF.DataServices.Metadata.Models;
 
 
 namespace Brady.ScrapRunner.Mobile.Interfaces
@@ -9,6 +11,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
     public interface ICodeTableService
     {
+        Task<ChangeResultWithItem<CodeTableProcess>> FindCodesRemoteAsync(CodeTableProcess codeTableProcess);
+
         Task<List<CodeTableModel>> FindCountryStatesAsync(string country);
 
         Task UpdateCodeTable(IEnumerable<CodeTable> codeTable);

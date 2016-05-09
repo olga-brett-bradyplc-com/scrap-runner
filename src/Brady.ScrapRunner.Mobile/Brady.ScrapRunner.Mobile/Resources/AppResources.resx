@@ -388,4 +388,8 @@
     <value>Yard/Scale</value>
     <comment>RouteDetail</comment>
   </data>
+  <data name="LoadingMiscInformation" xml:space="preserve">
+    <value>Loading Miscellaneous Information</value>
+    <comment>SignInViewModel</comment>
+  </data>
 </root>

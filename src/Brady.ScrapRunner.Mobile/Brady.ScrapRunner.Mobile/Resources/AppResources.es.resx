@@ -354,4 +354,8 @@
     <value>Ahorro</value>
     <comment>Fuel Entry View</comment>
   </data>
+  <data name="LoadingMiscInformation" xml:space="preserve">
+    <value>Loading Miscellaneous Information (es)</value>
+    <comment>NEEDS TRANSLATION; SignInViewModel</comment>
+  </data>
 </root>

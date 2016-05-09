@@ -26,32 +26,40 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class FuelEntryViewModel : BaseViewModel
     {
         private readonly ICodeTableService _codeTableService;
-        private readonly ITripService _tripService;
-        private readonly IDbService _dbService;
-        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IPreferenceService _preferenceService;
+        private readonly IDriverService _driverService;
 
-        public FuelEntryViewModel(IConnectionService<DataServiceClient> connection, 
-                                  IDbService dbService,
-                                  ICodeTableService codeTableService, 
-                                  ITripService tripService)
+        public FuelEntryViewModel(IConnectionService<DataServiceClient> connection,
+                                  IDriverService driverService,
+                                  IPreferenceService preferenceService,
+                                  ICodeTableService codeTableService)
         {
-            _connection = connection;
-            _dbService = dbService;
+            _driverService = driverService;
             _codeTableService = codeTableService;
-            _tripService = tripService;
+            _preferenceService = preferenceService;
 
             Title = AppResources.FuelEntry;
         }
         public override async void Start()
         {
-            var states = await _codeTableService.FindCountryStatesAsync("STATESUSA");
+            var currentCountryPreference = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCountry);
+
+            // If not Canada or Mexico, default to grabbing US states
+            var currentStateList =
+                currentCountryPreference == "CAN"
+                    ? CodeTableNameConstants.StatesCanada
+                    : currentCountryPreference == "MEX"
+                        ? CodeTableNameConstants.StatesMexico
+                        : CodeTableNameConstants.StatesUSA;
+            
+            var states = await _codeTableService.FindCountryStatesAsync(currentStateList);
             StatesList = new ObservableCollection<CodeTableModel>(states);
 
             base.Start();
         }
 
-        private string _odometerReading;
-        public string OdometerReading
+        private int? _odometerReading;
+        public int? OdometerReading
         {
             get { return _odometerReading; }
             set
@@ -60,8 +68,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 SaveFuelEntryCommand.RaiseCanExecuteChanged();
             }
         }
-        private string _fuelAmount;
-        public string FuelAmount
+        private float _fuelAmount;
+        public float FuelAmount
         {
             get { return _fuelAmount; }
             set
@@ -99,15 +107,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         protected bool CanExecuteSaveFuelEntryCommand()
         {
-            return !string.IsNullOrWhiteSpace(OdometerReading)
-                   && !string.IsNullOrWhiteSpace(FuelAmount)
+            return !string.IsNullOrWhiteSpace(OdometerReading.ToString())
+                   && !string.IsNullOrWhiteSpace(FuelAmount.ToString())
                    && !string.IsNullOrWhiteSpace(SelectedState);
         }
         protected async void ExecuteSaveFuelEntryCommand()
         {
             //TODO: add update db tables fuel entry routine
 
-            var odometerResults = Validate<OdometerRangeValidator, int?>(Int32.Parse(OdometerReading));
+            var odometerResults = Validate<OdometerRangeValidator, int?>(OdometerReading);
             if (!odometerResults.IsValid)
             {
                 UserDialogs.Instance.Alert(odometerResults.Errors.First().ErrorMessage);
@@ -133,32 +141,26 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             using (var loginData = UserDialogs.Instance.Loading(AppResources.SavingData, maskType: MaskType.Black))
             {
-                // Delete/Create necesscary SQLite tables
-                await _dbService.RefreshAll();
+                var currentUser = await _driverService.GetCurrentDriverStatus();
 
-                var tripObj = new TripInfoProcess
+                var fuelEntry = await _driverService.SetFuelEntry(new DriverFuelEntryProcess
                 {
-                    EmployeeId = "930"
-                };
+                    EmployeeId = currentUser.EmployeeId,
+                    Odometer = OdometerReading ?? default(int),
+                    ActionDateTime = DateTime.Now,
+                    PowerId = currentUser.PowerId,
+                    State = SelectedState,
+                    TripNumber = currentUser.TripNumber,
+                    TripSegNumber = currentUser.TripSegNumber,
+                    FuelAmount = FuelAmount
+                });
 
-                var tripProcess = await _connection.GetConnection().UpdateAsync(tripObj, requeryUpdated: false);
+                if (fuelEntry.WasSuccessful) return true;
 
-                if (tripProcess.WasSuccessful)
-                {
-                    if (tripProcess.Item?.Trips?.Count > 0)
-                        await _tripService.UpdateTrips(tripProcess.Item.Trips);
-
-                    if (tripProcess.Item?.TripSegments?.Count > 0)
-                        await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
-                }
-                else
-                {
-                    await UserDialogs.Instance.AlertAsync(tripProcess.Failure.Summary,
-                        AppResources.Error, AppResources.OK);
-                    return false;
-                }
+                await UserDialogs.Instance.AlertAsync(fuelEntry.Failure.Summary,
+                    AppResources.Error, AppResources.OK);
+                return false;
             }
-            return true;
         }
     }
 }

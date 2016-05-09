@@ -2,6 +2,8 @@
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
+using BWF.DataServices.Domain.Models;
+using BWF.DataServices.Metadata.Models;
 using BWF.DataServices.PortableClients;
 
 namespace Brady.ScrapRunner.Mobile.Services
@@ -67,6 +69,12 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegmentContainer>, IEnumerable<TripSegmentContainerModel>>(tripSegmentContainers);
             return _tripSegmentContainerRepository.InsertRangeAsync(mapped);
+        }
+
+        public async Task<ChangeResultWithItem<TripInfoProcess>> FindTripsRemoteAsync(TripInfoProcess tripInfoProcess)
+        {
+            var tripProcess = await _connection.GetConnection().UpdateAsync(tripInfoProcess, requeryUpdated: false);
+            return tripProcess;
         }
 
         /// <summary>

@@ -17,6 +17,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<ChangeResultWithItem<DriverArriveProcess>> SetDriverArrived(DriverArriveProcess driverArriveProcess);
 
+        Task<ChangeResultWithItem<DriverFuelEntryProcess>> SetFuelEntry(DriverFuelEntryProcess driverFuelEntryProcess);
+
         Task<DriverStatusModel> GetCurrentDriverStatus();
     }
 }

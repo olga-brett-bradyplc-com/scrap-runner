@@ -1,5 +1,8 @@
 ﻿using System;
 using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
+using BWF.DataServices.Domain.Models;
+using BWF.DataServices.Metadata.Models;
 
 namespace Brady.ScrapRunner.Mobile.Interfaces
 {
@@ -14,6 +17,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task UpdateTripSegments(IEnumerable<TripSegment> tripSegments);
 
         Task UpdateTripSegmentContainers(IEnumerable<TripSegmentContainer> tripSegmentContainers);
+
+        Task<ChangeResultWithItem<TripInfoProcess>> FindTripsRemoteAsync(TripInfoProcess tripInfoProcess);
 
         Task<bool> IsTripLegTransactionAsync(string tripNumber);
 

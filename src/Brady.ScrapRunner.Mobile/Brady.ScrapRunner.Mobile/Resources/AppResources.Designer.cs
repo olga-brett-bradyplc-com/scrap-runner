@@ -305,6 +305,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loading Miscellaneous Information.
+        /// </summary>
+        public static string LoadingMiscInformation {
+            get {
+                return ResourceManager.GetString("LoadingMiscInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading Preferences.
         /// </summary>
         public static string LoadingPreferences {
