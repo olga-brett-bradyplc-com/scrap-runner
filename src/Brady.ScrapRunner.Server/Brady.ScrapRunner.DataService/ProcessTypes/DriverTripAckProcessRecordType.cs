@@ -187,7 +187,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
                     ////////////////////////////////////////////////
-                    //Add entry to Event Log – Segment Done. 
+                    //Add entry to Event Log – Trip Ack. 
                     StringBuilder sbComment = new StringBuilder();
                     sbComment.Append(EventCommentConstants.ReceivedDriverAck);
                     sbComment.Append(" HH:");
@@ -204,12 +204,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         EventSeqNo = 0,
                         EventTerminalId = employeeMaster.TerminalId,
                         EventRegionId = employeeMaster.RegionId,
-                        //These are not populated for logins in the current system.
+                        //These are not populated in the current system.
                         // EventEmployeeId = driverStatus.EmployeeId,
                         // EventEmployeeName = Common.GetDriverName(employeeMaster),
                         EventTripNumber = driverTripAckProcess.TripNumber,
                         EventProgram = EventProgramConstants.Services,
-                        //These are not populated for enroutes in the current system.
+                        //These are not populated in the current system.
                         //EventScreen = null,
                         //EventAction = null,
                         EventComment = comment,
