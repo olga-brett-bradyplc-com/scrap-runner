@@ -71,6 +71,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Amount.
+        /// </summary>
+        public static string AmountHint {
+            get {
+                return ResourceManager.GetString("AmountHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Arrive.
         /// </summary>
         public static string ArriveLabel {
@@ -170,6 +179,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current Odometer.
+        /// </summary>
+        public static string CurrentOdometerHint {
+            get {
+                return ResourceManager.GetString("CurrentOdometerHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Customer Location.
         /// </summary>
         public static string CustomerLocation {
@@ -238,6 +256,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string FinishTripLabel {
             get {
                 return ResourceManager.GetString("FinishTripLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fuel Entry.
+        /// </summary>
+        public static string FuelEntry {
+            get {
+                return ResourceManager.GetString("FuelEntry", resourceCulture);
             }
         }
         
@@ -481,6 +508,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string RouteSummary {
             get {
                 return ResourceManager.GetString("RouteSummary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        public static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving.
+        /// </summary>
+        public static string SavingData {
+            get {
+                return ResourceManager.GetString("SavingData", resourceCulture);
             }
         }
         
