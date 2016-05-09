@@ -762,12 +762,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         EventSeqNo = 0,
                         EventTerminalId = employeeMaster.TerminalId,
                         EventRegionId = employeeMaster.RegionId,
-                        //These are not populated for logins in the current system.
+                        //These are not populated in the current system.
                         // EventEmployeeId = driverStatus.EmployeeId,
                         // EventEmployeeName = Common.GetDriverName(employeeMaster),
                         EventTripNumber = driverEnrouteProcess.TripNumber,
                         EventProgram = EventProgramConstants.Services,
-                        //These are not populated for enroutes in the current system.
+                        //These are not populated in the current system.
                         //EventScreen = null,
                         //EventAction = null,
                         EventComment = comment,
