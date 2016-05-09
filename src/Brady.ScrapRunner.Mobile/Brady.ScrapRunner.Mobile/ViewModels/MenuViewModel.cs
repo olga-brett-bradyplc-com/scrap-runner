@@ -34,5 +34,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 ShowViewModel<SignInViewModel>();
             }
         }
+        private MvxCommand _fuelentryCommand;
+
+        public MvxCommand FuelEntryCommand
+            => _fuelentryCommand ?? (_fuelentryCommand = new MvxCommand(ExecuteFuelEntryCommand));
+
+        public void ExecuteFuelEntryCommand()
+        {
+            ShowViewModel<FuelEntryViewModel>(_connection);
+        }
     }
 }

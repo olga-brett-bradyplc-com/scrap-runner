@@ -26,6 +26,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ICustomerService _customerService;
         private readonly IDriverService _driverService;
         private readonly IContainerService _containerService;
+        private readonly ICodeTableService _codeTableService;
         private readonly IConnectionService<DataServiceClient> _connection;
 
         public SignInViewModel(
@@ -35,6 +36,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ICustomerService customerService,
             IDriverService driverService,
             IContainerService containerService,
+            ICodeTableService codeTableService,
             IConnectionService<DataServiceClient> connection)
         {
             _dbService = dbService;
@@ -43,6 +45,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _customerService = customerService;
             _driverService = driverService;
             _containerService = containerService;
+            _codeTableService = codeTableService;
 
             _connection = connection;
             Title = AppResources.SignInTitle;
@@ -187,23 +190,23 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 loginData.Title = AppResources.LoadingPreferences;
 
-                    var preferenceObj = new PreferencesProcess
-                    {
-                        EmployeeId = UserName
-                    };
+                var preferenceObj = new PreferencesProcess
+                {
+                    EmployeeId = UserName
+                };
 
-                    var preferenceProcess = await _connection.GetConnection().UpdateAsync(preferenceObj, requeryUpdated: false);
+                var preferenceProcess = await _connection.GetConnection().UpdateAsync(preferenceObj, requeryUpdated: false);
 
-                    if (preferenceProcess.WasSuccessful)
-                    {
-                        await _preferenceService.UpdatePreferences(preferenceProcess.Item.Preferences);
-                    }
-                    else
-                    {
-                        await UserDialogs.Instance.AlertAsync(preferenceProcess.Failure.Summary,
-                            AppResources.Error, AppResources.OK);
-                        return false;
-                    }
+                if (preferenceProcess.WasSuccessful)
+                {
+                    await _preferenceService.UpdatePreferences(preferenceProcess.Item.Preferences);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(preferenceProcess.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
 
                 loginData.Title = AppResources.LoadingTripInformation;
 
@@ -214,34 +217,43 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 var tripProcess = await _connection.GetConnection().UpdateAsync(tripObj, requeryUpdated: false);
 
-                    if (tripProcess.WasSuccessful)
-                    {
-                        // @TODO : Should we throw an error/alert dialog to the end user if any of these fail?
+                if (tripProcess.WasSuccessful)
+                {
+                    // @TODO : Should we throw an error/alert dialog to the end user if any of these fail?
 
-                        if( tripProcess.Item?.Trips?.Count > 0 )
-                            await _tripService.UpdateTrips(tripProcess.Item.Trips);
+                    if( tripProcess.Item?.Trips?.Count > 0 )
+                        await _tripService.UpdateTrips(tripProcess.Item.Trips);
 
-                        if(tripProcess.Item?.TripSegments?.Count > 0)
-                            await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
+                    if(tripProcess.Item?.TripSegments?.Count > 0)
+                        await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
 
-                        if(tripProcess.Item?.TripSegmentContainers?.Count > 0)
-                            await _tripService.UpdateTripSegmentContainers(tripProcess.Item.TripSegmentContainers);
+                    if(tripProcess.Item?.TripSegmentContainers?.Count > 0)
+                        await _tripService.UpdateTripSegmentContainers(tripProcess.Item.TripSegmentContainers);
 
-                        if(tripProcess.Item?.CustomerCommodities?.Count > 0)
-                            await _customerService.UpdateCustomerCommodity(tripProcess.Item.CustomerCommodities);
+                    if(tripProcess.Item?.CustomerCommodities?.Count > 0)
+                        await _customerService.UpdateCustomerCommodity(tripProcess.Item.CustomerCommodities);
 
-                        if(tripProcess.Item?.CustomerDirections?.Count > 0)
-                            await _customerService.UpdateCustomerDirections(tripProcess.Item.CustomerDirections);
+                    if(tripProcess.Item?.CustomerDirections?.Count > 0)
+                        await _customerService.UpdateCustomerDirections(tripProcess.Item.CustomerDirections);
 
-                        if(tripProcess.Item?.CustomerLocations?.Count > 0)
-                            await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
-                    }
-                    else
-                    {
-                        await UserDialogs.Instance.AlertAsync(tripProcess.Failure.Summary,
-                            AppResources.Error, AppResources.OK);
-                        return false;
-                    }
+                    if(tripProcess.Item?.CustomerLocations?.Count > 0)
+                        await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(tripProcess.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
+                var states = await _connection.GetConnection().QueryAsync<CodeTable>(new QueryBuilder<CodeTable>()
+                .Filter(x => x.Property(y => y.CodeName).EqualTo(CodeTableNameConstants.StatesUSA)
+                .Or().Property(y => y.CodeName).EqualTo(CodeTableNameConstants.StatesCanada)
+                .Or().Property(y => y.CodeName).EqualTo(CodeTableNameConstants.StatesMexico))
+                .OrderBy(x => x.CodeName)
+                .OrderBy(x => x.CodeValue));
+
+                if (states.Records.Count > 0)
+                    await _codeTableService.UpdateCodeTable(states.Records);
 
             }
             return true;

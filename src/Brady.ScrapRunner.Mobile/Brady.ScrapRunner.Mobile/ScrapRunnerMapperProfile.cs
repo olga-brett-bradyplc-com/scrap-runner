@@ -22,6 +22,7 @@
             // @TODO: TripSegComments cannot be mapped. We are probably using the wrong property here.
             CreateMap<TripSegmentContainer, TripSegmentContainerModel>()
                 .ForMember(tsc => tsc.TripSegComments, opt => opt.Ignore());
+            CreateMap<CodeTable, CodeTableModel>();
         }
     }
 }

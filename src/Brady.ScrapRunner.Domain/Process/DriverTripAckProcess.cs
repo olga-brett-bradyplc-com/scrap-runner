@@ -11,13 +11,13 @@ namespace Brady.ScrapRunner.Domain.Process
     ///
     public class DriverTripAckProcess : IHaveId<string>, IEquatable<DriverTripAckProcess>
     {
-        ///The driver id from the phone.
+        ///The driver id.  Required.
         public virtual string EmployeeId { get; set; }
 
-        /// Trip Number from the phone.  Required.
+        /// Trip Number.  Required.
         public virtual string TripNumber { get; set; }
 
-        /// The ActionDateTime from the phone. Required.
+        /// The ActionDateTime. Required.
         public virtual DateTime ActionDateTime { get; set; }
 
         /// Currently this is the driver id. Probably will not be needed in the future.

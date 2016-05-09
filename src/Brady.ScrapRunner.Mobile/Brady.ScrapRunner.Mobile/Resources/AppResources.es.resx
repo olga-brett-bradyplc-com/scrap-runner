@@ -335,4 +335,23 @@
     <value>Yard/Scale ( spanish )</value>
     <comment>NEEDS TRANSLATION; RouteDetail</comment>
   </data>
+  <data name="FuelEntry" xml:space="preserve">
+    <value>Entrada de combustible</value>
+  </data>
+  <data name="AmountHint" xml:space="preserve">
+    <value>Cantidad</value>
+    <comment>Fuel Entry View</comment>
+  </data>
+  <data name="CurrentOdometerHint" xml:space="preserve">
+    <value>Cuentakilómetros Actual</value>
+    <comment>Fuel Entry View</comment>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Bueno</value>
+    <comment>Fuel Entry View</comment>
+  </data>
+  <data name="SavingData" xml:space="preserve">
+    <value>Ahorro</value>
+    <comment>Fuel Entry View</comment>
+  </data>
 </root>

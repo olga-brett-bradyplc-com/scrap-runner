@@ -366,9 +366,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             tripSegmentContainer.TripSegContainerNumber = containerOnPowerId.ContainerNumber;
                             tripSegmentContainer.TripSegContainerType = containerOnPowerId.ContainerType;
                             tripSegmentContainer.TripSegContainerSize = containerOnPowerId.ContainerSize;
-                            tripSegmentContainer.TripSegContainerCommodityCode = containerOnPowerId.ContainerCommodityCode;
-                            tripSegmentContainer.TripSegContainerCommodityDesc = containerOnPowerId.ContainerCommodityDesc;
                             tripSegmentContainer.TripSegContainerActionDateTime = driverArriveProcess.ActionDateTime;
+
+                            //Not applicable on an arrive.
+                            //tripSegmentContainer.TripSegContainerCommodityCode = containerOnPowerId.ContainerCommodityCode;
+                            //tripSegmentContainer.TripSegContainerCommodityDesc = containerOnPowerId.ContainerCommodityDesc;
 
                             //Do the update
                             changeSetResult = Common.UpdateTripSegmentContainer(dataService, settings, tripSegmentContainer);
