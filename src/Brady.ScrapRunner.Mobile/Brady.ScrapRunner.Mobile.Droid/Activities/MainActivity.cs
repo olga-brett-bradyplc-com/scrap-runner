@@ -41,6 +41,15 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
             return base.OnOptionsItemSelected(item);
         }
 
+        // Forcing a fragment replace solves some caching issues we were running in to. This may not be the best long term option.
+        // As a reminder, we're inheriting from MvxCachingFragmentCompatActivity instead of MvxFragmentCompatActivity because the latter
+        // doesn't implement IFragmentHost, which causes the app to crash. @TODO : Look into alternatives
+        protected override void ShowFragment(string tag, int contentId, Bundle bundle, bool forceAddToBackStack = false,
+            bool forceReplaceFragment = false)
+        {
+            base.ShowFragment(tag, contentId, bundle, forceAddToBackStack, true);
+        }
+
         private void ShowBackButton()
         {
             DrawerLayout.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
