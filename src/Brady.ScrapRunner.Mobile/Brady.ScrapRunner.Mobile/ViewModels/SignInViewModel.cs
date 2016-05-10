@@ -49,7 +49,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             _connection = connection;
             Title = AppResources.SignInTitle;
-            SignInCommand = new MvxCommand(ExecuteSignInCommand, CanExecuteSignInCommand);
+            SignInCommand = new MvxAsyncCommand(ExecuteSignInCommandAsync, CanExecuteSignInCommand);
         }
 
         private string _userName;
@@ -96,9 +96,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        public MvxCommand SignInCommand { get; protected set; }
+        public IMvxAsyncCommand SignInCommand { get; protected set; }
 
-        protected async void ExecuteSignInCommand()
+        protected async Task ExecuteSignInCommandAsync()
         {
             var userNameResults = Validate<UsernameValidator, string>(UserName);
             if (!userNameResults.IsValid)

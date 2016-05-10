@@ -98,9 +98,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _statesList, value); }
         }
 
-        private MvxCommand _saveFuelEntryCommand;
-        public MvxCommand SaveFuelEntryCommand => _saveFuelEntryCommand ??
-            (_saveFuelEntryCommand = new MvxCommand(ExecuteSaveFuelEntryCommand, CanExecuteSaveFuelEntryCommand));
+        private IMvxAsyncCommand _saveFuelEntryCommand;
+        public IMvxAsyncCommand SaveFuelEntryCommand => _saveFuelEntryCommand ??
+            (_saveFuelEntryCommand = new MvxAsyncCommand(ExecuteSaveFuelEntryCommandAsync, CanExecuteSaveFuelEntryCommand));
 
         protected bool CanExecuteSaveFuelEntryCommand()
         {
@@ -109,7 +109,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                    && !string.IsNullOrWhiteSpace(SelectedState);
         }
 
-        protected async void ExecuteSaveFuelEntryCommand()
+        protected async Task ExecuteSaveFuelEntryCommandAsync()
         {
             //TODO: add update db tables fuel entry routine
 
@@ -135,6 +135,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     message, AppResources.Error, AppResources.OK);
             }
         }
+
         private async Task<bool> SaveFuelEntryAsync()
         {
             using (var loginData = UserDialogs.Instance.Loading(AppResources.SavingData, maskType: MaskType.Black))

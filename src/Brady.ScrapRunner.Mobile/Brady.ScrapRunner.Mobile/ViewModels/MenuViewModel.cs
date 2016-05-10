@@ -20,10 +20,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _connection = connection;
         }
 
-        private MvxCommand _logoutCommand;
-        public MvxCommand LogoutCommand => _logoutCommand ?? (_logoutCommand = new MvxCommand(ExecuteLogout));
+        private IMvxAsyncCommand _logoutCommand;
+        public IMvxAsyncCommand LogoutCommand => _logoutCommand ?? (_logoutCommand = new MvxAsyncCommand(ExecuteLogoutAsync));
 
-        public async void ExecuteLogout()
+        public async Task ExecuteLogoutAsync()
         {
             var logoutDialog = await UserDialogs.Instance.ConfirmAsync(
                 AppResources.LogOutMessage, AppResources.LogOut, AppResources.Yes, AppResources.No);
@@ -41,7 +41,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public void ExecuteFuelEntryCommand()
         {
-            ShowViewModel<FuelEntryViewModel>(_connection);
+            ShowViewModel<FuelEntryViewModel>();
         }
     }
 }
