@@ -90,7 +90,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             ChangeSetResult<string> changeSetResult = base.ProcessChangeSet(dataService, changeSet, settings);
 
             // If no problems, we are free to process.
-            // We only process one driver arrive at a time but in the more general cases we could be processing multiple records.
+            // We only process one record at a time but in the more general cases we could be processing multiple records.
             // So we loop over the one to many keys in the changeSetResult.SuccessfullyUpdated
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
@@ -398,7 +398,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     currentTripSegment.TripSegPowerId = driverArriveProcess.PowerId;
                     currentTripSegment.TripSegDriverId = driverArriveProcess.EmployeeId;
-                    currentTripSegment.TripSegDriverName = Common.GetDriverName(employeeMaster);
+                    currentTripSegment.TripSegDriverName = Common.GetEmployeeName(employeeMaster);
                     currentTripSegment.TripSegOdometerEnd = driverArriveProcess.Odometer;
                     currentTripSegment.TripSegEndLatitude = driverArriveProcess.Latitude;
                     currentTripSegment.TripSegEndLongitude = driverArriveProcess.Longitude;
@@ -724,7 +724,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         EventRegionId = employeeMaster.RegionId,
                         //These are not populated in the current system.
                         // EventEmployeeId = driverStatus.EmployeeId,
-                        // EventEmployeeName = Common.GetDriverName(employeeMaster),
+                        // EventEmployeeName = Common.GetEmployeeName(employeeMaster),
                         EventTripNumber = driverArriveProcess.TripNumber,
                         EventProgram = EventProgramConstants.Services,
                         //These are not populated in the current system.
@@ -736,13 +736,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ChangeSetResult<int> eventChangeSetResult;
                     eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
                     log.Debug("SRTEST:Saving EventLog Record - Arrive");
-                    //if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
-                    //{
-                    //    var s = string.Format("Could not update EventLog for Driver {0} {1}.",
-                    //                         driverStatus.EmployeeId, EventCommentConstants.ReceivedDriverLogin);
-                    //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                    //    break;
-                    //}
+                    //Check for EventLog failure.
+                    if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
+                    {
+                        var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                                driverArriveProcess.EmployeeId, EventCommentConstants.ReceivedDriverArrive);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        break;
+                    }
 
                     ////////////////////////////////////////////////
                     // TODO: Check if trip is out of order. 
