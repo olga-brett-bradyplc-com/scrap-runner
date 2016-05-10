@@ -11,12 +11,15 @@
         public string SerializedRecord { get; set; }
         public QueueItemVerb Verb { get; set; }
         public string DataService { get; set; }
+        public string IdType { get; set; }
+        public string SerializedId { get; set; }
     }
 
     public enum QueueItemVerb
     {
         Create,
         Update,
-        Delete
+        Delete,
+        ChangeSet
     }
 }
