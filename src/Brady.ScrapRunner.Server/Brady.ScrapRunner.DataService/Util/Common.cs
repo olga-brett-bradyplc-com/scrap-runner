@@ -51,7 +51,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// </summary>
         /// <param name="employeeMaster"></param>
         /// <returns>null if employeeMaster is null or both name components are null</returns>
-        public static string GetDriverName(EmployeeMaster employeeMaster)
+        public static string GetEmployeeName(EmployeeMaster employeeMaster)
         {
             string driverName = null;
             if (null != employeeMaster)
@@ -196,6 +196,46 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return errorsDetected;
         }
+        /// <summary>
+        /// Log an entry into the specified logger for every detected failure within a changeSetResult.
+        /// </summary>
+        /// <param name="changeSetResult">Resulting change set from an update</param>
+        /// <param name="requestObject">Data that caused the error.  It should have a meaningful ToString() defined.</param>
+        /// <param name="log">Referece to the caller's logger</param>
+        /// <returns>true if a failure is detected</returns>
+        public static bool LogChangeSetFailure(ChangeSetResult<int> changeSetResult, object requestObject, ILog log)
+        {
+            var errorsDetected = false;
+            if (changeSetResult.FailedCreates.Any())
+            {
+                errorsDetected = true;
+                foreach (long key in changeSetResult.FailedCreates.Keys)
+                {
+                    var failedChange = changeSetResult.GetFailedCreateForRef(key);
+                    log.ErrorFormat("ChangeSet create error occured: {0},  Request object: {1}", failedChange, requestObject);
+                }
+            }
+            if (changeSetResult.FailedUpdates.Any())
+            {
+                errorsDetected = true;
+                foreach (int key in changeSetResult.FailedUpdates.Keys)
+                {
+                    var failedChange = changeSetResult.GetFailedUpdateForId(key);
+                    log.ErrorFormat("ChangeSet update error occured: {0}, Request object: {1}", failedChange, requestObject);
+                }
+            }
+            if (changeSetResult.FailedDeletions.Any())
+            {
+                errorsDetected = true;
+                foreach (int key in changeSetResult.FailedDeletions.Keys)
+                {
+                    var failedChange = changeSetResult.GetFailedDeleteForId(key);
+                    log.ErrorFormat("ChangeSet delete error occured: {0}, Request object: {1}", failedChange, requestObject);
+                }
+            }
+            return errorsDetected;
+        }
+
         /// <summary>
         /// Insert a ContainerHistory record.
         ///  Note:  caller must handle faults.  E.G. if( handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
@@ -573,7 +613,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 TripSegStatusDesc = tripSegStatusDesc,
                 DriverStatus = driverStatus.Status,
                 DriverStatusDesc = driverStatusDesc,
-                DriverName = Common.GetDriverName(employeeMaster),
+                DriverName = Common.GetEmployeeName(employeeMaster),
                 TerminalId = driverStatus.TerminalId,
                 TerminalName = driverTerminalName,
                 RegionId = driverStatus.RegionId,
@@ -615,6 +655,49 @@ namespace Brady.ScrapRunner.DataService.Util
             return true;
         }
         /// <summary>
+        /// Insert a Message Record
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="log"></param>
+        /// <param name="message"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static bool InsertMessage(IDataService dataService, ProcessChangeSetSettings settings,
+             IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log,
+             Messages message, out DataServiceFault fault)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+
+            //For testing
+            log.Debug("SRTEST:Add Message");
+            log.DebugFormat("SRTEST:Sender:{0}-{1} Receiver:{2}-{3} Msg:{4}",
+                             message.SenderId,
+                             message.SenderName,
+                             message.ReceiverId,
+                             message.ReceiverName,
+                             message.MsgText);
+
+
+            // Insert Message 
+            var recordType = (MessagesRecordType)dataService.RecordTypes.Single(x => x.TypeName == "Messages");
+            var changeSet = (ChangeSet<int, Messages>)recordType.GetNewChangeSet();
+            long recordRef = 1;
+            changeSet.AddCreate(recordRef, message, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving Messages");
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            //ToDo: add fault checking
+            fault = null;
+            if (Common.LogChangeSetFailure(changeSetResult, message, log))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Insert a PowerFuel record.
         ///  Note:  caller must handle faults.  
         /// </summary>
@@ -633,8 +716,7 @@ namespace Brady.ScrapRunner.DataService.Util
             List<long> userRoleIds = userRoleIdsEnumerable.ToList();
 
             //////////////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////////////////////////
-            //Lookup the last power record for this trip and segment number to get the last sequence number used
+            //Lookup the last power record for this powerid and trip number to get the last sequence number used
             var powerFuelMax = Common.GetPowerFuelLast(dataService, settings, userCulture, userRoleIds,
                                powerFuel.PowerId, powerFuel.TripNumber, out fault);
             if (null != fault)
@@ -805,7 +887,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 PowerDateOutOfService = powerMaster.PowerDateOutOfService,
                 PowerDateInService = powerMaster.PowerDateInService,
                 PowerDriverId = powerMaster.PowerDriverId,
-                PowerDriverName = Common.GetDriverName(employeeMaster),
+                PowerDriverName = Common.GetEmployeeName(employeeMaster),
                 PowerOdometer = powerMaster.PowerOdometer,
                 PowerComments = powerMaster.PowerComments,
                 MdtId = powerMaster.MdtId,
@@ -971,7 +1053,23 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-
+        ///TABLE UPDATES
+        /// <summary>
+        /// Updates a Messages record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="messages"></param>
+        /// <returns></returns>
+        public static ChangeSetResult<int> UpdateMessages(IDataService dataService, ProcessChangeSetSettings settings,
+                                                  Messages messages)
+        {
+            var recordType = (MessagesRecordType)dataService.RecordTypes.Single(x => x.TypeName == "Messages");
+            var changeSet = (ChangeSet<int, Messages>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(messages.Id, messages);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
         ///TABLE UPDATES
         /// <summary>
         /// Update a PowerMaster record.
@@ -2024,6 +2122,41 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         /// EMPLOYEEMASTER Table queries
         /// <summary>
+        ///  Get an employee record from the EmployeeMaster for any employee
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="employeeId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty EmployeeMaster if employeeId is null or record does not exist for driver</returns>
+        public static EmployeeMaster GetEmployeeMaster(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string employeeId, out DataServiceFault fault)
+        {
+            fault = null;
+            EmployeeMaster employee = new EmployeeMaster();
+            if (null != employeeId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<EmployeeMaster>()
+                         .Filter(t => t.Property(p => p.EmployeeId).EqualTo(employeeId))
+                         .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return employee;
+                }
+                employee = (EmployeeMaster)queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
+            }
+            return employee;
+        }
+        /// EMPLOYEEMASTER Table queries
+        /// <summary>
         ///  Get a list of users that have access to messaging for the driver's area
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
@@ -2101,6 +2234,46 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return users;
         }
+        /// MESSAGE Table queries
+        /// <summary>
+        ///  Get messages that need to be sent to the driver
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="employeeId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if areaId is null or no entries are found</returns>
+        public static List<Messages> GetMessagesForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string employeeId, out DataServiceFault fault)
+        {
+            fault = null;
+            var messages = new List<Messages>();
+            if (null != employeeId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Messages>()
+                        .Filter(y => y.Property(x => x.ReceiverId).EqualTo(employeeId)
+                        .And().Property(x => x.Processed).EqualTo(Constants.No)
+                        .And().Property(x => x.DeleteFlag).EqualTo(Constants.No))
+                        .OrderBy(x => x.CreateDateTime)
+                        .GetQuery()
+                };
+
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return messages;
+                }
+                messages = queryResult.Records.Cast<Messages>().ToList();
+            }
+            return messages;
+        }
+
+        /// POWERFUEL Table queries
         /// <summary>
         /// Get the last power fuel record for powerid and tripnumber/driver id
         /// </summary>

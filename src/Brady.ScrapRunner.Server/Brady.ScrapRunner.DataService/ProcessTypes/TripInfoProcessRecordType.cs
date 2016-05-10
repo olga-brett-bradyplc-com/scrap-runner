@@ -134,7 +134,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     bool bLogin = true;
 
                     //Process will return the following lists.
-                    List<Trip> tripList = new List<Trip>();
+                    List<Trip> fullTripList = new List<Trip>();
                     List<TripSegment> fullTripSegmentList = new List<TripSegment>();
                     List<TripSegmentContainer> fullTripSegmentContainerList = new List<TripSegmentContainer>();
                     List<TripReferenceNumber> fullTripReferenceNumberList = new List<TripReferenceNumber>();
@@ -168,7 +168,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
-                    // Lookup trip  
+                    // Get the list of trips for driver
+                    var tripList = new List<Trip>();
                     if (bLogin)
                     {
                         tripList = Common.GetTripsForDriverAtLogin(dataService, settings, userCulture, userRoleIds,
@@ -184,6 +185,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
+                    //Save the list for sending to driver
+                    fullTripList.AddRange(tripList);
+
                     var customersInTrips = new List<string>();
                     foreach (var tripInfo in tripList)
                     {
@@ -203,12 +207,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //For each trip, get the reference numbers
                         var tripReferenceNumberList = Common.GetTripReferenceNumbers(dataService, settings, userCulture, userRoleIds,
                                             tripInfo.TripNumber, out fault);
-                        fullTripReferenceNumberList.AddRange(tripReferenceNumberList);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
+                        //Save the list for sending to driver
+                        fullTripReferenceNumberList.AddRange(tripReferenceNumberList);
                         //For testing
                         log.Debug("SRTEST:TripInfoProcess - Trip Reference Numbers");
                         foreach (var tripreference in tripReferenceNumberList)
@@ -223,12 +228,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //For each trip, get the incomplete segments
                         var tripSegmentList = Common.GetTripSegmentsIncomplete(dataService, settings, userCulture, userRoleIds,
                                           tripInfo.TripNumber, out fault);
-                        fullTripSegmentList.AddRange(tripSegmentList);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
+                        //Save the list for sending to driver
+                        fullTripSegmentList.AddRange(tripSegmentList);
                         //For testing
                         log.Debug("SRTEST:TripInfoProcess - Trip Segment");
                         foreach (var tripsegment in tripSegmentList)
@@ -253,12 +259,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         var tripContainerList = new List<TripSegmentContainer>();
                         tripContainerList = Common.GetTripContainers(dataService, settings, userCulture, userRoleIds,
                                             tripInfo.TripNumber, out fault);
-                        fullTripSegmentContainerList.AddRange(tripContainerList);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
+                        //Save the list for sending to driver
+                        fullTripSegmentContainerList.AddRange(tripContainerList);
                         //For testing
                         log.Debug("SRTEST:TripInfoProcess - Trip Containers");
                         foreach (var tripsegcontainer in tripContainerList)
@@ -281,12 +288,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         var custDirectionsList = Common.GetCustomerDirections(dataService, settings, userCulture, userRoleIds,
                                              custHostCode, out fault);
-                        fullCustomerDirectionsList.AddRange(custDirectionsList);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
+                        //Save the list for sending to driver
+                        fullCustomerDirectionsList.AddRange(custDirectionsList);
                         if (custDirectionsList.Count > 0)
                         {
                             StringBuilder sbDirections = new StringBuilder();
@@ -312,12 +320,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         {
                             var custCommodityList = Common.GetCustomerCommodities(dataService, settings, userCulture, userRoleIds,
                                                   custHostCode, out fault);
-                            fullCustomerCommodityList.AddRange(custCommodityList);
                             if (fault != null)
                             {
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                                 break;
                             }
+                            //Save the list for sending to driver
+                            fullCustomerCommodityList.AddRange(custCommodityList);
                             foreach (var customerCommodity in custCommodityList)
                             {
                                 log.DebugFormat("SRTEST:HostCode:{0} Code:{1} Desc:{2}",
@@ -335,12 +344,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         var custLocationsList = Common.GetCustomerLocations(dataService, settings, userCulture, userRoleIds,
                                             custHostCode, out fault);
-                        fullCustomerLocationList.AddRange(custLocationsList);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
+                        //Save the list for sending to driver
+                        fullCustomerLocationList.AddRange(custLocationsList);
                         foreach (var customerLocation in custLocationsList)
                         {
 
@@ -349,7 +359,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                            customerLocation.CustLocation);
                         }
                     }
-                    tripInfoProcess.Trips = tripList;
+                    //Set the return values
+                    tripInfoProcess.Trips = fullTripList;
                     tripInfoProcess.TripSegments = fullTripSegmentList;
                     tripInfoProcess.TripSegmentContainers = fullTripSegmentContainerList;
                     tripInfoProcess.TripReferenceNumbers = fullTripReferenceNumberList;

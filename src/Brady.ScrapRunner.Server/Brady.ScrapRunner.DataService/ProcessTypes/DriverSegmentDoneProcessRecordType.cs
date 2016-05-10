@@ -286,7 +286,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     currentTripSegment.TripSegPowerId = driverSegmentDoneProcess.PowerId;
                     currentTripSegment.TripSegPowerAssetNumber = powerMaster.PowerAssetNumber;
                     currentTripSegment.TripSegDriverId = driverSegmentDoneProcess.EmployeeId;
-                    currentTripSegment.TripSegDriverName = Common.GetDriverName(employeeMaster);
+                    currentTripSegment.TripSegDriverName = Common.GetEmployeeName(employeeMaster);
                     currentTripSegment.TripSegEndLatitude = driverSegmentDoneProcess.Latitude;
                     currentTripSegment.TripSegEndLongitude = driverSegmentDoneProcess.Longitude;
 
@@ -596,7 +596,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         EventRegionId = employeeMaster.RegionId,
                         //These are not populated in the current system.
                         // EventEmployeeId = driverStatus.EmployeeId,
-                        // EventEmployeeName = Common.GetDriverName(employeeMaster),
+                        // EventEmployeeName = Common.GetEmployeeName(employeeMaster),
                         EventTripNumber = driverSegmentDoneProcess.TripNumber,
                         EventProgram = EventProgramConstants.Services,
                         //These are not populated in the current system.
@@ -608,13 +608,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ChangeSetResult<int> eventChangeSetResult;
                     eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
                     log.Debug("SRTEST:Saving EventLog Record - Segment Done");
-                    //if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
-                    //{
-                    //    var s = string.Format("Could not update EventLog for Driver {0} {1}.",
-                    //                         driverStatus.EmployeeId, EventCommentConstants.ReceivedDriverLogin);
-                    //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                    //    break;
-                    //}
+                    //Check for EventLog failure.
+                    if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
+                    {
+                        var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                                driverSegmentDoneProcess.EmployeeId, EventCommentConstants.ReceivedDriverSegDone);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        break;
+                    }
 
                     //TODO Maybe not.  Check all dates and odometers for accuracy.
                     //Make sure drive and stop start and end date/ times are within the range of the segment start and end date / times.
@@ -907,7 +908,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                             select item.TripSegDriverId).LastOrDefault();
 
             //Set the Trip Changed UserName to the driver name.
-            currentTrip.TripChangedUserName = Common.GetDriverName(employeeMaster);
+            currentTrip.TripChangedUserName = Common.GetEmployeeName(employeeMaster);
 
             //Set the Trip Completed UserId to the Trip Changed UserId.
             currentTrip.TripCompletedUserId = currentTrip.TripChangedUserId;
