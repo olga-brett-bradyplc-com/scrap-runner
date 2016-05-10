@@ -5,7 +5,7 @@
 
     public interface IQueueService
     {
-        Task InsertQueueItemAsync<T>(T obj, QueueItemVerb verb, string dataService);
+        Task EnqueueItemAsync(QueueItemModel queueItem);
         Task ProcessQueueAsync();
         Task<bool> IsEmptyAsync();
     }

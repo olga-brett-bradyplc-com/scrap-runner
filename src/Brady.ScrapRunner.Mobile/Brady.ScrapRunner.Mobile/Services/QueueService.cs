@@ -2,92 +2,95 @@
 {
     using System;
     using System.Threading.Tasks;
+    using BWF.DataServices.Domain.Interfaces;
+    using BWF.DataServices.Metadata.Models;
     using BWF.DataServices.PortableClients.Interfaces;
     using Interfaces;
     using Models;
     using MvvmCross.Platform;
-    using MvvmCross.Platform.Platform;
     using Newtonsoft.Json;
 
     public class QueueService : IQueueService
     {
         private readonly IRepository<QueueItemModel> _repository;
-        private readonly IMvxJsonConverter _jsonConverter;
-        private readonly IConnectionService<OfflineCapableDataServiceClient> _connectionService;
+        private readonly IConnectionService<QueuedDataServiceClient> _connectionService;
 
         public QueueService(
             IRepository<QueueItemModel> repository, 
-            IMvxJsonConverter jsonConverter,
-            IConnectionService<OfflineCapableDataServiceClient> connectionService)
+            IConnectionService<QueuedDataServiceClient> connectionService)
         {
             _repository = repository;
-            _jsonConverter = jsonConverter;
             _connectionService = connectionService;
         }
 
-        public Task InsertQueueItemAsync<T>(T obj, QueueItemVerb verb, string dataService)
+        public Task EnqueueItemAsync(QueueItemModel queueItem)
         {
-            var queueItem = new QueueItemModel
-            {
-                RecordType = obj.GetType().ToString(),
-                SerializedRecord = _jsonConverter.SerializeObject(obj),
-                Verb = verb,
-                DataService = dataService
-            };
             return _repository.InsertAsync(queueItem);
         }
 
         public async Task ProcessQueueAsync()
         {
-            Mvx.Trace("ProcessQueueAsync started");
-            var onlineConnection = _connectionService.GetConnection().DataServiceClient;
-            var queueItemList = await _repository.AsQueryable().ToListAsync();
-            foreach (var queueItem in queueItemList)
+            var queueItem = await _repository.AsQueryable().FirstOrDefaultAsync();
+            if (queueItem == null) return;
+            var client = _connectionService.GetConnection().DataServiceClient;
+            var success = false;
+            switch (queueItem.Verb)
             {
-                Mvx.Trace($"Processing QueueItem {queueItem.RecordId}");
-                dynamic json = JsonConvert.DeserializeObject(queueItem.SerializedRecord);
-                switch (queueItem.Verb)
-                {
-                    case QueueItemVerb.Create:
-                        var createResult = await CreateAsync(onlineConnection, json, queueItem.DataService);
-                        if (createResult)
-                            await DeleteQueueItem(queueItem);
-                        break;
-                    case QueueItemVerb.Update:
-                        var updateResult = await UpdateAsync(onlineConnection, json, queueItem.DataService);
-                        if (updateResult)
-                            await DeleteQueueItem(queueItem);
-                        break;
-                    case QueueItemVerb.Delete:
-                        // @TODO: Implement
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                case QueueItemVerb.Create:
+                    var createResult = await CreateAsync(client, queueItem);
+                    success = createResult.WasSuccessful;
+                    Mvx.Trace("QueueService.CreateAsync");
+                    break;
+                case QueueItemVerb.Update:
+                    var updateResult = await UpdateAsync(client, queueItem);
+                    success = updateResult.WasSuccessful;
+                    Mvx.Trace("QueueService.UpdateAsync");
+                    break;
+                case QueueItemVerb.Delete:
+                    // @TODO: Implement.
+                    break;
+                case QueueItemVerb.ChangeSet:
+                    var changeSetResult = await ProcessChangeSetAsync(client, queueItem);
+                    // @TODO: How to determine if IChangeSetResult succeeded or failed?
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-            Mvx.Trace("ProcessQueueAsync stopped");
-        }
-
-        private async Task<bool> CreateAsync<T>(IDataServiceClient dataServiceClient, T item, string dataService)
-        {
-            var response = await dataServiceClient.CreateAsync(item, dataService, false);
-            return response.WasSuccessful;
-        }
-
-        private async Task<bool> UpdateAsync<T>(IDataServiceClient dataServiceClient, T item, string dataService)
-        {
-            var response = await dataServiceClient.UpdateAsync(item, dataService, false);
-            return response.WasSuccessful;
-        }
-
-        private Task DeleteQueueItem(QueueItemModel queueItem)
-        {
-            return _repository.DeleteAsync(queueItem);
+            if (success)
+                await _repository.DeleteAsync(queueItem);
         }
 
         public async Task<bool> IsEmptyAsync()
         {
             return await _repository.AsQueryable().CountAsync() > 0;
+        }
+
+        private Task<ChangeResult> CreateAsync(IDataServiceClient client, QueueItemModel queueItem)
+        {
+            var objectType = Type.GetType(queueItem.RecordType);
+            dynamic dynamicObject = JsonConvert.DeserializeObject(queueItem.SerializedRecord, objectType);
+            return client.CreateAsync(dynamicObject, queueItem.DataService, false);
+        }
+
+        private Task<ChangeResult> UpdateAsync(IDataServiceClient client, QueueItemModel queueItem)
+        {
+            var objectType = Type.GetType(queueItem.RecordType);
+            dynamic dynamicObject = JsonConvert.DeserializeObject(queueItem.SerializedRecord, objectType);
+            return client.UpdateAsync(dynamicObject, queueItem.DataService, false);
+        }
+
+        //private Task<ChangeResult> DeleteAsync(IDataServiceClient client, QueueItemModel queueItem)
+        //{
+        //    var idType = Type.GetType(queueItem.IdType);
+        //    dynamic dynamicId = JsonConvert.DeserializeObject(queueItem.SerializedId, idType);
+        //    return client.DeleteAsync(dynamicId, queueItem.DataService);
+        //}
+
+        private Task<IChangeSetResult> ProcessChangeSetAsync(IDataServiceClient client, QueueItemModel queueItem)
+        {
+            var objectType = Type.GetType(queueItem.SerializedRecord);
+            dynamic changeSet = JsonConvert.DeserializeObject(queueItem.SerializedRecord, objectType);
+            return client.ProcessChangeSetAsync(changeSet, queueItem.DataService);
         }
     }
 }

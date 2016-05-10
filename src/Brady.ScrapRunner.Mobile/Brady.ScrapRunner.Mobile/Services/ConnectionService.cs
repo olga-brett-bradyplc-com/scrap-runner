@@ -4,13 +4,13 @@
     using BWF.DataServices.PortableClients.Interfaces;
     using Interfaces;
 
-    public class ConnectionService : IConnectionService<OfflineCapableDataServiceClient>
+    public class ConnectionService : IConnectionService<QueuedDataServiceClient>
     {
         private IDataServiceClient Connection { get; set; }
         
         public bool CreateConnection(string hosturl, string username, string password, string dataService = null)
         {
-            Connection = new OfflineCapableDataServiceClient(hosturl, username, password, dataService);
+            Connection = new QueuedDataServiceClient(hosturl, username, password, dataService);
             return true;
         }
 
@@ -23,9 +23,9 @@
             }
         }
 
-        public OfflineCapableDataServiceClient GetConnection()
+        public QueuedDataServiceClient GetConnection()
         {
-            return (OfflineCapableDataServiceClient) Connection;
+            return (QueuedDataServiceClient) Connection;
         }
     }
 }

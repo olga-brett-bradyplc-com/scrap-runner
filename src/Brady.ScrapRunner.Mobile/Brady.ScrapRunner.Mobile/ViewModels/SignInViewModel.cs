@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IPreferenceService _preferenceService;
         private readonly ITripService _tripService;
         private readonly ICustomerService _customerService;
-        private readonly IConnectionService<OfflineCapableDataServiceClient> _connection;
+        private readonly IConnectionService<QueuedDataServiceClient> _connection;
         private readonly IQueueScheduler _queueScheduler;
 
         public SignInViewModel(
@@ -28,7 +28,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IPreferenceService preferenceService,
             ITripService tripService,
             ICustomerService customerService,
-            IConnectionService<OfflineCapableDataServiceClient> connection, 
+            IConnectionService<QueuedDataServiceClient> connection, 
             IQueueScheduler queueScheduler)
         {
             _dbService = dbService;

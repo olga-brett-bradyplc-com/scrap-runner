@@ -82,7 +82,7 @@
     <Compile Include="Services\ConnectionService.cs" />
     <Compile Include="Services\DemoClientSettings.cs" />
     <Compile Include="Services\LocationService.cs" />
-    <Compile Include="Services\OfflineCapableDataServiceClient.cs" />
+    <Compile Include="Services\QueuedDataServiceClient.cs" />
     <Compile Include="Services\PreferenceService.cs" />
     <Compile Include="Services\DbService.cs" />
     <Compile Include="Services\QueueService.cs" />
