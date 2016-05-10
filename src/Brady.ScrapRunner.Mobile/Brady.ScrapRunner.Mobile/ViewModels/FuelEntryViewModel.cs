@@ -29,8 +29,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IPreferenceService _preferenceService;
         private readonly IDriverService _driverService;
 
-        public FuelEntryViewModel(IConnectionService<DataServiceClient> connection,
-                                  IDriverService driverService,
+        public FuelEntryViewModel(IDriverService driverService,
                                   IPreferenceService preferenceService,
                                   ICodeTableService codeTableService)
         {
@@ -40,6 +39,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             Title = AppResources.FuelEntry;
         }
+
         public override async void Start()
         {
             var currentCountryPreference = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCountry);
@@ -68,8 +68,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 SaveFuelEntryCommand.RaiseCanExecuteChanged();
             }
         }
-        private float _fuelAmount;
-        public float FuelAmount
+
+        private float? _fuelAmount;
+        public float? FuelAmount
         {
             get { return _fuelAmount; }
             set
@@ -78,16 +79,18 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 SaveFuelEntryCommand.RaiseCanExecuteChanged();
             }
         }
+
         private string _selectedState;
         public string SelectedState
         {
             get { return _selectedState; }
             set
             {
-                _selectedState = value; RaisePropertyChanged(() => SelectedState);
+                SetProperty(ref _selectedState, value);
                 SaveFuelEntryCommand.RaiseCanExecuteChanged();
             }
         }
+
         private ObservableCollection<CodeTableModel> _statesList;
         public ObservableCollection<CodeTableModel> StatesList
         {
@@ -95,22 +98,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _statesList, value); }
         }
 
-        //public MvxCommand<CodeTableModel> SelectStateCommand { get; private set; }
-        //private void ExecuteSelectStateCommand(CodeTableModel stateInfo)
-        //{
-        //    SelectedState = stateInfo.CodeDisp1;
-        //}
-
         private MvxCommand _saveFuelEntryCommand;
         public MvxCommand SaveFuelEntryCommand => _saveFuelEntryCommand ??
             (_saveFuelEntryCommand = new MvxCommand(ExecuteSaveFuelEntryCommand, CanExecuteSaveFuelEntryCommand));
 
         protected bool CanExecuteSaveFuelEntryCommand()
         {
-            return !string.IsNullOrWhiteSpace(OdometerReading.ToString())
-                   && !string.IsNullOrWhiteSpace(FuelAmount.ToString())
+            return OdometerReading.HasValue
+                   && FuelAmount.HasValue
                    && !string.IsNullOrWhiteSpace(SelectedState);
         }
+
         protected async void ExecuteSaveFuelEntryCommand()
         {
             //TODO: add update db tables fuel entry routine
@@ -152,7 +150,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     State = SelectedState,
                     TripNumber = currentUser.TripNumber,
                     TripSegNumber = currentUser.TripSegNumber,
-                    FuelAmount = FuelAmount
+                    FuelAmount = FuelAmount ?? default(float)
                 });
 
                 if (fuelEntry.WasSuccessful) return true;

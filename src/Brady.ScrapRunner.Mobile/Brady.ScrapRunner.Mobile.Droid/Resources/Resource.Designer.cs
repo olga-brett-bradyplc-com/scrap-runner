@@ -3028,7 +3028,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			public const int material_gray_300 = 2131230795;
 			
 			// aapt resource value: 0x7f08004c
-			public const int material_gray_400 = 2131230796;
+			public const int material_gray_500 = 2131230796;
 			
 			// aapt resource value: 0x7f08004d
 			public const int material_gray_700 = 2131230797;
@@ -5519,11 +5519,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f07001f
 			public const int Platform_Widget_AppCompat_Spinner = 2131165215;
 			
-			// aapt resource value: 0x7f070161
-			public const int RoundedEditTextBottom = 2131165537;
+			// aapt resource value: 0x7f070162
+			public const int RoundedEditTextBottom = 2131165538;
 			
-			// aapt resource value: 0x7f070160
-			public const int RoundedEditTextTop = 2131165536;
+			// aapt resource value: 0x7f070161
+			public const int RoundedEditTextTop = 2131165537;
 			
 			// aapt resource value: 0x7f07002c
 			public const int RtlOverlay_DialogWindowTitle_AppCompat = 2131165228;
@@ -5575,6 +5575,9 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			
 			// aapt resource value: 0x7f07015e
 			public const int ScrapRunnerTheme_SignIn = 2131165534;
+			
+			// aapt resource value: 0x7f070160
+			public const int ScrapRunnerTheme_TextAppearance_Dark = 2131165536;
 			
 			// aapt resource value: 0x7f07015f
 			public const int ScrapRunnerTheme_TextAppearance_Light = 2131165535;
