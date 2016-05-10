@@ -80,8 +80,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        private string _selectedState;
-        public string SelectedState
+        private CodeTableModel _selectedState;
+        public CodeTableModel SelectedState
         {
             get { return _selectedState; }
             set
@@ -106,7 +106,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             return OdometerReading.HasValue
                    && FuelAmount.HasValue
-                   && !string.IsNullOrWhiteSpace(SelectedState);
+                   && !string.IsNullOrWhiteSpace(SelectedState?.CodeValue);
         }
 
         protected async Task ExecuteSaveFuelEntryCommandAsync()
@@ -148,7 +148,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     Odometer = OdometerReading ?? default(int),
                     ActionDateTime = DateTime.Now,
                     PowerId = currentUser.PowerId,
-                    State = SelectedState,
+                    State = SelectedState.CodeValue,
                     TripNumber = currentUser.TripNumber,
                     TripSegNumber = currentUser.TripSegNumber,
                     FuelAmount = FuelAmount ?? default(float)
