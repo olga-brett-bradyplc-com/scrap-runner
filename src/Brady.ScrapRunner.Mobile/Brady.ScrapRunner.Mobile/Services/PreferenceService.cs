@@ -4,20 +4,47 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
+using BWF.DataServices.Metadata.Models;
+using BWF.DataServices.PortableClients;
 
 namespace Brady.ScrapRunner.Mobile.Services
 {
     public class PreferenceService : IPreferenceService
     {
+        private readonly IConnectionService<DataServiceClient> _connection; 
         private readonly IRepository<PreferenceModel> _preferenceRepository;
 
-        public PreferenceService(
-            IRepository<PreferenceModel> preferenceRepository
-            )
+        public PreferenceService( 
+            IRepository<PreferenceModel> preferenceRepository, 
+            IConnectionService<DataServiceClient> connection)
         {
+            _connection = connection;
             _preferenceRepository = preferenceRepository;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="preferenceProcess"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<PreferencesProcess>> FindPreferencesRemoteAsync(PreferencesProcess preferenceProcess)
+        {
+            var preferences = await _connection.GetConnection().UpdateAsync(preferenceProcess, requeryUpdated: false);
+            return preferences;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="preferenceCode"></param>
+        /// <returns></returns>
+        public async Task<string> FindPreferenceValueAsync(string preferenceCode)
+        {
+            var currentPreference = await _preferenceRepository.FindAsync(p => p.Parameter == preferenceCode);
+            return currentPreference.ParameterValue;
         }
 
         /// <summary>

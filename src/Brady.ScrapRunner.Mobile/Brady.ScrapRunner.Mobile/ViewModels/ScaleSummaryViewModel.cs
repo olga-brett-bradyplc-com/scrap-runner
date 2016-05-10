@@ -21,7 +21,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _tripService = tripService;
 
             Title = AppResources.YardScaleSummary;
-
             ContainerSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteContainerSelectedCommand);
         }
 

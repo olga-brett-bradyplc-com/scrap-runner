@@ -141,6 +141,6 @@
             android:layout_height="match_parent"
             android:background="@color/material_gray_900"
             android:textColor="@color/material_white"
-            local:MvxBind="Click NextStageCommand" />
+            local:MvxBind="Text NextActionLabel; Click NextStageCommand" />
     </LinearLayout>
 </RelativeLayout>

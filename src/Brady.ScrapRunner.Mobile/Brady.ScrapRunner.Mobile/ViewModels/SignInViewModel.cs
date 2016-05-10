@@ -149,6 +149,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
+                // Trying to push all remote calls via BWF down into a respective service, since however we don't
+                // have a need for a login service, leaving this as it is.
                 var loginProcess = await _connection.GetConnection().UpdateAsync(
                     new DriverLoginProcess {
                         EmployeeId = UserName,
@@ -195,7 +197,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     EmployeeId = UserName
                 };
 
-                var preferenceProcess = await _connection.GetConnection().UpdateAsync(preferenceObj, requeryUpdated: false);
+                var preferenceProcess = await _preferenceService.FindPreferencesRemoteAsync(new PreferencesProcess { EmployeeId = UserName });
 
                 if (preferenceProcess.WasSuccessful)
                 {
@@ -210,12 +212,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 loginData.Title = AppResources.LoadingTripInformation;
 
-                var tripObj = new TripInfoProcess
+                var tripProcess = await _tripService.FindTripsRemoteAsync(new TripInfoProcess
                 {
                     EmployeeId = UserName
-                };
-
-                var tripProcess = await _connection.GetConnection().UpdateAsync(tripObj, requeryUpdated: false);
+                });
 
                 if (tripProcess.WasSuccessful)
                 {
@@ -245,15 +245,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
-                var states = await _connection.GetConnection().QueryAsync<CodeTable>(new QueryBuilder<CodeTable>()
-                .Filter(x => x.Property(y => y.CodeName).EqualTo(CodeTableNameConstants.StatesUSA)
-                .Or().Property(y => y.CodeName).EqualTo(CodeTableNameConstants.StatesCanada)
-                .Or().Property(y => y.CodeName).EqualTo(CodeTableNameConstants.StatesMexico))
-                .OrderBy(x => x.CodeName)
-                .OrderBy(x => x.CodeValue));
 
-                if (states.Records.Count > 0)
-                    await _codeTableService.UpdateCodeTable(states.Records);
+                loginData.Title = AppResources.LoadingMiscInformation;
+
+                var codesTable = await _codeTableService.FindCodesRemoteAsync(new CodeTableProcess { EmployeeId = UserName });
+
+                if (codesTable.WasSuccessful)
+                {
+                    await _codeTableService.UpdateCodeTable(codesTable.Item.CodeTables);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(codesTable.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
 
             }
             return true;

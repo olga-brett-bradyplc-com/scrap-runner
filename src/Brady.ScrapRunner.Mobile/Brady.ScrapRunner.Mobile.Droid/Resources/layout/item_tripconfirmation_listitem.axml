@@ -13,7 +13,7 @@
         android:layout_alignParentLeft="true"
         android:textColor="@color/material_gray_900"
         tools:text="LU"
-        local:MvxBind="Text DefaultTripSegContainerSeqNumber + ' ' + TripSegContainerType + '-' + TripSegContainerSize" />
+        local:MvxBind="Text DefaultTripSegContainerNumber + ' ' + TripSegContainerType + '-' + TripSegContainerSize" />
     <TextView
         android:id="@+id/tripContainerLocation"
         android:layout_width="match_parent"
