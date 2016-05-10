@@ -38,6 +38,10 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLoginProcess"
         },
         {
+          "text": "DriverMessageProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverMessageProcess"
+        },
+        {
           "text": "DriverSegmentDoneProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverSegmentDoneProcess"
         },

@@ -38,6 +38,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                   , new DriverHistoryMetadata()
                   , new DriverLoginProcessMetadata()
                   , new DriverMasterMetadata()
+                  , new DriverMessageProcessMetadata()
                   , new DriverSegmentDoneProcessMetadata()
                   , new DriverStatusMetadata()
                   , new DriverTripAckProcessMetadata()
