@@ -186,11 +186,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (confirm)
             {
 
-                var currentDriver = await _driverService.GetCurrentDriverStatus();
+                var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
                 using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
                 {
-                    var setDriverEnroute = await _driverService.SetDriverEnroute(new DriverEnrouteProcess
+                    var setDriverEnroute = await _driverService.SetDriverEnrouteRemoteAsync(new DriverEnrouteProcess
                     {
                         EmployeeId = currentDriver.EmployeeId,
                         PowerId = currentDriver.PowerId,
@@ -225,11 +225,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmArrivalTitle);
             if (confirm)
             {
-                var currentDriver = await _driverService.GetCurrentDriverStatus();
+                var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
                 using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
                 {
-                    var setDriverArrived = await _driverService.SetDriverArrived(new DriverArriveProcess
+                    var setDriverArrived = await _driverService.SetDriverArrivedRemoteAsync(new DriverArriveProcess
                     {
                         EmployeeId = currentDriver.EmployeeId,
                         PowerId = currentDriver.PowerId,
