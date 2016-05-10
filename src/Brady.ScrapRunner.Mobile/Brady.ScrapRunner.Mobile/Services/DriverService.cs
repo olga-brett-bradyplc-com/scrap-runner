@@ -40,7 +40,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// </summary>
         /// <param name="driverEnrouteProcess"></param>
         /// <returns></returns>
-        public async Task<ChangeResultWithItem<DriverEnrouteProcess>> SetDriverEnroute(DriverEnrouteProcess driverEnrouteProcess)
+        public async Task<ChangeResultWithItem<DriverEnrouteProcess>> SetDriverEnrouteRemoteAsync(DriverEnrouteProcess driverEnrouteProcess)
         {
             var enrouteProcess = await _connection.GetConnection().UpdateAsync(driverEnrouteProcess, requeryUpdated: false);
             return enrouteProcess;
@@ -51,7 +51,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// </summary>
         /// <param name="driverArriveProcess"></param>
         /// <returns></returns>
-        public async Task<ChangeResultWithItem<DriverArriveProcess>> SetDriverArrived(DriverArriveProcess driverArriveProcess)
+        public async Task<ChangeResultWithItem<DriverArriveProcess>> SetDriverArrivedRemoteAsync(DriverArriveProcess driverArriveProcess)
         {
             var arriveProcess = await _connection.GetConnection().UpdateAsync(driverArriveProcess, requeryUpdated: false);
             return arriveProcess;
@@ -63,13 +63,13 @@ namespace Brady.ScrapRunner.Mobile.Services
         ///     DriverStatus SQLite table
         /// </summary>
         /// <returns></returns>
-        public async Task<DriverStatusModel> GetCurrentDriverStatus()
+        public async Task<DriverStatusModel> GetCurrentDriverStatusAsync()
         {
             var driver = await _driverStatusRepository.AllAsync();
             return driver.FirstOrDefault();
         }
 
-        public async Task<ChangeResultWithItem<DriverFuelEntryProcess>> SetFuelEntry(
+        public async Task<ChangeResultWithItem<DriverFuelEntryProcess>> SetFuelEntryRemoteAsync(
             DriverFuelEntryProcess driverFuelEntryProcess)
         {
             var fuelEntry = await _connection.GetConnection().UpdateAsync(driverFuelEntryProcess, requeryUpdated: false);
