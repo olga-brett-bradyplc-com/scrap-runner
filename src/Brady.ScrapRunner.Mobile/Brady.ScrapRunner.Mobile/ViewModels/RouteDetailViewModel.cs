@@ -4,6 +4,7 @@ using Brady.ScrapRunner.Mobile.Enums;
 using Brady.ScrapRunner.Mobile.Helpers;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Mobile.Interfaces;
@@ -26,9 +27,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _tripService = tripService;
             _driverService = driverService;
             DirectionsCommand = new MvxCommand(ExecuteDrivingDirectionsCommand);
-            EnRouteCommand = new MvxCommand(ExecuteEnRouteCommand);
-            ArriveCommand = new MvxCommand(ExecuteArriveCommand);
-            NextStageCommand = new MvxCommand(ExecuteNextStageCommand);
+            EnRouteCommand = new MvxAsyncCommand(ExecuteEnRouteCommandAsync);
+            ArriveCommand = new MvxAsyncCommand(ExecuteArriveCommandAsync);
+            NextStageCommand = new MvxAsyncCommand(ExecuteNextStageCommandAsync);
         }
 
         public void Init(string tripNumber)
@@ -163,9 +164,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         // Command bindings
         public MvxCommand DirectionsCommand { get; private set; }
-        public MvxCommand EnRouteCommand { get; private set; }
-        public MvxCommand ArriveCommand { get; private set; }
-        public MvxCommand NextStageCommand { get; private set; }
+        public IMvxAsyncCommand EnRouteCommand { get; private set; }
+        public IMvxAsyncCommand ArriveCommand { get; private set; }
+        public IMvxAsyncCommand NextStageCommand { get; private set; }
 
         // Command impl
         private void ExecuteDrivingDirectionsCommand()
@@ -174,7 +175,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 ShowViewModel<RouteDirectionsViewModel>(new {custHostCode = _custHostCode});
         }
 
-        private async void ExecuteEnRouteCommand()
+        private async Task ExecuteEnRouteCommandAsync()
         {
             var message = string.Format(AppResources.ConfirmEnRouteMessage,
                 "\n\n",
@@ -214,7 +215,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        private async void ExecuteArriveCommand()
+        private async Task ExecuteArriveCommandAsync()
         {
             var message = string.Format(AppResources.ConfirmArrivalMessage,
                 "\n\n",
@@ -265,7 +266,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        private async void ExecuteNextStageCommand()
+        private async Task ExecuteNextStageCommandAsync()
         {
             if (await _tripService.IsTripLegTransactionAsync(TripNumber))
             {
