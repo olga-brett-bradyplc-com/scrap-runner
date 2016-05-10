@@ -61,9 +61,9 @@
 
         public int? TripSegContainerWeightTare { get; set; }
 
-        public int? TripSegContainerLatitude { get; set; }
+        public double? TripSegContainerLatitude { get; set; }
 
-        public int? TripSegContainerLongitude { get; set; }
+        public double? TripSegContainerLongitude { get; set; }
 
         [MaxLength(1)]
         public string TripSegContainerLoaded { get; set; }
@@ -72,6 +72,9 @@
         public string TripSegContainerOnTruck { get; set; }
 
         public short? TripSegContainerLevel { get; set; }
+
+        [MaxLength(1)]
+        public string TripSegContainerComplete { get; set; }
 
         // Convenience methods
         [Ignore]

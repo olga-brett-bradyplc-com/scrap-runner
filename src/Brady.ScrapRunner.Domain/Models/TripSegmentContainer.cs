@@ -33,8 +33,8 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual DateTime? WeightGross2ndDateTime { get; set; }
         public virtual DateTime? WeightTareDateTime { get; set; }
         public virtual short? TripSegContainerLevel { get; set; }
-        public virtual int? TripSegContainerLatitude { get; set; }
-        public virtual int? TripSegContainerLongitude { get; set; }
+        public virtual double? TripSegContainerLatitude { get; set; }
+        public virtual double? TripSegContainerLongitude { get; set; }
         public virtual string TripSegContainerLoaded { get; set; }
         public virtual string TripSegContainerOnTruck { get; set; }
         public virtual string TripScaleReferenceNumber { get; set; }

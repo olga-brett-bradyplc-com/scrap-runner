@@ -68,5 +68,12 @@ namespace Brady.ScrapRunner.Mobile.Services
             var driver = await _driverStatusRepository.AllAsync();
             return driver.FirstOrDefault();
         }
+
+        public async Task<ChangeResultWithItem<DriverFuelEntryProcess>> SetFuelEntry(
+            DriverFuelEntryProcess driverFuelEntryProcess)
+        {
+            var fuelEntry = await _connection.GetConnection().UpdateAsync(driverFuelEntryProcess, requeryUpdated: false);
+            return fuelEntry;
+        }
     }
 }

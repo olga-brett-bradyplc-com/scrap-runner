@@ -251,6 +251,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Complete Trip.
+        /// </summary>
+        public static string FinishTripLabel {
+            get {
+                return ResourceManager.GetString("FinishTripLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fuel Entry.
         /// </summary>
         public static string FuelEntry {
@@ -292,6 +301,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Level {
             get {
                 return ResourceManager.GetString("Level", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading Miscellaneous Information.
+        /// </summary>
+        public static string LoadingMiscInformation {
+            get {
+                return ResourceManager.GetString("LoadingMiscInformation", resourceCulture);
             }
         }
         
@@ -715,6 +733,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string YardScaleDetail {
             get {
                 return ResourceManager.GetString("YardScaleDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yard/Scale.
+        /// </summary>
+        public static string YardScaleLabel {
+            get {
+                return ResourceManager.GetString("YardScaleLabel", resourceCulture);
             }
         }
         

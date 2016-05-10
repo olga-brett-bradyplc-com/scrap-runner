@@ -2,9 +2,11 @@
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using BWF.DataServices.Metadata.Models;
+using BWF.DataServices.PortableClients;
 
 namespace Brady.ScrapRunner.Mobile.Services
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -15,11 +17,26 @@ namespace Brady.ScrapRunner.Mobile.Services
 
     public class CodeTableService : ICodeTableService
     {
+        private readonly IConnectionService<DataServiceClient> _connection; 
         private readonly IRepository<CodeTableModel> _codeTableRepository;
-        public CodeTableService(IRepository<CodeTableModel> codeTableRepository)
+
+        public CodeTableService(IRepository<CodeTableModel> codeTableRepository, IConnectionService<DataServiceClient> connection )
         {
+            _connection = connection;
             _codeTableRepository = codeTableRepository;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="codeTableProcess"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<CodeTableProcess>> FindCodesRemoteAsync(CodeTableProcess codeTableProcess)
+        {
+            var codeTable = await _connection.GetConnection().UpdateAsync(codeTableProcess, requeryUpdated: false);
+            return codeTable;
+        }
+
         /// <summary>
         /// Find all states for the given country code name
         /// </summary>
