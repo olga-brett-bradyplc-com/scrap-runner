@@ -25,8 +25,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             SecondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);
             TareWeightSetCommand = new MvxCommand(ExecuteTareWeightSetCommand, IsGrossWeightSet);
 
-            ContainerSetDownCommand = new MvxCommand(ExecuteContainerSetDownCommand);
-            ContainerLeftOnTruckCommand = new MvxCommand(ExecuteContainerLeftOnTruckCommand);
+            ContainerSetDownCommand = new MvxAsyncCommand(ExecuteContainerSetDownCommandAsync);
+            ContainerLeftOnTruckCommand = new MvxAsyncCommand(ExecuteContainerLeftOnTruckCommandAsync);
         }
 
         public void Init(string tripNumber, string tripSegNumber, string tripSegContainerNumber)
@@ -113,14 +113,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Command bindings
-        public MvxCommand ContainerSetDownCommand { get; private set; }
-        public MvxCommand ContainerLeftOnTruckCommand { get; private set; }
+        public IMvxAsyncCommand ContainerSetDownCommand { get; private set; }
+        public IMvxAsyncCommand ContainerLeftOnTruckCommand { get; private set; }
         public MvxCommand GrossWeightSetCommand { get; private set; }
         public MvxCommand TareWeightSetCommand { get; private set; }
         public MvxCommand SecondGrossWeightSetCommand { get; private set; }
 
         // Command impl
-        private async void ExecuteContainerSetDownCommand()
+        private async Task ExecuteContainerSetDownCommandAsync()
         {
             // @TODO : Determine if this is last leg of trip, and then give warning that this action will complete said trip
             var result = await UserDialogs.Instance.ConfirmAsync(AppResources.SetDownContainerMessage, AppResources.SetDown);
@@ -135,11 +135,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 //    _tripService.UpdateTripSegmentContainerLongLatAsync(TripNumber, TripSegNumber,
                 //        TripSegContainerNumber, Latitude, Longitude);
                 await _tripService.CompleteTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerNumber);
-                ExecuteNextStage();
+                await ExecuteNextStage();
             }
         }
 
-        private async void ExecuteContainerLeftOnTruckCommand()
+        private async Task ExecuteContainerLeftOnTruckCommandAsync()
         {
             var result = await UserDialogs.Instance.ConfirmAsync(AppResources.LeftOnTruckContainerMessage, AppResources.LeftOnTruck);
             if (result)
@@ -148,7 +148,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        private async void ExecuteNextStage()
+        private async Task ExecuteNextStage()
         {
             // Are there any more containers that need to be weighed?
             // Check to see if any containers/segments exists

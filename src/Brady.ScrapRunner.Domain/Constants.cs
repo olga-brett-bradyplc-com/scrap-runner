@@ -286,10 +286,21 @@
         /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
         public static readonly string ReceivedDriverContainerAction = "RECEIVED DRIVER CONTAINER ACTION";
     }
-
     /// <summary>
-    /// Driver Preference internal codes. From the Preferences table.
+    /// The Message Source descriptions.  Used in the Messages table.
     /// </summary>
+    public static class MessagesMsgSourceConstants
+    {
+        /// <summary>FromDriver: R</summary>
+        public static readonly string FromDriver = "R";
+        /// <summary>FromDispatcher: L</summary>
+        public static readonly string FromDispatcher = "L";
+        /// <summary>BroadcastToAllDrvrs: B</summary>
+        public static readonly string BroadcastToAllDrvrs = "B";
+
+    }        /// <summary>
+             /// Driver Preference internal codes. From the Preferences table.
+             /// </summary>
     public static class PrefDriverConstants
     {
         /// <summary>
