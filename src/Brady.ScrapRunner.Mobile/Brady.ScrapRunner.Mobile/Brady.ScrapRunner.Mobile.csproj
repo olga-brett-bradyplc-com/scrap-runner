@@ -47,6 +47,7 @@
     <Compile Include="Interfaces\IDbService.cs" />
     <Compile Include="Interfaces\IDriverService.cs" />
     <Compile Include="Interfaces\ILocationService.cs" />
+    <Compile Include="Interfaces\IMessagesService.cs" />
     <Compile Include="Interfaces\IPreferenceService.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\IConnectionService.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Models\CustomerCommodityModel.cs" />
     <Compile Include="Models\CustomerLocationModel.cs" />
     <Compile Include="Models\DriverStatusModel.cs" />
+    <Compile Include="Models\MessagesModel.cs" />
     <Compile Include="Models\PowerMasterModel.cs" />
     <Compile Include="Models\ContainerMasterModel.cs" />
     <Compile Include="Models\CustomerDirectionsModel.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="Services\DemoClientSettings.cs" />
     <Compile Include="Services\DriverService.cs" />
     <Compile Include="Services\LocationService.cs" />
+    <Compile Include="Services\MessagesService.cs" />
     <Compile Include="Services\PreferenceService.cs" />
     <Compile Include="Services\DbService.cs" />
     <Compile Include="Services\TripService.cs" />
@@ -95,6 +98,8 @@
     <Compile Include="ViewModels\FuelEntryViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\MessagesViewModel.cs" />
+    <Compile Include="ViewModels\NewMessageViewModel.cs" />
     <Compile Include="ViewModels\ScaleDetailViewModel.cs" />
     <Compile Include="ViewModels\ScaleSummaryViewModel.cs" />
     <Compile Include="ViewModels\TransactionConfirmationViewModel.cs" />
