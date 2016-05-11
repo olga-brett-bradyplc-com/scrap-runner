@@ -28,6 +28,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IContainerService _containerService;
         private readonly ICodeTableService _codeTableService;
         private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IMessagesService _messagesService;
+
 
         public SignInViewModel(
             IDbService dbService,
@@ -37,7 +39,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IDriverService driverService,
             IContainerService containerService,
             ICodeTableService codeTableService,
-            IConnectionService<DataServiceClient> connection)
+            IMessagesService messagesService,
+           IConnectionService<DataServiceClient> connection)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -46,6 +49,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _driverService = driverService;
             _containerService = containerService;
             _codeTableService = codeTableService;
+            _messagesService = messagesService;
 
             _connection = connection;
             Title = AppResources.SignInTitle;
@@ -260,6 +264,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
+                var messages = await _connection.GetConnection().QueryAsync<Messages>(new QueryBuilder<Messages>()
+                     .Filter(x => x.Property(y => y.ReceiverId).EqualTo(UserName))
+                     .OrderBy(x => x.MsgId)
+                     );
+
+                if (messages.Records.Count > 0)
+                    await _messagesService.UpdateMessages(messages.Records);
 
             }
             return true;

@@ -358,4 +358,10 @@
     <value>Loading Miscellaneous Information (es)</value>
     <comment>NEEDS TRANSLATION; SignInViewModel</comment>
   </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Mensajes</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Mensaje</value>
+  </data>
 </root>

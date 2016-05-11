@@ -66,6 +66,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 case Resource.Id.nav_fuelentry:
                     ViewModel.FuelEntryCommand.Execute();
                     break;
+                case Resource.Id.nav_messages:
+                    ViewModel.MessagesCommand.Execute();
+                    break;
             }
         }
     }
