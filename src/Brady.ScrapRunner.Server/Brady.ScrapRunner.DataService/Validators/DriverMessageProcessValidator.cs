@@ -21,7 +21,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         public DriverMessageProcessValidator()
         {
             RuleFor(x => x.EmployeeId).NotEmpty();
-            RuleFor(x => x.ActionDateTime).NotEmpty();
+            //RuleFor(x => x.ActionDateTime).NotEmpty();
             //RuleFor(x => x.SenderId).NotEmpty();
             //RuleFor(x => x.MessageId).GreaterThanOrEqualTo(0);
             //RuleFor(x => x.MessageText).NotEmpty();
