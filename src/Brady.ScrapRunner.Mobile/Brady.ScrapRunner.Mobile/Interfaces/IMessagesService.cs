@@ -1,4 +1,6 @@
 ﻿using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
+using BWF.DataServices.Metadata.Models;
 
 namespace Brady.ScrapRunner.Mobile.Interfaces
 {
@@ -8,9 +10,11 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
     public interface IMessagesService
     {
-        Task<List<MessagesModel>> FindDrvrMsgsAsync(string driver);
+        Task<ChangeResultWithItem<DriverMessageProcess>> FindMsgsRemoteAsync(DriverMessageProcess driverMessageProcess);
 
         Task<MessagesModel> FindMessageAsync(int? msgId);
+
+        Task<List<MessagesModel>> FindDrvrMsgsAsync(string employeeId);
 
         Task UpdateMessages(IEnumerable<Messages> messages);
     }

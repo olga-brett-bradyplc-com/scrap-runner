@@ -2,6 +2,7 @@
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using BWF.DataServices.Metadata.Models;
+using BWF.DataServices.PortableClients;
 
 namespace Brady.ScrapRunner.Mobile.Services
 {
@@ -15,13 +16,32 @@ namespace Brady.ScrapRunner.Mobile.Services
 
     public class MessagesService : IMessagesService
     {
+        private readonly IConnectionService<DataServiceClient> _connection;
         private readonly IRepository<MessagesModel> _messagesRepository;
-        public MessagesService(IRepository<MessagesModel> messagesRepository)
+
+        public MessagesService(IRepository<MessagesModel> messagesRepository, IConnectionService<DataServiceClient> connection)
         {
+            _connection = connection;
             _messagesRepository = messagesRepository;
         }
         /// <summary>
         /// Find messages for the given driver
+        /// </summary>
+        /// <param name="driverMessageProcess"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverMessageProcess>> FindMsgsRemoteAsync(DriverMessageProcess driverMessageProcess)
+        {
+            var msgsTable = await _connection.GetConnection().UpdateAsync(driverMessageProcess, requeryUpdated: false);
+            return msgsTable;
+        }
+
+        public async Task<MessagesModel> FindMessageAsync(int? msgId)
+        {
+            var message = await _messagesRepository.FindAsync(t => t.MsgId == msgId);
+            return message;
+        }
+        /// <summary>
+        /// Find all messages for the given driver id
         /// </summary>
         /// <param name="driverId"></param>
         /// <returns></returns>
@@ -29,15 +49,9 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var sortedMsgs = await _messagesRepository.AsQueryable()
                 .Where(t => t.ReceiverId == driverId)
-                .OrderBy(t => t.MsgId)
+                .OrderBy(t => t.CreateDateTime)
                 .ToListAsync();
             return sortedMsgs;
-        }
-
-        public async Task<MessagesModel> FindMessageAsync(int? msgId)
-        {
-            var message = await _messagesRepository.FindAsync(t => t.MsgId == msgId);
-            return message;
         }
 
         public Task UpdateMessages(IEnumerable<Messages> messages)

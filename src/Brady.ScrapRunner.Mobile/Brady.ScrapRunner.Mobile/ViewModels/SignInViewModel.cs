@@ -264,13 +264,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
-                var messages = await _connection.GetConnection().QueryAsync<Messages>(new QueryBuilder<Messages>()
-                     .Filter(x => x.Property(y => y.ReceiverId).EqualTo(UserName))
-                     .OrderBy(x => x.MsgId)
-                     );
 
-                if (messages.Records.Count > 0)
-                    await _messagesService.UpdateMessages(messages.Records);
+                var messagesTable = await _messagesService.FindMsgsRemoteAsync(new DriverMessageProcess { EmployeeId = UserName });
+
+                if (messagesTable.WasSuccessful)
+                {
+                    await _messagesService.UpdateMessages(messagesTable.Item.Messages);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(messagesTable.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
 
             }
             return true;
