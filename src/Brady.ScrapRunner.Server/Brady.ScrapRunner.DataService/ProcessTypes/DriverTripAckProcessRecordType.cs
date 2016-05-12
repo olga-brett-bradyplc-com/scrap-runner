@@ -217,7 +217,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ChangeSetResult<int> eventChangeSetResult;
                     eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
-                    log.Debug("SRTEST:Saving EventLog Record - Segment Done");
+                    log.Debug("SRTEST:Saving EventLog Record - Trip Ack");
                     //Check for EventLog failure.
                     if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
                     {

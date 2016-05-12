@@ -283,8 +283,10 @@
         public static readonly string ReceivedDriverCancelSeg = "RECEIVED DRIVER CANCEL SEG";
         /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
         public static readonly string ReceivedDriverAddedSeg = "RECEIVED DRIVER ADDED SEG";
-        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
+        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER CONTAINER ACTION SEG</summary>
         public static readonly string ReceivedDriverContainerAction = "RECEIVED DRIVER CONTAINER ACTION";
+        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER NEW CONTAINER</summary>
+        public static readonly string ReceivedDriverNewContainer = "RECEIVED DRIVER NEW CONTAINER";
     }
     /// <summary>
     /// The Message Source descriptions.  Used in the Messages table.

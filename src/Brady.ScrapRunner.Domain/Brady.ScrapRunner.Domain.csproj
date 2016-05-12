@@ -57,6 +57,7 @@
     <Compile Include="Metadata\DriverEfficiencyMetadata.cs" />
     <Compile Include="Metadata\DriverEnrouteProcessMetadata.cs" />
     <Compile Include="Metadata\DriverMessageProcessMetadata.cs" />
+    <Compile Include="Metadata\DriverNewContainerProcessMetadata.cs" />
     <Compile Include="Metadata\DriverSegmentDoneProcessMetadata.cs" />
     <Compile Include="Metadata\DriverTripAckProcessMetadata.cs" />
     <Compile Include="Metadata\DriverFuelEntryProcessMetadata.cs" />
@@ -175,6 +176,7 @@
     <Compile Include="Process\DriverEnrouteProcess.cs" />
     <Compile Include="Process\DriverLoginProcess.cs" />
     <Compile Include="Process\DriverMessageProcess.cs" />
+    <Compile Include="Process\DriverNewContainerProcess.cs" />
     <Compile Include="Process\DriverSegmentDoneProcess.cs" />
     <Compile Include="Process\DriverTripAckProcess.cs" />
     <Compile Include="Process\DriverFuelEntryProcess.cs" />

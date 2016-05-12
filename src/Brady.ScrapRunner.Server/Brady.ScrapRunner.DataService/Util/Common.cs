@@ -1020,6 +1020,23 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         ///TABLE UPDATES
         /// <summary>
+        /// Update a ContainerHistory record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="containerHistory"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdateContainerHistory(IDataService dataService, ProcessChangeSetSettings settings,
+                                              ContainerHistory containerHistory)
+        {
+            var recordType = (ContainerHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "ContainerHistory");
+            var changeSet = (ChangeSet<string, ContainerHistory>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(containerHistory.Id, containerHistory);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+        //TABLE UPDATES
+        /// <summary>
         /// Update a ContainerMaster record.
         /// </summary>
         /// <param name="dataService"></param>
@@ -1035,7 +1052,6 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-
         ///TABLE UPDATES
         /// <summary>
         /// Update a CustomerMaster record.
@@ -1136,6 +1152,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+        
         /// <summary>
         /// Update a TripSegmentContainer record.
         /// </summary>
@@ -1152,6 +1169,42 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+        /* ToDo: This does not compile
+        /// <summary>
+        /// Delete a ContainerHistory record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="containerHistory"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> DeleteContainerHistory(IDataService dataService, ProcessChangeSetSettings settings,
+                                              ContainerHistory containerHistory)
+        {
+            var recordType = (ContainerHistory)dataService.RecordTypes.Single(x => x.TypeName == "ContainerHistory");
+            var changeSet = (ChangeSet<string, ContainerHistory>)recordType.GetNewChangeSet();
+            changeSet.AddDelete(containerHistory.Id);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+        */
+        /* ToDo: This does not compile
+        /// <summary>
+        /// Delete a ContainerMaster record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="containerMaster"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> DeleteContainerMaster(IDataService dataService, ProcessChangeSetSettings settings,
+                                              ContainerMaster containerMaster)
+        {
+            var recordType = (ContainerMaster)dataService.RecordTypes.Single(x => x.TypeName == "ContainerMaster");
+            var changeSet = (ChangeSet<string, ContainerMaster>)recordType.GetNewChangeSet();
+            changeSet.AddDelete(containerMaster.Id);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+        */
         /// <summary>
         /// Delete a TripSegmentContainer record.
         /// </summary>
@@ -1614,6 +1667,40 @@ namespace Brady.ScrapRunner.DataService.Util
                     return containers;
                 }
                 containers = queryResult.Records.Cast<ContainerChange>().ToList();
+            }
+            return containers;
+        }
+        /// CONTAINERHISTORY Table queries
+        /// <summary>
+        ///  Get a list of container history records for a given container
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="containerNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if containerNumber is null or no entries are found</returns>
+        public static List<ContainerHistory> GetContainerHistory(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string containerNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var containers = new List<ContainerHistory>();
+            if (null != containerNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<ContainerHistory>()
+                    .Filter(y => y.Property(x => x.ContainerNumber).EqualTo(containerNumber))
+                    .OrderBy(x => x.ContainerSeqNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return containers;
+                }
+                containers = queryResult.Records.Cast<ContainerHistory>().ToList();
             }
             return containers;
         }
