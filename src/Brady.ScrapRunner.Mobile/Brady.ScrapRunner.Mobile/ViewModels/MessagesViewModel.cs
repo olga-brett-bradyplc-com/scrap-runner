@@ -40,33 +40,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
         public override async void Start()
         {
-            var messages = await _messagesService.FindDrvrMsgsAsync("930");
+            var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
+            var messages = await _messagesService.FindDrvrMsgsAsync(currentDriver.EmployeeId);
             Messages = new ObservableCollection<MessagesModel>(messages);
-
-            if (Messages.Count == 0)
-            {
-                MessagesModel m1 = new MessagesModel();
-                m1.MsgId = 1;
-                m1.ReceiverId = "930";
-                m1.SenderId = "D1";
-                m1.SenderName = "Dispatcher #1";
-                m1.CreateDateTime = DateTime.Now;
-                m1.MsgText = "Terminal is closing soon";
-                m1.Ack = "N";
-
-                Messages.Add(m1);
-
-                MessagesModel m2 = new MessagesModel();
-                m2.MsgId = 2;
-                m2.ReceiverId = "930";
-                m2.SenderId = "D2";
-                m2.SenderName = "Dispatcher #2";
-                m2.CreateDateTime = DateTime.Now;
-                m2.MsgText = "Be careful on icy road";
-                m2.Ack = "N";
-
-                Messages.Add(m2);
-            }
 
             base.Start();
         }

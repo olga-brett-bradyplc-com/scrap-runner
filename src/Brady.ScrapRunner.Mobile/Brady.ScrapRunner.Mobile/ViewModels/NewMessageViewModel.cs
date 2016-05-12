@@ -38,10 +38,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 _msgText = message.MsgText;
             }
-            else
-            {
-                _msgText = "Terminal is closing soon";
-            }
 
             base.Start();
         }
