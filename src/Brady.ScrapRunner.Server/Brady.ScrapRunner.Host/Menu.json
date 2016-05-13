@@ -42,6 +42,10 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverMessageProcess"
         },
         {
+          "text": "DriverNewContainerProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverNewContainerProcess"
+        },
+        {
           "text": "DriverSegmentDoneProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverSegmentDoneProcess"
         },
