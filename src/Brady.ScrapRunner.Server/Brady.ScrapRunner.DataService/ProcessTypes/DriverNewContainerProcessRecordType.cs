@@ -121,6 +121,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
+                    //ToDo: Even getting a single ContainerHistory record and deleting it, throws an exception
+                    //var containerHistory = Common.GetContainerHistoryOne(dataService, settings, userCulture, userRoleIds,
+                    //driverNewContainerProcess.ContainerBarcode, 1, out fault);
+                    //changeSetResult = Common.DeleteContainerHistory(dataService, settings, containerHistory);
+
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
@@ -136,12 +141,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         + driverNewContainerProcess.EmployeeId));
                         break;
                     }
-
+                                      
                     ////////////////////////////////////////////////
                     // Get the Container record. Container Number in the table is the incoming bar code number.
                     // We are about to change the Container number to the incoming container number.
                     var containerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
-                                                  driverNewContainerProcess.ContainerBarcode, out fault);
+                                                    driverNewContainerProcess.ContainerBarcode, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -162,6 +167,20 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //The event log will show the changes.
 
                     ////////////////////////////////////////////////
+                    //The update actually adds a new container record, so we must delete the original record.
+                    //ToDo: Delete ContainerMaster method does NOT throw an exception
+                    changeSetResult = Common.DeleteContainerMaster(dataService, settings, containerMaster);
+                    log.DebugFormat("SRTEST:Deleting ContainerMaster Record for Container:{0}- NewContainer.",
+                                    containerMaster.ContainerNumber);
+                    if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
+                    {
+                        var s = string.Format("Could not update ContainerMaster for Container:{0}.",
+                                containerMaster.ContainerNumber);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        break;
+                    }
+
+                    ////////////////////////////////////////////////
                     string originalContainerNumber = containerMaster.ContainerNumber;
                     //Set the newly assigned ContainerNumber
                     containerMaster.ContainerNumber = driverNewContainerProcess.ContainerNumber;
@@ -170,7 +189,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     containerMaster.ContainerSize = driverNewContainerProcess.ContainerSize;
 
                     //Set the comments. This is new.
-                    containerMaster.ContainerComments = string.Format("Changed from NB# {0}", containerMaster.ContainerNumber);
+                    containerMaster.ContainerComments = string.Format("Changed from NB# {0}", originalContainerNumber);
 
                     //Do the update
                     changeSetResult = Common.UpdateContainerMaster(dataService, settings, containerMaster);
@@ -183,50 +202,50 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
                     }
-                    ////////////////////////////////////////////////
-                    //ToDo: The update actually adds a new container record. Do I need to delete the old record?
-                    //ToDo: DeleteContainerMaster method will not compile
-                    //changeSetResult = Common.DeleteContainerMaster(dataService, settings, containerMaster);
-                    log.DebugFormat("SRTEST:Deleting ContainerMaster Record for Container:{0}- NewContainer.",
-                                    containerMaster.ContainerNumber);
-                    if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
-                    {
-                        var s = string.Format("Could not update ContainerMaster for Container:{0}.",
-                                containerMaster.ContainerNumber);
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                        break;
-                    }
-
+                            
                     ////////////////////////////////////////////////
                     // Get any Container History records. Container Number in the table is the incoming bar code number.
                     // We are about to change the Container number to the incoming container number.
                     var containerHistory = Common.GetContainerHistory(dataService, settings, userCulture, userRoleIds,
-                                           driverNewContainerProcess.ContainerBarcode, out fault);
+                                            driverNewContainerProcess.ContainerBarcode, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    if (null == containerHistory)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid ContainerNumber: "
-                                        + driverNewContainerProcess.ContainerBarcode));
-                        break;
-                    }
-                    if (containerHistory.Count() > 0)
+                    if (null != containerHistory && containerHistory.Count() > 0)
                     {
                         foreach (var container in containerHistory)
                         {
+                            ////////////////////////////////////////////////
+                            //The update actually adds a new container record, so we need to delete the original record.
+                            //ToDo: DeleteContainerHistory method throws an exception
+                            //NHibernate.NonUniqueObjectException: 
+                            //a different object with the same identifier value was already associated with the session: 
+                            // changeSetResult = Common.DeleteContainerHistory(dataService, settings, container);
+                            log.DebugFormat("SRTEST:Deleting ContainerHistory Record for Container:{0} Seq:{1}- NewContainer.",
+                                            container.ContainerNumber, container.ContainerSeqNumber);
+                            if (Common.LogChangeSetFailure(changeSetResult, container, log))
+                            {
+                                var s = string.Format("Could not update ContainerHistory for Container:{0} Seq:{1}.",
+                                        container.ContainerNumber, container.ContainerSeqNumber);
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                break;
+                            }
+                            
                             //Set the newly assigned ContainerNumber
                             container.ContainerNumber = driverNewContainerProcess.ContainerNumber;
                             //Set the newly assigned Type and size
                             container.ContainerType = driverNewContainerProcess.ContainerType;
                             container.ContainerSize = driverNewContainerProcess.ContainerSize;
 
+                            //Set the comments. This is new.
+                            container.ContainerComments = string.Format("Changed from NB# {0}", originalContainerNumber);
+
                             //Do the update
                             changeSetResult = Common.UpdateContainerHistory(dataService, settings, container);
                             log.DebugFormat("SRTEST:Saving ContainerHistory Record for ContainerNumber:{0} Seq:{1} - NewContainer.",
-                                             container.ContainerNumber, container.ContainerSeqNumber);
+                                            container.ContainerNumber, container.ContainerSeqNumber);
                             if (Common.LogChangeSetFailure(changeSetResult, container, log))
                             {
                                 var s = string.Format("Could not update ContainerHistory for ContainerNumber:{0}.",
@@ -235,21 +254,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 break;
                             }
 
-                            ////////////////////////////////////////////////
-                            //ToDo: The update actually adds a new container record. Do I need to delete the old record?
-                            //ToDo: DeleteContainerHistory method will not compile
-                            //changeSetResult = Common.DeleteContainerHistory(dataService, settings, containerMaster);
-                            log.DebugFormat("SRTEST:Deleting ContainerHistory Record for Container:{0} Seq:{1}- NewContainer.",
-                                            container.ContainerNumber, container.ContainerSeqNumber);
-                            if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
-                            {
-                                var s = string.Format("Could not update ContainerHistory for Container:{0} Seq:{1}.",
-                                         container.ContainerNumber, container.ContainerSeqNumber);
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                                break;
-                            }
-                        }
-                    }
+                        }//end of foreach (var container in containerHistory)
+                    }//end of if (containerHistory.Count() > 0)
 
                     ////////////////////////////////////////////////
                     //Add entry to Event Log – New Container. 

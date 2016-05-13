@@ -1169,7 +1169,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-        /* ToDo: This does not compile
+
         /// <summary>
         /// Delete a ContainerHistory record.
         /// </summary>
@@ -1180,15 +1180,14 @@ namespace Brady.ScrapRunner.DataService.Util
         public static ChangeSetResult<string> DeleteContainerHistory(IDataService dataService, ProcessChangeSetSettings settings,
                                               ContainerHistory containerHistory)
         {
-            var recordType = (ContainerHistory)dataService.RecordTypes.Single(x => x.TypeName == "ContainerHistory");
+            var recordType = (ContainerHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "ContainerHistory");
             var changeSet = (ChangeSet<string, ContainerHistory>)recordType.GetNewChangeSet();
             changeSet.AddDelete(containerHistory.Id);
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-        */
-        /* ToDo: This does not compile
-        /// <summary>
+
+         /// <summary>
         /// Delete a ContainerMaster record.
         /// </summary>
         /// <param name="dataService"></param>
@@ -1198,13 +1197,13 @@ namespace Brady.ScrapRunner.DataService.Util
         public static ChangeSetResult<string> DeleteContainerMaster(IDataService dataService, ProcessChangeSetSettings settings,
                                               ContainerMaster containerMaster)
         {
-            var recordType = (ContainerMaster)dataService.RecordTypes.Single(x => x.TypeName == "ContainerMaster");
+            var recordType = (ContainerMasterRecordType)dataService.RecordTypes.Single(x => x.TypeName == "ContainerMaster");
             var changeSet = (ChangeSet<string, ContainerMaster>)recordType.GetNewChangeSet();
             changeSet.AddDelete(containerMaster.Id);
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-        */
+       
         /// <summary>
         /// Delete a TripSegmentContainer record.
         /// </summary>
@@ -1704,6 +1703,44 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return containers;
         }
+
+        /// CONTAINERHISTORY Table  queries
+        /// <summary>
+        /// Gets a single container history record
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="containerNumber"></param>
+        /// <param name="containerSeqNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static ContainerHistory GetContainerHistoryOne(IDataService dataService, ProcessChangeSetSettings settings,
+         string userCulture, IEnumerable<long> userRoleIds, string containerNumber, int containerSeqNumber,out DataServiceFault fault)
+         {
+            fault = null;
+            var containerHistory = new ContainerHistory();
+            if (null != containerNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<ContainerHistory>()
+                             .Filter(t => t.Property(p => p.ContainerNumber).EqualTo(containerNumber)
+                             .And().Property(x => x.ContainerSeqNumber).EqualTo(containerSeqNumber))
+                             .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return containerHistory;
+                }
+                containerHistory = (ContainerHistory)queryResult.Records.Cast<ContainerHistory>().FirstOrDefault();
+            }
+            return containerHistory;
+        }
+
         /// CONTAINERHISTORY Table  queries
         /// <summary>
         ///  Get the last container history record for a given container number
