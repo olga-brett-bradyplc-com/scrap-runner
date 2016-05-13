@@ -19,7 +19,6 @@
     {
         Create,
         Update,
-        Delete,
-        ChangeSet
+        Delete
     }
 }

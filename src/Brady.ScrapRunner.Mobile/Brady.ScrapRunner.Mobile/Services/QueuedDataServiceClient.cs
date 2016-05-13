@@ -74,6 +74,12 @@
         {
             return _dataServiceClient.QueryAsync(queryBuilder, dataService);
         }
+
+        public Task<ChangeSetResult<Tid>> ProcessChangeSetAsync<Tid, Titem>(ChangeSet<Tid, Titem> changeSet, string dataService = null) where Titem : IHaveId<Tid>
+        {
+            return _dataServiceClient.ProcessChangeSetAsync(changeSet, dataService);
+        }
+
         #endregion
 
         private bool IsConnected()
@@ -89,6 +95,8 @@
                 if (response.WasSuccessful) return response;
             }
             var queueItem = CreateQueueItemByObject(item, QueueItemVerb.Create, dataService);
+            // The actual id is rarely set at this point, but we can probably extract the type of the id so it's easier to build a ChangeSet.
+            SetQueueItemIdFromObject(item, queueItem);
             await _queueService.EnqueueItemAsync(queueItem);
             return new ChangeResultWithItem<T> { WasSuccessful = true };
         }
@@ -140,21 +148,6 @@
             var queueItem = CreateQueueItemById(id, QueueItemVerb.Delete, dataService);
             await _queueService.EnqueueItemAsync(queueItem);
             return new ChangeResult { WasSuccessful = true };
-        }
-
-        public async Task<ChangeSetResult<Tid>> ProcessChangeSetAsync<Tid, Titem>(ChangeSet<Tid, Titem> changeSet, string dataService = null) where Titem : IHaveId<Tid>
-        {
-            if (IsConnected())
-            {
-                var response = await _dataServiceClient.ProcessChangeSetAsync(changeSet, dataService);
-                var failures = response.FailedCreates?.Count + 
-                               response.FailedDeletions?.Count +
-                               response.FailedUpdates?.Count;
-                if (failures == 0) return response;
-            }
-            var queueItem = CreateQueueItemByChangeSet(changeSet, dataService);
-            await _queueService.EnqueueItemAsync(queueItem);
-            return new ChangeSetResult<Tid>();
         }
 
         private void SetQueueItemIdFromObject<T>(T item, QueueItemModel queueItem)
@@ -209,18 +202,6 @@
                 DataService = dataService
             };
             SetQueueItemId(id, queueItem);
-            return queueItem;
-        }
-
-        private QueueItemModel CreateQueueItemByChangeSet<Tid, Titem>(ChangeSet<Tid, Titem> changeSet, string dataService = null) where Titem : IHaveId<Tid>
-        {
-            var queueItem = new QueueItemModel
-            {
-                Verb = QueueItemVerb.ChangeSet,
-                DataService = dataService,
-                RecordType = changeSet.GetType().AssemblyQualifiedName,
-                SerializedRecord = JsonConvert.SerializeObject(changeSet)
-            };
             return queueItem;
         }
     }
