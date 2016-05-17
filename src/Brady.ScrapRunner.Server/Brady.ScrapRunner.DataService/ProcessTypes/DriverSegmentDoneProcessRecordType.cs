@@ -214,6 +214,35 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //Get a list of incomplete containers for the segment
+                    var incompleteTripSegContainerList = Common.GetTripSegmentContainersIncomplete(dataService, settings, userCulture, userRoleIds,
+                                               driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    if (incompleteTripSegContainerList != null)
+                    {
+                        foreach (var incompleteTripSegmentContainer in incompleteTripSegContainerList)
+                        {
+                            //TODO: Do the delete. DeleteTripSegmentContainer throws an exception
+                            //changeSetResult = Common.DeleteTripSegmentContainer(dataService, settings, incompleteTripSegmentContainer);
+                            log.DebugFormat("SRTEST:Deleting TripSegmentContainer Record for Trip:{0}-{1} Container:{2}- Segment Done.",
+                                            incompleteTripSegmentContainer.TripNumber, incompleteTripSegmentContainer.TripSegNumber,
+                                            incompleteTripSegmentContainer.TripSegContainerNumber);
+                            if (Common.LogChangeSetFailure(changeSetResult, incompleteTripSegmentContainer, log))
+                            {
+                                var s = string.Format("Could not update TripSegmentContainer for Trip:{0}-{1} Container:{2}.",
+                                        incompleteTripSegmentContainer.TripNumber, incompleteTripSegmentContainer.TripSegNumber,
+                                        incompleteTripSegmentContainer.TripSegContainerNumber);
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                break;
+                            }
+                        }
+                    }
+
+                    ////////////////////////////////////////////////
                     //Get a list of all containers for the segment
                     var tripSegContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
                                                driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber, out fault);
@@ -222,6 +251,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
+                    //Delete any containers that have not been completed.
+                    //var incompleteTripSegContainerList = (from c in tripSegContainerList
+                    //                                     where (c.TripSegContainerComplete == null
+                    //                                     || c.TripSegContainerComplete != Constants.Yes)
+                    //                                     select c).ToList();
+
+                    ////////////////////////////////////////////////
+                    //Include just the complete containers in the list
+                    tripSegContainerList = (from c in tripSegContainerList
+                                           where c.TripSegContainerComplete == Constants.Yes
+                                           select c).ToList();
 
                     ////////////////////////////////////////////////
                     // Get the Customer record for the destination cust host code
@@ -246,7 +286,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     currentTripSegment.TripSegPowerId = driverSegmentDoneProcess.PowerId;
                     currentTripSegment.TripSegPowerAssetNumber = powerMaster.PowerAssetNumber;
                     currentTripSegment.TripSegDriverId = driverSegmentDoneProcess.EmployeeId;
-                    currentTripSegment.TripSegDriverName = Common.GetDriverName(employeeMaster);
+                    currentTripSegment.TripSegDriverName = Common.GetEmployeeName(employeeMaster);
                     currentTripSegment.TripSegEndLatitude = driverSegmentDoneProcess.Latitude;
                     currentTripSegment.TripSegEndLongitude = driverSegmentDoneProcess.Longitude;
 
@@ -554,12 +594,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         EventSeqNo = 0,
                         EventTerminalId = employeeMaster.TerminalId,
                         EventRegionId = employeeMaster.RegionId,
-                        //These are not populated for logins in the current system.
+                        //These are not populated in the current system.
                         // EventEmployeeId = driverStatus.EmployeeId,
-                        // EventEmployeeName = Common.GetDriverName(employeeMaster),
+                        // EventEmployeeName = Common.GetEmployeeName(employeeMaster),
                         EventTripNumber = driverSegmentDoneProcess.TripNumber,
                         EventProgram = EventProgramConstants.Services,
-                        //These are not populated for enroutes in the current system.
+                        //These are not populated in the current system.
                         //EventScreen = null,
                         //EventAction = null,
                         EventComment = comment,
@@ -568,13 +608,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ChangeSetResult<int> eventChangeSetResult;
                     eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
                     log.Debug("SRTEST:Saving EventLog Record - Segment Done");
-                    //if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
-                    //{
-                    //    var s = string.Format("Could not update EventLog for Driver {0} {1}.",
-                    //                         driverStatus.EmployeeId, EventCommentConstants.ReceivedDriverLogin);
-                    //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                    //    break;
-                    //}
+                    //Check for EventLog failure.
+                    if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
+                    {
+                        var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                                driverSegmentDoneProcess.EmployeeId, EventCommentConstants.ReceivedDriverSegDone);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        break;
+                    }
 
                     //TODO Maybe not.  Check all dates and odometers for accuracy.
                     //Make sure drive and stop start and end date/ times are within the range of the segment start and end date / times.
@@ -644,9 +685,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //}
 
                     ////////////////////////////////////////////////
-                    //TODO:Calculate driver's cumulative time which is the sum of standard drive and stop minutes
-                    //for all incomplete trip segments 
-                    //Cannot requery db because changes have not been committed.
+                    //Update the driver's cumulative time which is the sum of standard drive and stop minutes for all 
+                    //incomplete trip segments.Cannot requery db because changes have not been committed.
                     //Just subtract the std stop and drive times for this completed segment from the existing cumulative time.
                     driverStatus.DriverCumMinutes -= (int)currentTripSegment.TripSegStandardDriveMinutes;
                     driverStatus.DriverCumMinutes -= (int)currentTripSegment.TripSegStandardStopMinutes;
@@ -868,7 +908,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                             select item.TripSegDriverId).LastOrDefault();
 
             //Set the Trip Changed UserName to the driver name.
-            currentTrip.TripChangedUserName = Common.GetDriverName(employeeMaster);
+            currentTrip.TripChangedUserName = Common.GetEmployeeName(employeeMaster);
 
             //Set the Trip Completed UserId to the Trip Changed UserId.
             currentTrip.TripCompletedUserId = currentTrip.TripChangedUserId;

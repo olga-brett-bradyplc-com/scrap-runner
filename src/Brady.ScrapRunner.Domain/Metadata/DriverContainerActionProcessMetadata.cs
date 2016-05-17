@@ -3,9 +3,9 @@ using BWF.DataServices.Metadata.Fluent.Abstract;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
-    public class DriverContainerDoneProcessMetadata : TypeMetadataProvider<DriverContainerDoneProcess>
+    public class DriverContainerActionProcessMetadata : TypeMetadataProvider<DriverContainerActionProcess>
     {
-        public DriverContainerDoneProcessMetadata()
+        public DriverContainerActionProcessMetadata()
         {
 
             AutoUpdatesByDefault();

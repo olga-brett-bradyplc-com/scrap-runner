@@ -357,4 +357,45 @@
     <value>Yes</value>
     <comment>MenuViewModel</comment>
   </data>
+  <data name="LoadingPreferences" xml:space="preserve">
+    <value>Loading Preferences</value>
+    <comment>sign in view</comment>
+  </data>
+  <data name="FuelEntry" xml:space="preserve">
+    <value>Fuel Entry</value>
+  </data>
+  <data name="AmountHint" xml:space="preserve">
+    <value>Amount</value>
+    <comment>Fuel Entry View</comment>
+  </data>
+  <data name="CurrentOdometerHint" xml:space="preserve">
+    <value>Current Odometer</value>
+    <comment>Fuel Entry View</comment>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>OK</value>
+    <comment>Fuel Entry View</comment>
+  </data>
+  <data name="SavingData" xml:space="preserve">
+    <value>Saving</value>
+    <comment>Fuel Entry View</comment>
+  </data>
+  <data name="FinishTripLabel" xml:space="preserve">
+    <value>Complete Trip</value>
+    <comment>RouteDetail</comment>
+  </data>
+  <data name="YardScaleLabel" xml:space="preserve">
+    <value>Yard/Scale</value>
+    <comment>RouteDetail</comment>
+  </data>
+  <data name="LoadingMiscInformation" xml:space="preserve">
+    <value>Loading Miscellaneous Information</value>
+    <comment>SignInViewModel</comment>
+  </data>
+  <data name="Messages" xml:space="preserve">
+    <value>Messages</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
 </root>

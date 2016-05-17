@@ -649,34 +649,34 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         StringBuilder sbComment = new StringBuilder();
                         sbComment.Append(EventCommentConstants.ReceivedDriverLogin);
                         sbComment.Append(" HH:");
-                        sbComment.Append(driverStatus.LoginDateTime);
-                        if (null != driverStatus.TripNumber)
+                        sbComment.Append(driverLoginProcess.LoginDateTime);
+                        if (null != driverLoginProcess.TripNumber)
                         { 
                             sbComment.Append(" Trip:");
-                            sbComment.Append(driverStatus.TripNumber);
+                            sbComment.Append(driverLoginProcess.TripNumber);
                             sbComment.Append("-");
-                            sbComment.Append(driverStatus.TripSegNumber);
+                            sbComment.Append(driverLoginProcess.TripSegNumber);
                         }
                         sbComment.Append(" Drv:");
-                        sbComment.Append(driverStatus.EmployeeId);
+                        sbComment.Append(driverLoginProcess.EmployeeId);
                         sbComment.Append(" Pwr:");
-                        sbComment.Append(driverStatus.PowerId);
+                        sbComment.Append(driverLoginProcess.PowerId);
                         sbComment.Append(" Odom:");
-                        sbComment.Append(driverStatus.Odometer);
+                        sbComment.Append(driverLoginProcess.Odometer);
                         string comment = sbComment.ToString().Trim();
 
                         var eventLog = new EventLog()
                         {
-                            EventDateTime = driverStatus.LoginDateTime,
+                            EventDateTime = driverLoginProcess.LoginDateTime,
                             EventSeqNo = 0,
-                            EventTerminalId = driverStatus.TerminalId,
-                            EventRegionId = driverStatus.RegionId,
-                            //These are not populated for logins in the current system.
-                            // EventEmployeeId = driverStatus.EmployeeId,
-                            // EventEmployeeName = Common.GetDriverName(employeeMaster),
-                            EventTripNumber = driverStatus.TripNumber,
+                            EventTerminalId = employeeMaster.TerminalId,
+                            EventRegionId = employeeMaster.RegionId,
+                            //These are not populated in the current system.
+                            // EventEmployeeId = driverLoginProcess.EmployeeId,
+                            // EventEmployeeName = Common.GetEmployeeName(employeeMaster),
+                            EventTripNumber = driverLoginProcess.TripNumber,
                             EventProgram = EventProgramConstants.Services,
-                            //These are not populated for logins in the current system.
+                            //These are not populated in the current system.
                             //EventScreen = null,
                             //EventAction = null,
                             EventComment = comment,
@@ -685,13 +685,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ChangeSetResult<int> eventChangeSetResult;
                         eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
                         log.Debug("SRTEST:Saving EventLog Record - Login");
-                        //if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
-                        //{
-                        //    var s = string.Format("Could not update EventLog for Driver {0} {1}.",
-                        //                         driverStatus.EmployeeId, EventCommentConstants.ReceivedDriverLogin);
-                        //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                        //    break;
-                        //}
+                        //Check for EventLog failure.
+                        if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
+                        {
+                            var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                                    driverLoginProcess.EmployeeId, EventCommentConstants.ReceivedDriverLogin);
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            break;
+                        }
 
                         ////////////////////////////////////////////////
                         // Send Container Inventory
@@ -975,7 +976,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     tripSegmentMileage.TripSegMileagePowerId = driverLoginProcess.PowerId;
                     tripSegmentMileage.TripSegMileageOdometerStart = driverLoginProcess.Odometer;
                     tripSegmentMileage.TripSegMileageDriverId = driverLoginProcess.EmployeeId;
-                    tripSegmentMileage.TripSegMileageDriverName = Common.GetDriverName(employeeMaster);
+                    tripSegmentMileage.TripSegMileageDriverName = Common.GetEmployeeName(employeeMaster);
 
                     //Update the TripSegmentMileage record
                     scratchChangeSetResult = Common.UpdateTripSegmentMileage(dataService, settings, tripSegmentMileage);

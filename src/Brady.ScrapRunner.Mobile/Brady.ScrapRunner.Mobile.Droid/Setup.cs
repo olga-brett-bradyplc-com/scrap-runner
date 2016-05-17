@@ -10,8 +10,11 @@ using MvvmCross.Platform.IoC;
 using System.Net;
 using System.Reflection;
 using Android.Content;
+using Android.Widget;
+using MvvmCross.Binding.Bindings.Target.Construction;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Droid.Platform;
+using MvvmCross.Droid.Support.V7.AppCompat;
 
 namespace Brady.ScrapRunner.Mobile.Droid
 {
@@ -65,6 +68,13 @@ namespace Brady.ScrapRunner.Mobile.Droid
         {
             base.FillValueConverters(registry);
             registry.AddOrOverwrite("Language", new MvxLanguageConverter());
+        }
+
+        // Implemented to fix issues with SelectedItem binding not working with MvxSpinner
+        protected override void FillTargetFactories(IMvxTargetBindingFactoryRegistry registry)
+        {
+            MvxAppCompatSetupHelper.FillTargetFactories(registry);
+            base.FillTargetFactories(registry);
         }
 
         protected override void InitializeLastChance()

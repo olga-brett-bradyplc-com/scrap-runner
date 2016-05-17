@@ -26,8 +26,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.GPSAutoFlag);
             IntegerProperty(x => x.Latitude);
             IntegerProperty(x => x.Longitude);
-            StringProperty(x => x.TerminalId);
-            StringProperty(x => x.RegionId);
             StringProperty(x => x.Mdtid);
 
             ViewDefaults()
@@ -40,8 +38,6 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.GPSAutoFlag)
             .Property(x => x.Latitude)
             .Property(x => x.Longitude)
-            .Property(x => x.TerminalId)
-            .Property(x => x.RegionId)
             .Property(x => x.Mdtid)
 
             .OrderBy(x => x.EmployeeId);

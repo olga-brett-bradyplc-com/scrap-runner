@@ -13,6 +13,7 @@
             CreateMap<EmployeeMaster, EmployeeMasterModel>();
             CreateMap<Preference, PreferenceModel>();
             CreateMap<PowerMaster, PowerMasterModel>();
+            CreateMap<DriverStatus, DriverStatusModel>();
             CreateMap<Trip, TripModel>();
             CreateMap<TripSegment, TripSegmentModel>()
                 .ForMember(m => m.CompositeKey, o => o.Ignore());
@@ -24,8 +25,9 @@
                 .ForMember(m => m.CompositeId, o => o.Ignore());
             // @TODO: TripSegComments cannot be mapped. We are probably using the wrong property here.
             CreateMap<TripSegmentContainer, TripSegmentContainerModel>()
-                .ForMember(m => m.TripSegComments, o => o.Ignore())
-                .ForMember(m => m.CompositeKey, o => o.Ignore());
+                .ForMember(tsc => tsc.TripSegComments, opt => opt.Ignore());
+            CreateMap<CodeTable, CodeTableModel>();
+            CreateMap<Messages, MessagesModel>();
         }
     }
 }

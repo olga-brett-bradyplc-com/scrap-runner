@@ -11,22 +11,22 @@ namespace Brady.ScrapRunner.Domain.Process
     ///
     public class DriverArriveProcess : IHaveId<string>, IEquatable<DriverArriveProcess>
     {
-        ///The driver id from the phone.
+        ///The driver id. Required.
         public virtual string EmployeeId { get; set; }
 
-        /// Trip Number from the phone.  Required.
+        /// Trip Number. Required.
         public virtual string TripNumber { get; set; }
 
-        /// Trip Segment Number from the phone.  Required.
+        /// Trip Segment Number. Required.
         public virtual string TripSegNumber { get; set; }
 
-        /// The ActionDateTime from the phone. Required.
+        /// The ActionDateTime. Required.
         public virtual DateTime ActionDateTime { get; set; }
 
-        ///The power id from the phone. Required.
+        ///The power id. Required.
         public virtual string PowerId { get; set; }
 
-        ///The odometer from the phone. Required.
+        ///The odometer. Required.
         public virtual int Odometer { get; set; }
 
         /// GPS Auto enroute/arrive flag.  Y/N. Default is N.
@@ -37,12 +37,6 @@ namespace Brady.ScrapRunner.Domain.Process
 
         /// Longitude of the arrive.
         public virtual int? Longitude { get; set; }
-
-        /// Standard information.
-        public virtual string TerminalId { get; set; }
-
-        /// Standard information.
-        public virtual string RegionId { get; set; }
 
         /// Currently this is the driver id. Probably will not be needed in the future.
         public virtual string Mdtid { get; set; }

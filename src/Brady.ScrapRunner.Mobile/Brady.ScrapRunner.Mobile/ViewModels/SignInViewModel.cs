@@ -1,9 +1,13 @@
 ﻿using Brady.ScrapRunner.Domain.Process;
 using BWF.DataServices.PortableClients;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using MvvmCross.Core.ViewModels;
 using Brady.ScrapRunner.Mobile.Resources;
@@ -20,26 +24,37 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IPreferenceService _preferenceService;
         private readonly ITripService _tripService;
         private readonly ICustomerService _customerService;
-        private readonly IConnectionService _connection;
-        private readonly IQueueScheduler _queueScheduler;
+        private readonly IDriverService _driverService;
+        private readonly IContainerService _containerService;
+        private readonly ICodeTableService _codeTableService;
+        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IMessagesService _messagesService;
+
 
         public SignInViewModel(
             IDbService dbService,
             IPreferenceService preferenceService,
             ITripService tripService,
             ICustomerService customerService,
-            IConnectionService connection, 
-            IQueueScheduler queueScheduler)
+            IDriverService driverService,
+            IContainerService containerService,
+            ICodeTableService codeTableService,
+            IMessagesService messagesService,
+           IConnectionService<DataServiceClient> connection)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
             _tripService = tripService;
             _customerService = customerService;
+            _driverService = driverService;
+            _containerService = containerService;
+            _codeTableService = codeTableService;
+            _messagesService = messagesService;
 
             _connection = connection;
             _queueScheduler = queueScheduler;
             Title = AppResources.SignInTitle;
-            SignInCommand = new MvxCommand(ExecuteSignInCommand, CanExecuteSignInCommand);
+            SignInCommand = new MvxAsyncCommand(ExecuteSignInCommandAsync, CanExecuteSignInCommand);
         }
 
         private string _userName;
@@ -86,9 +101,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        public MvxCommand SignInCommand { get; protected set; }
+        public IMvxAsyncCommand SignInCommand { get; protected set; }
 
-        protected async void ExecuteSignInCommand()
+        protected async Task ExecuteSignInCommandAsync()
         {
             var userNameResults = Validate<UsernameValidator, string>(UserName);
             if (!userNameResults.IsValid)
@@ -140,24 +155,39 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
-                var loginProcessObj = new DriverLoginProcess
-                {
-                    EmployeeId = UserName,
-                    Password = Password,
-                    PowerId = TruckId,
-                    Odometer = Odometer,
-                    LocaleCode = 1033,
-                    OverrideFlag = "N",
-                    Mdtid = "Phone",
-                    LoginDateTime = DateTime.Now
-                };
-
-                var loginProcess =
-                    await _connection.GetConnection().UpdateAsync(loginProcessObj, requeryUpdated: false);
+                // Trying to push all remote calls via BWF down into a respective service, since however we don't
+                // have a need for a login service, leaving this as it is.
+                var loginProcess = await _connection.GetConnection().UpdateAsync(
+                    new DriverLoginProcess {
+                        EmployeeId = UserName,
+                        Password = Password,
+                        PowerId = TruckId,
+                        Odometer = Odometer,
+                        LocaleCode = 1033,
+                        OverrideFlag = "N",
+                        Mdtid = "Phone",
+                        LoginDateTime = DateTime.Now
+                    }, requeryUpdated: false);
 
                 if (loginProcess.WasSuccessful)
                 {
-                    var temp = loginProcess.Item;
+                    await _containerService.UpdateContainerMaster(loginProcess.Item.ContainersOnPowerId);
+
+                    await _driverService.UpdateDriverStatus(new DriverStatus
+                    {
+                        EmployeeId = loginProcess.Item.EmployeeId,
+                        Status = DriverStatusSRConstants.LoggedIn,
+                        TerminalId = loginProcess.Item.TermId,
+                        PowerId = loginProcess.Item.PowerId,
+                        RegionId = loginProcess.Item.RegionId,
+                        MDTId = loginProcess.Item.Mdtid,
+                        LoginDateTime = loginProcess.Item.LoginDateTime,
+                        ActionDateTime = loginProcess.Item.LoginDateTime,
+                        //DriverCumMinutes = loginProcess.Item.DriverCumlMinutes @TODO Should this be sent in login process?
+                        Odometer = loginProcess.Item.Odometer,
+                        LoginProcessedDateTime = loginProcess.Item.LoginDateTime,
+                        DriverLCID = loginProcess.Item.LocaleCode
+                    });
                 }
                 else
                 {
@@ -166,14 +196,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
-                loginData.Title = "Loading Preferences";
+                loginData.Title = AppResources.LoadingPreferences;
 
                 var preferenceObj = new PreferencesProcess
                 {
                     EmployeeId = UserName
                 };
 
-                var preferenceProcess = await _connection.GetConnection().UpdateAsync(preferenceObj, requeryUpdated: false);
+                var preferenceProcess = await _preferenceService.FindPreferencesRemoteAsync(new PreferencesProcess { EmployeeId = UserName });
 
                 if (preferenceProcess.WasSuccessful)
                 {
@@ -188,16 +218,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 loginData.Title = AppResources.LoadingTripInformation;
 
-                var tripObj = new TripInfoProcess
+                var tripProcess = await _tripService.FindTripsRemoteAsync(new TripInfoProcess
                 {
                     EmployeeId = UserName
-                };
-
-                var tripProcess = await _connection.GetConnection().UpdateAsync(tripObj, requeryUpdated: false);
+                });
 
                 if (tripProcess.WasSuccessful)
                 {
-                    
                     // @TODO : Should we throw an error/alert dialog to the end user if any of these fail?
 
                     if( tripProcess.Item?.Trips?.Count > 0 )
@@ -221,6 +248,35 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 else
                 {
                     await UserDialogs.Instance.AlertAsync(tripProcess.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
+
+                loginData.Title = AppResources.LoadingMiscInformation;
+
+                var codesTable = await _codeTableService.FindCodesRemoteAsync(new CodeTableProcess { EmployeeId = UserName });
+
+                if (codesTable.WasSuccessful)
+                {
+                    await _codeTableService.UpdateCodeTable(codesTable.Item.CodeTables);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(codesTable.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
+
+                var messagesTable = await _messagesService.FindMsgsRemoteAsync(new DriverMessageProcess { EmployeeId = UserName });
+
+                if (messagesTable.WasSuccessful)
+                {
+                    if(messagesTable.Item?.Messages?.Count > 0)
+                        await _messagesService.UpdateMessages(messagesTable.Item.Messages);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(messagesTable.Failure.Summary,
                         AppResources.Error, AppResources.OK);
                     return false;
                 }

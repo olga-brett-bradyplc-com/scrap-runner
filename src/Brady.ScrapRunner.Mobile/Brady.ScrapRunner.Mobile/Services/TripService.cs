@@ -1,5 +1,10 @@
-﻿using Brady.ScrapRunner.Domain.Models;
+﻿using System;
+using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
+using BWF.DataServices.Domain.Models;
+using BWF.DataServices.Metadata.Models;
+using BWF.DataServices.PortableClients;
 
 namespace Brady.ScrapRunner.Mobile.Services
 {
@@ -13,17 +18,20 @@ namespace Brady.ScrapRunner.Mobile.Services
 
     public class TripService : ITripService
     {
+        private readonly IConnectionService<DataServiceClient> _connection; 
         private readonly IRepository<PreferenceModel> _preferenceRepository;
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository; 
 
         public TripService(
+            IConnectionService<DataServiceClient> connection,
             IRepository<PreferenceModel> preferenceRepository, 
             IRepository<TripModel> tripRepository, 
             IRepository<TripSegmentModel> tripSegmentRepository,
             IRepository<TripSegmentContainerModel> tripSegmentContainerRepository )
         {
+            _connection = connection;
             _preferenceRepository = preferenceRepository;
             _tripRepository = tripRepository;
             _tripSegmentRepository = tripSegmentRepository;
@@ -63,6 +71,12 @@ namespace Brady.ScrapRunner.Mobile.Services
             return _tripSegmentContainerRepository.InsertRangeAsync(mapped);
         }
 
+        public async Task<ChangeResultWithItem<TripInfoProcess>> FindTripsRemoteAsync(TripInfoProcess tripInfoProcess)
+        {
+            var tripProcess = await _connection.GetConnection().UpdateAsync(tripInfoProcess, requeryUpdated: false);
+            return tripProcess;
+        }
+
         /// <summary>
         /// Retrieve whether trip order in enforced via preferences table
         /// </summary>
@@ -71,6 +85,78 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var preference = await _preferenceRepository.FindAsync(p => p.Parameter == "DEFEnforceSeqProcess");
             return preference != null && preference.ParameterValue == Constants.Yes;
+        }
+
+        /// <summary>
+        /// Check to see if first segment of given leg contains a basic trip type that
+        /// warrants sending user to through the transaction summary screen.
+        /// 
+        /// Should note that we don't need to evaluate whether there are multiple trip segments
+        /// that should be processed together, as they'll automatically be picked up on the 
+        /// transaction screen together.
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns>bool</returns>
+        public async Task<bool> IsTripLegTransactionAsync(string tripNumber)
+        {
+            var segment = await _tripSegmentRepository.AsQueryable()
+                .Where(ts =>
+                    ts.TripNumber == tripNumber
+                    &&
+                    (ts.TripSegStatus == TripSegStatusConstants.Pending ||
+                     ts.TripSegStatus == TripSegStatusConstants.Missed))
+                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
+
+            return segment.TripSegType.Equals(BasicTripTypeConstants.DropEmpty) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.DropFull) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.PickupEmpty) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.PickupFull) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.Load) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.Unload) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.Respot);
+        }
+
+        /// <summary>
+        /// Check to see if first segment of given leg contains a basic trip type that
+        /// warrants sending user to through the scale summary screen.
+        /// 
+        /// Should note that we don't need to evaluate whether there are multiple trip segments
+        /// that should be processed together, as they'll automatically be picked up on the 
+        /// scale screen together.
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns>bool</returns>
+        public async Task<bool> IsTripLegScaleAsync(string tripNumber)
+        {
+            var segment = await _tripSegmentRepository.AsQueryable()
+                .Where(ts =>
+                    ts.TripNumber == tripNumber
+                    &&
+                    (ts.TripSegStatus == TripSegStatusConstants.Pending ||
+                     ts.TripSegStatus == TripSegStatusConstants.Missed))
+                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
+
+            return segment.TripSegType.Equals(BasicTripTypeConstants.Scale) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.ReturnYard);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns></returns>
+        public async Task<bool> IsTripLegNoScreenAsync(string tripNumber)
+        {
+            var segment = await _tripSegmentRepository.AsQueryable()
+                .Where(ts =>
+                    ts.TripNumber == tripNumber
+                    &&
+                    (ts.TripSegStatus == TripSegStatusConstants.Pending ||
+                     ts.TripSegStatus == TripSegStatusConstants.Missed))
+                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
+
+            return segment.TripSegType.Equals(BasicTripTypeConstants.YardWork) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.ReturnYardNC);
         }
 
         /// <summary>
@@ -110,7 +196,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// Find all trip segments for the given trip leg of a trip
+        /// Find all trip segments for the given leg of a trip
         /// </summary>
         /// <param name="tripNumber"></param>
         /// <returns></returns>
@@ -133,6 +219,7 @@ namespace Brady.ScrapRunner.Mobile.Services
 
         /// <summary>
         /// Find all trip segment containers for the given trip leg.
+        /// @TODO : 
         /// </summary>
         /// <param name="tripNumber"></param>
         /// <param name="tripSegNo"></param>
@@ -147,7 +234,7 @@ namespace Brady.ScrapRunner.Mobile.Services
                 Mvx.TaggedError(Constants.ScrapRunner, $"Couldn't find next containers for trip {tripNumber}.");
                 return Enumerable.Empty<TripSegmentContainerModel>().ToList();
             }
-            return containers;
+            return containers.TakeWhile(tscm => tscm.TripSegContainerComplete != Constants.Yes).ToList();
         }
 
         /// <summary>
@@ -171,17 +258,92 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// Complete a given trip; @TODO : This is not implemented correctly?
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNo"></param>
+        /// <param name="tripSegContainerNumer"></param>
+        /// <param name="gsWt"></param>
+        /// <param name="gs2Wt"></param>
+        /// <param name="trWt"></param>
+        /// <returns></returns>
+        public async Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo, string tripSegContainerNumer)
+        {
+            // @TODO : Not complete
+            var container = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(
+                    tscm =>
+                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
+                        tscm.TripSegContainerNumber == tripSegContainerNumer).FirstOrDefaultAsync();
+            
+            // @TODO : This is just a stopgap for us to know what we've marked as "complete". This will change once the remote call is finished
+            container.TripSegContainerComplete = Constants.Yes;
+
+            return await _tripSegmentContainerRepository.UpdateAsync(container);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNo"></param>
+        /// <param name="tripSegContainerNumber"></param>
+        /// <param name="gsWt"></param>
+        /// <param name="gs2Wt"></param>
+        /// <param name="trWt"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateTripSegmentContainerWeightTimesAsync(string tripNumber, string tripSegNo, string tripSegContainerNumber, DateTime? gsWt, DateTime? gs2Wt, DateTime? trWt)
+        {
+            // @TODO : Not complete
+            var container = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(
+                    tscm =>
+                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
+                        tscm.TripSegContainerNumber == tripSegContainerNumber).FirstOrDefaultAsync();
+
+            container.WeightGrossDateTime = gsWt;
+            container.WeightGross2ndDateTime = gs2Wt;
+            container.WeightTareDateTime = trWt;
+
+            return await _tripSegmentContainerRepository.UpdateAsync(container);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNo"></param>
+        /// <param name="tripSegContainerNumber"></param>
+        /// <param name="latitude"></param>
+        /// <param name="longitude"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo, string tripSegContainerNumber, double? latitude, double? longitude)
+        {
+
+            // @TODO : Not complete
+            var container = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(
+                    tscm =>
+                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
+                        tscm.TripSegContainerNumber == tripSegContainerNumber).FirstOrDefaultAsync();
+
+            container.TripSegContainerLongitude = longitude;
+            container.TripSegContainerLatitude = latitude;
+
+            return await _tripSegmentContainerRepository.UpdateAsync(container);
+        }
+
+        /// <summary>
+        /// Complete a given trip
         /// </summary>
         /// <param name="tripNumber"></param>
         /// <returns></returns>
         public async Task<int> CompleteTripAsync(string tripNumber)
         {
+            // @TODO : Implement remote process once it's completed
             var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
             trip.TripStatus = TripStatusConstants.Done;
-            await _tripRepository.UpdateAsync(trip);
-
-            return await Task.FromResult(1);
+            return await _tripRepository.UpdateAsync(trip);
         }
 
         /// <summary>
@@ -196,11 +358,7 @@ namespace Brady.ScrapRunner.Mobile.Services
                 await _tripSegmentRepository.FindAsync(
                         ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
             tripSegment.TripSegStatus = TripSegStatusConstants.Done;
-            await _tripSegmentRepository.UpdateAsync(tripSegment);
-
-            // @TODO : Fix this ...
-            return await Task.FromResult(1);
+            return await _tripSegmentRepository.UpdateAsync(tripSegment);
         }
-
     }
 }

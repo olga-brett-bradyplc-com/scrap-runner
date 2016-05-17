@@ -10,12 +10,12 @@ using Brady.ScrapRunner.Domain.Process;
 
 namespace Brady.ScrapRunner.DataService.Mappings
 {
-   /// <summary>
-    /// DriverContainerDoneProcess mapping to NHibernate.
-    /// </summary>
-    public class DriverContainerDoneProcessMap : ClassMapping<DriverContainerDoneProcess>
+    /// <summary>
+    /// DriverNewContainerProcess mapping to NHibernate.
+    /// </summary>    
+    public class DriverNewContainerProcessMap : ClassMapping<DriverNewContainerProcess>
     {
-        public DriverContainerDoneProcessMap()
+        public DriverNewContainerProcessMap()
         {
             Table("EmployeeMaster");
 

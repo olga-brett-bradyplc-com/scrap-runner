@@ -90,7 +90,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             ChangeSetResult<string> changeSetResult = base.ProcessChangeSet(dataService, changeSet, settings);
 
             // If no problems, we are free to process.
-            // We only process one driver enroute at a time but in the more general cases we could be processing multiple records.
+            // We only process one record at a time but in the more general cases we could be processing multiple records.
             // So we loop over the one to many keys in the changeSetResult.SuccessfullyUpdated
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
@@ -377,9 +377,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             tripSegmentContainer.TripSegContainerNumber = containerOnPowerId.ContainerNumber;
                             tripSegmentContainer.TripSegContainerType = containerOnPowerId.ContainerType;
                             tripSegmentContainer.TripSegContainerSize = containerOnPowerId.ContainerSize;
-                            tripSegmentContainer.TripSegContainerCommodityCode = containerOnPowerId.ContainerCommodityCode;
-                            tripSegmentContainer.TripSegContainerCommodityDesc = containerOnPowerId.ContainerCommodityDesc;
                             tripSegmentContainer.TripSegContainerActionDateTime = driverEnrouteProcess.ActionDateTime;
+
+                            //Not applicable on an enroute.
+                            //tripSegmentContainer.TripSegContainerCommodityCode = containerOnPowerId.ContainerCommodityCode;
+                            //tripSegmentContainer.TripSegContainerCommodityDesc = containerOnPowerId.ContainerCommodityDesc;
 
                             //Do the update
                             changeSetResult = Common.UpdateTripSegmentContainer(dataService, settings, tripSegmentContainer);
@@ -411,7 +413,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     currentTripSegment.TripSegPowerId = driverEnrouteProcess.PowerId;
                     currentTripSegment.TripSegDriverId = driverEnrouteProcess.EmployeeId;
-                    currentTripSegment.TripSegDriverName = Common.GetDriverName(employeeMaster);
+                    currentTripSegment.TripSegDriverName = Common.GetEmployeeName(employeeMaster);
                     currentTripSegment.TripSegOdometerStart = driverEnrouteProcess.Odometer;
                     currentTripSegment.TripSegStartLatitude = driverEnrouteProcess.Latitude;
                     currentTripSegment.TripSegStartLongitude = driverEnrouteProcess.Longitude;
@@ -505,6 +507,24 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         //TODO: Delete any existing trip segment mileage records for this segment
                         //Driver might be starting this trip again. Maybe he went enroute/arrived, logged out and is now going enroute again.
+                        var oldTripSegmentMileageList = Common.GetTripSegmentMileage(dataService, settings, userCulture, userRoleIds,
+                                                driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber, out fault);
+                        foreach (var oldTripSegmentMileage in oldTripSegmentMileageList)
+                        {
+                            //TODO: Do the delete. DeleteTripSegmentMileage throws an exception
+                            //changeSetResult = Common.DeleteTripSegmentMileage(dataService, settings, oldTripSegmentMileage);
+                            log.DebugFormat("SRTEST:Deleting TripSegmentMileage Record for Trip:{0}-{1} Seq:{2}- Enroute.",
+                                            oldTripSegmentMileage.TripNumber, oldTripSegmentMileage.TripSegNumber,
+                                            oldTripSegmentMileage.TripSegMileageSeqNumber);
+                            if (Common.LogChangeSetFailure(changeSetResult, oldTripSegmentMileage, log))
+                            {
+                                var s = string.Format("Could not update TripSegmentContainer for Trip:{0}-{1} Seq:{2}.",
+                                        oldTripSegmentMileage.TripNumber, oldTripSegmentMileage.TripSegNumber,
+                                        oldTripSegmentMileage.TripSegMileageSeqNumber);
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                break;
+                            }
+                        }
                     }
 
                     //Normally for enroutes, we need to add a mileage record, but just in case there is an open-ended
@@ -742,12 +762,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         EventSeqNo = 0,
                         EventTerminalId = employeeMaster.TerminalId,
                         EventRegionId = employeeMaster.RegionId,
-                        //These are not populated for logins in the current system.
+                        //These are not populated in the current system.
                         // EventEmployeeId = driverStatus.EmployeeId,
-                        // EventEmployeeName = Common.GetDriverName(employeeMaster),
+                        // EventEmployeeName = Common.GetEmployeeName(employeeMaster),
                         EventTripNumber = driverEnrouteProcess.TripNumber,
                         EventProgram = EventProgramConstants.Services,
-                        //These are not populated for enroutes in the current system.
+                        //These are not populated in the current system.
                         //EventScreen = null,
                         //EventAction = null,
                         EventComment = comment,
@@ -756,13 +776,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ChangeSetResult<int> eventChangeSetResult;
                     eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
                     log.Debug("SRTEST:Saving EventLog Record - Enroute");
-                    //if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
-                    //{
-                    //    var s = string.Format("Could not update EventLog for Driver {0} {1}.",
-                    //                         driverStatus.EmployeeId, EventCommentConstants.ReceivedDriverLogin);
-                    //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                    //    break;
-                    //}
+                    //Check for EventLog failure.
+                    if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
+                    {
+                        var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                                driverEnrouteProcess.EmployeeId, EventCommentConstants.ReceivedDriverEnroute);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        break;
+                    }
 
 
                     ////////////////////////////////////////////////

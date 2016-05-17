@@ -90,7 +90,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             ChangeSetResult<string> changeSetResult = base.ProcessChangeSet(dataService, changeSet, settings);
 
             // If no problems, we are free to process.
-            // We only process one driver enroute at a time but in the more general cases we could be processing multiple records.
+            // We only process one record at a time but in the more general cases we could be processing multiple records.
             // So we loop over the one to many keys in the changeSetResult.SuccessfullyUpdated
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
@@ -187,7 +187,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
                     ////////////////////////////////////////////////
-                    //Add entry to Event Log – Segment Done. 
+                    //Add entry to Event Log – Trip Ack. 
                     StringBuilder sbComment = new StringBuilder();
                     sbComment.Append(EventCommentConstants.ReceivedDriverAck);
                     sbComment.Append(" HH:");
@@ -204,12 +204,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         EventSeqNo = 0,
                         EventTerminalId = employeeMaster.TerminalId,
                         EventRegionId = employeeMaster.RegionId,
-                        //These are not populated for logins in the current system.
+                        //These are not populated in the current system.
                         // EventEmployeeId = driverStatus.EmployeeId,
-                        // EventEmployeeName = Common.GetDriverName(employeeMaster),
+                        // EventEmployeeName = Common.GetEmployeeName(employeeMaster),
                         EventTripNumber = driverTripAckProcess.TripNumber,
                         EventProgram = EventProgramConstants.Services,
-                        //These are not populated for enroutes in the current system.
+                        //These are not populated in the current system.
                         //EventScreen = null,
                         //EventAction = null,
                         EventComment = comment,
@@ -217,14 +217,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ChangeSetResult<int> eventChangeSetResult;
                     eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
-                    log.Debug("SRTEST:Saving EventLog Record - Segment Done");
-                    //if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
-                    //{
-                    //    var s = string.Format("Could not update EventLog for Driver {0} {1}.",
-                    //                         driverStatus.EmployeeId, EventCommentConstants.ReceivedDriverLogin);
-                    //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                    //    break;
-                    //}
+                    log.Debug("SRTEST:Saving EventLog Record - Trip Ack");
+                    //Check for EventLog failure.
+                    if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
+                    {
+                        var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                                driverTripAckProcess.EmployeeId, EventCommentConstants.ReceivedDriverAck);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        break;
+                    }
 
 
                 }//end of foreach...

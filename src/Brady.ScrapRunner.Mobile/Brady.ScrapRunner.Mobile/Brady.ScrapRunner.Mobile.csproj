@@ -42,9 +42,13 @@
     <Compile Include="Enums\MenuFilterEnum.cs" />
     <Compile Include="Helpers\ChangeSetExtensions.cs" />
     <Compile Include="Helpers\Grouping.cs" />
+    <Compile Include="Interfaces\ICodeTableService.cs" />
+    <Compile Include="Interfaces\IContainerService.cs" />
     <Compile Include="Interfaces\ICustomerService.cs" />
     <Compile Include="Interfaces\IDbService.cs" />
+    <Compile Include="Interfaces\IDriverService.cs" />
     <Compile Include="Interfaces\ILocationService.cs" />
+    <Compile Include="Interfaces\IMessagesService.cs" />
     <Compile Include="Interfaces\INetworkAvailabilityService.cs" />
     <Compile Include="Interfaces\IPreferenceService.cs" />
     <Compile Include="Interfaces\IQueueScheduler.cs" />
@@ -54,9 +58,11 @@
     <Compile Include="Interfaces\IClientSettings.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
     <Compile Include="Interfaces\ITripService.cs" />
+    <Compile Include="Models\CodeTableModel.cs" />
     <Compile Include="Models\CustomerCommodityModel.cs" />
     <Compile Include="Models\CustomerLocationModel.cs" />
     <Compile Include="Models\DriverStatusModel.cs" />
+    <Compile Include="Models\MessagesModel.cs" />
     <Compile Include="Models\PowerMasterModel.cs" />
     <Compile Include="Models\ContainerMasterModel.cs" />
     <Compile Include="Models\CustomerDirectionsModel.cs" />
@@ -77,11 +83,15 @@
     </Compile>
     <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="ScrapRunnerMapperProfile.cs" />
+    <Compile Include="Services\CodeTableService.cs" />
+    <Compile Include="Services\ContainerService.cs" />
     <Compile Include="Services\CustomerService.cs" />
     <Compile Include="Services\DemoDataGenerator.cs" />
     <Compile Include="Services\ConnectionService.cs" />
     <Compile Include="Services\DemoClientSettings.cs" />
+    <Compile Include="Services\DriverService.cs" />
     <Compile Include="Services\LocationService.cs" />
+    <Compile Include="Services\MessagesService.cs" />
     <Compile Include="Services\QueuedDataServiceClient.cs" />
     <Compile Include="Services\PreferenceService.cs" />
     <Compile Include="Services\DbService.cs" />
@@ -92,8 +102,11 @@
     <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
+    <Compile Include="ViewModels\FuelEntryViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\MessagesViewModel.cs" />
+    <Compile Include="ViewModels\NewMessageViewModel.cs" />
     <Compile Include="ViewModels\ScaleDetailViewModel.cs" />
     <Compile Include="ViewModels\ScaleSummaryViewModel.cs" />
     <Compile Include="ViewModels\TransactionConfirmationViewModel.cs" />
@@ -109,7 +122,9 @@
     <Compile Include="ViewModels\BaseViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\AppResources.es.resx" />
+    <EmbeddedResource Include="Resources\AppResources.es.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\AppResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
@@ -118,11 +133,11 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Acr.UserDialogs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acr.UserDialogs.4.3.0\lib\portable-win+net45+wp8+win8+wpa81\Acr.UserDialogs.dll</HintPath>
+      <HintPath>..\..\..\packages\Acr.UserDialogs.5.0.1\lib\portable-win+net45+wp8+win8+wpa81\Acr.UserDialogs.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Acr.UserDialogs.Interface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acr.UserDialogs.4.3.0\lib\portable-win+net45+wp8+win8+wpa81\Acr.UserDialogs.Interface.dll</HintPath>
+      <HintPath>..\..\..\packages\Acr.UserDialogs.5.0.1\lib\portable-win+net45+wp8+win8+wpa81\Acr.UserDialogs.Interface.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
@@ -154,43 +169,43 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Binding, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.1\lib\portable-net45+win+wpa81+wp80\MvvmCross.Binding.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.4\lib\portable-net45+win+wpa81+wp80\MvvmCross.Binding.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Core, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Core.4.1.0\lib\portable-net45+win+wpa81+wp80\MvvmCross.Core.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Core.4.1.4\lib\portable-net45+win+wpa81+wp80\MvvmCross.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Localization, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.1\lib\portable-net45+win+wpa81+wp80\MvvmCross.Localization.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.4\lib\portable-net45+win+wpa81+wp80\MvvmCross.Localization.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Platform, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Platform.4.1.0\lib\portable-net45+win+wpa81+wp80\MvvmCross.Platform.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Platform.4.1.4\lib\portable-net45+win+wpa81+wp80\MvvmCross.Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Color, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Color.4.1.0\lib\portable-net45+win+wpa81+wp80\MvvmCross.Plugins.Color.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Color.4.1.4\lib\portable-net45+win+wpa81+wp80\MvvmCross.Plugins.Color.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Json, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Json.4.1.0\lib\portable-net45+win+wpa81+wp80\MvvmCross.Plugins.Json.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Json.4.1.4\lib\portable-net45+win+wpa81+wp80\MvvmCross.Plugins.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Location, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Location.4.1.0\lib\portable-net45+win+wpa81+wp80\MvvmCross.Plugins.Location.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Location.4.1.4\lib\portable-net45+win+wpa81+wp80\MvvmCross.Plugins.Location.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Messenger, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Messenger.4.1.0\lib\portable-net45+win+wpa81+wp80\MvvmCross.Plugins.Messenger.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Messenger.4.1.4\lib\portable-net45+win+wpa81+wp80\MvvmCross.Plugins.Messenger.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Sqlite, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.SQLitePCL.4.1.0\lib\portable-win+net45+wp8+win8+wpa81+win81+dotnet\MvvmCross.Plugins.Sqlite.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.SQLitePCL.4.1.4\lib\portable-win+net45+wp8+win8+wpa81+win81+dotnet\MvvmCross.Plugins.Sqlite.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Visibility, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Visibility.4.1.0\lib\portable-net45+win+wpa81+wp80\MvvmCross.Plugins.Visibility.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Visibility.4.1.4\lib\portable-net45+win+wpa81+wp80\MvvmCross.Plugins.Visibility.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

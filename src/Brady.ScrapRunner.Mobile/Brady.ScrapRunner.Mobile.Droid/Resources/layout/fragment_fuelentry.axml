@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:background="@color/material_white"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/center_panel"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_centerInParent="true">
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/ScrapRunnerTheme.TextAppearance.Dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/fuelAmountInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                local:MvxBind="Text FuelAmount"
+                local:MvxLang="Hint AmountHint" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/ScrapRunnerTheme.TextAppearance.Dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/odometerInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                local:MvxBind="Text OdometerReading"
+                local:MvxLang="Hint CurrentOdometerHint" />
+        </android.support.design.widget.TextInputLayout>
+        <MvxSpinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:foreground="#ffffff"
+            android:textSize="40dp"
+            android:id="@+id/MvxStateSpinner"
+            local:MvxItemTemplate="@layout/item_state"
+            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown"
+            local:MvxBind="ItemsSource StatesList;SelectedItem SelectedState" />
+        <Button
+            local:MvxBind="Click SaveFuelEntryCommand"
+            local:MvxLang="Text Save"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:foreground="#ffffff" />
+    </LinearLayout>
+    <include
+        layout="@layout/toolbar" />
+</RelativeLayout>

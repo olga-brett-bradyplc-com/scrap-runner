@@ -191,7 +191,12 @@
   <ItemGroup>
     <Compile Include="Concrete\SRDataService.cs" />
     <Compile Include="Concrete\SRRepository.cs" />
+    <Compile Include="Mappings\DriverMessageProcessMap.cs" />
+    <Compile Include="Mappings\DriverNewContainerProcessMap.cs" />
     <Compile Include="Mappings\DriverTripAckProcessMap.cs" />
+    <Compile Include="Mappings\DriverFuelEntryProcessMap.cs" />
+    <Compile Include="ProcessTypes\DriverMessageProcessRecordType.cs" />
+    <Compile Include="ProcessTypes\DriverNewContainerProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverSegmentDoneProcessRecordType.cs" />
     <Compile Include="Interfaces\ISRRepository.cs" />
     <Compile Include="Mappings\AreaMasterMap.cs" />
@@ -205,7 +210,7 @@
     <Compile Include="Mappings\ControlNumberMasterMap.cs" />
     <Compile Include="Mappings\CustomerDirectionsMap.cs" />
     <Compile Include="Mappings\DriverArriveProcessMap.cs" />
-    <Compile Include="Mappings\DriverContainerDoneProcessMap.cs" />
+    <Compile Include="Mappings\DriverContainerActionProcessMap.cs" />
     <Compile Include="Mappings\DriverEfficiencyMap.cs" />
     <Compile Include="Mappings\DriverEnrouteProcessMap.cs" />
     <Compile Include="Mappings\DriverSegmentDoneProcessMap.cs" />
@@ -263,8 +268,9 @@
     <Compile Include="ProcessTypes\CommodityMasterProcessRecordType.cs" />
     <Compile Include="ProcessTypes\ContainerChangeProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverArriveProcessRecordType.cs" />
-    <Compile Include="ProcessTypes\DriverContainerDoneProcessRecordType.cs" />
+    <Compile Include="ProcessTypes\DriverContainerActionProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverEnrouteProcessRecordType.cs" />
+    <Compile Include="ProcessTypes\DriverFuelEntryProcessRecordType.cs" />
     <Compile Include="ProcessTypes\PreferencesProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverLoginProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverTripAckProcessRecordType.cs" />
@@ -349,16 +355,22 @@
     <Compile Include="Validators\CustomerDirectionsValidator.cs" />
     <Compile Include="Validators\DriverArriveProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverArriveProcessValidator.cs" />
-    <Compile Include="Validators\DriverContainerDoneProcessDeletionValidator.cs" />
-    <Compile Include="Validators\DriverContainerDoneProcessValidator.cs" />
+    <Compile Include="Validators\DriverContainerActionProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverContainerActionProcessValidator.cs" />
     <Compile Include="Validators\DriverEfficiencyDeletionValidator.cs" />
     <Compile Include="Validators\DriverEfficiencyValidator.cs" />
     <Compile Include="Validators\DriverEnrouteProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverEnrouteProcessValidator.cs" />
+    <Compile Include="Validators\DriverMessageProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverMessageProcessValidator.cs" />
+    <Compile Include="Validators\DriverNewContainerProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverNewContainerProcessValidator.cs" />
     <Compile Include="Validators\DriverSegmentDoneProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverSegmentDoneProcessValidator.cs" />
     <Compile Include="Validators\DriverTripAckProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverTripAckProcessValidator.cs" />
+    <Compile Include="Validators\DriverFuelEntryProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverFuelEntryProcessValidator.cs" />
     <Compile Include="Validators\PreferencesProcessValidator.cs" />
     <Compile Include="Validators\PreferencesProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverLoginProcessDeletionValidator.cs" />

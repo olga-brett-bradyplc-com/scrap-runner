@@ -1,49 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Enums;
 using Brady.ScrapRunner.Mobile.Helpers;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Models;
+using MvvmCross.Core.ViewModels;
+using Brady.ScrapRunner.Mobile.Resources;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using Acr.UserDialogs;
-    using Interfaces;
-    using Models;
-    using MvvmCross.Core.ViewModels;
-    using Resources;
-
-    // This is still a work in progress
+    
     public class RouteDetailViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
-        private string _custHostCode;
-        private string _enrouteLabel;
-        private string _arriveLabel;
+        private readonly IDriverService _driverService;
 
-        public RouteDetailViewModel(ITripService tripService)
+        private string _custHostCode;
+
+        public RouteDetailViewModel(ITripService tripService, IDriverService driverService)
         {
             _tripService = tripService;
+            _driverService = driverService;
             DirectionsCommand = new MvxCommand(ExecuteDrivingDirectionsCommand);
-            EnRouteCommand = new MvxCommand(ExecuteEnRouteCommand);
-            ArriveCommand = new MvxCommand(ExecuteArriveCommand);
-            NextStageCommand = new MvxCommand(ExecuteNextStageCommand);
+            EnRouteCommand = new MvxAsyncCommand(ExecuteEnRouteCommandAsync);
+            ArriveCommand = new MvxAsyncCommand(ExecuteArriveCommandAsync);
+            NextStageCommand = new MvxAsyncCommand(ExecuteNextStageCommandAsync);
         }
 
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
-        }
-        public string EnrouteLabel
-        {
-            get { return _enrouteLabel; }
-            set { SetProperty(ref _enrouteLabel, value); }
-        }
-        public string ArriveLabel
-        {
-            get { return _arriveLabel; }
-            set { SetProperty(ref _arriveLabel, value); }
         }
  
         public override async void Start()
@@ -84,7 +75,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
 
             MenuFilter = MenuFilterEnum.NotOnTrip; // Reset for when we start a new trip segment
-
             base.Start();
         }
 
@@ -103,6 +93,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _tripType, value); }
         }
 
+        private string _enrouteLabel;
+        public string EnrouteLabel
+        {
+            get { return _enrouteLabel; }
+            set { SetProperty(ref _enrouteLabel, value); }
+        }
+
+        private string _arriveLabel;
+        public string ArriveLabel
+        {
+            get { return _arriveLabel; }
+            set { SetProperty(ref _arriveLabel, value); }
+        }
         private string _tripFor;
         public string TripFor
         {
@@ -145,6 +148,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _currentStatus, value); }
         }
 
+        private string _nextActionLabel;
+        public string NextActionLabel
+        {
+            get { return _nextActionLabel; }
+            set { SetProperty(ref _nextActionLabel, value);  }
+        }
+
         private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers; 
         public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
         {
@@ -154,9 +164,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         // Command bindings
         public MvxCommand DirectionsCommand { get; private set; }
-        public MvxCommand EnRouteCommand { get; private set; }
-        public MvxCommand ArriveCommand { get; private set; }
-        public MvxCommand NextStageCommand { get; private set; }
+        public IMvxAsyncCommand EnRouteCommand { get; private set; }
+        public IMvxAsyncCommand ArriveCommand { get; private set; }
+        public IMvxAsyncCommand NextStageCommand { get; private set; }
 
         // Command impl
         private void ExecuteDrivingDirectionsCommand()
@@ -165,7 +175,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 ShowViewModel<RouteDirectionsViewModel>(new {custHostCode = _custHostCode});
         }
 
-        private async void ExecuteEnRouteCommand()
+        private async Task ExecuteEnRouteCommandAsync()
         {
             var message = string.Format(AppResources.ConfirmEnRouteMessage,
                 "\n\n",
@@ -176,12 +186,36 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmEnrouteTitle);
             if (confirm)
             {
-                CurrentStatus = "EN"; //DriverStatusConstants.EnRoute;
-                MenuFilter = MenuFilterEnum.OnTrip;
+
+                var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
+                using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
+                {
+                    var setDriverEnroute = await _driverService.SetDriverEnrouteRemoteAsync(new DriverEnrouteProcess
+                    {
+                        EmployeeId = currentDriver.EmployeeId,
+                        PowerId = currentDriver.PowerId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = "01",
+                        ActionDateTime = DateTime.Now,
+                        Odometer = currentDriver.Odometer ?? default(int),
+                    });
+
+                    if (setDriverEnroute.WasSuccessful)
+                    {
+                        CurrentStatus = DriverStatusConstants.Enroute;
+                        MenuFilter = MenuFilterEnum.OnTrip;
+                    }
+                    else
+                    {
+                        await UserDialogs.Instance.AlertAsync(setDriverEnroute.Failure.Summary,
+                            AppResources.Error, AppResources.OK);
+                    }
+                }
             }
         }
 
-        private async void ExecuteArriveCommand()
+        private async Task ExecuteArriveCommandAsync()
         {
             var message = string.Format(AppResources.ConfirmArrivalMessage,
                 "\n\n",
@@ -192,21 +226,66 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmArrivalTitle);
             if (confirm)
             {
-                CurrentStatus = "AR"; //DriverStatusConstants.Arrive;
+                var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
+                using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
+                {
+                    var setDriverArrived = await _driverService.SetDriverArrivedRemoteAsync(new DriverArriveProcess
+                    {
+                        EmployeeId = currentDriver.EmployeeId,
+                        PowerId = currentDriver.PowerId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = "01",
+                        ActionDateTime = DateTime.Now,
+                        Odometer = currentDriver.Odometer ?? default(int),
+                    });
+
+                    if (setDriverArrived.WasSuccessful)
+                    {
+                        CurrentStatus = DriverStatusConstants.Arrive;
+                    }
+                    else
+                    {
+                        await UserDialogs.Instance.AlertAsync(setDriverArrived.Failure.Summary,
+                            AppResources.Error, AppResources.OK);
+                    }
+
+                    if (await _tripService.IsTripLegTransactionAsync(TripNumber))
+                    {
+                        NextActionLabel = AppResources.Transactions;
+                    }
+                    else if (await _tripService.IsTripLegScaleAsync(TripNumber))
+                    {
+                        NextActionLabel = AppResources.YardScaleLabel;
+                    }
+                    else if (await _tripService.IsTripLegNoScreenAsync(TripNumber))
+                    {
+                        NextActionLabel = AppResources.FinishTripLabel;
+                    }
+                }
             }
         }
 
-        private void ExecuteNextStageCommand()
+        private async Task ExecuteNextStageCommandAsync()
         {
-            if (Containers.First().Key.TripSegType.Equals("DE"))
+            if (await _tripService.IsTripLegTransactionAsync(TripNumber))
             {
                 Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
-            else if (Containers.First().Key.TripSegType.Equals("RT"))
+            else if (await _tripService.IsTripLegScaleAsync(TripNumber))
             {
                 Close(this);
                 ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
+            }
+            else if (await _tripService.IsTripLegNoScreenAsync(TripNumber))
+            {
+                Close(this);
+                foreach (var groupings in Containers)
+                    await _tripService.CompleteTripSegmentAsync(TripNumber, groupings.Key.TripSegNumber);
+
+                await _tripService.CompleteTripAsync(TripNumber);
+                ShowViewModel<RouteSummaryViewModel>();
             }
         }
     }

@@ -18,7 +18,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             _tripService = tripService;
             Title = AppResources.SignatureReceipt;
-            ConfirmTransactionsCommand = new MvxCommand(ExecuteConfirmTransactionsCommand);
+            ConfirmTransactionsCommand = new MvxAsyncCommand(ExecuteConfirmTransactionsCommandAsync);
         }
 
         public void Init(string tripNumber)
@@ -62,22 +62,31 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _containers, value); }
         }
 
-
         // Command bindings
-        public MvxCommand ConfirmTransactionsCommand { get; private set; }
+        public IMvxAsyncCommand ConfirmTransactionsCommand { get; private set; }
 
         // Command Impl
-        private async void ExecuteConfirmTransactionsCommand()
+        private async Task ExecuteConfirmTransactionsCommandAsync()
         {
             using (var completeTripSegment = UserDialogs.Instance.Loading("Completing Trip Segment", maskType: MaskType.Clear))
             {
-                foreach (Grouping<TripSegmentModel, TripSegmentContainerModel> grouping in Containers)
+                foreach (var grouping in Containers)
                 {
                     await _tripService.CompleteTripSegmentAsync(TripNumber, grouping.Key.TripSegNumber);
                 }
             }
+
+            var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             Close(this);
-            ShowViewModel<RouteDetailViewModel>(new {tripNumber = TripNumber});
+
+            if (nextTripSegment.Any())
+            {
+                ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
+            }
+            else
+            {
+                ShowViewModel<RouteSummaryViewModel>();
+            }
         }
 
     }

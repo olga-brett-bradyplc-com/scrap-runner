@@ -22,16 +22,28 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverArriveProcess"
         },
         {
-          "text": "DriverContainerDoneProcess",
-          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverContainerDoneProcess"
+          "text": "DriverContainerActionProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverContainerActionProcess"
         },
         {
           "text": "DriverEnrouteProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverEnrouteProcess"
         },
         {
+          "text": "DriverFuelEntryProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverFuelEntryProcess"
+        },
+        {
           "text": "DriverLoginProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLoginProcess"
+        },
+        {
+          "text": "DriverMessageProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverMessageProcess"
+        },
+        {
+          "text": "DriverNewContainerProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverNewContainerProcess"
         },
         {
           "text": "DriverSegmentDoneProcess",

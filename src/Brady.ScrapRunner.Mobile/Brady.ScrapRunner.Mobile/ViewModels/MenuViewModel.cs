@@ -24,10 +24,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _queueScheduler = queueScheduler;
         }
 
-        private MvxCommand _logoutCommand;
-        public MvxCommand LogoutCommand => _logoutCommand ?? (_logoutCommand = new MvxCommand(ExecuteLogout));
+        private IMvxAsyncCommand _logoutCommand;
+        public IMvxAsyncCommand LogoutCommand => _logoutCommand ?? (_logoutCommand = new MvxAsyncCommand(ExecuteLogoutAsync));
 
-        public async void ExecuteLogout()
+        public async Task ExecuteLogoutAsync()
         {
             var logoutDialog = await UserDialogs.Instance.ConfirmAsync(
                 AppResources.LogOutMessage, AppResources.LogOut, AppResources.Yes, AppResources.No);
@@ -38,6 +38,24 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _connection.DeleteConnection();
                 ShowViewModel<SignInViewModel>();
             }
+        }
+        private MvxCommand _fuelentryCommand;
+
+        public MvxCommand FuelEntryCommand
+            => _fuelentryCommand ?? (_fuelentryCommand = new MvxCommand(ExecuteFuelEntryCommand));
+
+        public void ExecuteFuelEntryCommand()
+        {
+            ShowViewModel<FuelEntryViewModel>();
+        }
+        private MvxCommand _messagesCommand;
+
+        public MvxCommand MessagesCommand
+            => _messagesCommand ?? (_messagesCommand = new MvxCommand(ExecuteMessagesCommand));
+
+        public void ExecuteMessagesCommand()
+        {
+            ShowViewModel<MessagesViewModel>(_connection);
         }
     }
 }

@@ -25,8 +25,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             SecondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);
             TareWeightSetCommand = new MvxCommand(ExecuteTareWeightSetCommand, IsGrossWeightSet);
 
-            ContainerSetDownCommand = new MvxCommand(ExecuteContainerSetDownCommand);
-            ContainerLeftOnTruckCommand = new MvxCommand(ExecuteContainerLeftOnTruckCommand);
+            ContainerSetDownCommand = new MvxAsyncCommand(ExecuteContainerSetDownCommandAsync);
+            ContainerLeftOnTruckCommand = new MvxAsyncCommand(ExecuteContainerLeftOnTruckCommandAsync);
         }
 
         public void Init(string tripNumber, string tripSegNumber, string tripSegContainerNumber)
@@ -86,8 +86,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _tripSegContainerNumber, value); }
         }
 
-        private string _grossTime;
-        public string GrossTime
+        private DateTime? _grossTime;
+        public DateTime? GrossTime
         {
             get { return _grossTime; }
             set
@@ -98,57 +98,49 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        private string _secondGrossTime;
-        public string SecondGrossTime
+        private DateTime? _secondGrossTime;
+        public DateTime? SecondGrossTime
         {
             get { return _secondGrossTime; }
             set { SetProperty(ref _secondGrossTime, value); }
         }
 
-        private string _tareTime;
-        public string TareTime
+        private DateTime? _tareTime;
+        public DateTime? TareTime
         {
             get { return _tareTime; }
             set { SetProperty(ref _tareTime, value); }
         }
 
         // Command bindings
-        public MvxCommand ContainerSetDownCommand { get; private set; }
-        public MvxCommand ContainerLeftOnTruckCommand { get; private set; }
+        public IMvxAsyncCommand ContainerSetDownCommand { get; private set; }
+        public IMvxAsyncCommand ContainerLeftOnTruckCommand { get; private set; }
         public MvxCommand GrossWeightSetCommand { get; private set; }
         public MvxCommand TareWeightSetCommand { get; private set; }
         public MvxCommand SecondGrossWeightSetCommand { get; private set; }
 
         // Command impl
-        public async void ExecuteContainerSetDownCommand()
+        private async Task ExecuteContainerSetDownCommandAsync()
         {
             // @TODO : Determine if this is last leg of trip, and then give warning that this action will complete said trip
             var result = await UserDialogs.Instance.ConfirmAsync(AppResources.SetDownContainerMessage, AppResources.SetDown);
             if (result)
             {
-                foreach (var grouping in Containers)
-                {
-                    await _tripService.CompleteTripSegmentAsync(TripNumber, grouping.Key.TripSegNumber);
-                }
-                // Check to see if any containers/segments exists
-                // If not, delete the trip and return to route summary
-                // Otherwise, we'd go to the next point in the trip
-                var trip = await _tripService.FindNextTripSegmentsAsync(TripNumber);
-
-                // @TODO : Implement logic to determine where to go from each trip
-                if (!trip.Any())
-                {
-                    await _tripService.CompleteTripAsync(TripNumber);
-                    Close(this);
-                    ShowViewModel<RouteSummaryViewModel>();
-                }
+                // @TODO : This won't work with bulk processing
+                await
+                    _tripService.UpdateTripSegmentContainerWeightTimesAsync(TripNumber, TripSegNumber,
+                        TripSegContainerNumber, GrossTime, SecondGrossTime, TareTime);
+                // @TODO : Implement once we have our location service working
+                //await
+                //    _tripService.UpdateTripSegmentContainerLongLatAsync(TripNumber, TripSegNumber,
+                //        TripSegContainerNumber, Latitude, Longitude);
+                await _tripService.CompleteTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerNumber);
+                await ExecuteNextStage();
             }
         }
 
-        public async void ExecuteContainerLeftOnTruckCommand()
+        private async Task ExecuteContainerLeftOnTruckCommandAsync()
         {
-            // @TODO : Determine if this is the last set of containers for trip, then either navigate back to scale summary
-            // @TODO : or finish route and navigate to route summary screen
             var result = await UserDialogs.Instance.ConfirmAsync(AppResources.LeftOnTruckContainerMessage, AppResources.LeftOnTruck);
             if (result)
             {
@@ -156,24 +148,46 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        public void ExecuteGrossWeightSetCommand()
+        private async Task ExecuteNextStage()
         {
-            GrossTime = DateTime.Now.ToString("hh:mm tt");
+            // Are there any more containers that need to be weighed?
+            // Check to see if any containers/segments exists
+            // If not, delete the trip and return to route summary
+            // Otherwise, we'd go to the next point in the trip
+            var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
+
+            if (!tripSegmentContainers.Any())
+            {
+                await _tripService.CompleteTripAsync(TripNumber);
+                await _tripService.CompleteTripSegmentAsync(TripNumber, TripSegNumber);
+                Close(this);
+                ShowViewModel<RouteSummaryViewModel>();
+            }
+            else
+            {
+                Close(this);
+                ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
+            }
         }
 
-        public void ExecuteSecondGrossWeightSetCommand()
+        private void ExecuteGrossWeightSetCommand()
         {
-            SecondGrossTime = DateTime.Now.ToString("hh:mm tt");
+            GrossTime = DateTime.Now;
         }
 
-        public void ExecuteTareWeightSetCommand()
+        private void ExecuteSecondGrossWeightSetCommand()
         {
-            TareTime = DateTime.Now.ToString("hh:mm tt");
+            SecondGrossTime = DateTime.Now;
         }
 
-        public bool IsGrossWeightSet()
+        private void ExecuteTareWeightSetCommand()
         {
-            return !string.IsNullOrWhiteSpace(GrossTime);
+            TareTime = DateTime.Now;
+        }
+
+        private bool IsGrossWeightSet()
+        {
+            return GrossTime == null;
         }
     }
 }

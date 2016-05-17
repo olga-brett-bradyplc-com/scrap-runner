@@ -45,7 +45,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public void ExecuteRouteSelectedCommand(TripModel selectedTrip)
         {
-            Close(this);
+            Close(this); // temporary fix
             ShowViewModel<RouteDetailViewModel>(new {tripNumber = selectedTrip.TripNumber});
         }
     }

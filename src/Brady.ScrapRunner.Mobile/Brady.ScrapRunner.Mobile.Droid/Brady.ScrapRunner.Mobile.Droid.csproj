@@ -59,114 +59,110 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Acr.Support.Android, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acr.Support.1.1.1\lib\MonoAndroid10\Acr.Support.Android.dll</HintPath>
+      <HintPath>..\..\..\packages\Acr.Support.2.0.2\lib\MonoAndroid10\Acr.Support.Android.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Acr.UserDialogs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acr.UserDialogs.4.3.0\lib\MonoAndroid10\Acr.UserDialogs.dll</HintPath>
+      <HintPath>..\..\..\packages\Acr.UserDialogs.5.0.1\lib\MonoAndroid10\Acr.UserDialogs.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Acr.UserDialogs.Interface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acr.UserDialogs.4.3.0\lib\MonoAndroid10\Acr.UserDialogs.Interface.dll</HintPath>
+      <HintPath>..\..\..\packages\Acr.UserDialogs.5.0.1\lib\MonoAndroid10\Acr.UserDialogs.Interface.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AndHUD, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acr.UserDialogs.4.3.0\lib\MonoAndroid10\AndHUD.dll</HintPath>
+      <HintPath>..\..\..\packages\Acr.UserDialogs.5.0.1\lib\MonoAndroid10\AndHUD.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Mono.Android" />
     <Reference Include="Mono.Android.Export" />
     <Reference Include="mscorlib" />
     <Reference Include="MvvmCross.Binding, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.1\lib\MonoAndroid\MvvmCross.Binding.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.4\lib\MonoAndroid\MvvmCross.Binding.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Binding.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.1\lib\MonoAndroid\MvvmCross.Binding.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.4\lib\MonoAndroid\MvvmCross.Binding.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Core, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Core.4.1.0\lib\MonoAndroid\MvvmCross.Core.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Core.4.1.4\lib\MonoAndroid\MvvmCross.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Core.4.1.0\lib\MonoAndroid\MvvmCross.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Core.4.1.4\lib\MonoAndroid\MvvmCross.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Shared, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Shared.4.1.2\lib\MonoAndroid\MvvmCross.Droid.Shared.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Shared.4.1.4\lib\MonoAndroid\MvvmCross.Droid.Shared.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.Design, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.Design.4.1.1\lib\MonoAndroid403\MvvmCross.Droid.Support.Design.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.Design.4.1.5\lib\MonoAndroid403\MvvmCross.Droid.Support.Design.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.V4, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V4.4.1.1\lib\MonoAndroid403\MvvmCross.Droid.Support.V4.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V4.4.1.5\lib\MonoAndroid403\MvvmCross.Droid.Support.V4.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.V7.AppCompat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.AppCompat.4.1.2\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.AppCompat.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MvvmCross.Droid.Support.V7.Fragging, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.Fragging.4.1.1\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.Fragging.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.AppCompat.4.1.5\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.AppCompat.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Support.V7.RecyclerView, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.RecyclerView.4.1.0\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.RecyclerView.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Droid.Support.V7.RecyclerView.4.1.4\lib\MonoAndroid403\MvvmCross.Droid.Support.V7.RecyclerView.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Localization, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.1\lib\MonoAndroid\MvvmCross.Localization.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Binding.4.1.4\lib\MonoAndroid\MvvmCross.Localization.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Platform, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Platform.4.1.0\lib\MonoAndroid\MvvmCross.Platform.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Platform.4.1.4\lib\MonoAndroid\MvvmCross.Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Platform.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Platform.4.1.0\lib\MonoAndroid\MvvmCross.Platform.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Platform.4.1.4\lib\MonoAndroid\MvvmCross.Platform.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Color, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Color.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Color.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Color.4.1.4\lib\MonoAndroid\MvvmCross.Plugins.Color.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Color.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Color.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Color.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Color.4.1.4\lib\MonoAndroid\MvvmCross.Plugins.Color.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Json, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Json.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Json.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Json.4.1.4\lib\MonoAndroid\MvvmCross.Plugins.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Location, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Location.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Location.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Location.4.1.4\lib\MonoAndroid\MvvmCross.Plugins.Location.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Location.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Location.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Location.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Location.4.1.4\lib\MonoAndroid\MvvmCross.Plugins.Location.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Messenger, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Messenger.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Messenger.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Messenger.4.1.4\lib\MonoAndroid\MvvmCross.Plugins.Messenger.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Sqlite, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.SQLitePCL.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Sqlite.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.SQLitePCL.4.1.4\lib\MonoAndroid\MvvmCross.Plugins.Sqlite.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Sqlite.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.SQLitePCL.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Sqlite.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.SQLitePCL.4.1.4\lib\MonoAndroid\MvvmCross.Plugins.Sqlite.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Visibility, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Visibility.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Visibility.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Visibility.4.1.4\lib\MonoAndroid\MvvmCross.Plugins.Visibility.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Plugins.Visibility.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Plugin.Visibility.4.1.0\lib\MonoAndroid\MvvmCross.Plugins.Visibility.Droid.dll</HintPath>
+      <HintPath>..\..\..\packages\MvvmCross.Plugin.Visibility.4.1.4\lib\MonoAndroid\MvvmCross.Plugins.Visibility.Droid.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -193,24 +189,32 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
+    <Reference Include="Xamarin.Android.Support.Animated.Vector.Drawable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.Animated.Vector.Drawable.23.3.0\lib\MonoAndroid403\Xamarin.Android.Support.Animated.Vector.Drawable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Xamarin.Android.Support.Design, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Android.Support.Design.23.1.1.1\lib\MonoAndroid403\Xamarin.Android.Support.Design.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.Design.23.3.0\lib\MonoAndroid43\Xamarin.Android.Support.Design.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v4, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Android.Support.v4.23.1.1.1\lib\MonoAndroid403\Xamarin.Android.Support.v4.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.v4.23.3.0\lib\MonoAndroid403\Xamarin.Android.Support.v4.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.AppCompat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Android.Support.v7.AppCompat.23.1.1.1\lib\MonoAndroid403\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.v7.AppCompat.23.3.0\lib\MonoAndroid403\Xamarin.Android.Support.v7.AppCompat.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.CardView, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Android.Support.v7.CardView.23.1.1.0\lib\MonoAndroid403\Xamarin.Android.Support.v7.CardView.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.v7.CardView.23.3.0\lib\MonoAndroid403\Xamarin.Android.Support.v7.CardView.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v7.RecyclerView, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Xamarin.Android.Support.v7.RecyclerView.23.1.1.1\lib\MonoAndroid403\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.v7.RecyclerView.23.3.0\lib\MonoAndroid403\Xamarin.Android.Support.v7.RecyclerView.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Xamarin.Android.Support.Vector.Drawable, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\lib\MonoAndroid403\Xamarin.Android.Support.Vector.Drawable.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ZXing.Net.Mobile.Core, Version=2.0.4.46, Culture=neutral, processorArchitecture=MSIL">
@@ -237,6 +241,9 @@
     <Compile Include="Controls\GroupListView\BindableGroupListAdapter.cs" />
     <Compile Include="Controls\GroupListView\BindableGroupListView.cs" />
     <Compile Include="DebugTrace.cs" />
+    <Compile Include="Fragments\FuelEntryFragment.cs" />
+    <Compile Include="Fragments\MessagesFragment.cs" />
+    <Compile Include="Fragments\NewMessageFragment.cs" />
     <Compile Include="LinkerPleaseInclude.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -272,7 +279,7 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\fragment_signin.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\toolbar.axml">
       <SubType>AndroidResource</SubType>
@@ -284,13 +291,13 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\fragment_routesummary.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\item_trip.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\fragment_routedetail.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\item_tripsegment.axml">
       <SubType>AndroidResource</SubType>
@@ -350,11 +357,29 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\SplashScreen.axml" />
+    <AndroidResource Include="Resources\layout\fragment_fuelentry.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\item_spinnerdropdown.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\item_state.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\fragment_messages.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\item_message.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\fragment_newmessage.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\icon.png" />
     <AndroidResource Include="Resources\drawable-hdpi\icon.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\icon.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\icon.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\icon.png" />
   </ItemGroup>
   <ItemGroup>
@@ -387,7 +412,7 @@
     <AndroidResource Include="Resources\drawable-hdpi\ic_assignment_turned_in_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_assignment_turned_in_white_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_assignment_turned_in_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_assignment_turned_in_white_24dp.png" />
@@ -402,7 +427,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_assignment_late_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_assignment_late_white_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_assignment_late_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_assignment_late_white_24dp.png" />
@@ -414,7 +439,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_alarm_on_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_alarm_on_white_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_alarm_on_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_alarm_on_white_24dp.png" />
@@ -429,7 +454,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_alarm_on_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_alarm_on_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_alarm_on_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_alarm_on_black_24dp.png" />
@@ -444,7 +469,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_settings_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_settings_white_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_settings_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_settings_white_36dp.png" />
@@ -459,7 +484,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_keyboard_arrow_right_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_keyboard_arrow_right_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_keyboard_arrow_right_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_keyboard_arrow_right_black_24dp.png" />
@@ -474,7 +499,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_settings_white_48dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_settings_white_48dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_settings_white_48dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_settings_white_48dp.png" />
@@ -489,7 +514,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_local_shipping_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_local_shipping_white_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_local_shipping_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_local_shipping_white_36dp.png" />
@@ -504,7 +529,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_directions_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_directions_white_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_directions_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_directions_white_36dp.png" />
@@ -519,7 +544,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_place_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_place_white_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_place_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_place_white_36dp.png" />
@@ -534,7 +559,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_loupe_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_loupe_white_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_loupe_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_loupe_white_36dp.png" />
@@ -583,7 +608,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_local_shipping_white_18dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_local_shipping_white_18dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_local_shipping_white_18dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_local_shipping_white_18dp.png" />
@@ -607,7 +632,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_check_circle_green_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_check_circle_green_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_check_circle_green_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_check_circle_green_36dp.png" />
@@ -631,10 +656,6 @@
     <AndroidResource Include="Resources\drawable\navigation_header_background.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\values\SplashStyle.xml" />
-    <AndroidResource Include="Resources\drawable\splash.png" />
-  </ItemGroup>
-  <ItemGroup>
     <AndroidResource Include="Resources\drawable\user_icon_header_navigation.png" />
   </ItemGroup>
   <ItemGroup>
@@ -644,7 +665,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_view_quilt_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_view_quilt_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_view_quilt_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_view_quilt_black_36dp.png" />
@@ -659,7 +680,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_email_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_email_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_email_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_email_black_36dp.png" />
@@ -674,7 +695,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_assignment_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_assignment_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_assignment_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_assignment_black_36dp.png" />
@@ -689,7 +710,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_local_gas_station_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_local_gas_station_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_local_gas_station_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_local_gas_station_black_36dp.png" />
@@ -701,7 +722,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_add_a_photo_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_add_a_photo_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_add_a_photo_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_add_a_photo_black_36dp.png" />
@@ -719,7 +740,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_swap_vert_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_swap_vert_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_swap_vert_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_swap_vert_black_36dp.png" />
@@ -734,7 +755,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_directions_bus_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_directions_bus_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_directions_bus_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_directions_bus_black_36dp.png" />
@@ -749,7 +770,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_queue_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_queue_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_queue_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_queue_black_36dp.png" />
@@ -764,7 +785,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_redo_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_redo_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_redo_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_redo_black_36dp.png" />
@@ -779,7 +800,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_block_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_block_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_block_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_block_black_36dp.png" />
@@ -794,7 +815,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_forum_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_forum_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_forum_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_forum_black_36dp.png" />
@@ -809,7 +830,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_chat_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_chat_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_chat_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_chat_black_36dp.png" />
@@ -824,7 +845,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_help_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_help_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_help_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_help_black_36dp.png" />
@@ -839,7 +860,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_phonelink_setup_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_phonelink_setup_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_phonelink_setup_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_phonelink_setup_black_36dp.png" />
@@ -854,7 +875,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_info_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_info_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_info_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_info_black_36dp.png" />
@@ -869,7 +890,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_report_problem_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_report_problem_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_report_problem_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_report_problem_black_36dp.png" />
@@ -881,7 +902,7 @@
     <AndroidResource Include="Resources\drawable-hdpi\ic_phonelink_erase_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_phonelink_erase_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_phonelink_erase_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_phonelink_erase_black_36dp.png" />
@@ -896,7 +917,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_local_shipping_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_local_shipping_white_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_local_shipping_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_local_shipping_white_24dp.png" />
@@ -904,7 +925,18 @@
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxxhdpi\ic_local_shipping_white_24dp.png" />
   </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values\SplashStyle.xml" />
+    <AndroidResource Include="Resources\drawable\splash.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <Import Project="..\..\..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\build\Xamarin.Android.Support.Vector.Drawable.targets" Condition="Exists('..\..\..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\build\Xamarin.Android.Support.Vector.Drawable.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\build\Xamarin.Android.Support.Vector.Drawable.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\build\Xamarin.Android.Support.Vector.Drawable.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
      Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
