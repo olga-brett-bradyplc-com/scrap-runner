@@ -27,7 +27,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
         private readonly IContainerService _containerService;
         private readonly ICodeTableService _codeTableService;
-        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IQueueScheduler _queueScheduler;
+        private readonly IConnectionService _connection;
         private readonly IMessagesService _messagesService;
 
 
@@ -40,7 +41,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IContainerService containerService,
             ICodeTableService codeTableService,
             IMessagesService messagesService,
-           IConnectionService<DataServiceClient> connection)
+            IConnectionService connection,
+            IQueueScheduler queueScheduler)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -50,7 +52,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _containerService = containerService;
             _codeTableService = codeTableService;
             _messagesService = messagesService;
-
             _connection = connection;
             _queueScheduler = queueScheduler;
             Title = AppResources.SignInTitle;

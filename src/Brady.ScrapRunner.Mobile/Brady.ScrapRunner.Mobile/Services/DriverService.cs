@@ -14,11 +14,11 @@ namespace Brady.ScrapRunner.Mobile.Services
 {
     public class DriverService : IDriverService
     {
-        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IConnectionService _connection;
         private readonly IRepository<DriverStatusModel> _driverStatusRepository;
 
         public DriverService(IRepository<DriverStatusModel> driverStatusRepository, 
-            IConnectionService<DataServiceClient> connection)
+            IConnectionService connection)
         {
             _driverStatusRepository = driverStatusRepository;
             _connection = connection;

@@ -18,14 +18,14 @@ namespace Brady.ScrapRunner.Mobile.Services
 
     public class TripService : ITripService
     {
-        private readonly IConnectionService<DataServiceClient> _connection; 
+        private readonly IConnectionService _connection; 
         private readonly IRepository<PreferenceModel> _preferenceRepository;
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository; 
 
         public TripService(
-            IConnectionService<DataServiceClient> connection,
+            IConnectionService connection,
             IRepository<PreferenceModel> preferenceRepository, 
             IRepository<TripModel> tripRepository, 
             IRepository<TripSegmentModel> tripSegmentRepository,

@@ -16,10 +16,10 @@ namespace Brady.ScrapRunner.Mobile.Services
 
     public class MessagesService : IMessagesService
     {
-        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IConnectionService _connection;
         private readonly IRepository<MessagesModel> _messagesRepository;
 
-        public MessagesService(IRepository<MessagesModel> messagesRepository, IConnectionService<DataServiceClient> connection)
+        public MessagesService(IRepository<MessagesModel> messagesRepository, IConnectionService connection)
         {
             _connection = connection;
             _messagesRepository = messagesRepository;
