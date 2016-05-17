@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+    <TextView
+        android:id="@+id/container_item_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_margin_half"
+        local:MvxBind="Text Format('{0}-{1}', ContainerNumber, ContainerCustHostCode)"
+        android:textColor="#000000"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        tools:text="R030-1001" />
+    <TextView
+        android:id="@+id/container_item_type"
+        android:layout_below="@id/container_item_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:textSize="18dp"
+        android:textColor="#000000"
+        android:padding="10dp"
+        android:layout_marginBottom="10dp"
+        local:MvxBind="Text Format('{0} {1}', ContainerType, ContainerSize)"
+        tools:text="Rolloff 30" />
+</RelativeLayout>

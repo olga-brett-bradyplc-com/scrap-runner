@@ -120,7 +120,18 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return;
 
                 Close(this);
-                ShowViewModel<RouteSummaryViewModel>();
+
+                var containers = await _containerService.FindPowerIdContainers(TruckId);
+
+                if (containers.Any())
+                {
+                    ShowViewModel<LoadDropContainerViewModel>();
+                }
+                else
+                {
+                    ShowViewModel<RouteSummaryViewModel>();
+                }
+
             }
             catch (Exception exception)
             {

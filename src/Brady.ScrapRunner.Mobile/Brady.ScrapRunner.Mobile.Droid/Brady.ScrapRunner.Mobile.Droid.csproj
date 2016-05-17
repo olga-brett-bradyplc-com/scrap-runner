@@ -242,6 +242,7 @@
     <Compile Include="Controls\GroupListView\BindableGroupListView.cs" />
     <Compile Include="DebugTrace.cs" />
     <Compile Include="Fragments\FuelEntryFragment.cs" />
+    <Compile Include="Fragments\LoadDropContainerFragment.cs" />
     <Compile Include="LinkerPleaseInclude.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -359,6 +360,12 @@
     </AndroidResource>
     <AndroidResource Include="Resources\layout\item_state.axml">
       <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\fragment_loaddropcontainer.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\item_container.axml">
+      <SubType>AndroidResource</SubType>
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
