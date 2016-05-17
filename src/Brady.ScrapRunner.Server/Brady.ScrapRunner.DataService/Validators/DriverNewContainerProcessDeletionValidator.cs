@@ -7,8 +7,8 @@ using NHibernate.Criterion;
 
 namespace Brady.ScrapRunner.DataService.Validators
 {
-    public class DriverMessageProcessValidator :
-       AbstractValidator<DriverMessageProcess>,
+    public class DriverNewContainerProcessDeletionValidator :
+       AbstractValidator<DriverNewContainerProcess>,
        IRequireCrudingDataServiceRepository
     {
         ICrudingDataServiceRepository _repository;
@@ -18,13 +18,9 @@ namespace Brady.ScrapRunner.DataService.Validators
             _repository = repository;
         }
 
-        public DriverMessageProcessValidator()
+        public DriverNewContainerProcessDeletionValidator()
         {
             RuleFor(x => x.EmployeeId).NotEmpty();
-            //RuleFor(x => x.ActionDateTime).NotEmpty();
-            //RuleFor(x => x.SenderId).NotEmpty();
-            //RuleFor(x => x.MessageId).GreaterThanOrEqualTo(0);
-            //RuleFor(x => x.MessageText).NotEmpty();
         }
 
     }

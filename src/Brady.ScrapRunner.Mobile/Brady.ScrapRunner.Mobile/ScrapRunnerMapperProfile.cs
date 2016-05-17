@@ -24,6 +24,7 @@
             CreateMap<TripSegmentContainer, TripSegmentContainerModel>()
                 .ForMember(tsc => tsc.TripSegComments, opt => opt.Ignore());
             CreateMap<CodeTable, CodeTableModel>();
+            CreateMap<Messages, MessagesModel>();
         }
     }
 }

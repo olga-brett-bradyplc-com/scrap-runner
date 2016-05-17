@@ -242,7 +242,6 @@
     <Compile Include="Controls\GroupListView\BindableGroupListView.cs" />
     <Compile Include="DebugTrace.cs" />
     <Compile Include="Fragments\FuelEntryFragment.cs" />
-    <Compile Include="Fragments\LoadDropContainerFragment.cs" />
     <Compile Include="LinkerPleaseInclude.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -286,13 +285,13 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\fragment_routesummary.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\item_trip.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\fragment_routedetail.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\item_tripsegment.axml">
       <SubType>AndroidResource</SubType>
@@ -361,17 +360,11 @@
     <AndroidResource Include="Resources\layout\item_state.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
-    <AndroidResource Include="Resources\layout\fragment_loaddropcontainer.axml">
-      <SubType>AndroidResource</SubType>
-    </AndroidResource>
-    <AndroidResource Include="Resources\layout\item_container.axml">
-      <SubType>AndroidResource</SubType>
-    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\icon.png" />
     <AndroidResource Include="Resources\drawable-hdpi\icon.png" />
-    <AndroidResource Include="Resources\drawable-xhdpi\icon.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\icon.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\icon.png" />
   </ItemGroup>
   <ItemGroup>
@@ -404,7 +397,7 @@
     <AndroidResource Include="Resources\drawable-hdpi\ic_assignment_turned_in_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_assignment_turned_in_white_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_assignment_turned_in_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_assignment_turned_in_white_24dp.png" />
@@ -419,7 +412,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_assignment_late_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_assignment_late_white_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_assignment_late_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_assignment_late_white_24dp.png" />
@@ -431,7 +424,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_alarm_on_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_alarm_on_white_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_alarm_on_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_alarm_on_white_24dp.png" />
@@ -446,7 +439,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_alarm_on_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_alarm_on_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_alarm_on_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_alarm_on_black_24dp.png" />
@@ -461,7 +454,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_settings_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_settings_white_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_settings_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_settings_white_36dp.png" />
@@ -476,7 +469,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_keyboard_arrow_right_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_keyboard_arrow_right_black_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_keyboard_arrow_right_black_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_keyboard_arrow_right_black_24dp.png" />
@@ -491,7 +484,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_settings_white_48dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_settings_white_48dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_settings_white_48dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_settings_white_48dp.png" />
@@ -506,7 +499,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_local_shipping_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_local_shipping_white_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_local_shipping_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_local_shipping_white_36dp.png" />
@@ -521,7 +514,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_directions_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_directions_white_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_directions_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_directions_white_36dp.png" />
@@ -536,7 +529,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_place_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_place_white_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_place_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_place_white_36dp.png" />
@@ -551,7 +544,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_loupe_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_loupe_white_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_loupe_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_loupe_white_36dp.png" />
@@ -600,7 +593,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_local_shipping_white_18dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_local_shipping_white_18dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_local_shipping_white_18dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_local_shipping_white_18dp.png" />
@@ -624,7 +617,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_check_circle_green_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_check_circle_green_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_check_circle_green_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_check_circle_green_36dp.png" />
@@ -657,7 +650,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_view_quilt_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_view_quilt_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_view_quilt_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_view_quilt_black_36dp.png" />
@@ -672,7 +665,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_email_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_email_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_email_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_email_black_36dp.png" />
@@ -687,7 +680,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_assignment_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_assignment_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_assignment_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_assignment_black_36dp.png" />
@@ -702,7 +695,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_local_gas_station_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_local_gas_station_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_local_gas_station_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_local_gas_station_black_36dp.png" />
@@ -714,7 +707,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_add_a_photo_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_add_a_photo_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_add_a_photo_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_add_a_photo_black_36dp.png" />
@@ -732,7 +725,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_swap_vert_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_swap_vert_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_swap_vert_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_swap_vert_black_36dp.png" />
@@ -747,7 +740,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_directions_bus_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_directions_bus_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_directions_bus_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_directions_bus_black_36dp.png" />
@@ -762,7 +755,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_queue_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_queue_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_queue_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_queue_black_36dp.png" />
@@ -777,7 +770,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_redo_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_redo_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_redo_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_redo_black_36dp.png" />
@@ -792,7 +785,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_block_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_block_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_block_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_block_black_36dp.png" />
@@ -807,7 +800,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_forum_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_forum_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_forum_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_forum_black_36dp.png" />
@@ -822,7 +815,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_chat_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_chat_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_chat_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_chat_black_36dp.png" />
@@ -837,7 +830,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_help_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_help_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_help_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_help_black_36dp.png" />
@@ -852,7 +845,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_phonelink_setup_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_phonelink_setup_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_phonelink_setup_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_phonelink_setup_black_36dp.png" />
@@ -867,7 +860,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_info_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_info_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_info_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_info_black_36dp.png" />
@@ -882,7 +875,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_report_problem_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_report_problem_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_report_problem_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_report_problem_black_36dp.png" />
@@ -894,7 +887,7 @@
     <AndroidResource Include="Resources\drawable-hdpi\ic_phonelink_erase_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_phonelink_erase_black_36dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_phonelink_erase_black_36dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_phonelink_erase_black_36dp.png" />
@@ -909,7 +902,7 @@
     <AndroidResource Include="Resources\drawable-mdpi\ic_local_shipping_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable-xhdpi\ic_local_shipping_white_24dp.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\drawable-xhdpi\ic_local_shipping_white_24dp.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxhdpi\ic_local_shipping_white_24dp.png" />

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+  <include
+      layout="@layout/toolbar" />
+  <!-- Layout that includes Company Title Header, State Buttons, and Trip location -->
+  <RelativeLayout
+      android:id="@+id/SubNavigationPanel"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:layout_width="match_parent"
+      android:layout_marginTop="56dp">
+    <TextView
+        android:id="@+id/message_body"
+        android:layout_weight="1"
+        android:text="Terminal is closing"
+        android:layout_alignParentLeft="true"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:background="@color/material_white"
+        android:textSize="16dp"
+        android:textColor="@color/material_gray_900"
+        />
+    </RelativeLayout>
+</RelativeLayout>
