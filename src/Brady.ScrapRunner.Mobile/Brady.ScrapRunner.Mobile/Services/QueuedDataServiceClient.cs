@@ -10,27 +10,26 @@
     using BWF.DataServices.PortableClients.Interfaces;
     using Interfaces;
     using Models;
-    using MvvmCross.Platform;
     using Newtonsoft.Json;
 
     public class QueuedDataServiceClient : IDataServiceClient
     {
         private readonly INetworkAvailabilityService _networkAvailabilityService;
         private readonly IQueueService _queueService;
-        private readonly IDataServiceClient _dataServiceClient;
+        private readonly DataServiceClient _dataServiceClient;
 
-        public QueuedDataServiceClient(string hosturl, string username, string password, string dataService = null)
+        public QueuedDataServiceClient(
+            INetworkAvailabilityService networkAvailabilityService, 
+            IQueueService queueService, 
+            DataServiceClient dataServiceClient)
         {
-            _networkAvailabilityService = Mvx.Resolve<INetworkAvailabilityService>();
-            _queueService = Mvx.Resolve<IQueueService>();
-            _dataServiceClient = new DataServiceClient(hosturl, username, password, dataService);
+            _networkAvailabilityService = networkAvailabilityService;
+            _queueService = queueService;
+            _dataServiceClient = dataServiceClient;
         }
-
-        public IDataServiceClient DataServiceClient => _dataServiceClient;
 
         public void Dispose()
         {
-            _dataServiceClient.Dispose();
         }
 
         #region IDataServiceClient wrapper methods. These methods do not use the queue.
@@ -175,20 +174,14 @@
             }
         }
 
-        private void SetQueueItemId<Tid>(Tid id, QueueItemModel queueItem)
-        {
-            queueItem.IdType = id.GetType().AssemblyQualifiedName;
-            queueItem.SerializedId = JsonConvert.SerializeObject(id);
-        }
-
         private QueueItemModel CreateQueueItemByObject<T>(T item, QueueItemVerb verb, string dataService = null)
         {
             var queueItem = new QueueItemModel
             {
-                RecordType = item.GetType().AssemblyQualifiedName,
-                SerializedRecord = JsonConvert.SerializeObject(item),
                 Verb = verb,
-                DataService = dataService
+                DataService = dataService,
+                RecordType = item.GetType().AssemblyQualifiedName,
+                SerializedRecord = JsonConvert.SerializeObject(item)
             };
             SetQueueItemIdFromObject(item, queueItem);
             return queueItem;
@@ -199,9 +192,10 @@
             var queueItem = new QueueItemModel
             {
                 Verb = verb,
-                DataService = dataService
+                DataService = dataService,
+                IdType = id.GetType().AssemblyQualifiedName,
+                SerializedId = JsonConvert.SerializeObject(id)
             };
-            SetQueueItemId(id, queueItem);
             return queueItem;
         }
     }

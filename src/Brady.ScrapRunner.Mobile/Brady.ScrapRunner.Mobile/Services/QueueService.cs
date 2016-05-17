@@ -10,11 +10,11 @@
     public class QueueService : IQueueService
     {
         private readonly IRepository<QueueItemModel> _repository;
-        private readonly IConnectionService<QueuedDataServiceClient> _connectionService;
+        private readonly IConnectionService _connectionService;
 
         public QueueService(
             IRepository<QueueItemModel> repository, 
-            IConnectionService<QueuedDataServiceClient> connectionService)
+            IConnectionService connectionService)
         {
             _repository = repository;
             _connectionService = connectionService;
@@ -27,7 +27,7 @@
 
         public async Task ProcessQueueAsync()
         {
-            var client = _connectionService.GetConnection().DataServiceClient;
+            var client = _connectionService.GetConnection();
             var queueItems = await _repository.AsQueryable().ToListAsync();
             foreach (var queueItem in queueItems)
             {

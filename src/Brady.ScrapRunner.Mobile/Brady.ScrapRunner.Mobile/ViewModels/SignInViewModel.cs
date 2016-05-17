@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IPreferenceService _preferenceService;
         private readonly ITripService _tripService;
         private readonly ICustomerService _customerService;
-        private readonly IConnectionService<QueuedDataServiceClient> _connection;
+        private readonly IConnectionService _connection;
         private readonly IQueueScheduler _queueScheduler;
 
         public SignInViewModel(
@@ -28,7 +28,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IPreferenceService preferenceService,
             ITripService tripService,
             ICustomerService customerService,
-            IConnectionService<QueuedDataServiceClient> connection, 
+            IConnectionService connection, 
             IQueueScheduler queueScheduler)
         {
             _dbService = dbService;
@@ -137,9 +137,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 // Check username/password against BWF, and create session if valid
                 IClientSettings clientSettings = new DemoClientSettings();
-                var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
+                _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
-                if (!connectionCreated) Mvx.Warning("Failed to create connection.");
 
                 var loginProcessObj = new DriverLoginProcess
                 {

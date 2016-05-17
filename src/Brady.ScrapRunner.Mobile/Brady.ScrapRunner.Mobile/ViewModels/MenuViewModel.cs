@@ -15,10 +15,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class MenuViewModel : BaseViewModel
     {
-        private readonly IConnectionService<QueuedDataServiceClient> _connection;
+        private readonly IConnectionService _connection;
         private readonly IQueueScheduler _queueScheduler;
 
-        public MenuViewModel(IConnectionService<QueuedDataServiceClient> connection, IQueueScheduler queueScheduler)
+        public MenuViewModel(IConnectionService connection, IQueueScheduler queueScheduler)
         {
             _connection = connection;
             _queueScheduler = queueScheduler;

@@ -23,7 +23,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class PowerUnitViewModel : BaseViewModel
     {
-        private readonly IConnectionService<QueuedDataServiceClient> _connection;
+        private readonly IConnectionService _connection;
         private readonly IRepository<PowerMasterModel> _powerMasterRepository;
         private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository;
         private readonly IRepository<DriverStatusModel> _driverStatusRepository;
@@ -32,7 +32,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository; 
 
         public PowerUnitViewModel( 
-            IConnectionService<QueuedDataServiceClient> connection,
+            IConnectionService connection,
             IRepository<PowerMasterModel> powerMasterRepository,
             IRepository<EmployeeMasterModel> employeeMasterRepository,
             IRepository<TripModel> tripRepository,
