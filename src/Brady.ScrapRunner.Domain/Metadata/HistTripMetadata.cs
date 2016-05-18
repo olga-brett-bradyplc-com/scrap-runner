@@ -35,7 +35,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripType);
             StringProperty(x => x.TripTypeDesc);
             IntegerProperty(x => x.TripSequenceNumber);
-            IntegerProperty(x => x.TripSendFlag);
+            EnumProperty(x => x.TripSendReseqFlag);
             StringProperty(x => x.TripDriverId);
             StringProperty(x => x.TripDriverName);
             StringProperty(x => x.TripCustHostCode);
@@ -78,7 +78,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripPrimaryContainerLocation);
             StringProperty(x => x.TripPowerId);
             StringProperty(x => x.TripCommodityScaleMsg);
-            IntegerProperty(x => x.TripSendReceiptFlag);
+            EnumProperty(x => x.TripSendReceiptFlag);
             StringProperty(x => x.TripDriverIdPrev);
             TimeProperty(x => x.TripCompletedDateTime);
             IntegerProperty(x => x.TripSendScaleNotificationFlag);
@@ -103,7 +103,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripDispatcherInstructions);
             StringProperty(x => x.TripScaleReferenceNumber);
             StringProperty(x => x.TripMultContainerFlag);
-            IntegerProperty(x => x.TripSendReseqFlag);
+            EnumProperty(x => x.TripSendReseqFlag);
             //StringProperty(x => x.TripServerLocation);
             StringProperty(x => x.TripPowerAssetNumber);
             //StringProperty(x => x.TripStatusPrev);

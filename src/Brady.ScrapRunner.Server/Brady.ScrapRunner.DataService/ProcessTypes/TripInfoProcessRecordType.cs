@@ -205,8 +205,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the reference numbers
-                        var tripReferenceNumberList = Common.GetTripReferenceNumbers(dataService, settings, userCulture, userRoleIds,
-                                            tripInfo.TripNumber, out fault);
+                        var tripReferenceNumberList = Common.GetTripReferenceNumberForTrip(dataService, settings, userCulture, userRoleIds,
+                                                      tripInfo.TripNumber, out fault);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -257,7 +257,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the containers for all of the segments
                         var tripContainerList = new List<TripSegmentContainer>();
-                        tripContainerList = Common.GetTripContainers(dataService, settings, userCulture, userRoleIds,
+                        tripContainerList = Common.GetTripContainersForTrip(dataService, settings, userCulture, userRoleIds,
                                             tripInfo.TripNumber, out fault);
                         if (fault != null)
                         {
