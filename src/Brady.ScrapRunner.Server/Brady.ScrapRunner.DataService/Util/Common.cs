@@ -458,7 +458,136 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return true;
         }
- 
+        public static bool InsertDriverEfficiency(IDataService dataService, ProcessChangeSetSettings settings,
+             IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log,
+              Trip trip, List<TripSegment> tripSegmentList, List<DriverDelay> tripDelayList, out DataServiceFault fault)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Try to find a driver efficiency record for this trip. There should not be one
+            var driverEfficiency = Common.GetDriverEfficiencyForDriverTrip(dataService, settings, userCulture, userRoleIds,
+                                   trip.TripDriverId,trip.TripNumber, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            if (null == driverEfficiency)
+            {
+                driverEfficiency = new DriverEfficiency();
+            }
+
+            driverEfficiency.TripDriverId = trip.TripDriverId;
+            driverEfficiency.TripNumber = trip.TripNumber;
+            driverEfficiency.TripDriverName = trip.TripDriverName;
+            driverEfficiency.TripType = trip.TripType;
+            driverEfficiency.TripTypeDesc = trip.TripTypeDesc;
+            driverEfficiency.TripCustHostCode = trip.TripCustHostCode;
+            driverEfficiency.TripCustName = trip.TripCustName;
+            driverEfficiency.TripCustAddress1 = trip.TripCustAddress1;
+            driverEfficiency.TripCustAddress2 = trip.TripCustAddress2;
+            driverEfficiency.TripCustCity = trip.TripCustCity;
+            driverEfficiency.TripCustState = trip.TripCustState;
+            driverEfficiency.TripCustZip = trip.TripCustZip;
+            driverEfficiency.TripCustCountry = trip.TripCustCountry;
+            driverEfficiency.TripTerminalId = trip.TripTerminalId;
+            driverEfficiency.TripTerminalName = trip.TripTerminalName;
+            driverEfficiency.TripRegionId = trip.TripRegionId;
+            driverEfficiency.TripRegionName = trip.TripRegionName;
+            driverEfficiency.TripReferenceNumber = trip.TripReferenceNumber;
+            driverEfficiency.TripCompletedDateTime = trip.TripCompletedDateTime;
+
+            driverEfficiency.TripPowerId = trip.TripPowerId;
+
+            driverEfficiency.TripOdometerStart = (from tripSegment in tripSegmentList
+                    select tripSegment.TripSegOdometerStart).FirstOrDefault();
+
+            driverEfficiency.TripOdometerEnd = (from tripSegment in tripSegmentList
+                    select tripSegment.TripSegOdometerEnd).LastOrDefault();
+
+            driverEfficiency.TripActualDriveMinutes = trip.TripActualDriveMinutes;
+            driverEfficiency.TripStandardDriveMinutes = trip.TripStandardDriveMinutes;
+
+            //Initialize
+            driverEfficiency.TripActualYardMinutes = 0;
+            driverEfficiency.TripStandardYardMinutes = 0;
+            driverEfficiency.TripActualStopMinutes = 0;
+            driverEfficiency.TripStandardStopMinutes = 0;
+            driverEfficiency.TripActualTotalMinutes = 0;
+            driverEfficiency.TripStandardTotalMinutes = 0;
+            driverEfficiency.TripYardDelayMinutes = 0;
+            driverEfficiency.TripCustDelayMinutes = 0;
+            driverEfficiency.TripLunchBreakDelayMinutes = 0;
+            driverEfficiency.TripDelayMinutes = 0;
+
+            foreach (var tripSegment in tripSegmentList)
+            {
+                if (tripSegment.TripSegDestCustType == CustomerTypeConstants.Yard)
+                {
+                    driverEfficiency.TripActualYardMinutes += tripSegment.TripSegActualStopMinutes;
+                    driverEfficiency.TripStandardYardMinutes += tripSegment.TripSegStandardStopMinutes;
+                }
+                else
+                {
+                    driverEfficiency.TripActualStopMinutes += tripSegment.TripSegActualStopMinutes;
+                    driverEfficiency.TripStandardStopMinutes += tripSegment.TripSegStandardStopMinutes;
+                }
+            }
+
+            driverEfficiency.TripActualTotalMinutes = driverEfficiency.TripActualDriveMinutes
+                                                      + driverEfficiency.TripActualYardMinutes
+                                                      + driverEfficiency.TripActualStopMinutes;
+            driverEfficiency.TripStandardTotalMinutes = driverEfficiency.TripStandardDriveMinutes
+                                                        + driverEfficiency.TripStandardYardMinutes 
+                                                        + driverEfficiency.TripStandardStopMinutes;
+
+            foreach (var tripDelay in tripDelayList)
+            {
+                if (tripDelay.DelayStartDateTime != null && tripDelay.DelayEndDateTime != null)
+                {
+
+                    var codeTableDelayCode = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                        CodeTableNameConstants.DelayCodes, tripDelay.DelayCode, out fault);
+
+                    if (codeTableDelayCode.CodeDisp2 == DelayTypeConstants.Yard)
+                    {
+                        driverEfficiency.TripYardDelayMinutes += (int)(tripDelay.DelayEndDateTime.Value.Subtract
+                                (tripDelay.DelayStartDateTime.Value).TotalMinutes);
+                    }
+                    else if (codeTableDelayCode.CodeDisp2 == DelayTypeConstants.Customer)
+                    {
+                        driverEfficiency.TripCustDelayMinutes += (int)(tripDelay.DelayEndDateTime.Value.Subtract
+                                (tripDelay.DelayStartDateTime.Value).TotalMinutes);
+                    }
+                    else if (codeTableDelayCode.CodeDisp2 == DelayTypeConstants.LunchBreak)
+                    {
+                        driverEfficiency.TripLunchBreakDelayMinutes += (int)(tripDelay.DelayEndDateTime.Value.Subtract
+                               (tripDelay.DelayStartDateTime.Value).TotalMinutes);
+                    }
+
+                    driverEfficiency.TripDelayMinutes += (int)(tripDelay.DelayEndDateTime.Value.Subtract
+                                (tripDelay.DelayStartDateTime.Value).TotalMinutes);
+                }//end of if (tripDelay.DelayStartDateTime != null && tripDelay.DelayEndDateTime != null)
+
+            } //end of             foreach (var tripDelay in tripDelayList)
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            // Insert DriverEfficiency
+            var recordType = (DriverEfficiencyRecordType)dataService.RecordTypes.Single(x => x.TypeName == "DriverEfficiency");
+            var changeSet = (ChangeSet<string, DriverEfficiency>)recordType.GetNewChangeSet();
+            long recordRef = 1;
+            changeSet.AddCreate(recordRef, driverEfficiency, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving DriverEfficiency Record");
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            if (Common.LogChangeSetFailure(changeSetResult, driverEfficiency, log))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
+
         /// <summary>
         /// Insert a DriverHistory record.
         /// </summary>
@@ -925,6 +1054,347 @@ namespace Brady.ScrapRunner.DataService.Util
             return true;
         }
 
+        /// <summary>
+        /// Add history trip, trip segment, trip segment container, trip reference number, trip segment mileage records
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="log"></param>
+        /// <param name="histAction"></param>
+        /// <param name="trip"></param>
+        /// <param name="tripSegment"></param>
+        /// <param name="tripSegmentContainer"></param>
+        /// <param name="tripReferenceNumber"></param>
+        /// <param name="tripSegmentMileage"></param>
+        /// <param name="callCountThisTxn"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static bool InsertTripHistory(IDataService dataService, ProcessChangeSetSettings settings,
+             IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log,
+             string histAction, Trip trip, List<TripSegment> tripSegmentList, List<TripSegmentContainer> tripSegmentContainerList, 
+             List<TripReferenceNumber> tripReferenceNumberList, List<TripSegmentMileage> tripSegmentMileageList, 
+             int callCountThisTxn, out DataServiceFault fault)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the last trip history trip record for this trip  to get the last sequence number used
+            var histTripMax = Common.GetHistTripLast(dataService, settings, userCulture, userRoleIds,
+                               trip.TripNumber,  out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            int histSeqNo = callCountThisTxn;
+            if (histTripMax != null)
+            {
+                histSeqNo = histTripMax.HistSeqNo + callCountThisTxn;
+            }
+
+            //Set the HistTrip fields
+            var histTrip = new HistTrip();
+            histTrip.HistSeqNo = histSeqNo;
+            histTrip.HistAction = histAction;
+            histTrip.TripNumber = trip.TripNumber;
+            histTrip.TripStatus = trip.TripStatus;
+            histTrip.TripStatusDesc = trip.TripStatusDesc;
+            histTrip.TripAssignStatus = trip.TripAssignStatus;
+            histTrip.TripAssignStatusDesc = trip.TripAssignStatusDesc;
+            histTrip.TripType = trip.TripType;
+            histTrip.TripTypeDesc = trip.TripTypeDesc;
+            histTrip.TripSequenceNumber = trip.TripSequenceNumber;
+            histTrip.TripSendFlag = trip.TripSendFlag;
+            histTrip.TripDriverId = trip.TripDriverId;
+            histTrip.TripDriverName = trip.TripDriverName;
+            histTrip.TripCustHostCode = trip.TripCustHostCode;
+            histTrip.TripCustCode4_4 = trip.TripCustCode4_4;
+            histTrip.TripCustName = trip.TripCustName;
+            histTrip.TripCustAddress1 = trip.TripCustAddress1;
+            histTrip.TripCustAddress2 = trip.TripCustAddress2;
+            histTrip.TripCustCity = trip.TripCustCity;
+            histTrip.TripCustState = trip.TripCustState;
+            histTrip.TripCustZip = trip.TripCustZip;
+            histTrip.TripCustCountry = trip.TripCustCountry;
+            histTrip.TripCustPhone1 = trip.TripCustPhone1;
+            histTrip.TripTerminalId = trip.TripTerminalId;
+            histTrip.TripTerminalName = trip.TripTerminalName;
+            histTrip.TripRegionId = trip.TripRegionId;
+            histTrip.TripRegionName = trip.TripRegionName;
+            histTrip.TripContactName = trip.TripContactName;
+            histTrip.TripSalesman = trip.TripSalesman;
+            histTrip.TripCustOpenTime = trip.TripCustOpenTime;
+            histTrip.TripCustCloseTime = trip.TripCustCloseTime;
+            histTrip.TripReadyDateTime = trip.TripReadyDateTime;
+            histTrip.TripEnteredUserId = trip.TripEnteredUserId;
+            histTrip.TripEnteredUserName = trip.TripEnteredUserName;
+            histTrip.TripEnteredDateTime = trip.TripEnteredDateTime;
+            histTrip.TripStandardDriveMinutes = trip.TripStandardDriveMinutes;
+            histTrip.TripStandardStopMinutes = trip.TripStandardStopMinutes;
+            histTrip.TripActualDriveMinutes = trip.TripActualDriveMinutes;
+            histTrip.TripActualStopMinutes = trip.TripActualStopMinutes;
+            histTrip.TripContractNumber = trip.TripContractNumber;
+            histTrip.TripShipmentNumber = trip.TripShipmentNumber;
+            histTrip.TripCommodityPurchase = trip.TripCommodityPurchase;
+            histTrip.TripCommoditySale = trip.TripCommoditySale;
+            histTrip.TripSpecInstructions = trip.TripSpecInstructions;
+            histTrip.TripExpediteFlag = trip.TripExpediteFlag;
+            histTrip.TripPrimaryContainerNumber = trip.TripPrimaryContainerNumber;
+            histTrip.TripPrimaryContainerType = trip.TripPrimaryContainerType;
+            histTrip.TripPrimaryContainerSize = trip.TripPrimaryContainerSize;
+            histTrip.TripPrimaryCommodityCode = trip.TripPrimaryCommodityCode;
+            histTrip.TripPrimaryCommodityDesc = trip.TripPrimaryCommodityDesc;
+            histTrip.TripPrimaryContainerLocation = trip.TripPrimaryContainerLocation;
+            histTrip.TripPowerId = trip.TripPowerId;
+            histTrip.TripCommodityScaleMsg = trip.TripCommodityScaleMsg;
+            histTrip.TripSendReceiptFlag = trip.TripSendReceiptFlag;
+            histTrip.TripDriverIdPrev = trip.TripDriverIdPrev;
+            histTrip.TripCompletedDateTime = trip.TripCompletedDateTime;
+            histTrip.TripSendScaleNotificationFlag = trip.TripSendScaleNotificationFlag;
+            histTrip.TripExtendedFlag = trip.TripExtendedFlag;
+            histTrip.TripExtendedReason = trip.TripExtendedReason;
+            histTrip.TripInProgressFlag = trip.TripInProgressFlag;
+            histTrip.TripNightRunFlag = trip.TripNightRunFlag;
+            histTrip.TripDoneMethod = trip.TripDoneMethod;
+            histTrip.TripCompletedUserId = trip.TripCompletedUserId;
+            histTrip.TripCompletedUserName = trip.TripCompletedUserName;
+            histTrip.TripReferenceNumber = trip.TripReferenceNumber;
+            histTrip.TripChangedDateTime = trip.TripChangedDateTime;
+            histTrip.TripChangedUserId = trip.TripChangedUserId;
+            histTrip.TripChangedUserName = trip.TripChangedUserName;
+            histTrip.TripDirectSegNumber = trip.TripDirectSegNumber;
+            histTrip.TripDirectDriveMinutes = trip.TripDirectDriveMinutes;
+            histTrip.TripDirectTotalMinutes = trip.TripDirectTotalMinutes;
+            histTrip.TripStartedDateTime = trip.TripStartedDateTime;
+            histTrip.TripErrorDesc = trip.TripErrorDesc;
+            histTrip.TripDriverInstructions = trip.TripDriverInstructions;
+            histTrip.TripDispatcherInstructions = trip.TripDispatcherInstructions;
+            histTrip.TripScaleReferenceNumber = trip.TripScaleReferenceNumber;
+            histTrip.TripMultContainerFlag = trip.TripMultContainerFlag;
+            histTrip.TripSendReseqFlag = trip.TripSendReseqFlag;
+            histTrip.TripPowerAssetNumber = trip.TripPowerAssetNumber;
+            histTrip.TripHaulerHostCode = trip.TripHaulerHostCode;
+            histTrip.TripHaulerName = trip.TripHaulerName;
+            histTrip.TripHaulerAddress1 = trip.TripHaulerAddress1;
+            histTrip.TripHaulerCity = trip.TripHaulerCity;
+            histTrip.TripHaulerState = trip.TripHaulerState;
+            histTrip.TripHaulerZip = trip.TripHaulerZip;
+            histTrip.TripHaulerCountry = trip.TripHaulerCountry;
+            histTrip.TripResolvedFlag = trip.TripResolvedFlag;
+            histTrip.TripSendScaleDateTime = trip.TripSendScaleDateTime;
+            histTrip.TripResendScaleNotificationFlag = trip.TripResendScaleNotificationFlag;
+            histTrip.TripResendScaleDateTime = trip.TripResendScaleDateTime;
+            histTrip.TripImageFlag = trip.TripImageFlag;
+            histTrip.TripScaleTerminalId = trip.TripScaleTerminalId;
+            histTrip.TripScaleTerminalName = trip.TripScaleTerminalName;
+            histTrip.TripSendScaleTerminalId = trip.TripSendScaleTerminalId;
+            histTrip.TripSendScaleTerminalName = trip.TripSendScaleTerminalName;
+            histTrip.TripResendScaleTerminalId = trip.TripResendScaleTerminalId;
+            histTrip.TripResendScaleTerminalName = trip.TripResendScaleTerminalName;
+
+            // Insert HistTrip 
+            var recordTypeHistTrip = (HistTripRecordType)dataService.RecordTypes.Single(x => x.TypeName == "HistTrip");
+            var changeSetHistTrip = (ChangeSet<string, HistTrip>)recordTypeHistTrip.GetNewChangeSet();
+            long recordRefHistTrip = 1;
+            changeSetHistTrip.AddCreate(recordRefHistTrip, histTrip, userRoleIds, userRoleIds);
+            log.DebugFormat("SRTEST:Saving HistTrip {0}", histTrip.TripNumber);
+            var changeSetResultHistTrip = recordTypeHistTrip.ProcessChangeSet(dataService, changeSetHistTrip, settings);
+            if (Common.LogChangeSetFailure(changeSetResultHistTrip, histTrip, log))
+            {
+                return false;
+            }
+
+            //Set the HistTripSegment fields
+            foreach (var tripSegment in tripSegmentList)
+            {
+                var histTripSegment = new HistTripSegment();
+                histTripSegment.HistSeqNo = histSeqNo;
+                histTripSegment.TripNumber = tripSegment.TripNumber;
+                histTripSegment.TripSegNumber = tripSegment.TripSegNumber;
+                histTripSegment.TripSegStatus = tripSegment.TripSegStatus;
+                histTripSegment.TripSegStatusDesc = tripSegment.TripSegStatusDesc;
+                histTripSegment.TripSegType = tripSegment.TripSegType;
+                histTripSegment.TripSegTypeDesc = tripSegment.TripSegTypeDesc;
+                histTripSegment.TripSegPowerId = tripSegment.TripSegPowerId;
+                histTripSegment.TripSegDriverId = tripSegment.TripSegDriverId;
+                histTripSegment.TripSegDriverName = tripSegment.TripSegDriverName;
+                histTripSegment.TripSegStartDateTime = tripSegment.TripSegStartDateTime;
+                histTripSegment.TripSegEndDateTime = tripSegment.TripSegEndDateTime;
+                histTripSegment.TripSegStandardDriveMinutes = tripSegment.TripSegStandardDriveMinutes;
+                histTripSegment.TripSegStandardStopMinutes = tripSegment.TripSegStandardStopMinutes;
+                histTripSegment.TripSegActualDriveMinutes = tripSegment.TripSegActualDriveMinutes;
+                histTripSegment.TripSegActualStopMinutes = tripSegment.TripSegActualStopMinutes;
+                histTripSegment.TripSegOdometerStart = tripSegment.TripSegOdometerStart;
+                histTripSegment.TripSegOdometerEnd = tripSegment.TripSegOdometerEnd;
+                histTripSegment.TripSegComments = tripSegment.TripSegComments;
+                histTripSegment.TripSegOrigCustType = tripSegment.TripSegOrigCustType;
+                histTripSegment.TripSegOrigCustTypeDesc = tripSegment.TripSegOrigCustTypeDesc;
+                histTripSegment.TripSegOrigCustHostCode = tripSegment.TripSegOrigCustHostCode;
+                histTripSegment.TripSegOrigCustCode4_4 = tripSegment.TripSegOrigCustCode4_4;
+                histTripSegment.TripSegOrigCustName = tripSegment.TripSegOrigCustName;
+                histTripSegment.TripSegOrigCustAddress1 = tripSegment.TripSegOrigCustAddress1;
+                histTripSegment.TripSegOrigCustAddress2 = tripSegment.TripSegOrigCustAddress2;
+                histTripSegment.TripSegOrigCustCity = tripSegment.TripSegOrigCustCity;
+                histTripSegment.TripSegOrigCustState = tripSegment.TripSegOrigCustState;
+                histTripSegment.TripSegOrigCustZip = tripSegment.TripSegOrigCustZip;
+                histTripSegment.TripSegOrigCustCountry = tripSegment.TripSegOrigCustCountry;
+                histTripSegment.TripSegOrigCustPhone1 = tripSegment.TripSegOrigCustPhone1;
+                histTripSegment.TripSegOrigCustTimeFactor = tripSegment.TripSegOrigCustTimeFactor;
+                histTripSegment.TripSegDestCustType = tripSegment.TripSegDestCustType;
+                histTripSegment.TripSegDestCustTypeDesc = tripSegment.TripSegDestCustTypeDesc;
+                histTripSegment.TripSegDestCustHostCode = tripSegment.TripSegDestCustHostCode;
+                histTripSegment.TripSegDestCustName = tripSegment.TripSegDestCustName;
+                histTripSegment.TripSegDestCustAddress1 = tripSegment.TripSegDestCustAddress1;
+                histTripSegment.TripSegDestCustAddress2 = tripSegment.TripSegDestCustAddress2;
+                histTripSegment.TripSegDestCustCity = tripSegment.TripSegDestCustCity;
+                histTripSegment.TripSegDestCustState = tripSegment.TripSegDestCustState;
+                histTripSegment.TripSegDestCustZip = tripSegment.TripSegDestCustZip;
+                histTripSegment.TripSegDestCustCountry = tripSegment.TripSegDestCustCountry;
+                histTripSegment.TripSegDestCustPhone1 = tripSegment.TripSegDestCustPhone1;
+                histTripSegment.TripSegDestCustTimeFactor = tripSegment.TripSegDestCustTimeFactor;
+                histTripSegment.TripSegPrimaryContainerNumber = tripSegment.TripSegPrimaryContainerNumber;
+                histTripSegment.TripSegPrimaryContainerType = tripSegment.TripSegPrimaryContainerType;
+                histTripSegment.TripSegPrimaryContainerSize = tripSegment.TripSegPrimaryContainerSize;
+                histTripSegment.TripSegPrimaryContainerCommodityCode = tripSegment.TripSegPrimaryContainerCommodityCode;
+                histTripSegment.TripSegPrimaryContainerCommodityDesc = tripSegment.TripSegPrimaryContainerCommodityDesc;
+                histTripSegment.TripSegPrimaryContainerLocation = tripSegment.TripSegPrimaryContainerLocation;
+                histTripSegment.TripSegActualDriveStartDateTime = tripSegment.TripSegActualDriveStartDateTime;
+                histTripSegment.TripSegActualDriveEndDateTime = tripSegment.TripSegActualDriveEndDateTime;
+                histTripSegment.TripSegActualStopStartDateTime = tripSegment.TripSegActualStopStartDateTime;
+                histTripSegment.TripSegActualStopEndDateTime = tripSegment.TripSegActualStopEndDateTime;
+                histTripSegment.TripSegStartLatitude = tripSegment.TripSegStartLatitude;
+                histTripSegment.TripSegStartLongitude = tripSegment.TripSegStartLongitude;
+                histTripSegment.TripSegEndLatitude = tripSegment.TripSegEndLatitude;
+                histTripSegment.TripSegEndLongitude = tripSegment.TripSegEndLongitude;
+                histTripSegment.TripSegStandardMiles = tripSegment.TripSegStandardMiles;
+                histTripSegment.TripSegErrorDesc = tripSegment.TripSegErrorDesc;
+                histTripSegment.TripSegContainerQty = tripSegment.TripSegContainerQty;
+                histTripSegment.TripSegDriverGenerated = tripSegment.TripSegDriverGenerated;
+                histTripSegment.TripSegDriverModified = tripSegment.TripSegDriverModified;
+                histTripSegment.TripSegPowerAssetNumber = tripSegment.TripSegPowerAssetNumber;
+                histTripSegment.TripSegExtendedFlag = tripSegment.TripSegExtendedFlag;
+                histTripSegment.TripSegSendReceiptFlag = tripSegment.TripSegSendReceiptFlag;
+
+                // Insert HistTripSegment
+                var recordTypeHistTripSegment = (HistTripSegmentRecordType)dataService.RecordTypes.Single(x => x.TypeName == "HistTripSegment");
+                var changeSetHistTripSegment = (ChangeSet<string, HistTripSegment>)recordTypeHistTripSegment.GetNewChangeSet();
+                long recordRefHistTripSegment = 1;
+                changeSetHistTripSegment.AddCreate(recordRefHistTripSegment, histTripSegment, userRoleIds, userRoleIds);
+                log.DebugFormat("SRTEST:Saving HistTripSegment {0}-{1}", histTripSegment.TripNumber, histTripSegment.TripSegNumber);
+                var changeSetResultHistTripSegment = recordTypeHistTripSegment.ProcessChangeSet(dataService, changeSetHistTripSegment, settings);
+                if (Common.LogChangeSetFailure(changeSetResultHistTripSegment, histTripSegment, log))
+                {
+                    return false;
+                }
+            }
+
+            foreach (var tripSegmentContainer in tripSegmentContainerList)
+            {
+                //Set the HistTripSegmentContainer fields
+                var histTripSegmentContainer = new HistTripSegmentContainer();
+                histTripSegmentContainer.HistSeqNo = histSeqNo;
+                histTripSegmentContainer.TripNumber = tripSegmentContainer.TripNumber;
+                histTripSegmentContainer.TripSegNumber = tripSegmentContainer.TripSegNumber;
+                histTripSegmentContainer.TripSegContainerSeqNumber = tripSegmentContainer.TripSegContainerSeqNumber;
+                histTripSegmentContainer.TripSegContainerNumber = tripSegmentContainer.TripSegContainerNumber;
+                histTripSegmentContainer.TripSegContainerType = tripSegmentContainer.TripSegContainerType;
+                histTripSegmentContainer.TripSegContainerSize = tripSegmentContainer.TripSegContainerSize;
+                histTripSegmentContainer.TripSegContainerCommodityCode = tripSegmentContainer.TripSegContainerCommodityCode;
+                histTripSegmentContainer.TripSegContainerCommodityDesc = tripSegmentContainer.TripSegContainerCommodityDesc;
+                histTripSegmentContainer.TripSegContainerLocation = tripSegmentContainer.TripSegContainerLocation;
+                histTripSegmentContainer.TripSegContainerShortTerm = tripSegmentContainer.TripSegContainerShortTerm;
+                histTripSegmentContainer.TripSegContainerWeightGross = tripSegmentContainer.TripSegContainerWeightGross;
+                histTripSegmentContainer.TripSegContainerWeightGross2nd = tripSegmentContainer.TripSegContainerWeightGross2nd;
+                histTripSegmentContainer.TripSegContainerWeightTare = tripSegmentContainer.TripSegContainerWeightTare;
+                histTripSegmentContainer.TripSegContainerReviewFlag = tripSegmentContainer.TripSegContainerReviewFlag;
+                histTripSegmentContainer.TripSegContainerReviewReason = tripSegmentContainer.TripSegContainerReviewReason;
+                histTripSegmentContainer.TripSegContainerActionDateTime = tripSegmentContainer.TripSegContainerActionDateTime;
+                histTripSegmentContainer.TripSegContainerEntryMethod = tripSegmentContainer.TripSegContainerEntryMethod;
+                histTripSegmentContainer.WeightGrossDateTime = tripSegmentContainer.WeightGrossDateTime;
+                histTripSegmentContainer.WeightGross2ndDateTime = tripSegmentContainer.WeightGross2ndDateTime;
+                histTripSegmentContainer.WeightTareDateTime = tripSegmentContainer.WeightTareDateTime;
+                histTripSegmentContainer.TripSegContainerLevel = tripSegmentContainer.TripSegContainerLevel;
+                histTripSegmentContainer.TripSegContainerLatitude = tripSegmentContainer.TripSegContainerLatitude;
+                histTripSegmentContainer.TripSegContainerLongitude = tripSegmentContainer.TripSegContainerLongitude;
+                histTripSegmentContainer.TripSegContainerLoaded = tripSegmentContainer.TripSegContainerLoaded;
+                histTripSegmentContainer.TripSegContainerOnTruck = tripSegmentContainer.TripSegContainerOnTruck;
+                histTripSegmentContainer.TripScaleReferenceNumber = tripSegmentContainer.TripScaleReferenceNumber;
+                histTripSegmentContainer.TripSegContainerSubReason = tripSegmentContainer.TripSegContainerSubReason;
+                histTripSegmentContainer.TripSegContainerComment = tripSegmentContainer.TripSegContainerComment;
+                histTripSegmentContainer.TripSegContainerComplete = tripSegmentContainer.TripSegContainerComplete;
+
+                // Insert HistTripSegmentContainer
+                var recordTypeHistTripSegmentContainer = (HistTripSegmentContainerRecordType)dataService.RecordTypes.Single(x => x.TypeName == "HistTripSegmentContainer");
+                var changeSetHistTripSegmentContainer = (ChangeSet<string, HistTripSegmentContainer>)recordTypeHistTripSegmentContainer.GetNewChangeSet();
+                long recordRefHistTripSegmentContainer = 1;
+                changeSetHistTripSegmentContainer.AddCreate(recordRefHistTripSegmentContainer, histTripSegmentContainer, userRoleIds, userRoleIds);
+                log.DebugFormat("SRTEST:Saving HistTripSegmentContainer {0}-{1} {2}", 
+                    histTripSegmentContainer.TripNumber, histTripSegmentContainer.TripSegNumber,histTripSegmentContainer.TripSegContainerSeqNumber);
+                var changeSetResultHistTripSegmentContainer = recordTypeHistTripSegmentContainer.ProcessChangeSet(dataService, changeSetHistTripSegmentContainer, settings);
+                if (Common.LogChangeSetFailure(changeSetResultHistTripSegmentContainer, histTripSegmentContainer, log))
+                {
+                    return false;
+                }
+            }
+
+            foreach (var tripReferenceNumber in tripReferenceNumberList)
+            {
+                //Set the HistTripReferenceNumber fields
+                var histTripReferenceNumber = new HistTripReferenceNumber();
+                histTripReferenceNumber.HistSeqNo = histSeqNo;
+                histTripReferenceNumber.TripNumber = tripReferenceNumber.TripNumber;
+                histTripReferenceNumber.TripSeqNumber = tripReferenceNumber.TripSeqNumber;
+                histTripReferenceNumber.TripRefNumberDesc = tripReferenceNumber.TripRefNumberDesc;
+                histTripReferenceNumber.TripRefNumber = tripReferenceNumber.TripRefNumber;
+
+                // Insert HistTripReferenceNumber
+                var recordTypeHistTripReferenceNumber = (HistTripReferenceNumberRecordType)dataService.RecordTypes.Single(x => x.TypeName == "HistTripReferenceNumber");
+                var changeSetHistTripReferenceNumber = (ChangeSet<string, HistTripReferenceNumber>)recordTypeHistTripReferenceNumber.GetNewChangeSet();
+                long recordRefHistTripReferenceNumber = 1;
+                changeSetHistTripReferenceNumber.AddCreate(recordRefHistTripReferenceNumber, histTripReferenceNumber, userRoleIds, userRoleIds);
+                log.DebugFormat("SRTEST:Saving HistTripReferenceNumber {0} Seq:{1} Ref#{2}-{3}",
+                    histTripReferenceNumber.TripNumber, histTripReferenceNumber.TripSeqNumber, histTripReferenceNumber.TripRefNumberDesc,histTripReferenceNumber.TripRefNumber);
+                var changeSetResultHistTripReferenceNumber = recordTypeHistTripReferenceNumber.ProcessChangeSet(dataService, changeSetHistTripReferenceNumber, settings);
+                if (Common.LogChangeSetFailure(changeSetResultHistTripReferenceNumber, histTripReferenceNumber, log))
+                {
+                    return false;
+                }
+            }
+
+            foreach (var tripSegmentMileage in tripSegmentMileageList)
+            {
+                //Set the HistTripSegmentMileage fields
+                var histTripSegmentMileage = new HistTripSegmentMileage();
+                histTripSegmentMileage.HistSeqNo = histSeqNo;
+                histTripSegmentMileage.TripNumber = tripSegmentMileage.TripNumber;
+                histTripSegmentMileage.TripSegNumber = tripSegmentMileage.TripSegNumber;
+                histTripSegmentMileage.TripSegMileageSeqNumber = tripSegmentMileage.TripSegMileageSeqNumber;
+                histTripSegmentMileage.TripSegMileageState = tripSegmentMileage.TripSegMileageState;
+                histTripSegmentMileage.TripSegMileageCountry = tripSegmentMileage.TripSegMileageCountry;
+                histTripSegmentMileage.TripSegMileageOdometerStart = tripSegmentMileage.TripSegMileageOdometerStart;
+                histTripSegmentMileage.TripSegMileageOdometerEnd = tripSegmentMileage.TripSegMileageOdometerEnd;
+                histTripSegmentMileage.TripSegLoadedFlag = tripSegmentMileage.TripSegLoadedFlag;
+                histTripSegmentMileage.TripSegMileagePowerId = tripSegmentMileage.TripSegMileagePowerId;
+                histTripSegmentMileage.TripSegMileageDriverId = tripSegmentMileage.TripSegMileageDriverId;
+                histTripSegmentMileage.TripSegMileageDriverName = tripSegmentMileage.TripSegMileageDriverName;
+
+                // Insert HistTripSegmentMileage
+                var recordTypeHistTripSegmentMileage = (HistTripSegmentMileageRecordType)dataService.RecordTypes.Single(x => x.TypeName == "HistTripSegmentMileage");
+                var changeSetHistTripSegmentMileage = (ChangeSet<string, HistTripSegmentMileage>)recordTypeHistTripSegmentMileage.GetNewChangeSet();
+                long recordRefHistTripSegmentMileage = 1;
+                changeSetHistTripSegmentMileage.AddCreate(recordRefHistTripSegmentMileage, histTripSegmentMileage, userRoleIds, userRoleIds);
+                log.DebugFormat("SRTEST:Saving HistTripSegmentMileage {0}-{1} {2}",
+                    histTripSegmentMileage.TripNumber, histTripSegmentMileage.TripSegNumber, histTripSegmentMileage.TripSegMileageSeqNumber);
+                var changeSetResultHistTripSegmentMileage = recordTypeHistTripSegmentMileage.ProcessChangeSet(dataService, changeSetHistTripSegmentMileage, settings);
+                if (Common.LogChangeSetFailure(changeSetResultHistTripSegmentMileage, histTripSegmentMileage, log))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Insert a TripSegmentMileage record.
@@ -2099,6 +2569,77 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return driverDelays;
         }
+        /// <summary>
+        /// Get driver delays for a given trip number
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static List<DriverDelay> GetDriverDelaysForTrip(IDataService dataService, ProcessChangeSetSettings settings,
+               string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var driverDelays = new List<DriverDelay>();
+            if (null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<DriverDelay>()
+                        .Filter(t => t.Property(p => p.TripNumber).EqualTo(tripNumber))
+                        .OrderBy(p => p.TripSegNumber)
+                        .OrderBy(p => p.DelaySeqNumber)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return driverDelays;
+                }
+                driverDelays = queryResult.Records.Cast<DriverDelay>().ToList();
+            }
+            return driverDelays;
+        }
+
+
+        ///DRIVEREFFICIENCY table queries
+        /// <summary>
+        /// Get a driver efficiency record for a given trip
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static DriverEfficiency GetDriverEfficiencyForDriverTrip(IDataService dataService, ProcessChangeSetSettings settings,
+                            string userCulture, IEnumerable<long> userRoleIds, string driverId, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var driverEfficiency = new DriverEfficiency();
+            if (null != tripNumber && null != driverId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<DriverEfficiency>()
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverId)
+                    .And(x => x.TripNumber).EqualTo(tripNumber))
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return driverEfficiency;
+                }
+                driverEfficiency = queryResult.Records.Cast<DriverEfficiency>().FirstOrDefault();
+            }
+            return driverEfficiency;
+        }
         /// DRIVERSTATUS Table  queries
         /// <summary>
         ///  Get an driver status record from the DriverStatus
@@ -2358,6 +2899,41 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return users;
         }
+        /// <summary>
+        /// Get the last history trip record
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static HistTrip GetHistTripLast(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var histTrip = new HistTrip();
+            if (null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<HistTrip>()
+                        .Filter(t => t.Property(p => p.TripNumber).EqualTo(tripNumber))
+                        .OrderBy(p => p.HistSeqNo, Direction.Descending)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return histTrip;
+                }
+                histTrip = queryResult.Records.Cast<HistTrip>().FirstOrDefault();
+            }
+            return histTrip;
+        }
+
+
         /// MESSAGE Table queries
         /// <summary>
         ///  Get messages that need to be sent to the driver
@@ -2987,7 +3563,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="tripNumber"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if tripNumber is null or no entries are found</returns>
-        public static List<TripReferenceNumber> GetTripReferenceNumbers(IDataService dataService, ProcessChangeSetSettings settings,
+        public static List<TripReferenceNumber> GetTripReferenceNumberForTrip(IDataService dataService, ProcessChangeSetSettings settings,
               string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
         {
             fault = null;
@@ -3132,7 +3708,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="tripNumber"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if tripNumber is null or no entries are found</returns>
-        public static List<TripSegment> GetTripSegments(IDataService dataService, ProcessChangeSetSettings settings,
+        public static List<TripSegment> GetTripSegmentsForTrip(IDataService dataService, ProcessChangeSetSettings settings,
               string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
         {
             fault = null;
@@ -3242,7 +3818,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="tripNumber"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if tripNumber is null or no entries are found</returns>
-        public static List<TripSegmentContainer> GetTripContainers(IDataService dataService, ProcessChangeSetSettings settings,
+        public static List<TripSegmentContainer> GetTripContainersForTrip(IDataService dataService, ProcessChangeSetSettings settings,
               string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
         {
             fault = null;
@@ -3253,6 +3829,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     CurrentQuery = new QueryBuilder<TripSegmentContainer>()
                     .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripNumber))
+                    .OrderBy(x => x.TripSegNumber)
                     .OrderBy(x => x.TripSegContainerSeqNumber)
                     .GetQuery()
                 };
@@ -3277,7 +3854,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="tripNumber"></param>
         /// <param name="tripSegNumber"></param>
         /// <param name="fault"></param>
-        /// <returns>An empty list if tripNumber or triSegNumber is null or no entries are found</returns>
+        /// <returns>An empty list if tripNumber or tripSegNumber is null or no entries are found</returns>
         public static List<TripSegmentContainer> GetTripSegmentContainers(IDataService dataService, ProcessChangeSetSettings settings,
               string userCulture, IEnumerable<long> userRoleIds, string tripNumber, string tripSegNumber, out DataServiceFault fault)
         {
@@ -3417,6 +3994,41 @@ namespace Brady.ScrapRunner.DataService.Util
                 tripSegmentContainer = queryResult.Records.Cast<TripSegmentContainer>().FirstOrDefault();
             }
             return tripSegmentContainer;
+        }
+        /// TRIPSEGMENTMILEAGE Table  queries
+        /// <summary>
+        ///  Gets the trip segment mileage records for a given trip.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if tripNumber or tripSegNumber is null or no entries are found</returns>
+        public static List<TripSegmentMileage> GetTripSegmentMileageForTrip(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripSegmentMileage = new List<TripSegmentMileage>();
+            if (null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripSegmentMileage>()
+                        .Filter(t => t.Property(p => p.TripNumber).EqualTo(tripNumber))
+                        .OrderBy(p => p.TripSegMileageSeqNumber)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripSegmentMileage;
+                }
+                tripSegmentMileage = queryResult.Records.Cast<TripSegmentMileage>().ToList();
+            }
+            return tripSegmentMileage;
         }
         /// TRIPSEGMENTMILEAGE Table  queries
         /// <summary>
@@ -3565,6 +4177,39 @@ namespace Brady.ScrapRunner.DataService.Util
                 tripTypeBasic = (TripTypeBasic)queryResult.Records.Cast<TripTypeBasic>().FirstOrDefault();
             }
             return tripTypeBasic;
+        }
+
+        /// <summary>
+        /// Get a master desc trip type record for a given master trip type.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripTypeCode"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static TripTypeMasterDesc GetTripTypeMasterDesc(IDataService dataService, ProcessChangeSetSettings settings,
+                    string userCulture, IEnumerable<long> userRoleIds, string tripTypeCode, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripTypeMasterDesc = new TripTypeMasterDesc();
+            if (null != tripTypeCode)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripTypeMasterDesc>()
+                    .Filter(y => y.Property(x => x.TripTypeCode).EqualTo(tripTypeCode))
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripTypeMasterDesc;
+                }
+                tripTypeMasterDesc = (TripTypeMasterDesc)queryResult.Records.Cast<TripTypeMasterDesc>().FirstOrDefault();
+            }
+            return tripTypeMasterDesc;
         }
     }
 }

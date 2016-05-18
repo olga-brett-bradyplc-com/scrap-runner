@@ -169,7 +169,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Get a list of all  segments for the trip
-                    var tripSegList = Common.GetTripSegments(dataService, settings, userCulture, userRoleIds,
+                    var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
                                         driverEnrouteProcess.TripNumber, out fault);
                     if (null != fault)
                     {

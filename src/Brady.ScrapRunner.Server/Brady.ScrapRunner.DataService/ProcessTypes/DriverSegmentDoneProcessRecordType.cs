@@ -135,7 +135,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == employeeMaster)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid DriverId: "
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid DriverId: "
                                         + driverSegmentDoneProcess.EmployeeId));
                         break;
                     }
@@ -151,7 +151,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == currentTrip)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: "
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid TripNumber: "
                                         + driverSegmentDoneProcess.TripNumber));
                         break;
                     }
@@ -176,7 +176,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == powerMaster)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid PowerId: "
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid PowerId: "
                                         + driverSegmentDoneProcess.PowerId));
                         break;
                     }
@@ -193,7 +193,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Get a list of all segments for the trip
-                    var tripSegList = Common.GetTripSegments(dataService, settings, userCulture, userRoleIds,
+                    var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
                                       driverSegmentDoneProcess.TripNumber, out fault);
                     if (null != fault)
                     {
@@ -202,66 +202,53 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    // Get a list of all containers for the trip from the TripSegmentContainer table
+                    var tripContainerList = Common.GetTripContainersForTrip(dataService, settings, userCulture, userRoleIds,
+                                            driverSegmentDoneProcess.TripNumber, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+
+                    ////////////////////////////////////////////////
+                    //Get a list of all TripReferenceNumber records for the trip
+                    var tripReferenceNumberList = Common.GetTripReferenceNumberForTrip(dataService, settings, userCulture, userRoleIds,
+                                                  driverSegmentDoneProcess.TripNumber, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    ////////////////////////////////////////////////
+                    //Get a list of all TripSegmentMileage records for the trip
+                    var tripSegmentMileageList = Common.GetTripSegmentMileageForTrip(dataService, settings, userCulture, userRoleIds,
+                                                 driverSegmentDoneProcess.TripNumber, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    ////////////////////////////////////////////////
+                    // Get the driver delays for trip number
+                    var tripDelayList = Common.GetDriverDelaysForTrip(dataService, settings, userCulture, userRoleIds,
+                                                 driverSegmentDoneProcess.TripNumber, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    ////////////////////////////////////////////////
                     // Get the current TripSegment record
                     var currentTripSegment = (from item in tripSegList
                                              where item.TripSegNumber == driverSegmentDoneProcess.TripSegNumber
                                              select item).FirstOrDefault();
                     if (null == currentTripSegment)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripSegment: " +
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid TripSegment: " +
                             driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
                         break;
                     }
-
-                    ////////////////////////////////////////////////
-                    //Get a list of incomplete containers for the segment
-                    var incompleteTripSegContainerList = Common.GetTripSegmentContainersIncomplete(dataService, settings, userCulture, userRoleIds,
-                                               driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber, out fault);
-                    if (null != fault)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
-                    if (incompleteTripSegContainerList != null)
-                    {
-                        foreach (var incompleteTripSegmentContainer in incompleteTripSegContainerList)
-                        {
-                            //TODO: Do the delete. DeleteTripSegmentContainer throws an exception
-                            //changeSetResult = Common.DeleteTripSegmentContainer(dataService, settings, incompleteTripSegmentContainer);
-                            log.DebugFormat("SRTEST:Deleting TripSegmentContainer Record for Trip:{0}-{1} Container:{2}- Segment Done.",
-                                            incompleteTripSegmentContainer.TripNumber, incompleteTripSegmentContainer.TripSegNumber,
-                                            incompleteTripSegmentContainer.TripSegContainerNumber);
-                            if (Common.LogChangeSetFailure(changeSetResult, incompleteTripSegmentContainer, log))
-                            {
-                                var s = string.Format("Could not update TripSegmentContainer for Trip:{0}-{1} Container:{2}.",
-                                        incompleteTripSegmentContainer.TripNumber, incompleteTripSegmentContainer.TripSegNumber,
-                                        incompleteTripSegmentContainer.TripSegContainerNumber);
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                                break;
-                            }
-                        }
-                    }
-
-                    ////////////////////////////////////////////////
-                    //Get a list of all containers for the segment
-                    var tripSegContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
-                                               driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber, out fault);
-                    if (null != fault)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
-                    //Delete any containers that have not been completed.
-                    //var incompleteTripSegContainerList = (from c in tripSegContainerList
-                    //                                     where (c.TripSegContainerComplete == null
-                    //                                     || c.TripSegContainerComplete != Constants.Yes)
-                    //                                     select c).ToList();
-
-                    ////////////////////////////////////////////////
-                    //Include just the complete containers in the list
-                    tripSegContainerList = (from c in tripSegContainerList
-                                           where c.TripSegContainerComplete == Constants.Yes
-                                           select c).ToList();
 
                     ////////////////////////////////////////////////
                     // Get the Customer record for the destination cust host code
@@ -274,15 +261,47 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == destCustomerMaster)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid CustHostCode: "
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid CustHostCode: "
                                         + currentTripSegment.TripSegDestCustHostCode));
                         break;
                     }
 
                     ////////////////////////////////////////////////
+                    //Get a list of incomplete containers for the segment
+                    var incompleteTripSegContainerList = (from item in tripContainerList
+                                                          where item.TripSegContainerComplete != Constants.Yes
+                                                          select item).ToList();
+                    if (incompleteTripSegContainerList != null)
+                    {
+                        foreach (var incompleteTripSegmentContainer in incompleteTripSegContainerList)
+                        {
+                            //TODO: Do the delete. DeleteTripSegmentContainer throws an exception
+                            //changeSetResult = Common.DeleteTripSegmentContainer(dataService, settings, incompleteTripSegmentContainer);
+                            log.DebugFormat("SRTEST:Deleting TripSegmentContainer Record for Trip:{0}-{1} Container:{2}- Segment Done.",
+                                            incompleteTripSegmentContainer.TripNumber, incompleteTripSegmentContainer.TripSegNumber,
+                                            incompleteTripSegmentContainer.TripSegContainerNumber);
+                            if (Common.LogChangeSetFailure(changeSetResult, incompleteTripSegmentContainer, log))
+                            {
+                                var s = string.Format("Segment Done:Could not delete TripSegmentContainer for Trip:{0}-{1} Container:{2}.",
+                                        incompleteTripSegmentContainer.TripNumber, incompleteTripSegmentContainer.TripSegNumber,
+                                        incompleteTripSegmentContainer.TripSegContainerNumber);
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                break;
+                            }
+                        }
+                    }
+
+                    ////////////////////////////////////////////////
+                    //Get a list of all containers for the segment. Include just the complete containers.
+                    var tripSegContainerList = (from item in tripContainerList
+                                                where item.TripSegNumber == driverSegmentDoneProcess.TripSegNumber
+                                                && item.TripSegContainerComplete == Constants.Yes
+                                                select item).ToList();
+
+                    ////////////////////////////////////////////////
                     //Start Updating...
                     ////////////////////////////////////////////////
-                    //Update the TripSegment record.
+                    //Update the current TripSegment record.
                     currentTripSegment.TripSegPowerId = driverSegmentDoneProcess.PowerId;
                     currentTripSegment.TripSegPowerAssetNumber = powerMaster.PowerAssetNumber;
                     currentTripSegment.TripSegDriverId = driverSegmentDoneProcess.EmployeeId;
@@ -426,13 +445,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                     }
 
-                    //Do the update
+                    //Do the TripSegment table update
                     changeSetResult = Common.UpdateTripSegment(dataService, settings, currentTripSegment);
                     log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Segment Done.",
                                     currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
                     if (Common.LogChangeSetFailure(changeSetResult, currentTripSegment, log))
                     {
-                        var s = string.Format("Could not update TripSegment for Trip:{0}-{1}.",
+                        var s = string.Format("Segment Done:Could not update TripSegment for Trip:{0}-{1}.",
                             currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
@@ -468,7 +487,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                                 nextTripSegment.TripNumber, nextTripSegment.TripSegNumber);
                                 if (Common.LogChangeSetFailure(changeSetResult, nextTripSegment, log))
                                 {
-                                    var s = string.Format("Could not update next TripSegment for Trip:{0}-{1}.",
+                                    var s = string.Format("Segment Done:Could not update next TripSegment for Trip:{0}-{1}.",
                                         nextTripSegment.TripNumber, nextTripSegment.TripSegNumber);
                                     changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                     break;
@@ -495,30 +514,29 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         currentTrip.TripPrimaryCommodityDesc = currentTripSegment.TripSegPrimaryContainerCommodityDesc;
                         currentTrip.TripPrimaryContainerLocation = currentTripSegment.TripSegPrimaryContainerLocation;
                         currentTrip.TripStartedDateTime = currentTripSegment.TripSegStartDateTime;
-                        if (currentTripSegment.TripSegContainerQty > 1)
-                        {
-                            currentTrip.TripMultContainerFlag = Constants.Yes;
-                        }
-                        else
-                        {
-                            currentTrip.TripMultContainerFlag = Constants.No;
-                        }
-                        currentTrip.TripInProgressFlag = Constants.Yes;
+                    }
+                    //Set the multiple container flag at the trip level
+                    if (currentTripSegment.TripSegContainerQty > 1)
+                    {
+                        currentTrip.TripMultContainerFlag = Constants.Yes;
+                    }
 
-                        //Set the auto email receipt flag in the trip record
-                        currentTrip.TripSendReceiptFlag = currentTripSegment.TripSegSendReceiptFlag;
+                    //Set the Trip In Progress flag to Y even though it should already have been set to Y in the enroute process.
+                    currentTrip.TripInProgressFlag = Constants.Yes;
 
-                        //Do the update
-                        changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
-                        log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Segment Done.",
-                                        currentTrip.TripNumber);
-                        if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
-                        {
-                            var s = string.Format("Could not update Trip for Trip:{0}.",
-                                currentTrip.TripNumber);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                            break;
-                        }
+                    //Set the auto email receipt flag in the trip record
+                    currentTrip.TripSendReceiptFlag = currentTripSegment.TripSegSendReceiptFlag;
+
+                    //Do the update
+                    changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
+                    log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Segment Done.",
+                                    currentTrip.TripNumber);
+                    if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
+                    {
+                        var s = string.Format("Segment Done:Could not update Trip for Trip:{0}.",
+                            currentTrip.TripNumber);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        break;
                     }
 
                     ////////////////////////////////////////////////
@@ -540,7 +558,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     driverSegmentDoneProcess.PowerId);
                     if (Common.LogChangeSetFailure(changeSetResult, powerMaster, log))
                     {
-                        var s = string.Format("Could not update PowerMaster for PowerId:{0}.",
+                        var s = string.Format("Segment Done:Could not update PowerMaster for PowerId:{0}.",
                                               driverSegmentDoneProcess.PowerId);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
@@ -561,7 +579,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                             currentTripSegment.TripSegDestCustHostCode);
                             if (Common.LogChangeSetFailure(changeSetResult, destCustomerMaster, log))
                             {
-                                var s = string.Format("Could not update CustomerMaster for CustHostCode:{0}.",
+                                var s = string.Format("Segment Done:Could not update CustomerMaster for CustHostCode:{0}.",
                                                       currentTripSegment.TripSegDestCustHostCode);
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                 break;
@@ -608,11 +626,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ChangeSetResult<int> eventChangeSetResult;
                     eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
                     log.Debug("SRTEST:Saving EventLog Record - Segment Done");
+                    log.DebugFormat("SRTEST:Saving EventLog Record for Trip:{0}-{1} - Segment Done.",
+                                  currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
                     //Check for EventLog failure.
                     if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
                     {
-                        var s = string.Format("Could not update EventLog for Driver {0} {1}.",
-                                driverSegmentDoneProcess.EmployeeId, EventCommentConstants.ReceivedDriverSegDone);
+                        var s = string.Format("Segment Done:Could not update EventLog for Trip:{0}-{1}.",
+                                currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
                     }
@@ -632,9 +652,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         {
                             if (!MarkTripDone(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                                                 driverSegmentDoneProcess, employeeMaster, powerMaster,
-                                                currentTrip, tripSegList, tripSegContainerList))
+                                                currentTrip, tripSegList, tripSegContainerList, tripReferenceNumberList, 
+                                                tripSegmentMileageList, tripDelayList))
                             {
-                                var s = string.Format("Could not Mark Trip Done for Trip:{0}.",
+                                var s = string.Format("Segment Done:Could not Mark Trip Done for Trip:{0}.",
                                                       currentTrip.TripNumber);
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                 break;
@@ -653,7 +674,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (driverStatus == null)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid DriverId: "
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid DriverId: "
                                       + driverSegmentDoneProcess.EmployeeId));
                         break;
                     }
@@ -762,7 +783,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     driverStatus.EmployeeId);
                     if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
                     {
-                        var s = string.Format("Could not update DriverStatus for DriverId:{0}.",
+                        var s = string.Format("Segment Done:Could not update DriverStatus for DriverId:{0}.",
                             driverStatus.EmployeeId);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
@@ -801,26 +822,20 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         public bool MarkTripDone(IDataService dataService, ProcessChangeSetSettings settings,
            ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
            DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster, 
-           Trip currentTrip, List<TripSegment> tripSegList, List<TripSegmentContainer> tripSegContainerList)
+           Trip currentTrip, List<TripSegment> tripSegList, List<TripSegmentContainer> tripContainerList,
+            List<TripReferenceNumber> tripReferenceNumberList, List<TripSegmentMileage> tripSegmentMileageList,
+            List<DriverDelay> tripDelayList)
         {
             DataServiceFault fault = null;
             string msgKey = key;
             int containerHistoryInsertCount = 0;
+            int tripHistoryInsertCount = 0;
 
             ////////////////////////////////////////////////
             //TODO: Check for exception type delays
             //If any delay was an exception type, change the status of the segment to E=Exception
             //var driverDelays = Common.GetDriverDelaysException(dataService, settings, userCulture, userRoleIds,
             //                                driverSegmentDoneProcess.EmployeeId, out fault);
-            if (null != fault)
-            {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                return false;
-            }
-
-            // Get a list of all containers for the trip from the TripSegmentContainer table
-            var tripContainerList = Common.GetTripContainers(dataService, settings, userCulture, userRoleIds,
-                                    driverSegmentDoneProcess.TripNumber, out fault);
             if (null != fault)
             {
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -938,22 +953,125 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             }
 
-            //TODO: Check if the TripSendFlag in the Trip table should be set to send completed trip information.
-            //Set the trip send flag to the appropriate value based on Trip Status.
-            if (currentTrip.TripStatus == TripStatusConstants.Done)
+            ////////////////////////////////////////////////
+            // TODO: Test Trip Send Flag setting
+            // Check if the TripSendFlag in the Trip table should be set to send completed trip information.
+            // ScrapRunner sends trips to host only when the trip send flag is set to D=Done.
+
+            ////////////////////////////////////////////////
+            //Initially set the send flag not to send completed trip information to the host.
+            currentTrip.TripSendFlag = TripSendFlagValue.NotSentToHost;
+
+            ////////////////////////////////////////////////
+            // Preferences:  Lookup the yard preference "DEFTHTrip".  
+            // If preference DefTHTrip set to Y then set the send flag according to the trip status
+            // Otherwise set the flag to indicate that completed trip information will not be sent to the host.
+            string prefDEFTHTrip = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                   currentTrip.TripTerminalId, PrefYardConstants.DEFTHTrip, out fault);
+            if (null != fault)
             {
-                currentTrip.TripSendFlag = TripSendFlagValue.TripDone;
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
             }
-            else if (currentTrip.TripStatus == TripStatusConstants.Exception)
+            ////////////////////////////////////////////////
+            // Preferences:  Lookup the yard preference "DEFSendExceptionTripsToHost".  
+            // If preference DefTHTrip set to Y then set the send flag according to the trip status
+            // Otherwise set the flag to indicate that completed trip information will not be sent to the host.
+            string prefDEFSendExceptionTripsToHost = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                     currentTrip.TripTerminalId, PrefYardConstants.DEFSendExceptionTripsToHost, out fault);
+            if (null != fault)
             {
-                currentTrip.TripSendFlag = TripSendFlagValue.TripException;
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
             }
-            else if (currentTrip.TripStatus == TripStatusConstants.Review)
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the TripTypeCompTripMsg flag in the TripTypeMasterDesc table 
+            var tripTypeMasterDesc = Common.GetTripTypeMasterDesc(dataService, settings, userCulture, userRoleIds,
+                                     currentTrip.TripType, out fault);
+            if (null != fault)
             {
-                currentTrip.TripSendFlag = TripSendFlagValue.TripInReview;
+                return false;
             }
+            string tripTypeCompTripMsg = tripTypeMasterDesc?.TripTypeCompTripMsg;
+
+            //First, this flag must be set to Y or nothing will be sent.
+            if (prefDEFTHTrip == Constants.Yes)
+            {
+                //Next this flag must be set to Y or nothing will be sent
+                if (tripTypeCompTripMsg == Constants.Yes)
+                {
+                    //Set the trip send flag to the appropriate value based on Trip Status.
+                    if (currentTrip.TripStatus == TripStatusConstants.Done)
+                    {
+                        currentTrip.TripSendFlag = TripSendFlagValue.TripDone;
+                    }
+                    else if (currentTrip.TripStatus == TripStatusConstants.Exception)
+                    {
+                        currentTrip.TripSendFlag = TripSendFlagValue.TripException;
+                        //Check the DEFSendExceptionTripsToHost to see if exception trips should be sent
+                        if (prefDEFSendExceptionTripsToHost == Constants.Yes)
+                        {
+                            //This overrides the Exception setting
+                            currentTrip.TripSendFlag = TripSendFlagValue.TripDone;
+                        }
+                    }
+                    else if (currentTrip.TripStatus == TripStatusConstants.Review)
+                    {
+                        currentTrip.TripSendFlag = TripSendFlagValue.TripInReview;
+                    }
+                }//end of if (tripTypeCompTripMsg == Constants.Yes)
+            }//end of if (prefDEFTHTrip == Constants.Yes)
+
 
             //TODO: Check if the TripSendScaleNotificationFlag in the Trip table should be set to send a scale notice.
+            //If the trip is supposed to generate a scale notice (TripCommodityScaleMsg = Y)
+            //and one has not been generated, send it now by setting the TripSendScaleNotificationFlag to 1
+            //This would occur for a trip that did not have a return to yard segment because the driver
+            //is going to a different customer site to pick up a second container there.
+
+            ////////////////////////////////////////////////
+            //Initially set the send flag not to send completed trip information to the host.
+            currentTrip.TripSendScaleNotificationFlag = TripSendScaleFlagValue.NoScale;
+
+            ////////////////////////////////////////////////
+            // Preferences:  Lookup the yard preference "DEFTHScale".  
+            // If preference DEFTHScale set to Y then set the send scale flag.
+            string preDEFTHScale = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                   currentTrip.TripTerminalId, PrefYardConstants.DEFTHScale, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            //First, this flag must be set to Y or nothing will be sent.
+            if (preDEFTHScale == Constants.Yes)
+            {
+                //Also this flag must be set on the trip record
+                if (currentTrip.TripCommodityScaleMsg == Constants.Yes)
+                {
+                    //If Scale notice has not been sent on the enroute back to the yard, send the scale notice.
+                    if (currentTrip.TripSendScaleNotificationFlag == TripSendScaleFlagValue.NoScale)
+                    {
+                        //Set the scale notice flag to send
+                        currentTrip.TripSendScaleNotificationFlag = TripSendScaleFlagValue.ScaleReady;
+                        //However...
+                        //If trip is an exception, but has a loaded container, send the scale notice.
+                        //Otherwise do not send.
+                        if (currentTrip.TripStatus == TripStatusConstants.Exception)
+                        {
+                            string loaded = (from item in tripContainerList
+                                         where item.TripSegContainerLoaded == Constants.Yes
+                                         select item.TripSegContainerLoaded).FirstOrDefault();
+
+                            if (loaded == null)
+                            {
+                                currentTrip.TripSendScaleNotificationFlag = TripSendScaleFlagValue.NoScale;
+                            }
+
+                        }//end of if (currentTrip.TripStatus == TripStatusConstants.Exception)
+                    }//end of if (currentTrip.TripSendScaleNotificationFlag == TripSendScaleFlagValue.NoScale)
+                }//end of if (currentTrip.TripCommodityScaleMsg == Constants.Yes)
+            }//end of if (preDEFTHScale == Constants.Yes)
 
 
             //TODO: Check if the trip should be placed in the Error Queue
@@ -962,21 +1080,21 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             //Do the update to the trip table
             changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
-            log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Segment Done.",
+            log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Trip Done.",
                             currentTrip.TripNumber);
             if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
             {
-                var s = string.Format("Could not update Trip for Trip:{0}.",
+                var s = string.Format("Trip Done:Could not update Trip for Trip:{0}.",
                     currentTrip.TripNumber);
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                 return false;
             }
 
             ////////////////////////////////////////////////
-            //Update ContainerMaster for each container in the TripSegmentContainer records,/remove the current trip information.      
+            //Update ContainerMaster for each container in the TripSegmentContainer records,
+            //remove the current trip information.      
 
-
-            // Next pull out a list of distinct container numbers only 
+            // From the list of containers used on the trip, pull out a list of distinct container numbers. 
             var containerList = (from item in tripContainerList
                                  select item.TripSegContainerNumber).Distinct().ToList();
 
@@ -988,50 +1106,65 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                 return false;
             }
-            if (null == containersOnTrip)
+            if (null != containersOnTrip)
             {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid PowerId: "
-                                + driverSegmentDoneProcess.PowerId));
+                foreach (var containerMaster in containersOnTrip)
+                {
+                    //Remove current trip information
+                    containerMaster.ContainerCurrentTripNumber = null;
+                    containerMaster.ContainerCurrentTripSegNumber = null;
+                    containerMaster.ContainerCurrentTripSegType = null;
+
+                    //This is where the Pending Move DateTime is removed in the current ScrapRunner.
+                    containerMaster.ContainerPendingMoveDateTime = null;
+
+                    //Do the update to the container master table
+                    changeSetResult = Common.UpdateContainerMaster(dataService, settings, containerMaster);
+                    log.DebugFormat("SRTEST:Saving Container Record for Container:{0} - Trip Done.",
+                                    containerMaster.ContainerNumber);
+                    if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
+                    {
+                        var s = string.Format("Trip Done:Could not update Container:{0}.",
+                            containerMaster.ContainerNumber);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        return false;
+                    }
+                    ////////////////////////////////////////////////
+                    //Add record to Container History. 
+                    if (!Common.InsertContainerHistory(dataService, settings, containerMaster,
+                        ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        log.ErrorFormat("Trip Done:InsertContainerHistory failed: {0} during segment done request: {1}",
+                                         fault.Message, driverSegmentDoneProcess);
+                        return false;
+                    }
+                }//foreach (var containerMaster in containersOnTrip)
+            }// if (null != containersOnTrip)
+
+            ////////////////////////////////////////////////
+            //Add record to the DriverEfficiency table.  
+            if (!Common.InsertDriverEfficiency(dataService, settings, userRoleIds, userCulture, log,
+                     currentTrip, tripSegList, tripDelayList, out fault))
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                log.ErrorFormat("Trip Done:InsertDriverHistory failed: {0} during segment done request: {1}", 
+                                 fault.Message, driverSegmentDoneProcess);
                 return false;
             }
-            foreach (var containerMaster in containersOnTrip)
+
+            ////////////////////////////////////////////////
+            //Add records to Trip History tables. 
+            string histAction = HistoryActionConstants.DriverDoneTrip;
+            if (!Common.InsertTripHistory(dataService, settings, userRoleIds, userCulture, log,
+                histAction, currentTrip, tripSegList, tripContainerList, tripReferenceNumberList, tripSegmentMileageList,
+                ++tripHistoryInsertCount, out fault))
             {
-                //Remove current trip information
-                containerMaster.ContainerCurrentTripNumber = null;
-                containerMaster.ContainerCurrentTripSegNumber = null;
-                containerMaster.ContainerCurrentTripSegType = null;
-
-                //This is where the Pending Move DateTime is removed in the current ScrapRunner.
-                containerMaster.ContainerPendingMoveDateTime = null;
-
-                //Do the update to the container master table
-                changeSetResult = Common.UpdateContainerMaster(dataService, settings, containerMaster);
-                log.DebugFormat("SRTEST:Saving Container Record for Container:{0} - Trip Done.",
-                                containerMaster.ContainerNumber);
-                if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
-                {
-                    var s = string.Format("Could not update Container for Container:{0}.",
-                        containerMaster.ContainerNumber);
-                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                    return false;
-                }
-                ////////////////////////////////////////////////
-                //Add record to Container History. 
-                if (!Common.InsertContainerHistory(dataService, settings, containerMaster,
-                    ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
-                {
-                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                    log.ErrorFormat("InsertContainerHistory failed: {0} during segment done request: {1}", 
-                                     fault.Message, driverSegmentDoneProcess);
-                    break;
-                }
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                log.ErrorFormat("Trip Done:InsertTripHistory failed: {0} during segment done request: {1}",
+                                 fault.Message, driverSegmentDoneProcess);
+                return false;
             }
-
-            ////////////////////////////////////////////////
-            //TODO: Add record to DriverEfficiency table.
-
-            ////////////////////////////////////////////////
-            //TODO: Add records to History Trip Tables. 
 
             ////////////////////////////////////////////////
             //TODO: Resequence trips for the driver of the completed trip.
