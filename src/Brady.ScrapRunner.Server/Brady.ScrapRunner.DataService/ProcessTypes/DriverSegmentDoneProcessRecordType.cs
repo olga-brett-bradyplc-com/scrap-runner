@@ -343,7 +343,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     currentTripSegment.TripSegStatus = TripSegStatusConstants.Done;
                     //If any container is in review, set segment status to R=Review
                     var review = from item in tripSegContainerList
-                                 where item.TripSegContainerReviewFlag == ActionTypeConstants.Review
+                                 where item.TripSegContainerReviewFlag == ContainerActionTypeConstants.Review
                                  select item;
                     if (review != null && review.Count() > 0)
                     {
@@ -354,7 +354,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         //If any container is an exception, set segment status to E=Exception
                         var exception = from item in tripSegContainerList
-                                        where item.TripSegContainerReviewFlag == ActionTypeConstants.Exception
+                                        where item.TripSegContainerReviewFlag == ContainerActionTypeConstants.Exception
                                         select item;
                         if (exception != null && exception.Count() > 0)
                         {

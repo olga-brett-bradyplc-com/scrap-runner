@@ -39,17 +39,31 @@
         /// Useage: Prefix for states codetable values.
         /// </summary>
         public static readonly string StatesPrefix = "STATES";
+
+        /// <summary>
+        /// Driver delay prefix 
+        /// Useage: For delays without a trip number, use # + driverid
+        /// </summary>
+        public static readonly string DriverPrefix = "#";
     }
     /// <summary>
-    /// The Action Type internal codes.  Used in the processing container information.
+    /// The Container Action Type internal codes.  Used in the processing container information.
     /// </summary>
-    public static class ActionTypeConstants
+    public static class ContainerActionTypeConstants
     {
         public static readonly string Done = "D";
         public static readonly string Review = "R";
         public static readonly string Exception = "E";
         public static readonly string Load = "L";
         public static readonly string Dropped = "S";
+    }
+    /// <summary>
+    /// The Delay Action Type internal codes.  Used in the processing delay & back on duty information.
+    /// </summary>
+    public static class DelayActionTypeConstants
+    {
+        public static readonly string Delay = "D";
+        public static readonly string BackOnDuty = "B";
     }
     /// <summary>
     /// The Basic Trip Type internal codes.  Used in the TripTypeBasic table.
