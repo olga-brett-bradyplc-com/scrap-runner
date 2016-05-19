@@ -269,8 +269,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (messagesTable.WasSuccessful)
                 {
-                    if(messagesTable.Item?.Messages?.Count > 0)
-                        await _messagesService.UpdateMessages(messagesTable.Item.Messages);
+                    await _messagesService.UpdateMessages(messagesTable.Item.Messages);
                 }
                 else
                 {

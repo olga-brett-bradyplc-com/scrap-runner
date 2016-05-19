@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+  <TextView
+         android:id="@+id/msg_text"
+         android:layout_alignParentLeft="true"
+         android:layout_height="wrap_content"
+         android:layout_width="match_parent"
+         android:background="@drawable/rectangle_border"
+         android:textSize="16dp"
+         android:textColor="@color/material_gray_900"
+         local:MvxBind="Text MsgText"
+         local:MvxLang="TextSource MsgText" />
+</RelativeLayout>
