@@ -69,6 +69,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 case Resource.Id.nav_messages:
                     ViewModel.MessagesCommand.Execute();
                     break;
+                case Resource.Id.nav_composemessage:
+                    ViewModel.NewMessageCommand.Execute();
+                    break;
             }
         }
     }
