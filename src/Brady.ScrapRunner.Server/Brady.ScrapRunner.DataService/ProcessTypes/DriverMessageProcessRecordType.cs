@@ -29,7 +29,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     /// PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery
     /// 
     /// cURL example: 
-    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/MessageProcess/001/withoutrequery
+    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/DriverMessageProcess/001/withoutrequery
     /// Portable Client example: 
     ///     var updateResult = client.UpdateAsync(itemToUpdate, requeryUpdated:false).Result;
     ///  
@@ -132,7 +132,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == employeeMaster)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid DriverId: "
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverMessageProcess:Invalid DriverId: "
                                         + driverMessageProcess.EmployeeId));
                         break;
                     }
@@ -145,7 +145,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (!SendMessage(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                                     driverMessageProcess, employeeMaster))
                         {
-                            var s = string.Format("Could not Send Message for Driver:{0}.",
+                            var s = string.Format("DriverMessageProcess:Could not Send Message for Driver:{0}.",
                                                   driverMessageProcess.EmployeeId);
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
@@ -157,7 +157,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (!ProcessMessage(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                                     driverMessageProcess, employeeMaster))
                         {
-                            var s = string.Format("Could not Process Message for Driver:{0}.",
+                            var s = string.Format("DriverMessageProcess:Could not Process Message for Driver:{0}.",
                                                   driverMessageProcess.EmployeeId);
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
@@ -178,12 +178,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedDeletions.Any())
             {
                 transaction.Rollback();
-                log.Debug("SRTEST:Transaction Rollback - Message");
+                log.Debug("SRTEST:Transaction Rollback - Driver Message");
             }
             else
             {
                 transaction.Commit();
-                log.Debug("SRTEST:Transaction Committed - Message");
+                log.Debug("SRTEST:Transaction Committed - Driver Message");
                 // We need to notify that data has changed for any types we have updated
                 // We always need to notify for the current type
                 dataService.NotifyOfExternalChangesToData();
@@ -240,12 +240,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                 //Do the update
                 scratchChangeSetResult = Common.UpdateMessages(dataService, settings, message);
-                log.DebugFormat("SRTEST:Saving Message Record for DriverId:{0} - Message{1}.",
-                                message.ReceiverId,message.MsgId);
+                log.DebugFormat("SRTEST:Saving Message sent to DriverId:{0} From:{1}-Message:{2}.",
+                                message.ReceiverId.Trim(),message.SenderId.Trim(), message.MsgId);
                 //Check for Messages failure.
                 if (Common.LogChangeSetFailure(scratchChangeSetResult, message, log))
                 {
-                    var s = string.Format("Could not update Messages for DriverId:{0}.",
+                    var s = string.Format("DriverMessageProcess:Could not update messages for DriverId:{0}.",
                              driverMessageProcess.EmployeeId);
                     changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                     return false;
@@ -271,7 +271,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             if (null == receiverEmpMaster)
             {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid DriverId: "
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverMessageProcess:Invalid DriverId: "
                                 + driverMessageProcess.ReceiverId));
                 return false;
             }
@@ -298,7 +298,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             Common.InsertMessage(dataService, settings,
                                  userRoleIds,userCulture,log,newMessage,out fault);
-            log.Debug("SRTEST:Saving Message Record - Message");
+            log.DebugFormat("SRTEST:Saving message received from DriverId:{0} To:{1}-Message:{2}.",
+                            newMessage.SenderId.Trim(),newMessage.ReceiverId.Trim(), newMessage.MsgId);
             //ToDo: Check for Message Record failure.
             return true;
         }
