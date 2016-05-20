@@ -85,7 +85,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             _containersToken.Dispose();
             _containersToken = null;
 
-            _scannerFragment.StopScanning();
+            _scannerFragment?.StopScanning();
         }
 
         private async void LoadScanner()
