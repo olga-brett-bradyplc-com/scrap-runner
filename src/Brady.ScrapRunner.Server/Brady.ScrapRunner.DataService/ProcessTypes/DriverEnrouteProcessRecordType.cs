@@ -169,7 +169,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Get a list of all  segments for the trip
-                    var tripSegList = Common.GetTripSegments(dataService, settings, userCulture, userRoleIds,
+                    var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
                                         driverEnrouteProcess.TripNumber, out fault);
                     if (null != fault)
                     {
@@ -542,7 +542,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //If there is no open-ended mileage record, add a one with just a start odometer.
                         //Pass in false to not update ending odometer. 
                         Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
-                            currentTripSegment, containersOnPowerId, false, tripSegmentMileageCount, out fault);
+                            currentTripSegment, containersOnPowerId, false, ++tripSegmentMileageCount, out fault);
                         log.DebugFormat("SRTEST:Adding TripSegmentMileage Record for Trip:{0}-{1} - Enroute.",
                                         driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber);
                     }
@@ -661,7 +661,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        log.ErrorFormat("InsertDriverHistory failed: {0} during enorute request: {1}", fault.Message, driverEnrouteProcess);
+                        log.ErrorFormat("InsertDriverHistory failed: {0} during Enroute request: {1}", fault.Message, driverEnrouteProcess);
                         break;
                     }
 

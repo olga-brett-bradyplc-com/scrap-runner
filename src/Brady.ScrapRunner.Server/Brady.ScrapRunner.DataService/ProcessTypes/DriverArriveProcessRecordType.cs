@@ -199,7 +199,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Get a list of all segments for the trip
-                    var tripSegList = Common.GetTripSegments(dataService, settings, userCulture, userRoleIds,
+                    var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
                                         driverArriveProcess.TripNumber, out fault);
                     if (null != fault)
                     {
@@ -465,7 +465,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //If there is no open-ended mileage record to update, add a complete one with start and end odometers.
                         //Pass in true to set both starting and ending odometers.
                         Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
-                            currentTripSegment, containersOnPowerId, true, tripSegmentMileageCount, out fault);
+                            currentTripSegment, containersOnPowerId, true, ++tripSegmentMileageCount, out fault);
                         log.DebugFormat("SRTEST:Adding TripSegmentMileage Record for Trip:{0}-{1} - Arrive.",
                                         driverArriveProcess.TripNumber, driverArriveProcess.TripSegNumber);
                     }
@@ -517,7 +517,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 //Also add a TripMileage record for the next segment if the destination host code is
                                 //the same as the current segment.
                                 Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
-                                    nextTripSegment, containersOnPowerId, true, tripSegmentMileageCount, out fault);
+                                    nextTripSegment, containersOnPowerId, true, ++tripSegmentMileageCount, out fault);
                                 log.DebugFormat("SRTEST:Adding TripSegmentMileage Record for Trip:{0}-{1} - Arrive.",
                                                 nextTripSegment.TripNumber, nextTripSegment.TripSegNumber);
 

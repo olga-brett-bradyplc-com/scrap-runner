@@ -68,7 +68,7 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual TripSendAutoReceiptValue TripSendReceiptFlag { get; set; }
         public virtual string TripDriverIdPrev { get; set; }
         public virtual DateTime? TripCompletedDateTime { get; set; }
-        public virtual int? TripSendScaleNotificationFlag { get; set; }
+        public virtual TripSendScaleFlagValue TripSendScaleNotificationFlag { get; set; }
         public virtual string TripExtendedFlag { get; set; }
         public virtual string TripExtendedReason { get; set; }
         public virtual string TripInProgressFlag { get; set; }

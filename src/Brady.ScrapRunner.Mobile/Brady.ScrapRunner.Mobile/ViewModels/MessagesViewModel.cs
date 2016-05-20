@@ -42,8 +42,36 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
-            var messages = await _messagesService.FindDrvrMsgsAsync(currentDriver.EmployeeId);
+            var messages = await _messagesService.SortedDrvrMsgsAsync();
             Messages = new ObservableCollection<MessagesModel>(messages);
+
+            if (Messages.Count == 0)
+            {
+                MessagesModel m1 = new MessagesModel();
+                m1.MsgText = "Terminal is closing";
+                m1.Ack = "N";
+                m1.CreateDateTime = DateTime.Now;
+                m1.MsgId = 1;
+                m1.ReceiverId = "930";
+                m1.SenderId = "Dispatcher #1";
+                m1.ReceiverName = "Steve Hartman";
+                m1.SenderName = "John Smith";
+
+                Messages.Add(m1);
+
+                MessagesModel m2 = new MessagesModel();
+                m2.MsgText = "Be carefule on icy road";
+                m2.Ack = "N";
+                m2.CreateDateTime = DateTime.Now;
+                m2.MsgId = 2;
+                m2.ReceiverId = "930";
+                m2.SenderId = "Dispatcher #2";
+                m2.ReceiverName = "Steve Hartman";
+                m2.SenderName = "Julian Northman";
+
+                Messages.Add(m2);
+
+            }
 
             base.Start();
         }
@@ -68,8 +96,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public void ExecuteMessageSelectedCommand(MessagesModel selectedMessage)
         {
-            Close(this); // temporary fix
-            ShowViewModel<NewMessageViewModel>(new { message = selectedMessage.MsgId });
+            Close(this);
+            ShowViewModel<NewMessageViewModel>(new { message = selectedMessage.SenderId });
         }
     }
 }

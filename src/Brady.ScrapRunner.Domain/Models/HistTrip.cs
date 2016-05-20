@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BWF.DataServices.Metadata.Interfaces;
+using Brady.ScrapRunner.Domain.Enums;
 
 namespace Brady.ScrapRunner.Domain.Models
 {
@@ -23,7 +24,7 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripType { get; set; }
         public virtual string TripTypeDesc { get; set; }
         public virtual int? TripSequenceNumber { get; set; }
-        public virtual int? TripSendFlag { get; set; }
+        public virtual TripSendFlagValue TripSendFlag { get; set; }
         public virtual string TripDriverId { get; set; }
         public virtual string TripDriverName { get; set; }
         public virtual string TripCustHostCode { get; set; }
@@ -66,10 +67,10 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripPrimaryContainerLocation { get; set; }
         public virtual string TripPowerId { get; set; }
         public virtual string TripCommodityScaleMsg { get; set; }
-        public virtual int? TripSendReceiptFlag { get; set; }
+        public virtual TripSendAutoReceiptValue TripSendReceiptFlag { get; set; }
         public virtual string TripDriverIdPrev { get; set; }
         public virtual DateTime? TripCompletedDateTime { get; set; }
-        public virtual int? TripSendScaleNotificationFlag { get; set; }
+        public virtual TripSendScaleFlagValue TripSendScaleNotificationFlag { get; set; }
         public virtual string TripExtendedFlag { get; set; }
         public virtual string TripExtendedReason { get; set; }
         public virtual string TripInProgressFlag { get; set; }
@@ -91,7 +92,7 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripDispatcherInstructions { get; set; }
         public virtual string TripScaleReferenceNumber { get; set; }
         public virtual string TripMultContainerFlag { get; set; }
-        public virtual int? TripSendReseqFlag { get; set; }
+        public virtual TripSendReseqFlagValue TripSendReseqFlag { get; set; }
         //public virtual string TripServerLocation { get; set; }
         public virtual string TripPowerAssetNumber { get; set; }
         //public virtual string TripStatusPrev { get; set; }
