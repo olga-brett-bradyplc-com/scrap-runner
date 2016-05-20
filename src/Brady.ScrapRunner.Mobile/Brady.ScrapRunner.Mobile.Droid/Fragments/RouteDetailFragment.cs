@@ -77,12 +77,28 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 case "EN":
                     layout.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
                     toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
+
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+                    {
+                        Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+                        Activity.Window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
+                        Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
+                    }
+
                     enrouteButton.Visibility = ViewStates.Invisible;
                     arriveButton.Visibility = ViewStates.Visible;
                     break;
                 case "AR":
                     layout.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
                     toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
+
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+                    {
+                        Activity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+                        Activity.Window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
+                        Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
+                    }
+
                     arriveButton.Visibility = ViewStates.Invisible;
                     directionsButton.SetX(directionsButton.GetX() + 135);
                     buttonLayout.Visibility = ViewStates.Visible;

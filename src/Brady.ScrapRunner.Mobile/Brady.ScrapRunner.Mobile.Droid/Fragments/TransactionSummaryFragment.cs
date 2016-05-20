@@ -8,6 +8,8 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
 using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.ViewModels;
@@ -18,6 +20,7 @@ using MvvmCross.Binding.ExtensionMethods;
 using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Platform.WeakSubscription;
 using ZXing.Mobile;
+using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
@@ -31,6 +34,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         protected override int FragmentId => Resource.Layout.fragment_transactionsummary;
         protected override bool NavMenuEnabled => true;
+        protected override int NavColor => Resource.Color.arrive;
 
         public override async void OnViewCreated(View view, Bundle savedInstanceState)
         {
