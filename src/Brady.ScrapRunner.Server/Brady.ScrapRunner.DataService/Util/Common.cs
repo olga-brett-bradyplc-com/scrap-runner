@@ -90,7 +90,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 if (tripSegType == BasicTripTypeConstants.PickupEmpty ||
                     tripSegType == BasicTripTypeConstants.PickupFull)
                 {
-                    if (actionType == ActionTypeConstants.Exception)
+                    if (actionType == ContainerActionTypeConstants.Exception)
                     {
                         //Container was not picked up.
                         onPowerId = false;
@@ -99,7 +99,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 if (tripSegType == BasicTripTypeConstants.DropEmpty ||
                     tripSegType == BasicTripTypeConstants.DropFull)
                 {
-                    if (actionType != ActionTypeConstants.Exception)
+                    if (actionType != ContainerActionTypeConstants.Exception)
                     {
                         //Container was dropped.
                         onPowerId = false;
@@ -453,6 +453,62 @@ namespace Brady.ScrapRunner.DataService.Util
             log.Debug("SRTEST:Saving ContainerHistory");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             if (Common.LogChangeSetFailure(changeSetResult, containerHistory, log))
+            {
+                return false;
+            }
+            return true;
+        }
+        /// <summary>
+        /// Insert a DriverDelay record.
+        ///  Note:  caller must handle faults.  
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="driverDelay"></param>
+        /// <param name="callCountThisTxn">Start with 1 and increment if multiple inserts are desired.</param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="fault"></param>
+        /// <returns>true if success</returns>
+        public static bool InsertDriverDelay(IDataService dataService, ProcessChangeSetSettings settings,
+             IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log,
+             DriverDelay driverDelay, int callCountThisTxn, out DataServiceFault fault)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the last delay record for this driverid and trip number to get the last sequence number used
+            var driverDelayMax = Common.GetDriverDelayLast(dataService, settings, userCulture, userRoleIds,
+                                 driverDelay.DriverId, driverDelay.TripNumber, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            driverDelay.DelaySeqNumber = callCountThisTxn;
+            if (driverDelayMax != null)
+            {
+                driverDelay.DelaySeqNumber = driverDelayMax.DelaySeqNumber + callCountThisTxn;
+            }
+
+            //For testing
+            log.Debug("SRTEST:Add DriverDelay");
+            log.DebugFormat("SRTEST:DriverId:{0} TripNumber:{1}-{2} StartDate:{3} DelayCode:{4} Seq#:{5}",
+                             driverDelay.DriverId,
+                             driverDelay.TripNumber,
+                             driverDelay.TripSegNumber,
+                             driverDelay.DelayStartDateTime,
+                             driverDelay.DelayCode,
+                             driverDelay.DelaySeqNumber);
+
+
+            // Insert DriverDelay 
+            var recordType = (DriverDelayRecordType)dataService.RecordTypes.Single(x => x.TypeName == "DriverDelay");
+            var changeSet = (ChangeSet<string, DriverDelay>)recordType.GetNewChangeSet();
+            long recordRef = 1;
+            changeSet.AddCreate(recordRef, driverDelay, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving DriverDelay");
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            if (Common.LogChangeSetFailure(changeSetResult, driverDelay, log))
             {
                 return false;
             }
@@ -855,7 +911,7 @@ namespace Brady.ScrapRunner.DataService.Util
             powerFuel.PowerFuelSeqNumber = callCountThisTxn;
             if (powerFuelMax != null)
             {
-                powerFuel.PowerFuelSeqNumber = ++powerFuelMax.PowerFuelSeqNumber + callCountThisTxn;
+                powerFuel.PowerFuelSeqNumber = powerFuelMax.PowerFuelSeqNumber + callCountThisTxn;
             }
               
             //For testing
@@ -1428,7 +1484,7 @@ namespace Brady.ScrapRunner.DataService.Util
             int tripSegmentMileageSeqNo = callCountThisTxn;
             if (tripSegmentMileageMax != null)
             {
-                tripSegmentMileageSeqNo = ++tripSegmentMileageMax.TripSegMileageSeqNumber + callCountThisTxn;
+                tripSegmentMileageSeqNo = tripSegmentMileageMax.TripSegMileageSeqNumber + callCountThisTxn;
             }
             var tripSegmentMileage = new TripSegmentMileage();
             tripSegmentMileage.TripNumber = tripSegment.TripNumber;
@@ -1574,6 +1630,23 @@ namespace Brady.ScrapRunner.DataService.Util
             return changeSetResult;
         }
         /// <summary>
+        /// Update a DriverDelay record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="driverDelay"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdateDriverDelay(IDataService dataService, ProcessChangeSetSettings settings,
+                                      DriverDelay driverDelay)
+        {
+            var recordType = (DriverDelayRecordType)dataService.RecordTypes.Single(x => x.TypeName == "DriverDelay");
+            var changeSet = (ChangeSet<string, DriverDelay>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(driverDelay.Id, driverDelay);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+
+        /// <summary>
         /// Update a DriverStatus record.
         /// </summary>
         /// <param name="dataService"></param>
@@ -1673,7 +1746,24 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-       
+
+        /// <summary>
+        /// Delete a DriverDelay record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="driverDelay"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> DeleteDriverDelay(IDataService dataService, ProcessChangeSetSettings settings,
+                                              DriverDelay driverDelay)
+        {
+            var recordType = (DriverDelayRecordType)dataService.RecordTypes.Single(x => x.TypeName == "DriverDelay");
+            var changeSet = (ChangeSet<string, DriverDelay>)recordType.GetNewChangeSet();
+            changeSet.AddDelete(driverDelay.Id);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+
         /// <summary>
         /// Delete a TripSegmentContainer record.
         /// </summary>
@@ -2557,7 +2647,7 @@ namespace Brady.ScrapRunner.DataService.Util
                     CurrentQuery = new QueryBuilder<DriverDelay>()
                         .Filter(t => t.Property(p => p.DriverId).EqualTo(driverId)
                         .And().Property(p => p.DelayEndDateTime).IsNull())
-                        .OrderBy(p => p.DelaySeqNumber, Direction.Descending)
+                        .OrderBy(p => p.DelayStartDateTime, Direction.Descending)
                         .GetQuery()
                 };
                 var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
@@ -2603,7 +2693,42 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return driverDelays;
         }
-
+        /// DriverDelay Table queries
+        /// <summary>
+        /// Get the last delay record for driverid and tripnumber/driver id
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="tripNumberOrDriverId"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static DriverDelay GetDriverDelayLast(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string driverId, string tripNumberOrDriverId, out DataServiceFault fault)
+        {
+            fault = null;
+            var driverDelay = new DriverDelay();
+            if (null != driverId && null != tripNumberOrDriverId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<DriverDelay>()
+                        .Filter(t => t.Property(p => p.DriverId).EqualTo(driverId).And()
+                        .Property(p => p.TripNumber).EqualTo(tripNumberOrDriverId))
+                        .OrderBy(p => p.DelaySeqNumber, Direction.Descending)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return driverDelay;
+                }
+                driverDelay = queryResult.Records.Cast<DriverDelay>().FirstOrDefault();
+            }
+            return driverDelay;
+        }
 
         ///DRIVEREFFICIENCY table queries
         /// <summary>

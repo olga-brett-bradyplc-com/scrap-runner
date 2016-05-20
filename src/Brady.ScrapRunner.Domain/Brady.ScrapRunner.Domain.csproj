@@ -54,6 +54,7 @@
     <Compile Include="Metadata\CustomerDirectionsMetadata.cs" />
     <Compile Include="Metadata\DriverArriveProcessMetadata.cs" />
     <Compile Include="Metadata\DriverContainerActionProcessMetadata.cs" />
+    <Compile Include="Metadata\DriverDelayProcessMetadata.cs" />
     <Compile Include="Metadata\DriverEfficiencyMetadata.cs" />
     <Compile Include="Metadata\DriverEnrouteProcessMetadata.cs" />
     <Compile Include="Metadata\DriverMessageProcessMetadata.cs" />
@@ -173,6 +174,7 @@
     <Compile Include="Process\ContainerChangeProcess.cs" />
     <Compile Include="Process\DriverArriveProcess.cs" />
     <Compile Include="Process\DriverContainerActionProcess.cs" />
+    <Compile Include="Process\DriverDelayProcess.cs" />
     <Compile Include="Process\DriverEnrouteProcess.cs" />
     <Compile Include="Process\DriverLoginProcess.cs" />
     <Compile Include="Process\DriverMessageProcess.cs" />

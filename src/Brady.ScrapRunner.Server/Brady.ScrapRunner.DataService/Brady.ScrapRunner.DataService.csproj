@@ -191,10 +191,12 @@
   <ItemGroup>
     <Compile Include="Concrete\SRDataService.cs" />
     <Compile Include="Concrete\SRRepository.cs" />
+    <Compile Include="Mappings\DriverDelayProcessMap.cs" />
     <Compile Include="Mappings\DriverMessageProcessMap.cs" />
     <Compile Include="Mappings\DriverNewContainerProcessMap.cs" />
     <Compile Include="Mappings\DriverTripAckProcessMap.cs" />
     <Compile Include="Mappings\DriverFuelEntryProcessMap.cs" />
+    <Compile Include="ProcessTypes\DriverDelayProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverMessageProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverNewContainerProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverSegmentDoneProcessRecordType.cs" />
@@ -357,6 +359,8 @@
     <Compile Include="Validators\DriverArriveProcessValidator.cs" />
     <Compile Include="Validators\DriverContainerActionProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverContainerActionProcessValidator.cs" />
+    <Compile Include="Validators\DriverDelayProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverDelayProcessValidator.cs" />
     <Compile Include="Validators\DriverEfficiencyDeletionValidator.cs" />
     <Compile Include="Validators\DriverEfficiencyValidator.cs" />
     <Compile Include="Validators\DriverEnrouteProcessDeletionValidator.cs" />
