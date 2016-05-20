@@ -38,6 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:foreground="#ffffff"
+            android:spinnerMode="dialog"
             android:textSize="40dp"
             android:id="@+id/MvxStateSpinner"
             local:MvxItemTemplate="@layout/item_state"
