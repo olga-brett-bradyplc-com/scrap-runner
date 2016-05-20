@@ -7,24 +7,45 @@
     <include
         layout="@layout/toolbar" />
     <RelativeLayout
-        android:id="@+id/CurrentContainerLabelLL"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#CCCCCC">
-        <TextView
-            android:id="@+id/CurrentContainersLabel"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_margin_half"
-            android:textColor="#000000"
-            android:padding="10dp"
-            android:text="Current Containers" />
-    </RelativeLayout>
-    <Mvx.MvxListView
-        android:id="@+id/CurrentContainerList"
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        local:MvxItemTemplate="@layout/item_container"
-        local:MvxBind="ItemsSource CurrentContainers" />
+        android:layout_width="match_parent">
+        <FrameLayout
+            android:id="@+id/camera_fragment_loaddrop"
+            android:layout_alignParentTop="true"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#000" />
+        <TextView
+            android:id="@+id/ContainerCurrentLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_gravity="center"
+            android:layout_below="@id/camera_fragment_loaddrop"
+            android:textSize="17dp"
+            android:text="Current Containers" />
+        <ScrollView
+            android:id="@+id/ContainerScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/ContainerCurrentLabel"
+            android:fillViewport="true">
+            <Mvx.MvxListView
+                android:id="@+id/CurrentContainerList"
+                android:layout_below="@id/camera_fragment_loaddrop"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                local:MvxItemTemplate="@layout/item_container"
+                local:MvxBind="ItemsSource CurrentContainers" />
+        </ScrollView>
+        <Button
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:textColor="#ffffff"
+            android:background="@color/material_gray_900"
+            local:MvxBind="Click ConfirmContainersCommand"
+            android:text="Continue" />
+    </RelativeLayout>
 </LinearLayout>
