@@ -15,6 +15,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<List<CodeTableModel>> FindCountryStatesAsync(string country);
 
+        Task<List<CodeTableModel>> FindCodeTableList(string codeName);
+
         Task UpdateCodeTable(IEnumerable<CodeTable> codeTable);
 
     }
