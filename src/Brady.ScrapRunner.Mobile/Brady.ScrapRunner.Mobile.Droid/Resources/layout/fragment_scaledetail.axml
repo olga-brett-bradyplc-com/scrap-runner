@@ -29,10 +29,12 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/buttonTitle"
+        style="?android:attr/borderlessButtonStyle"
         android:gravity="left|center_vertical"
         android:textColor="@color/material_gray_900"
         android:paddingLeft="10dp"
         android:background="#ffffff"
+        android:drawableLeft="@drawable/ic_keyboard_arrow_right_black_24dp"
         local:MvxBind="Click GrossWeightSetCommand"
         local:MvxLang="Text GrossWeight" />
     <Button
@@ -40,30 +42,47 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/grossButton"
+        style="?android:attr/borderlessButtonStyle"
         android:gravity="left|center_vertical"
         android:textColor="@color/material_gray_900"
         android:paddingLeft="10dp"
         android:background="#ffffff"
+        android:drawableLeft="@drawable/ic_keyboard_arrow_right_black_24dp"
         local:MvxBind="Click SecondGrossWeightSetCommand"
         local:MvxLang="Text SecondGrossWeight" />
     <Button
         android:id="@+id/tareButton"
         android:layout_width="match_parent"
         android:layout_below="@id/secondGrossButton"
+        style="?android:attr/borderlessButtonStyle"
         android:gravity="left|center_vertical"
         android:layout_height="50dp"
         android:textColor="@color/material_gray_900"
+        android:paddingLeft="10dp"
+        android:drawableLeft="@drawable/ic_keyboard_arrow_right_black_24dp"
         android:background="#ffffff"
         local:MvxBind="Click TareWeightSetCommand"
         local:MvxLang="Text TareWeight" />
     <LinearLayout
-        android:layout_height="65dp"
         android:layout_width="match_parent"
-        android:layout_alignParentBottom="true">
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:weightSum="1">
         <Button
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:textColor="#ffffff"
+            android:layout_weight=".5"
+            android:layout_marginRight="1dp"
+            local:MvxBind="Click ContainerSetDownCommand"
+            local:MvxLang="Text LeftOnTruck"
+            android:background="@color/material_gray_900" />
+        <Button
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:textColor="#ffffff"
+            android:layout_marginLeft="1dp"
+            android:layout_weight=".5"
             local:MvxBind="Click ContainerSetDownCommand"
             local:MvxLang="Text SetDown"
             android:background="@color/material_gray_900" />
