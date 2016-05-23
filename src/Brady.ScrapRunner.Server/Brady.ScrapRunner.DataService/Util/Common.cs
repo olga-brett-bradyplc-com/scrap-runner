@@ -459,6 +459,65 @@ namespace Brady.ScrapRunner.DataService.Util
             return true;
         }
         /// <summary>
+        /// Insert a ContainerHistory record
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="log"></param>
+        /// <param name="containerHistory"></param>
+        /// <returns></returns>
+        public static bool InsertContainerHistory(IDataService dataService, ProcessChangeSetSettings settings,
+        IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log, ContainerHistory containerHistory)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+
+            // Insert ContainerHistory 
+            var recordType = (ContainerHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "ContainerHistory");
+            var changeSet = (ChangeSet<string, ContainerHistory>)recordType.GetNewChangeSet();
+            long recordRef = 1;
+            changeSet.AddCreate(recordRef, containerHistory, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving ContainerHistory");
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            if (Common.LogChangeSetFailure(changeSetResult, containerHistory, log))
+            {
+                return false;
+            }
+            return true;
+
+        }
+        /// <summary>
+        /// Insert a ContainerMaster record
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="log"></param>
+        /// <param name="containerMaster"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static bool InsertContainerMaster(IDataService dataService, ProcessChangeSetSettings settings,
+         IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log,ContainerMaster containerMaster)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+
+            // Insert containerMaster 
+            var recordType = (ContainerMasterRecordType)dataService.RecordTypes.Single(x => x.TypeName == "ContainerMaster");
+            var changeSet = (ChangeSet<string, ContainerMaster>)recordType.GetNewChangeSet();
+            long recordRef = 1;
+            changeSet.AddCreate(recordRef, containerMaster, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving ContainerMaster");
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
+            {
+                return false;
+            }
+            return true;
+
+        }
+        /// <summary>
         /// Insert a DriverDelay record.
         ///  Note:  caller must handle faults.  
         /// </summary>
@@ -1451,6 +1510,63 @@ namespace Brady.ScrapRunner.DataService.Util
 
             return true;
         }
+        /// <summary>
+        /// Insert a TripSegmentMileage record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="log"></param>
+        /// <param name="tripSegmentMileage"></param>
+        /// <param name="callCountThisTxn"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static bool InsertTripSegmentMileage(IDataService dataService, ProcessChangeSetSettings settings,
+             IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log,
+             TripSegmentMileage tripSegmentMileage, int callCountThisTxn, out DataServiceFault fault)
+        {
+            List<long> userRoleIds = userRoleIdsEnumerable.ToList();
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Lookup the last trip segment mileage record for this trip and segment number to get the last sequence number used
+            var tripSegmentMileageMax = Common.GetTripSegmentMileageLast(dataService, settings, userCulture, userRoleIds,
+                                        tripSegmentMileage.TripNumber, tripSegmentMileage.TripSegNumber, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            tripSegmentMileage.TripSegMileageSeqNumber = callCountThisTxn;
+            if (tripSegmentMileageMax != null)
+            {
+                tripSegmentMileage.TripSegMileageSeqNumber = tripSegmentMileageMax.TripSegMileageSeqNumber + callCountThisTxn;
+            }
+
+            //For testing
+            log.Debug("SRTEST:Add TripSegmentMileage");
+            log.DebugFormat("SRTEST:TripNumber:{0} Seg:{1} Start:{2} End:{3} State:{4} Seq#:{5}",
+                             tripSegmentMileage.TripNumber,
+                             tripSegmentMileage.TripSegNumber,
+                             tripSegmentMileage.TripSegMileageOdometerStart,
+                             tripSegmentMileage.TripSegMileageOdometerEnd,
+                             tripSegmentMileage.TripSegMileageState,
+                             tripSegmentMileage.TripSegMileageSeqNumber);
+
+
+            // Insert TripSegmentMileage 
+            var recordType = (TripSegmentMileageRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegmentMileage");
+            var changeSet = (ChangeSet<string, TripSegmentMileage>)recordType.GetNewChangeSet();
+            long recordRef = 1;
+            changeSet.AddCreate(recordRef, tripSegmentMileage, userRoleIds, userRoleIds);
+            log.Debug("SRTEST:Saving TripSegmentMileage");
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            if (Common.LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
+            {
+                return false;
+            }
+            return true;
+
+        }
 
         /// <summary>
         /// Insert a TripSegmentMileage record.
@@ -1798,7 +1914,10 @@ namespace Brady.ScrapRunner.DataService.Util
                 tripSegmentMileage.TripSegMileageState = tripSegment.TripSegDestCustState;
             if (null == tripSegmentMileage.TripSegMileageCountry)
                 tripSegmentMileage.TripSegMileageCountry = tripSegment.TripSegDestCustCountry;
-            tripSegmentMileage.TripSegLoadedFlag = Common.GetSegmentLoadedFlag(tripSegment, containersOnPowerId);
+            if (null != containersOnPowerId && containersOnPowerId.Count() > 0)
+            {
+                tripSegmentMileage.TripSegLoadedFlag = Common.GetSegmentLoadedFlag(tripSegment, containersOnPowerId);
+            }
             tripSegmentMileage.TripSegMileagePowerId = tripSegment.TripSegPowerId;
             tripSegmentMileage.TripSegMileageDriverId = tripSegment.TripSegDriverId;
             tripSegmentMileage.TripSegMileageDriverName = tripSegment.TripSegDriverName;

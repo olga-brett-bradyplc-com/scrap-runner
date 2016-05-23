@@ -217,7 +217,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         if (null == powerMaster)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Power ID " + driverLoginProcess.PowerId));
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverLoginProcess:Invalid Power ID " + driverLoginProcess.PowerId));
                             break;
                         }
                         //For testing
@@ -389,7 +389,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //Other statuses that the driver might have been in (delay, back on duty, fuel, done) don't matter anymore.
                             if (DriverStatusSRConstants.Enroute != driverStatus.Status &&
                                 DriverStatusSRConstants.Arrive != driverStatus.Status &&
-                                DriverStatusSRConstants.StateCrossing != driverStatus.Status)
+                                DriverStatusSRConstants.StateLine != driverStatus.Status)
                             {
                                 driverLoginProcess.DriverStatus = null;
                             }
@@ -407,7 +407,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             {
                                 if (DriverStatusSRConstants.Enroute != driverStatus.Status &&
                                     DriverStatusSRConstants.Arrive != driverStatus.Status &&
-                                    DriverStatusSRConstants.StateCrossing != driverStatus.Status &&
+                                    DriverStatusSRConstants.StateLine != driverStatus.Status &&
                                     DriverStatusSRConstants.Done != driverStatus.Status &&
                                     DriverStatusSRConstants.Delay != driverStatus.Status &&
                                     DriverStatusSRConstants.BackOnDuty != driverStatus.Status &&
@@ -437,7 +437,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         log.Debug("SRTEST:Saving Trip Record - TripInProgressFlag");
                                         if (Common.LogChangeSetFailure(scratchChangeSetResult, trip, log))
                                         {
-                                            var s = string.Format("Could not update Trip for TripInProgressFlag: {0}.", Constants.No);
+                                            var s = string.Format("DriverLoginProcess:Could not update Trip for TripInProgressFlag: {0}.", Constants.No);
                                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                             break;
                                         }
@@ -477,7 +477,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 {
                                     break;
                                 }
-                                var s = "Could not update driver status";
+                                var s = "DriverLoginProcess:Could not update driver status";
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                 break;
                             }
@@ -503,7 +503,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         if (null == currentTrip)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " + driverLoginProcess.TripNumber));
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverLoginProcess:Invalid TripNumber: " 
+                                           + driverLoginProcess.TripNumber));
                             break;
                         }
 
@@ -518,7 +519,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         if (null == currentTripSegment)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " 
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverLoginProcess:Invalid TripNumber: "
                                 + driverLoginProcess.TripNumber + "-" + driverLoginProcess.TripSegNumber));
                             break;
                         }
@@ -577,7 +578,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         log.Debug("SRTEST:Saving DriverStatus Record - Login");
                         if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
                         {
-                            var s = string.Format("Could not update DriverStatus for Driver {0}.",
+                            var s = string.Format("DriverLoginProcess:Could not update DriverStatus for Driver {0}.",
                                 driverLoginProcess.EmployeeId);
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
@@ -593,7 +594,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 break;
                             }
                             changeSetResult.FailedUpdates.Add(msgKey,
-                                new MessageSet(string.Format("Could not insert Driver History for Driver {0}.",
+                                new MessageSet(string.Format("DriverLoginProcess:Could not insert Driver History for Driver {0}.",
                                     driverLoginProcess.EmployeeId)));
                             break;
                         }
@@ -616,7 +617,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         log.Debug("SRTEST:Saving PowerMaster Record - Login");
                         if (Common.LogChangeSetFailure(scratchChangeSetResult, powerMaster, log))
                         {
-                            var s = string.Format("Could not update PowerMaster for PowerId:{0}.",
+                            var s = string.Format("DriverLoginProcess:Could not update PowerMaster for PowerId:{0}.",
                                 driverLoginProcess.PowerId);
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
@@ -632,7 +633,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 break;
                             }
                             changeSetResult.FailedUpdates.Add(msgKey,
-                                new MessageSet(string.Format("Could not insert Power History for Power Unit {0}.",
+                                new MessageSet(string.Format("DriverLoginProcess:Could not insert Power History for Power Unit {0}.",
                                     driverLoginProcess.PowerId)));
                             break;
                         }
@@ -688,7 +689,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //Check for EventLog failure.
                         if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
                         {
-                            var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                            var s = string.Format("DriverLoginProcess:Could not update EventLog for Driver {0} {1}.",
                                     driverLoginProcess.EmployeeId, EventCommentConstants.ReceivedDriverLogin);
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
@@ -883,7 +884,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     driverDelayChangeSetResult.FailedUpdates.Any() ||
                     driverDelayChangeSetResult.FailedDeletions.Any())
                 {
-                    var s = "Could not update open ended driver delays";
+                    var s = "DriverLoginProcess:Could not update open ended driver delays";
                     changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                     return false;
                 }
@@ -943,7 +944,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     log.Debug("SRTEST:Saving TripSegment Record - Login (Power Unit Change)");
                     if (Common.LogChangeSetFailure(scratchChangeSetResult, tripSegment, log))
                     {
-                        var s = string.Format("Could not update TripSegment for TripNumber {0}-{1}.",
+                        var s = string.Format("DriverLoginProcess:Could not update TripSegment for TripNumber {0}-{1}.",
                                                tripSegment.TripNumber, tripSegment.TripSegNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         return;
@@ -983,7 +984,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     log.Debug("SRTEST:Saving TripSegmentMileage Record - Login (Power Unit Change)");
                     if (Common.LogChangeSetFailure(scratchChangeSetResult, tripSegment, log))
                     {
-                        var s = string.Format("Could not update TripSegmentMileage for TripNumber {0}-{1} Seq#{2}.",
+                        var s = string.Format("DriverLoginProcess:Could not update TripSegmentMileage for TripNumber {0}-{1} Seq#{2}.",
                                 tripSegmentMileage.TripNumber, tripSegmentMileage.TripSegNumber, tripSegmentMileage.TripSegMileageSeqNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         return;

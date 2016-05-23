@@ -9,6 +9,7 @@ using BWF.DataServices.PortableClients;
 using BWF.DataServices.PortableClients.Builder;
 using BWF.DataServices.PortableClients.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace Brady.ScrapRunner.DataService.Tests
 {
@@ -170,6 +171,82 @@ namespace Brady.ScrapRunner.DataService.Tests
             }
 
         }
+        /// <summary>
+        /// Delete a single container history record
+        /// </summary>
+        [TestMethod]
+        public void DeleteContainerHistoryOneRecord()
+        {
+            string containerNumber = "1000S30";
+            int containerSeqNumber = 2;
+
+            var containerTableQuery = new QueryBuilder<ContainerHistory>()
+                .Filter(y => y.Property(x => x.ContainerNumber).EqualTo(containerNumber)
+                .And().Property(x => x.ContainerSeqNumber).EqualTo(containerSeqNumber));
+
+            string queryString = containerTableQuery.GetQuery();
+            Console.WriteLine(string.Format("queryString:{0}", queryString));
+
+            QueryResult<ContainerHistory> queryResult = _client.QueryAsync(containerTableQuery).Result;
+            var container = queryResult.Records.Cast<ContainerHistory>().FirstOrDefault();
+
+            if (null != container)
+            {
+                Console.WriteLine(string.Format("container.Id:{0}", container.Id));
+                ChangeResult changeResult = _client.DeleteAsync<String, ContainerHistory>(container.Id).Result;
+                if (!changeResult.WasSuccessful)
+                {
+                    Console.WriteLine(string.Format("Delete Failed"));
+                    Assert.Fail("ContainerHistory Delete Async not successful");
+                }
+                else
+                {
+                    Console.WriteLine(string.Format("Delete Successful"));
+                }
+            }
+            else
+            {
+                Console.WriteLine(string.Format("containerNumber:{0} containerSeqNumber {1} not found.", 
+                                  containerNumber, containerSeqNumber));
+            }
+        }
+        [TestMethod]
+        public void DeleteContainerHistoryMultipleRecords()
+        {
+            string containerNumber = "T3001";
+
+            var containerTableQuery = new QueryBuilder<ContainerHistory>()
+                .Filter(y => y.Property(x => x.ContainerNumber).EqualTo(containerNumber))
+                .OrderBy(x => x.ContainerSeqNumber);
+            string queryString = containerTableQuery.GetQuery();
+            Console.WriteLine(string.Format("queryString:{0}", queryString));
+
+            QueryResult<ContainerHistory> queryResult = _client.QueryAsync(containerTableQuery).Result;
+            var containers = queryResult.Records.Cast<ContainerHistory>().ToList();
+
+            if (null != containers && containers.Count() > 0)
+            {
+                foreach (var container in containers)
+                {
+                    Console.WriteLine(string.Format("container.Id:{0}", container.Id));
+                    ChangeResult changeResult = _client.DeleteAsync<String, ContainerHistory>(container.Id).Result;
+                    if (!changeResult.WasSuccessful)
+                    {
+                        Console.WriteLine(string.Format("Delete Failed"));
+                        Assert.Fail("ContainerHistory Delete Async not successful");
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Format("Delete Successful"));
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine(string.Format("containerNumber:{0} not found.", containerNumber));
+            }
+        }
+
         /// <summary>
         /// Illustrate equivalence of QueryBuilder and raw querystring approach
         /// </summary>
