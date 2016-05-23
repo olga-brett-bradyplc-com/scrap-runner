@@ -233,8 +233,8 @@
         public static readonly string NoWork         = "Z"; 
         /// <summary>Still Logged in, has completed a trip, has more trips.  Available: V</summary>
         public static readonly string Available     = "V";
-        /// <summary>StateCrossing: S</summary>
-        public static readonly string StateCrossing = "S";
+        /// <summary>StateLine: S</summary>
+        public static readonly string StateLine = "S";
         /// <summary>Fuel: F</summary>
         public static readonly string Fuel          = "F";
         /// <summary>Connected: C</summary>
@@ -276,7 +276,7 @@
         /// <summary>ReceivedDriverArrive: RECEIVED DRIVER ARRIVE</summary>
         public static readonly string ReceivedDriverArrive = "RECEIVED DRIVER ARRIVE";
         /// <summary>ReceivedDriverSLC: RECEIVED DRIVER SLC</summary>
-        public static readonly string ReceivedDriverSLC = "RECEIVED DRIVER SLC";
+        public static readonly string ReceivedDriverStateLine = "RECEIVED DRIVER SLC";
         /// <summary>ReceivedDriverFuel: RECEIVED DRIVER FUEL</summary>
         public static readonly string ReceivedDriverFuel = "RECEIVED DRIVER FUEL";
         /// <summary>ReceivedDriverDelay: RECEIVED DRIVER DELAY</summary>

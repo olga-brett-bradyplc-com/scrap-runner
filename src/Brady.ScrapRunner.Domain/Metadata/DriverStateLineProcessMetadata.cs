@@ -3,9 +3,9 @@ using BWF.DataServices.Metadata.Fluent.Abstract;
 
 namespace Brady.ScrapRunner.Domain.Metadata
 {
-    public class DriverFuelEntryProcessMetadata : TypeMetadataProvider<DriverFuelEntryProcess>
+    public class DriverStateLineProcessMetadata : TypeMetadataProvider<DriverStateLineProcess>
     {
-        public DriverFuelEntryProcessMetadata()
+        public DriverStateLineProcessMetadata()
         {
 
             AutoUpdatesByDefault();
@@ -25,7 +25,9 @@ namespace Brady.ScrapRunner.Domain.Metadata
             IntegerProperty(x => x.Odometer);
             StringProperty(x => x.State);
             StringProperty(x => x.Country);
-            NumericProperty(x => x.FuelAmount);
+            StringProperty(x => x.GPSAutoFlag);
+            IntegerProperty(x => x.Latitude);
+            IntegerProperty(x => x.Longitude);
             StringProperty(x => x.Mdtid);
 
             ViewDefaults()
@@ -37,11 +39,12 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.Odometer)
             .Property(x => x.State)
             .Property(x => x.Country)
-            .Property(x => x.FuelAmount)
+            .Property(x => x.GPSAutoFlag)
+            .Property(x => x.Latitude)
+            .Property(x => x.Longitude)
             .Property(x => x.Mdtid)
 
             .OrderBy(x => x.EmployeeId);
         }
     }
 }
-
