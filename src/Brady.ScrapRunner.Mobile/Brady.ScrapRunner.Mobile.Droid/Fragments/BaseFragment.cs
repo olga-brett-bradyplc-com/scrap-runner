@@ -1,9 +1,11 @@
 using System;
 using System.ComponentModel;
 using Android.App;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using Android.Support.V4.Widget;
 using Android.Views;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
@@ -44,6 +46,14 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 baseActivity.SetSupportActionBar(_toolbar);
                 baseActivity.SupportActionBar.SetDisplayHomeAsUpEnabled(NavMenuEnabled);
                 baseActivity.SupportActionBar.SetDisplayShowHomeEnabled(NavMenuEnabled);
+
+                _toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, NavColor)));
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+                {
+                    baseActivity.Window.ClearFlags(WindowManagerFlags.TranslucentStatus);
+                    baseActivity.Window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
+                    baseActivity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Activity, NavColor)));
+                }
 
                 if (NavMenuEnabled)
                 {
@@ -116,6 +126,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         protected abstract int FragmentId { get; }
         protected abstract bool NavMenuEnabled { get; }
+        protected virtual int NavColor { get; set; } = Resource.Color.material_gray_900;
 
         public override void OnActivityCreated(Bundle savedInstanceState)
         {

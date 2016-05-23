@@ -47,7 +47,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo,
             string tripSegContainerNumber, double? latitude, double? longitude);
 
-        Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo, string tripSegContainerNumber);
+        Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo, short tripSegContainerSeqNumber, string tripSegContainerNumber);
 
         Task<int> CompleteTripAsync(string tripNumber);
 

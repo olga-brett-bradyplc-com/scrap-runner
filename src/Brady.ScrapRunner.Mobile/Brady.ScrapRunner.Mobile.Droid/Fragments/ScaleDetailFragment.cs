@@ -1,8 +1,10 @@
 using System;
 using System.ComponentModel;
 using Android.App;
+using Android.Graphics;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.V4.Content;
 using Android.Views;
 using Android.Widget;
 using Brady.ScrapRunner.Mobile.ViewModels;
@@ -23,6 +25,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         protected override int FragmentId => Resource.Layout.fragment_scaledetail;
         protected override bool NavMenuEnabled => true;
+        protected override int NavColor => Resource.Color.arrive;
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {

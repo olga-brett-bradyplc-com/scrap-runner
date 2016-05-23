@@ -75,7 +75,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             return fuelEntry;
         }
 
-        public async Task<ChangeResultWithItem<DriverMessageProcess>> SendMessageRemoveAsync(DriverMessageProcess driverMessageEntryProcess)
+        public async Task<ChangeResultWithItem<DriverMessageProcess>> SendMessageRemoteAsync(DriverMessageProcess driverMessageEntryProcess)
         {
             var message = await _connection.GetConnection().UpdateAsync(driverMessageEntryProcess, requeryUpdated: false);
             return message;

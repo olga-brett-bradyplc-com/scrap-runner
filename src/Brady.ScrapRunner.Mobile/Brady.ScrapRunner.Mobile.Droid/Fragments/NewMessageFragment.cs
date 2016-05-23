@@ -25,7 +25,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     public class NewMessageFragment : BaseFragment<NewMessageViewModel>
     {
         protected override int FragmentId => Resource.Layout.fragment_newmessage;
-        protected override bool NavMenuEnabled => true;
+        protected override bool NavMenuEnabled => false;
 
     }
 }

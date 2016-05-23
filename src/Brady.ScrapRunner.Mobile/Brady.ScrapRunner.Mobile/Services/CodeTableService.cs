@@ -50,6 +50,21 @@ namespace Brady.ScrapRunner.Mobile.Services
                 .ToListAsync();
             return sortedStates;
         }
+
+        public async Task<List<CodeTableModel>> FindCodeTableList(string codeName)
+        {
+            var sortedCodes = await _codeTableRepository.AsQueryable()
+                .Where(t => t.CodeName == codeName)
+                .OrderBy(t => t.CodeValue)
+                .ToListAsync();
+            return sortedCodes;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="codeTable"></param>
+        /// <returns></returns>
         public Task UpdateCodeTable(IEnumerable<CodeTable> codeTable)
         {
             var mapped = AutoMapper.Mapper.Map<IEnumerable<CodeTable>, IEnumerable<CodeTableModel>>(codeTable);

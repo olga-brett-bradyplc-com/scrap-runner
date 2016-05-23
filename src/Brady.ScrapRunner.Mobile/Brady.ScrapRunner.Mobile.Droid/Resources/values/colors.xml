@@ -52,4 +52,6 @@
   <color name="arrive">@color/material_red_500</color>
   <color name="arrive_pressed">@color/material_red_700</color>
 
+  <color name="incoming_message">@color/material_white</color>
+
 </resources>

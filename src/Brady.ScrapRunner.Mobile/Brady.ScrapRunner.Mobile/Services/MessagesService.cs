@@ -46,7 +46,7 @@ namespace Brady.ScrapRunner.Mobile.Services
 
             var paddedSender = senderId.PadRight(10, ' ');
             var message = await _messagesRepository.AsQueryable()
-                .Where(t => t.ReceiverId == paddedSender)
+                .Where(t => t.ReceiverId == paddedSender || t.SenderId == paddedSender )
                 .OrderBy(t => t.CreateDateTime)
                 .ToListAsync();
             return message;
