@@ -121,7 +121,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     else
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Unable to process enroute for DriverId: " + driverEnrouteProcess.EmployeeId));
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Unable to process enroute for DriverId: " + driverEnrouteProcess.EmployeeId));
                         break;
                     }
 
@@ -136,7 +136,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null ==employeeMaster)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid DriverId: " 
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid DriverId: "
                                         + driverEnrouteProcess.EmployeeId));
                         break;
                     }
@@ -152,7 +152,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == currentTrip)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: " 
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid TripNumber: "
                                         + driverEnrouteProcess.TripNumber));
                         break;
                     }
@@ -184,7 +184,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                              select item).FirstOrDefault();
                     if (null == currentTripSegment)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripSegment: " +
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid TripSegment: " +
                             driverEnrouteProcess.TripNumber + "-" + driverEnrouteProcess.TripSegNumber));
                         break;
                     }
@@ -205,7 +205,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == powerMaster)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid PowerId: "
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid PowerId: "
                                         + driverEnrouteProcess.PowerId));
                         break;
                     }
@@ -241,7 +241,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     if (null == destCustomerMaster)
                     {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid CustHostCode: "
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid CustHostCode: "
                                         + currentTripSegment.TripSegDestCustHostCode));
                         break;
                     }
@@ -271,7 +271,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             }
                             if (null == containerMaster)
                             {
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid ContainerNumber: " + containerOnPowerId.ContainerNumber));
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid ContainerNumber: " 
+                                                     + containerOnPowerId.ContainerNumber));
                                 break;
                             }
                             //PowerId already set.
@@ -316,7 +317,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                             containerOnPowerId.ContainerNumber);
                             if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
                             {
-                                var s = string.Format("Could not update ContainerMaster for ContainerNumber:{0}.",
+                                var s = string.Format("DriverEnrouteProcess:Could not update ContainerMaster for ContainerNumber:{0}.",
                                          containerOnPowerId.ContainerNumber);
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                 break;
@@ -389,7 +390,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                             tripSegmentContainer.TripSegContainerNumber);
                             if (Common.LogChangeSetFailure(changeSetResult, tripSegmentContainer, log))
                             {
-                                var s = string.Format("Could not update TripSegmentContainerRecord for ContainerNumber:{0}.",
+                                var s = string.Format("DriverEnrouteProcess:Could not update TripSegmentContainerRecord for ContainerNumber:{0}.",
                                          tripSegmentContainer.TripSegContainerNumber);
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                 break;
@@ -448,7 +449,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
                     if (Common.LogChangeSetFailure(changeSetResult, currentTripSegment, log))
                     {
-                        var s = string.Format("Could not update TripSegment for Trip:{0}-{1}.",
+                        var s = string.Format("DriverEnrouteProcess:Could not update TripSegment for Trip:{0}-{1}.",
                             currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
@@ -493,7 +494,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                             previousTripSegment.TripNumber, previousTripSegment.TripSegNumber);
                             if (Common.LogChangeSetFailure(changeSetResult, previousTripSegment, log))
                             {
-                                var s = string.Format("Could not update previous TripSegment for Trip:{0}-{1}.",
+                                var s = string.Format("DriverEnrouteProcess:Could not update previous TripSegment for Trip:{0}-{1}.",
                                     previousTripSegment.TripNumber, previousTripSegment.TripSegNumber);
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                 break;
@@ -518,7 +519,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                             oldTripSegmentMileage.TripSegMileageSeqNumber);
                             if (Common.LogChangeSetFailure(changeSetResult, oldTripSegmentMileage, log))
                             {
-                                var s = string.Format("Could not update TripSegmentContainer for Trip:{0}-{1} Seq:{2}.",
+                                var s = string.Format("DriverEnrouteProcess:Could not update TripSegmentContainer for Trip:{0}-{1} Seq:{2}.",
                                         oldTripSegmentMileage.TripNumber, oldTripSegmentMileage.TripSegNumber,
                                         oldTripSegmentMileage.TripSegMileageSeqNumber);
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
@@ -555,7 +556,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber);
                         if (Common.LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
                         {
-                            var s = string.Format("Could not update TripSegmentMileage for Trip:{0}-{1}.",
+                            var s = string.Format("DriverEnrouteProcess:Could not update TripSegmentMileage for Trip:{0}-{1}.",
                                   driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber);
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
@@ -600,7 +601,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     currentTrip.TripNumber);
                     if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
                     {
-                        var s = string.Format("Could not update Trip for Trip:{0}.",
+                        var s = string.Format("DriverEnrouteProcess:Could not update Trip for Trip:{0}.",
                             currentTrip.TripNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
@@ -648,7 +649,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     driverStatus.EmployeeId);
                     if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
                     {
-                        var s = string.Format("Could not update DriverStatus for DriverId:{0}.",
+                        var s = string.Format("DriverEnrouteProcess:Could not update DriverStatus for DriverId:{0}.",
                             driverStatus.EmployeeId);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
@@ -683,7 +684,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     driverEnrouteProcess.PowerId);
                     if (Common.LogChangeSetFailure(changeSetResult, powerMaster, log))
                     {
-                        var s = string.Format("Could not update PowerMaster for PowerId:{0}.",
+                        var s = string.Format("DriverEnrouteProcess:Could not update PowerMaster for PowerId:{0}.",
                                               driverEnrouteProcess.PowerId);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
@@ -724,7 +725,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         currentTripSegment.TripSegOrigCustHostCode);
                         if (Common.LogChangeSetFailure(changeSetResult, originCustomerMaster, log))
                         {
-                            var s = string.Format("Could not update CustomerMaster for CustHostCode:{0}.",
+                            var s = string.Format("DriverEnrouteProcess:Could not update CustomerMaster for CustHostCode:{0}.",
                                                   currentTripSegment.TripSegOrigCustHostCode);
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
@@ -779,7 +780,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Check for EventLog failure.
                     if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
                     {
-                        var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                        var s = string.Format("DriverEnrouteProcess:Could not update EventLog for Driver {0} {1}.",
                                 driverEnrouteProcess.EmployeeId, EventCommentConstants.ReceivedDriverEnroute);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;

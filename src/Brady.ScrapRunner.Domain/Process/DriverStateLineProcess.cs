@@ -7,17 +7,17 @@ using BWF.DataServices.Metadata.Interfaces;
 namespace Brady.ScrapRunner.Domain.Process
 {
     ///
-    /// A FuelEntryProcess (request and response).
+    /// A DriverStateLineProcess (request and response).
     ///
-    public class DriverFuelEntryProcess : IHaveId<string>, IEquatable<DriverFuelEntryProcess>
+    public class DriverStateLineProcess : IHaveId<string>, IEquatable<DriverStateLineProcess>
     {
-        ///The driver id.  Required.
+        ///The driver id. Required.
         public virtual string EmployeeId { get; set; }
 
-        /// Trip Number.  Optional.
+        /// Trip Number.  Required.
         public virtual string TripNumber { get; set; }
 
-        /// Trip Segment Number.  Optional.
+        /// Trip Segment Number.  Required.
         public virtual string TripSegNumber { get; set; }
 
         /// The ActionDateTime. Required.
@@ -29,14 +29,20 @@ namespace Brady.ScrapRunner.Domain.Process
         ///The odometer. Required.
         public virtual int Odometer { get; set; }
 
-        ///The state. Required.
+        /// State.  Required.
         public virtual string State { get; set; }
 
-        ///The country.  Required.
+        /// Country.  Required.
         public virtual string Country { get; set; }
 
-        ///The amount of fuel. Required.
-        public virtual float FuelAmount { get; set; }
+        /// GPS Auto enroute/arrive flag.  Y/N. Default is N.
+        public virtual string GPSAutoFlag { get; set; }
+
+        /// Latitude of the enroute. Optional.
+        public virtual int? Latitude { get; set; }
+
+        /// Longitude of the enroute. Optional.
+        public virtual int? Longitude { get; set; }
 
         /// Currently this is the driver id. Probably will not be needed in the future.
         public virtual string Mdtid { get; set; }
@@ -52,7 +58,7 @@ namespace Brady.ScrapRunner.Domain.Process
                 // no-op
             }
         }
-        public virtual bool Equals(DriverFuelEntryProcess other)
+        public virtual bool Equals(DriverStateLineProcess other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -64,7 +70,7 @@ namespace Brady.ScrapRunner.Domain.Process
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((DriverFuelEntryProcess)obj);
+            return Equals((DriverStateLineProcess)obj);
         }
 
         public override int GetHashCode()
@@ -80,7 +86,7 @@ namespace Brady.ScrapRunner.Domain.Process
         /// </summary>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder("FuelEntryProcess{");
+            StringBuilder sb = new StringBuilder("DriverStateLineProcess{");
             sb.Append("EmployeeId:" + EmployeeId);
             sb.Append(", TripNumber: " + TripNumber);
             sb.Append(", TripSegNumber:" + TripSegNumber);
@@ -88,7 +94,7 @@ namespace Brady.ScrapRunner.Domain.Process
             sb.Append(", PowerId:" + PowerId);
             sb.Append(", Odometer:" + Odometer);
             sb.Append(", State:" + State);
-            sb.Append(", Amount:" + FuelAmount);
+            sb.Append(", GPSAutoFlag: " + GPSAutoFlag);
             sb.Append("}");
             return sb.ToString();
         }
