@@ -26,7 +26,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
         private readonly IContainerService _containerService;
         private readonly ICodeTableService _codeTableService;
-        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IConnectionService _connection;
         private readonly IMessagesService _messagesService;
 
 
@@ -39,7 +39,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IContainerService containerService,
             ICodeTableService codeTableService,
             IMessagesService messagesService,
-           IConnectionService<DataServiceClient> connection)
+           IConnectionService connection)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -157,7 +157,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 // Check username/password against BWF, and create session if valid
                 IClientSettings clientSettings = new DemoClientSettings();
-                var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
+                _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
