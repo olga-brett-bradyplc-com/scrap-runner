@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:layout_marginBottom="5dp">
+  <TextView
+      android:id="@+id/tripContainerInfo"
+      android:layout_width="match_parent"
+      android:layout_height="15dp"
+      android:layout_alignParentLeft="true"
+      android:textColor="@color/material_gray_900"
+      tools:text="LU"
+      local:MvxBind="Text DefaultTripSegContainerNumber + ' ' + TripSegContainerType + '-' + TripSegContainerSize" />
+  <TextView
+      android:id="@+id/tripContainerLocation"
+      android:layout_width="match_parent"
+      android:layout_height="15dp"
+      android:layout_below="@id/tripContainerInfo"
+      android:textColor="@color/material_gray_900"
+      tools:text="Trash Can"
+      local:MvxBind="Text TripSegContainerLocation" />
+  <TextView
+      android:id="@+id/tripCommodityDesc"
+      android:layout_width="match_parent"
+      android:layout_height="15dp"
+      android:layout_below="@id/tripContainerLocation"
+      android:textColor="@color/material_gray_900"
+      tools:text="#2 Tin"
+      local:MvxBind="Text TripSegContainerCommodityDesc" />
+  <ImageView
+      android:id="@+id/arrow_image"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerVertical="true"
+      android:layout_alignParentRight="true"
+      android:src="@drawable/ic_keyboard_arrow_right_black_24dp" />
+</RelativeLayout>
