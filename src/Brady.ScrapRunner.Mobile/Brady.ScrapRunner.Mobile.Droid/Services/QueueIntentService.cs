@@ -1,5 +1,6 @@
 namespace Brady.ScrapRunner.Mobile.Droid.Services
 {
+    using System;
     using Android.App;
     using Android.Content;
     using Android.Support.V4.Content;
@@ -53,6 +54,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                 if (!_networkAvailabilityService.IsNetworkConnectionAvailable()) return;
                 _inProgress = true;
                 await _queueService.ProcessQueueAsync();
+            }
+            catch (Exception exception)
+            {
+                Mvx.Error($"Caught exception in QueueService.OnHandleIntent {exception}");
             }
             finally
             {
