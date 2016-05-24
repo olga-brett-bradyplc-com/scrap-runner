@@ -1,10 +1,15 @@
 ﻿namespace Brady.ScrapRunner.Mobile.Services
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
+    using BWF.DataServices.Domain.Interfaces;
     using BWF.DataServices.Metadata.Models;
+    using Helpers;
     using Interfaces;
     using Models;
+    using MvvmCross.Platform;
     using Newtonsoft.Json;
 
     public class QueueService : IQueueService
@@ -27,44 +32,97 @@
 
         public async Task ProcessQueueAsync()
         {
-            var client = _connectionService.GetConnection();
-            var queueItems = await _repository.AsQueryable().ToListAsync();
-            foreach (var queueItem in queueItems)
+            while (await _repository.AsQueryable().CountAsync() > 0)
             {
-                var success = false;
-                switch (queueItem.Verb)
+                var queueItem = await _repository.AsQueryable().FirstOrDefaultAsync();
+                if (queueItem.Verb == QueueItemVerb.Delete)
                 {
-                    case QueueItemVerb.Create:
-                        dynamic createItem = JsonConvert.DeserializeObject(queueItem.SerializedRecord,
-                            Type.GetType(queueItem.RecordType));
-                        var createResult = await client.CreateAsync(createItem, queueItem.DataService, false);
-                        var createChangeResult = createResult as ChangeResult;
-                        if (createChangeResult != null) success = createChangeResult.WasSuccessful;
-                        break;
-                    case QueueItemVerb.Update:
-                        dynamic updateItem = JsonConvert.DeserializeObject(queueItem.SerializedRecord,
-                            Type.GetType(queueItem.RecordType));
-                        var updateResult = await client.UpdateAsync(updateItem, queueItem.DataService, false);
-                        var updateChangeResult = updateResult as ChangeResult;
-                        if (updateChangeResult != null) success = updateChangeResult.WasSuccessful;
-                        break;
-                    case QueueItemVerb.Delete:
-                        dynamic deleteId = JsonConvert.DeserializeObject(queueItem.SerializedId,
-                            Type.GetType(queueItem.IdType));
-                        var deleteResult = await client.DeleteAsync<dynamic>(deleteId, queueItem.DataService);
-                        var deleteChangeResult = deleteResult as ChangeResult;
-                        if (deleteChangeResult != null) success = deleteChangeResult.WasSuccessful;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    // Delete can't be used with a ChangeSet for now.
+                    // A ChangeSet requires the type and id.
+                    // The IDataServiceClient.DeleteAsync methods only provide an id.
+                    dynamic deleteId = JsonConvert.DeserializeObject(queueItem.SerializedId,
+                        Type.GetType(queueItem.IdType));
+                    var deleteResult = await _connectionService.GetConnection().DeleteAsync<dynamic>(
+                        deleteId, queueItem.DataService);
+                    var deleteChangeResult = deleteResult as ChangeResult;
+                    if (deleteChangeResult != null && deleteChangeResult.WasSuccessful)
+                        Mvx.Trace($"Deleted {queueItem.SerializedId}");
+                    else
+                        Mvx.Warning($"Failed to delete {queueItem.SerializedId} ({deleteChangeResult?.Failure.Summary})");
+                    await _repository.DeleteAsync(queueItem);
                 }
-                if (success) await _repository.DeleteAsync(queueItem);
+                else
+                {
+                    // Create and Update can be batched together as one ChangeSet.
+                    var queueItems = await _repository.ToListAsync(q => q.RecordType == queueItem.RecordType &&
+                        q.Verb == QueueItemVerb.Create || q.Verb == QueueItemVerb.Update);
+
+                    var objectType = Type.GetType(queueItem.RecordType);
+                    var idType = Type.GetType(queueItem.IdType);
+                    var changeSet = ChangeSetExtensions.MakeChangeSetForType(idType, objectType);
+                    var noRoleIds = Enumerable.Empty<long>().ToList();
+                    var createReference = 0L;
+                    var updateReferences = new List<object>();
+
+                    foreach (var remainingQueueItem in queueItems)
+                    {
+                        var deserializedObject = JsonConvert.DeserializeObject(queueItem.SerializedRecord, objectType);
+                        switch (remainingQueueItem.Verb)
+                        {
+                            case QueueItemVerb.Create:
+                                Mvx.Trace($"Adding ChangeSet create {createReference}");
+                                changeSet.AddCreate(createReference++, deserializedObject, noRoleIds, noRoleIds);
+                                break;
+                            case QueueItemVerb.Update:
+                                var deserializedId = JsonConvert.DeserializeObject(queueItem.SerializedId, idType);
+                                updateReferences.Add(deserializedId);
+                                Mvx.Trace($"Adding ChangeSet update {deserializedId}");
+                                changeSet.AddUpdate(deserializedId, deserializedObject);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                    var changeSetResult = await _connectionService.GetConnection().ProcessChangeSetAsync(
+                        changeSet, queueItem.DataService);
+                    if (WasChangeSetSuccessful(changeSetResult, createReference, updateReferences))
+                        Mvx.Trace($"Successfuly processed change set {queueItem.IdType} {queueItem.RecordType}");
+                    else
+                        Mvx.Warning($"Failed processing change set {queueItem.IdType} {queueItem.RecordType}");
+                    foreach (var itemToDelete in queueItems)
+                    {
+                        await _repository.DeleteAsync(itemToDelete);
+                    }
+                }
             }
         }
 
         public async Task<bool> IsEmptyAsync()
         {
-            return await _repository.AsQueryable().CountAsync() > 0;
+                return await _repository.AsQueryable().CountAsync() > 0;
+        }
+
+        private bool WasChangeSetSuccessful(IChangeSetResult changeSetResult, long createReference, IEnumerable<object> updateIds)
+        {
+            for (var reference = 0L; reference < createReference; reference++)
+            {
+                var failure = changeSetResult.GetFailedCreateForRef(reference);
+                if (failure != null)
+                {
+                    Mvx.Warning($"ChangeSet create for type {failure.Type} failed ({failure.Summary})");
+                    return false;
+                }
+            }
+            foreach (var updateId in updateIds)
+            {
+                var failure = changeSetResult.GetFailedUpdateForId(updateId);
+                if (failure != null)
+                {
+                    Mvx.Warning($"ChangeSet update for type {failure.Type} failed ({failure.Summary})");
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
