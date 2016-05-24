@@ -39,17 +39,31 @@
         /// Useage: Prefix for states codetable values.
         /// </summary>
         public static readonly string StatesPrefix = "STATES";
+
+        /// <summary>
+        /// Driver delay prefix 
+        /// Useage: For delays without a trip number, use # + driverid
+        /// </summary>
+        public static readonly string DriverPrefix = "#";
     }
     /// <summary>
-    /// The Action Type internal codes.  Used in the processing container information.
+    /// The Container Action Type internal codes.  Used in the processing container information.
     /// </summary>
-    public static class ActionTypeConstants
+    public static class ContainerActionTypeConstants
     {
         public static readonly string Done = "D";
         public static readonly string Review = "R";
         public static readonly string Exception = "E";
         public static readonly string Load = "L";
         public static readonly string Dropped = "S";
+    }
+    /// <summary>
+    /// The Delay Action Type internal codes.  Used in the processing delay & back on duty information.
+    /// </summary>
+    public static class DelayActionTypeConstants
+    {
+        public static readonly string Delay = "D";
+        public static readonly string BackOnDuty = "B";
     }
     /// <summary>
     /// The Basic Trip Type internal codes.  Used in the TripTypeBasic table.
@@ -219,8 +233,8 @@
         public static readonly string NoWork         = "Z"; 
         /// <summary>Still Logged in, has completed a trip, has more trips.  Available: V</summary>
         public static readonly string Available     = "V";
-        /// <summary>StateCrossing: S</summary>
-        public static readonly string StateCrossing = "S";
+        /// <summary>StateLine: S</summary>
+        public static readonly string StateLine = "S";
         /// <summary>Fuel: F</summary>
         public static readonly string Fuel          = "F";
         /// <summary>Connected: C</summary>
@@ -262,7 +276,7 @@
         /// <summary>ReceivedDriverArrive: RECEIVED DRIVER ARRIVE</summary>
         public static readonly string ReceivedDriverArrive = "RECEIVED DRIVER ARRIVE";
         /// <summary>ReceivedDriverSLC: RECEIVED DRIVER SLC</summary>
-        public static readonly string ReceivedDriverSLC = "RECEIVED DRIVER SLC";
+        public static readonly string ReceivedDriverStateLine = "RECEIVED DRIVER SLC";
         /// <summary>ReceivedDriverFuel: RECEIVED DRIVER FUEL</summary>
         public static readonly string ReceivedDriverFuel = "RECEIVED DRIVER FUEL";
         /// <summary>ReceivedDriverDelay: RECEIVED DRIVER DELAY</summary>
@@ -288,10 +302,16 @@
         /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER NEW CONTAINER</summary>
         public static readonly string ReceivedDriverNewContainer = "RECEIVED DRIVER NEW CONTAINER";
     }
-    /// <summary>
-    /// The Message Source descriptions.  Used in the Messages table.
-    /// </summary>
-    public static class MessagesMsgSourceConstants
+    public static class HistoryActionConstants
+    {
+        /// <summary>DriverDoneTrip: DRIVER DONE TRIP</summary>
+        public static readonly string DriverDoneTrip = "DRIVER DONE TRIP";
+
+    }
+        /// <summary>
+        /// The Message Source descriptions.  Used in the Messages table.
+        /// </summary>
+        public static class MessagesMsgSourceConstants
     {
         /// <summary>FromDriver: R</summary>
         public static readonly string FromDriver = "R";
@@ -300,9 +320,10 @@
         /// <summary>BroadcastToAllDrvrs: B</summary>
         public static readonly string BroadcastToAllDrvrs = "B";
 
-    }        /// <summary>
-             /// Driver Preference internal codes. From the Preferences table.
-             /// </summary>
+    } 
+    /// <summary>
+    /// Driver Preference internal codes. From the Preferences table.
+    /// </summary>
     public static class PrefDriverConstants
     {
         /// <summary>
@@ -644,7 +665,7 @@
         
     }
     /// <summary>
-    /// Driver Preference internal codes. From the Preferences table.
+    /// System Preference internal codes. From the Preferences table.
     /// </summary>
     public static class PrefSystemConstants
     {
@@ -664,6 +685,36 @@
         /// </summary>
         public static readonly string DEFAllowAnyPowerUnit = "DEFAllowAnyPowerUnit";
     }
+    /// <summary>
+    /// Driver Preference internal codes. From the Preferences table.
+    /// </summary>
+    public static class PrefYardConstants
+    {
+        /// <summary>
+        /// DEFTHTrip:
+        /// Send Completed Trip Information to Host (Y/N)
+        /// When this option is set to “Y”, completed trip information is sent to the host
+        /// accounting system. Usually Only trips with a Done status are sent.
+        /// </summary>
+        public static readonly string DEFTHTrip = "DEFTHTrip";
+
+        /// <summary>
+        /// DEFTHScale:
+        /// Send Scale Notice to Host (Y/N)
+        /// When this option is set to “Y”, scale notice information is sent to the host
+        /// accounting system. 
+        /// </summary>
+        public static readonly string DEFTHScale = "DEFTHScale"; 
+
+        /// <summary>
+        /// DEFSendExceptionTripsToHost:
+        /// Send Exception Trips to Host (Y/N)
+        /// When this option is set to “Y”, completed trip information for Exception trips is sent
+        /// to the host accounting system. 
+        /// </summary>
+        public static readonly string DEFSendExceptionTripsToHost = "DEFSendExceptionTripsToHost";
+    }
+
     /// <summary>
     /// The Power Status internal codes.  Used in the PowerMaster table.
     /// </summary>
@@ -726,31 +777,6 @@
         /// <summary>Manual: M</summary>
         public static readonly string Manual = "M";
     }
-
-    //Changed to enum TripSendFlagValue
-    //public static class TripSendFlagConstants
-    //{
-    //    public static readonly int NotReady        = 0;  //Not Ready to be sent to driver
-    //    public static readonly int Ready           = 1;  //Ready to be sent to driver
-    //    public static readonly int SentToDevice    = 2;  //Sent to driver
-    //    public static readonly int NotSentToDevice = 3;  //Unable to be sent to driver
-    //    public static readonly int CanceledReady   = 4;  //Canceled trip, ready to be sent to driver
-    //    public static readonly int CanceledSent    = 5;  //Canceled trip, sent to driver
-    //    public static readonly int TripInReview    = 7;  //Completed trip in review (set down or left on truck full)
-    //    public static readonly int TripException   = 8;  //Completed trip as exception (unable to process)
-    //    public static readonly int TripDone        = 9;  //Completed trip normal
-    //    public static readonly int SentToHost      = 10; //Completed, sent to host accounting system
-    //    public static readonly int SentToHostError = 11; //Completed, error in sending to host accounting system
-    //    public static readonly int NotSentToHost   = 12; //Completed, not sent to host accounting system
-    //}
-
-    //public static class TripSendReseqFlagConstants
-    //{
-    //    public static readonly int NotReseq = 0;     //Not Sequenced
-    //    public static readonly int AutoReseq = 1;    //Set when trip is entered or modified
-    //    public static readonly int ManualReseq = 2;  //Set when trips are actually resequenced by dispatcher
-    //    public static readonly int ReseqSent = 3;    //Set when the Reseq Message is sent
-    //}
 
     /// <summary>
     /// The trip segment status internal codes.  Used in the TripSegment table.

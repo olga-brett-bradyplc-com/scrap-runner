@@ -57,5 +57,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             ShowViewModel<MessagesViewModel>(_connection);
         }
+
+        private MvxCommand _newMessageCommand;
+
+        public MvxCommand NewMessageCommand
+            => _newMessageCommand ?? (_newMessageCommand = new MvxCommand(ExecuteNewMessageCommand));
+
+        public void ExecuteNewMessageCommand()
+        {
+            ShowViewModel<NewMessageViewModel>(_connection);
+        }
     }
 }

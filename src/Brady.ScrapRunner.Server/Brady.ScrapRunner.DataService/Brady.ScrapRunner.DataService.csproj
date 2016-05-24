@@ -191,10 +191,13 @@
   <ItemGroup>
     <Compile Include="Concrete\SRDataService.cs" />
     <Compile Include="Concrete\SRRepository.cs" />
+    <Compile Include="Mappings\DriverDelayProcessMap.cs" />
     <Compile Include="Mappings\DriverMessageProcessMap.cs" />
     <Compile Include="Mappings\DriverNewContainerProcessMap.cs" />
+    <Compile Include="Mappings\DriverStateLineProcessMap.cs" />
     <Compile Include="Mappings\DriverTripAckProcessMap.cs" />
     <Compile Include="Mappings\DriverFuelEntryProcessMap.cs" />
+    <Compile Include="ProcessTypes\DriverDelayProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverMessageProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverNewContainerProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverSegmentDoneProcessRecordType.cs" />
@@ -271,6 +274,7 @@
     <Compile Include="ProcessTypes\DriverContainerActionProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverEnrouteProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverFuelEntryProcessRecordType.cs" />
+    <Compile Include="ProcessTypes\DriverStateLineProcessRecordType.cs" />
     <Compile Include="ProcessTypes\PreferencesProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverLoginProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverTripAckProcessRecordType.cs" />
@@ -357,6 +361,8 @@
     <Compile Include="Validators\DriverArriveProcessValidator.cs" />
     <Compile Include="Validators\DriverContainerActionProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverContainerActionProcessValidator.cs" />
+    <Compile Include="Validators\DriverDelayProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverDelayProcessValidator.cs" />
     <Compile Include="Validators\DriverEfficiencyDeletionValidator.cs" />
     <Compile Include="Validators\DriverEfficiencyValidator.cs" />
     <Compile Include="Validators\DriverEnrouteProcessDeletionValidator.cs" />
@@ -367,6 +373,8 @@
     <Compile Include="Validators\DriverNewContainerProcessValidator.cs" />
     <Compile Include="Validators\DriverSegmentDoneProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverSegmentDoneProcessValidator.cs" />
+    <Compile Include="Validators\DriverStateLineProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverStateLineProcessValidator.cs" />
     <Compile Include="Validators\DriverTripAckProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverTripAckProcessValidator.cs" />
     <Compile Include="Validators\DriverFuelEntryProcessDeletionValidator.cs" />

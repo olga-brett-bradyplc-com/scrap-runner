@@ -1,28 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-  <include
-      layout="@layout/toolbar" />
-  <!-- Layout that includes Company Title Header, State Buttons, and Trip location -->
-  <RelativeLayout
-      android:id="@+id/SubNavigationPanel"
-      android:layout_height="wrap_content"
-      android:orientation="vertical"
-      android:layout_width="match_parent"
-      android:layout_marginTop="56dp">
-    <TextView
-        android:id="@+id/message_body"
-        android:layout_weight="1"
-        android:text="Terminal is closing"
-        android:layout_alignParentLeft="true"
+    <include
+        layout="@layout/toolbar" />
+    <RelativeLayout
+        android:id="@+id/SubNavigationPanel"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:background="@color/material_white"
-        android:textSize="16dp"
-        android:textColor="@color/material_gray_900"
-        />
+        android:layout_marginTop="56dp">
+        <ScrollView
+            android:id="@+id/scroll_content"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_marginBottom="45dp"
+            android:fillViewport="true"
+            android:layout_below="@id/SubNavigationPanel">
+            <Mvx.MvxListView
+                android:id="@+id/CurrentContainerList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                local:MvxItemTemplate="@layout/item_newmessage"
+                local:MvxBind="ItemsSource Messages" />
+        </ScrollView>
+        <RelativeLayout
+            android:id="@+id/content_layout"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            local:MvxItemTemplate="@layout/item_newmessage">
+            <EditText
+                android:id="@+id/messageInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:paddingRight="55dp"
+                android:layout_below="@id/scroll_content"
+                android:background="#fff"
+                android:padding="10dp"
+                local:MvxBind="Text MessageText"
+                local:MvxLang="Hint Message"
+                android:focusable="true"
+                android:focusableInTouchMode="true" />
+            <Button
+                android:layout_width="55dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="center"
+                android:background="?attr/colorAccent"
+                android:textColor="#000"
+                tools:text="Send"
+                local:MvxBind="Click SendMessageCommand"
+                local:MvxLang="Text Send" />
+        </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

@@ -40,15 +40,24 @@ namespace Brady.ScrapRunner.Mobile.Services
             var message = await _messagesRepository.FindAsync(t => t.MsgId == msgId);
             return message;
         }
+
+        public async Task<List<MessagesModel>> FindMsgsFromAsync(string senderId)
+        {
+
+            var paddedSender = senderId.PadRight(10, ' ');
+            var message = await _messagesRepository.AsQueryable()
+                .Where(t => t.ReceiverId == paddedSender || t.SenderId == paddedSender )
+                .OrderBy(t => t.CreateDateTime)
+                .ToListAsync();
+            return message;
+        }
         /// <summary>
         /// Find all messages for the given driver id
         /// </summary>
-        /// <param name="driverId"></param>
         /// <returns></returns>
-        public async Task<List<MessagesModel>> FindDrvrMsgsAsync(string driverId)
+        public async Task<List<MessagesModel>> SortedDrvrMsgsAsync()
         {
             var sortedMsgs = await _messagesRepository.AsQueryable()
-                .Where(t => t.ReceiverId == driverId)
                 .OrderBy(t => t.CreateDateTime)
                 .ToListAsync();
             return sortedMsgs;

@@ -26,6 +26,10 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverContainerActionProcess"
         },
         {
+          "text": "DriverDelayProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverDelayProcess"
+        },
+        {
           "text": "DriverEnrouteProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverEnrouteProcess"
         },
@@ -48,6 +52,10 @@
         {
           "text": "DriverSegmentDoneProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverSegmentDoneProcess"
+        },
+        {
+          "text": "DriverStateLineProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverStateLineProcess"
         },
         {
           "text": "DriverTripAckProcess",

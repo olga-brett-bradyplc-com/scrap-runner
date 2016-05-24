@@ -1,26 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Acr.UserDialogs;
-using Brady.ScrapRunner.Domain;
-using Brady.ScrapRunner.Domain.Models;
-using Brady.ScrapRunner.Domain.Process;
-using Brady.ScrapRunner.Mobile.Interfaces;
-using Brady.ScrapRunner.Mobile.Models;
-using Brady.ScrapRunner.Mobile.Services;
-using Brady.ScrapRunner.Mobile.Validators;
-using BWF.DataServices.Metadata.Fluent.Utils;
-using BWF.DataServices.PortableClients;
-using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.ExtensionMethods;
-using MvvmCross.Localization;
-
-namespace Brady.ScrapRunner.Mobile.ViewModels
+﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using System.Linq;
+    using Brady.ScrapRunner.Mobile.Interfaces;
+    using Brady.ScrapRunner.Mobile.Models;
     using System.Collections.ObjectModel;
-    using System.Globalization;
     using MvvmCross.Core.ViewModels;
     using Resources;
 
@@ -36,15 +19,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _messagesService = messagesService;
 
             Title = AppResources.Messages;
-            MessageSelectedCommand = new MvxCommand<MessagesModel>(ExecuteMessageSelectedCommand);
         }
+
         public override async void Start()
         {
             var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
+            var messages = await _messagesService.SortedDrvrMsgsAsync();
+            var messagegroupedby = messages.GroupBy(m => m.SenderId).Select(grp => grp.First()).ToList();
 
-            var messages = await _messagesService.FindDrvrMsgsAsync(currentDriver.EmployeeId);
-            Messages = new ObservableCollection<MessagesModel>(messages);
-
+            Messages = new ObservableCollection<MessagesModel>(messagegroupedby);
             base.Start();
         }
 
@@ -59,17 +42,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public MessagesModel SelectedMessage
         {
             get { return _selectedMessage; }
-            set
-            {
-                _selectedMessage = value; RaisePropertyChanged(() => SelectedMessage);
-            }
+            set { SetProperty(ref _selectedMessage, value); }
         }
-        public MvxCommand<MessagesModel> MessageSelectedCommand { get; private set; }
 
-        public void ExecuteMessageSelectedCommand(MessagesModel selectedMessage)
+        private IMvxCommand _messageSelectedCommand;
+        public IMvxCommand MessageSelectedCommand => _messageSelectedCommand ?? (_messageSelectedCommand = new MvxCommand<MessagesModel>(ExecuteMessageSelectedCommand));
+
+        public void ExecuteMessageSelectedCommand(MessagesModel messageModel)
         {
-            Close(this); // temporary fix
-            ShowViewModel<NewMessageViewModel>(new { message = selectedMessage.MsgId });
+            ShowViewModel<NewMessageViewModel>(new { remoteUserId = messageModel.SenderId });
         }
     }
 }

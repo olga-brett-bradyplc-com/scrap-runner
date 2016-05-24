@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Mobile.Enums;
 using BWF.DataServices.Metadata.Models;
 using MvvmCross.Binding.ExtensionMethods;
@@ -30,7 +32,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             TripNumber = tripNumber;
             SubTitle = TripNumber;
-            TransactionScannedCommand = new MvxCommand<string>(ExecuteTransactionScannedCommand);
+            TransactionScannedCommand = new MvxAsyncCommand<string>(ExecuteTransactionScannedCommandAsync);
+            SelectNextTransactionCommand = new MvxCommand(ExecuteSelectNextTransactionCommand);
             ConfirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand);
             TransactionSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteTransactionSelectedCommand);
         }
@@ -71,9 +74,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Command bindings
-        public MvxCommand<TripSegmentContainerModel> TransactionSelectedCommand { get; private set; }
-        public MvxCommand<string> TransactionScannedCommand { get; private set; }
-        public MvxCommand ConfirmationSelectedCommand { get; private set; }
+        public IMvxCommand TransactionSelectedCommand { get; private set; }
+        public IMvxAsyncCommand TransactionScannedCommand { get; private set; }
+        public IMvxCommand SelectNextTransactionCommand { get; private set; }
+        public IMvxCommand ConfirmationSelectedCommand { get; private set; }
 
         // Field bindings
         private TripSegmentContainerModel _currentTransaction;
@@ -105,37 +109,29 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Command impl
-        private void ExecuteTransactionScannedCommand(string scannedNumber)
+        private async Task ExecuteTransactionScannedCommandAsync(string scannedNumber)
         {
-            // If current transaction tripsegcontainernum == scannedNumber, mark it
-            if (CurrentTransaction.TripSegContainerNumber.Equals(scannedNumber))
+            foreach (var currentTripSeg in Containers.Select(container2 => container2.FirstOrDefault(tscm => tscm.TripSegContainerNumber == scannedNumber && string.IsNullOrEmpty(tscm.TripSegContainerComplete))))
             {
-                CurrentTransaction.TripSegContainerActionDateTime = DateTime.Now;
-                return;
+                CurrentTransaction = currentTripSeg ?? CurrentTransaction;
             }
 
-            //Check to see if scanned number exists elsewhere in the current set of containers.
-            //If so, set it, and move on
-            var container =
-                    Containers.Select(
-                        grouping => grouping.Where(tscm => tscm.TripSegContainerNumber.Equals(scannedNumber))).FirstOrDefault().FirstOrDefault();
-            if (container != null)
-            {
-                var previousTransaction = CurrentTransaction;
-                CurrentTransaction = container;
-                CurrentTransaction.TripSegContainerActionDateTime = DateTime.Now;
-
-                CurrentTransaction = previousTransaction;
-                return;
-            }
-
-            // Otherwise, if scanned number isn't found anywhere else, and current transaction.tripsegcontainernum === null
-            // Set it, and move on.
-            // @TODO : Should we validate that this container is within the container master, etc., etc.?
-            if (CurrentTransaction.TripSegContainerNumber == null)
-            {
+            if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
                 CurrentTransaction.TripSegContainerNumber = scannedNumber;
-                CurrentTransaction.TripSegContainerActionDateTime = DateTime.Now;
+
+            await
+                _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction.TripNumber,
+                    CurrentTransaction.TripSegNumber, CurrentTransaction.TripSegContainerSeqNumber,
+                    CurrentTransaction.TripSegContainerNumber);
+        }
+
+        private void ExecuteSelectNextTransactionCommand()
+        {
+            // Find next trip segment container that hasn't been completed
+            foreach (var currentTripSeg in Containers.Select(container2 => container2.FirstOrDefault(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete))))
+            {
+                CurrentTransaction = currentTripSeg;
+                break;
             }
         }
 

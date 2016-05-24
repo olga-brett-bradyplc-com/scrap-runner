@@ -10,14 +10,13 @@ using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using MvvmCross.Core.ViewModels;
+using MvvmCross.Plugins.Sqlite;
 using Brady.ScrapRunner.Mobile.Resources;
 using Brady.ScrapRunner.Mobile.Services;
 using Brady.ScrapRunner.Mobile.Validators;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using MvvmCross.Platform;
-
     public class SignInViewModel : BaseViewModel
     {
         private readonly IDbService _dbService;
@@ -27,8 +26,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
         private readonly IContainerService _containerService;
         private readonly ICodeTableService _codeTableService;
-        private readonly IQueueScheduler _queueScheduler;
-        private readonly IConnectionService _connection;
+        private readonly IConnectionService<DataServiceClient> _connection;
         private readonly IMessagesService _messagesService;
 
 
@@ -41,8 +39,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IContainerService containerService,
             ICodeTableService codeTableService,
             IMessagesService messagesService,
-            IConnectionService connection,
-            IQueueScheduler queueScheduler)
+           IConnectionService<DataServiceClient> connection)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -52,8 +49,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _containerService = containerService;
             _codeTableService = codeTableService;
             _messagesService = messagesService;
+
             _connection = connection;
-            _queueScheduler = queueScheduler;
             Title = AppResources.SignInTitle;
             SignInCommand = new MvxAsyncCommand(ExecuteSignInCommandAsync, CanExecuteSignInCommand);
         }
@@ -125,13 +122,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (!signInResult)
                     return;
 
-                _queueScheduler.Schedule(60 * 1000);
                 Close(this);
-                ShowViewModel<RouteSummaryViewModel>();
+
+                var containers = await _containerService.FindPowerIdContainersAsync(TruckId);
+
+                // @TODO : This is preferenced driven as to whether we take them to LoadDrop screen if containers are on truck
+                if (containers.Any())
+                    ShowViewModel<LoadDropContainerViewModel>(new { loginProcessed = true });
+                else
+                    ShowViewModel<RouteSummaryViewModel>();
+
             }
             catch (Exception exception)
             {
-                var message = exception.InnerException?.Message ?? exception.Message;
+                var message = exception?.InnerException?.Message ?? exception.Message;
                 await UserDialogs.Instance.AlertAsync(
                     message, AppResources.Error, AppResources.OK);
             }
@@ -153,7 +157,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 // Check username/password against BWF, and create session if valid
                 IClientSettings clientSettings = new DemoClientSettings();
-                _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
+                var connectionCreated = _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
@@ -217,6 +221,33 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
+                var codesTable = await _codeTableService.FindCodesRemoteAsync(new CodeTableProcess { EmployeeId = UserName });
+
+                if (codesTable.WasSuccessful)
+                {
+                    await _codeTableService.UpdateCodeTable(codesTable.Item.CodeTables);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(codesTable.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
+
+                var messagesTable = await _messagesService.FindMsgsRemoteAsync(new DriverMessageProcess { EmployeeId = UserName });
+
+                if (messagesTable.WasSuccessful)
+                {
+                    if (messagesTable.Item?.Messages?.Count > 0)
+                        await _messagesService.UpdateMessages(messagesTable.Item.Messages);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(messagesTable.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
+
                 loginData.Title = AppResources.LoadingTripInformation;
 
                 var tripProcess = await _tripService.FindTripsRemoteAsync(new TripInfoProcess
@@ -249,35 +280,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 else
                 {
                     await UserDialogs.Instance.AlertAsync(tripProcess.Failure.Summary,
-                        AppResources.Error, AppResources.OK);
-                    return false;
-                }
-
-                loginData.Title = AppResources.LoadingMiscInformation;
-
-                var codesTable = await _codeTableService.FindCodesRemoteAsync(new CodeTableProcess { EmployeeId = UserName });
-
-                if (codesTable.WasSuccessful)
-                {
-                    await _codeTableService.UpdateCodeTable(codesTable.Item.CodeTables);
-                }
-                else
-                {
-                    await UserDialogs.Instance.AlertAsync(codesTable.Failure.Summary,
-                        AppResources.Error, AppResources.OK);
-                    return false;
-                }
-
-                var messagesTable = await _messagesService.FindMsgsRemoteAsync(new DriverMessageProcess { EmployeeId = UserName });
-
-                if (messagesTable.WasSuccessful)
-                {
-                    if(messagesTable.Item?.Messages?.Count > 0)
-                        await _messagesService.UpdateMessages(messagesTable.Item.Messages);
-                }
-                else
-                {
-                    await UserDialogs.Instance.AlertAsync(messagesTable.Failure.Summary,
                         AppResources.Error, AppResources.OK);
                     return false;
                 }

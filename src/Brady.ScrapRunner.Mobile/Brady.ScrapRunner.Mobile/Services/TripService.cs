@@ -262,21 +262,21 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// </summary>
         /// <param name="tripNumber"></param>
         /// <param name="tripSegNo"></param>
+        /// <param name="tripSegContainerSeqNumber"></param>
         /// <param name="tripSegContainerNumer"></param>
-        /// <param name="gsWt"></param>
-        /// <param name="gs2Wt"></param>
-        /// <param name="trWt"></param>
         /// <returns></returns>
-        public async Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo, string tripSegContainerNumer)
+        public async Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo, short tripSegContainerSeqNumber, string tripSegContainerNumer)
         {
             // @TODO : Not complete
             var container = await _tripSegmentContainerRepository.AsQueryable()
                 .Where(
                     tscm =>
-                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
-                        tscm.TripSegContainerNumber == tripSegContainerNumer).FirstOrDefaultAsync();
-            
-            // @TODO : This is just a stopgap for us to know what we've marked as "complete". This will change once the remote call is finished
+                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo && tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).FirstOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(container.TripSegContainerNumber))
+                container.TripSegContainerNumber = tripSegContainerNumer;
+
+            container.TripSegContainerActionDateTime = DateTime.Now;
             container.TripSegContainerComplete = Constants.Yes;
 
             return await _tripSegmentContainerRepository.UpdateAsync(container);

@@ -11,52 +11,127 @@ using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Core.ViewModels;
 using Brady.ScrapRunner.Mobile.Resources;
+using Brady.ScrapRunner.Mobile.Validators;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     public class NewMessageViewModel : BaseViewModel
     {
         private readonly IMessagesService _messagesService;
+        private readonly IDriverService _driverService;
 
-        private string _msgText;
-
-        public NewMessageViewModel(IMessagesService messagesService)
+        public NewMessageViewModel(IDriverService driverService, IMessagesService messagesService)
         {
+            _driverService = driverService;
             _messagesService = messagesService;
-        }
-
-        public void Init(int? msgId)
-        {
-            MsgId = msgId;
+            Title = AppResources.Message;
         }
 
         public override async void Start()
         {
-            var message = await _messagesService.FindMessageAsync(MsgId);
+            var currentUser = await _driverService.GetCurrentDriverStatusAsync();
+            LocalUserId = currentUser.EmployeeId;
 
-            if (message != null)
-            {
-                _msgText = message.MsgText;
-            }
-
+            var messages = await _messagesService.FindMsgsFromAsync(RemoteUserId);
+            Messages = new ObservableCollection<MessagesModel>(messages);
             base.Start();
         }
 
-        private int? _msgId;
-        public int? MsgId
+        public void Init(string remoteUserId)
         {
-            get { return _msgId; }
-            set
+            RemoteUserId = remoteUserId;
+        }
+        
+        private string _remoteUserId;
+        public string RemoteUserId
+        {
+            get { return _remoteUserId; }
+            set { SetProperty(ref _remoteUserId, value); }
+        }
+
+        private ObservableCollection<MessagesModel> _messages;
+        public ObservableCollection<MessagesModel> Messages
+        {
+            get { return _messages; }
+            set { SetProperty(ref _messages, value); }
+        }
+
+        private string _messageText;
+        public string MessageText
+        {
+            get { return _messageText; }
+            set { SetProperty(ref _messageText, value); }
+        }
+
+        private string _localUserId;
+        public string LocalUserId
+        {
+            get { return _localUserId; }
+            set { SetProperty(ref _localUserId, value); }
+        }
+
+        private IMvxAsyncCommand _sendMessageCommand;
+        public IMvxAsyncCommand SendMessageCommand => _sendMessageCommand ??
+            (_sendMessageCommand = new MvxAsyncCommand(ExecuteSendMessageCommandAsync));
+
+        protected async Task ExecuteSendMessageCommandAsync()
+        {
+            try
             {
-                SetProperty(ref _msgId, value);
+                var sendMessageResult = await SaveSendMessageAsync();
+                if (!sendMessageResult)
+                    return;
+
+                Close(this);
+            }
+            catch (Exception exception)
+            {
+                var message = exception?.InnerException?.Message ?? exception.Message;
+                await UserDialogs.Instance.AlertAsync(
+                    message, AppResources.Error, AppResources.OK);
             }
         }
-
-        public string MsgText
+        private async Task<bool> SaveSendMessageAsync()
         {
-            get { return _msgText; }
-            set { SetProperty(ref _msgText, value); }
-        }
+            using (var loginData = UserDialogs.Instance.Loading(AppResources.SavingData, maskType: MaskType.Black))
+            {
+                var message = await _driverService.SendMessageRemoteAsync(new DriverMessageProcess
+                {
+                    EmployeeId = LocalUserId,
+                    ActionDateTime = DateTime.Now,
+                    SenderId = LocalUserId,
+                    ReceiverId = RemoteUserId,
+                    MessageText = MessageText,
+                    MessageThread = 0,
+                    UrgentFlag = Constants.No
+                });
 
+                if (message.WasSuccessful)
+                {
+                    //Add new message to the chain of messages
+                    Messages.Add(new MessagesModel
+                    {
+                        CreateDateTime = DateTime.Now,
+                        SenderId = LocalUserId,
+                        ReceiverId = RemoteUserId,
+                        MsgText = MessageText,
+                        Ack = "N",
+                        MessageThread = 1,
+                        SenderName = "", //TODO: get Sender's name
+                        ReceiverName = "", //TODO: get Receiver's name
+                        Urgent = Constants.No,
+                        Processed = Constants.No,
+                        MsgSource = "R",//Driver's source
+                        DeleteFlag = Constants.No
+                    });
+
+                    return true;
+                }
+
+                await UserDialogs.Instance.AlertAsync(message.Failure.Summary,
+                    AppResources.Error, AppResources.OK);
+                return false;
+            }
+        }
     }
 }

@@ -24,6 +24,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.PowerId);
             IntegerProperty(x => x.Odometer);
             StringProperty(x => x.State);
+            StringProperty(x => x.Country);
             NumericProperty(x => x.FuelAmount);
             StringProperty(x => x.Mdtid);
 
@@ -35,6 +36,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.PowerId)
             .Property(x => x.Odometer)
             .Property(x => x.State)
+            .Property(x => x.Country)
             .Property(x => x.FuelAmount)
             .Property(x => x.Mdtid)
 

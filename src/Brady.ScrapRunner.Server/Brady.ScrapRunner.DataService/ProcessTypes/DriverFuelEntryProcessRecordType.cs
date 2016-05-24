@@ -29,7 +29,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     /// PUT .../{dataServiceName}/{typeName}/{id}/withoutrequery
     /// 
     /// cURL example: 
-    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/FuelEntryProcess/001/withoutrequery
+    ///     PUT https://maunb-stm10.bradyplc.com:7776//api/scraprunner/DriverFuelEntryProcess/001/withoutrequery
     /// Portable Client example: 
     ///     var updateResult = client.UpdateAsync(itemToUpdate, requeryUpdated:false).Result;
     ///  
@@ -37,7 +37,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     /// within the postSingleAsync().  These re-retrieves of a trival query clobber our post-processed ChangeSetResult
     /// in memory.
 
-    [EditAction("FuelEntryProcess")]
+    [EditAction("DriverFuelEntryProcess")]
     public class DriverFuelEntryProcessRecordType : ChangeableRecordType
         <DriverFuelEntryProcess, string, DriverFuelEntryProcessValidator, DriverFuelEntryProcessDeletionValidator>
     {
@@ -195,20 +195,24 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             driverFuelEntryProcess.TripNumber = null;
                             driverFuelEntryProcess.TripSegNumber = null;
                         }
-                        ////////////////////////////////////////////////
-                        // Get the Trip segment record
-                        currentTripSegment = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
+                        if (driverFuelEntryProcess.TripNumber != null &&
+                            driverFuelEntryProcess.TripSegNumber != null)
+                        {
+                            ////////////////////////////////////////////////
+                            // Get the Trip segment record
+                            currentTripSegment = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
                                    driverFuelEntryProcess.TripNumber, driverFuelEntryProcess.TripSegNumber, out fault);
-                        if (null != fault)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            break;
-                        }
-                        if (null == currentTrip)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: "
-                               + driverFuelEntryProcess.TripNumber + "-" + driverFuelEntryProcess.TripSegNumber));
-                            break;
+                            if (null != fault)
+                            {
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                                break;
+                            }
+                            if (null == currentTrip)
+                            {
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: "
+                                   + driverFuelEntryProcess.TripNumber + "-" + driverFuelEntryProcess.TripSegNumber));
+                                break;
+                            }
                         }
                     }
 
@@ -241,25 +245,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     powerFuel.PowerDateOfFuel = driverFuelEntryProcess.ActionDateTime;
 
                     powerFuel.PowerState = driverFuelEntryProcess.State;
+                    powerFuel.PowerCountry = driverFuelEntryProcess.Country;
+
                     powerFuel.PowerOdometer = driverFuelEntryProcess.Odometer;
                     powerFuel.PowerGallons = driverFuelEntryProcess.FuelAmount;
-
-                    ////////////////////////////////////////////////
-                    //Lookup the default country for driver's terminal in preferences
-                    powerFuel.PowerCountry = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
-                                             employeeMaster.TerminalId, PrefDriverConstants.DEFCountry, out fault);
-                    if (null != fault)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
 
                     //Do the insert
                     //The insert function will calculate the PowerFuelSeqNumber
                     log.DebugFormat("SRTEST:Saving PowerFuel Record for PowerId:{0} - Fuel Entry.",
                                     powerFuel.PowerId);
                     if (!Common.InsertPowerFuel(dataService, settings, userRoleIds, userCulture, log,
-                                           powerFuel, powerFuelInsertCount, out fault))
+                                           powerFuel, ++powerFuelInsertCount, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         log.ErrorFormat("InsertPowerFuel failed: {0} during fuel entry request: {1}", fault.Message, driverFuelEntryProcess);
@@ -369,7 +365,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        log.ErrorFormat("InsertDriverHistory failed: {0} during enorute request: {1}", fault.Message, driverFuelEntryProcess);
+                        log.ErrorFormat("InsertDriverHistory failed: {0} during Fuel Entry request: {1}", fault.Message, driverFuelEntryProcess);
                         break;
                     }
 

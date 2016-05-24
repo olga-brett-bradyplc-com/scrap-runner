@@ -156,8 +156,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     /////////////////////////////////////////////////
                     //Split the processing into one of two functions:
                     //Load/drop action type
-                    if (driverContainerActionProcess.ActionType == ActionTypeConstants.Load ||
-                        driverContainerActionProcess.ActionType == ActionTypeConstants.Dropped)
+                    if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Load ||
+                        driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Dropped)
                     {
                         if (!ContainerLoadDrop(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                                     driverContainerActionProcess, employeeMaster, containerHistoryInsertCount))
@@ -302,7 +302,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             //ContainerType,ContainerSize,ContainerTerminalId,ContainerRegionId
 
             //Based on the action type, container may or may not be on the PowerId.
-            if (driverContainerActionProcess.ActionType == ActionTypeConstants.Load)
+            if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Load)
             {
                 containerMaster.ContainerPowerId = driverContainerActionProcess.PowerId;
             }
@@ -336,7 +336,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             //containerMaster.LocationWarningFlag;
 
             //If container is being loaded, it is on the move, so remove its current lat/lon
-            if (driverContainerActionProcess.ActionType == ActionTypeConstants.Load)
+            if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Load)
             {
                 containerMaster.ContainerLatitude = null;
                 containerMaster.ContainerLongitude = null;
@@ -422,7 +422,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             ////////////////////////////////////////////////
             //Get a list of all  segments for the trip
-            var tripSegList = Common.GetTripSegments(dataService, settings, userCulture, userRoleIds,
+            var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
                               driverContainerActionProcess.TripNumber, out fault);
             if (null != fault)
             {
@@ -709,8 +709,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             // The Review Flag and Reason contains either R=Review and the ReviewReason
             // or E=Exception and the Exception Reason
-            if (driverContainerActionProcess.ActionType == ActionTypeConstants.Exception ||
-                driverContainerActionProcess.ActionType == ActionTypeConstants.Review)
+            if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Exception ||
+                driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Review)
             {
                 tripSegmentContainer.TripSegContainerReviewFlag = driverContainerActionProcess.ActionType;
                 tripSegmentContainer.TripSegContainerReviewReason = driverContainerActionProcess.ActionCode

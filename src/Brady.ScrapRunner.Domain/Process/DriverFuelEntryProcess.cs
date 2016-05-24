@@ -32,6 +32,9 @@ namespace Brady.ScrapRunner.Domain.Process
         ///The state. Required.
         public virtual string State { get; set; }
 
+        ///The country.  Required.
+        public virtual string Country { get; set; }
+
         ///The amount of fuel. Required.
         public virtual float FuelAmount { get; set; }
 

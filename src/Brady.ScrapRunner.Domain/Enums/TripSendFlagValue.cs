@@ -106,4 +106,30 @@ namespace Brady.ScrapRunner.Domain.Enums
         [RichEnum("Not Sent To Host", "NotSentToHost")]
         NotSentToHost = 12
     }
+    public enum TripSendScaleFlagValue
+    {
+        /// <summary>
+        /// 0 - No scale notice.
+        /// </summary>
+        [RichEnum("No Scale", "NoScale")]
+        NoScale = 0,
+
+        /// <summary>
+        /// 1 - Scale notice ready to be sent.
+        /// </summary>
+        [RichEnum("Scale Ready", "ScaleReady")]
+        ScaleReady = 1,
+
+        /// <summary>
+        /// 1 - Scale notice sent.
+        /// </summary>
+        [RichEnum("Scale Sent", "ScaleSent")]
+        ScaleSent = 2,
+
+        /// <summary>
+        /// 1 - Scale ready to be sent.
+        /// </summary>
+        [RichEnum("Scale Not Sent", "ScaleNotSent")]
+        ScaleNotSent = 3
+    }
 }
