@@ -102,6 +102,8 @@
     <Compile Include="ViewModels\NbScanViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\PublicScaleDetailViewModel.cs" />
+    <Compile Include="ViewModels\PublicScaleSummaryViewModel.cs" />
     <Compile Include="ViewModels\ScaleDetailViewModel.cs" />
     <Compile Include="ViewModels\ScaleSummaryViewModel.cs" />
     <Compile Include="ViewModels\TransactionConfirmationViewModel.cs" />

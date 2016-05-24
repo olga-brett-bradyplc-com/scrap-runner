@@ -360,5 +360,50 @@ namespace Brady.ScrapRunner.Mobile.Services
             tripSegment.TripSegStatus = TripSegStatusConstants.Done;
             return await _tripSegmentRepository.UpdateAsync(tripSegment);
         }
+        /// <summary>
+        /// Check to see if arriving segment of given trip type is W (Scale) type
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns>bool</returns>
+        public async Task<bool> IsTripLegAcctTypeScale(string tripNumber)
+        {
+            var segment = await _tripSegmentRepository.AsQueryable()
+                .Where(ts =>
+                    ts.TripNumber == tripNumber
+                    &&
+                    (ts.TripSegDestCustType == CustomerTypeConstants.Scale))
+                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
+
+            return segment.TripSegType.Equals(BasicTripTypeConstants.Scale) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.ReturnYard);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNo"></param>
+        /// <param name="tripSegContainerSeqNumber"></param>
+        /// <param name="tripSegContainerNumer"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateTripSegmentContainerCantProcessAsync(string tripNumber, string tripSegNo, short tripSegContainerSeqNumber, string tripSegContainerNumer,
+            string selectedReason)
+        {
+            // @TODO : Not complete
+            var container = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(
+                    tscm =>
+                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo && tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).FirstOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(container.TripSegContainerNumber))
+                container.TripSegContainerNumber = tripSegContainerNumer;
+
+            //TODO: Set processed flag to N and update selected reason from the list
+            //container.TripSegContainerReviewReason = selectedReason;
+            //container.TripSegContainerReviewFlag = Constants.Yes;
+
+            return await _tripSegmentContainerRepository.UpdateAsync(container);
+        }
+
     }
 }

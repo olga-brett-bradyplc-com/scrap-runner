@@ -276,7 +276,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             else if (await _tripService.IsTripLegScaleAsync(TripNumber))
             {
                 Close(this);
-                ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
+
+                if (await _tripService.IsTripLegAcctTypeScale(TripNumber))
+                    ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                else
+                    ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
             }
             else if (await _tripService.IsTripLegNoScreenAsync(TripNumber))
             {
