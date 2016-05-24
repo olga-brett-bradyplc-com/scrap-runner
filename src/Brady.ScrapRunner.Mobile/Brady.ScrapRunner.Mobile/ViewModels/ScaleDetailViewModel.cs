@@ -29,10 +29,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ContainerLeftOnTruckCommand = new MvxAsyncCommand(ExecuteContainerLeftOnTruckCommandAsync);
         }
 
-        public void Init(string tripNumber, string tripSegNumber, string tripSegContainerNumber)
+        public void Init(string tripNumber, string tripSegNumber, short tripSegContainerSeqNumber, string tripSegContainerNumber)
         {
             TripNumber = tripNumber;
             TripSegNumber = tripSegNumber;
+            TripSegContainerSeqNumber = tripSegContainerSeqNumber;
             TripSegContainerNumber = tripSegContainerNumber;
             SubTitle = $"Trip {TripNumber}";
         }
@@ -86,6 +87,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _tripSegContainerNumber, value); }
         }
 
+        private short _tripSegContainerSeqNumber;
+        public short TripSegContainerSeqNumber
+        {
+            get { return _tripSegContainerSeqNumber; }
+            set { SetProperty(ref _tripSegContainerSeqNumber, value); }
+        }
+
         private DateTime? _grossTime;
         public DateTime? GrossTime
         {
@@ -134,7 +142,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 //await
                 //    _tripService.UpdateTripSegmentContainerLongLatAsync(TripNumber, TripSegNumber,
                 //        TripSegContainerNumber, Latitude, Longitude);
-                await _tripService.CompleteTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerNumber);
+                await _tripService.CompleteTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerSeqNumber, TripSegContainerNumber);
                 await ExecuteNextStage();
             }
         }

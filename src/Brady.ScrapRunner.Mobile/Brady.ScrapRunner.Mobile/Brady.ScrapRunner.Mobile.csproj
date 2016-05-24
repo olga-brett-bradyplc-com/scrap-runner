@@ -96,10 +96,12 @@
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
     <Compile Include="ViewModels\FuelEntryViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\LoadDropContainerViewModel.cs" />
     <Compile Include="ViewModels\MessagesViewModel.cs" />
     <Compile Include="ViewModels\NewMessageViewModel.cs" />
+    <Compile Include="ViewModels\NbScanViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\MenuViewModel.cs" />
     <Compile Include="ViewModels\ScaleDetailViewModel.cs" />
     <Compile Include="ViewModels\ScaleSummaryViewModel.cs" />
     <Compile Include="ViewModels\TransactionConfirmationViewModel.cs" />

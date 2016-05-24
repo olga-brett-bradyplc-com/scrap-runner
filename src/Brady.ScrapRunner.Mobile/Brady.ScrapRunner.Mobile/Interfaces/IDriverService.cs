@@ -19,7 +19,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<ChangeResultWithItem<DriverFuelEntryProcess>> SetFuelEntryRemoteAsync(DriverFuelEntryProcess driverFuelEntryProcess);
 
-        Task<ChangeResultWithItem<DriverMessageProcess>> SendMessageRemoveAsync(DriverMessageProcess driverMessageEntryProcess);
+        Task<ChangeResultWithItem<DriverMessageProcess>> SendMessageRemoteAsync(DriverMessageProcess driverMessageEntryProcess);
 
         Task<DriverStatusModel> GetCurrentDriverStatusAsync();
     }

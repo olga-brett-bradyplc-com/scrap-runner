@@ -85,6 +85,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 tripNumber = selectedSegment.TripNumber,
                 tripSegNumber = selectedSegment.TripSegNumber,
+                tripSegContainerSeqNumber = selectedSegment.TripSegContainerSeqNumber,
                 tripSegContainerNumber = selectedSegment.TripSegContainerNumber
             });
         }

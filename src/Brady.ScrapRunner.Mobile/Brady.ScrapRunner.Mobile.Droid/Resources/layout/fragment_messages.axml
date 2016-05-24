@@ -4,12 +4,11 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-  <include
-      layout="@layout/toolbar" />
-  <Mvx.MvxListView
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     local:MvxItemTemplate="@layout/item_message"
-     local:MvxBind="ItemsSource Messages; ItemClick MessageSelectedCommand"
-     />
+    <include
+        layout="@layout/toolbar" />
+    <Mvx.MvxListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        local:MvxItemTemplate="@layout/item_message"
+        local:MvxBind="ItemsSource Messages; ItemClick MessageSelectedCommand" />
 </LinearLayout>

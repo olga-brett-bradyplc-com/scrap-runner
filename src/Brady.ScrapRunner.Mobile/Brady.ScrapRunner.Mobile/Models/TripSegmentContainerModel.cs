@@ -11,7 +11,7 @@
         [PrimaryKey]
         public string CompositeKey
         {
-            get { return TripNumber + ";" + TripSegNumber + ";" + TripSegContainerNumber; }
+            get { return $"{TripNumber};{TripSegContainerSeqNumber};{TripSegNumber}"; }
             set { /* NO-OP SETTER */ }
         }
 

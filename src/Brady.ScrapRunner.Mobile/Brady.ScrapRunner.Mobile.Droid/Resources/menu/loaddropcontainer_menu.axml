@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+  <item
+    android:id="@+id/add_new_container_loaddrop"
+    android:icon="@drawable/ic_add_white_36dp"
+    android:title="Add New Container"
+    app:showAsAction="always" />
+  <item
+    android:id="@+id/developer_nb_scan"
+    android:title="NB Add Ct ( Dev )"
+    app:showAsAction="never"/>
+</menu>

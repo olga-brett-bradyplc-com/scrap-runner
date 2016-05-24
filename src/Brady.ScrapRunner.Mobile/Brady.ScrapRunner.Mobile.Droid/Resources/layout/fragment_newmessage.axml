@@ -1,56 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-  <include
-      layout="@layout/toolbar" />
-  <RelativeLayout
-      android:id="@+id/SubNavigationPanel"
-      android:layout_height="wrap_content"
-      android:orientation="vertical"
-      android:layout_width="match_parent"
-      android:layout_marginTop="56dp">
-    <ScrollView
-      android:id="@+id/scroll_content"
-      android:layout_height="wrap_content"
-      android:layout_width="match_parent"
-      android:orientation="vertical"
-      android:fillViewport="true"
-      android:layout_below="@id/SubNavigationPanel">
-      <RelativeLayout
-         android:id="@+id/content_layout"
-          android:layout_height="match_parent"
-          android:layout_width="match_parent"
-          android:orientation="vertical"
-          android:padding="10dp"
-          local:MvxItemTemplate="@layout/item_newmessage"
-          local:MvxBind="ItemSource Messages">
-        <requestFocus />
-      <EditText
-          android:id="@+id/messageInputField"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:layout_alignParentBottom="true"
-          android:layout_below="@id/scroll_content"
-          local:MvxBind="Text MessageText"
-          local:MvxLang="Hint Message"
-          android:focusable="true"
-          android:focusableInTouchMode="true"
-          android:layout_marginTop="410dp"
-          />
-        <Button
-          android:layout_width="96dp"
-          android:layout_height="wrap_content"
-          android:layout_below="@id/messageInputField"
-          android:layout_marginBottom="4dp"
-          android:layout_alignParentRight="true"
-          android:textColor="#fff"
-          local:MvxBind="Click SendMessageCommand"
-          local:MvxLang="Text Send" />
-      </RelativeLayout>
-  </ScrollView>
-</RelativeLayout>
-
+    <include
+        layout="@layout/toolbar" />
+    <RelativeLayout
+        android:id="@+id/SubNavigationPanel"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_marginTop="56dp">
+        <ScrollView
+            android:id="@+id/scroll_content"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_marginBottom="45dp"
+            android:fillViewport="true"
+            android:layout_below="@id/SubNavigationPanel">
+            <Mvx.MvxListView
+                android:id="@+id/CurrentContainerList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                local:MvxItemTemplate="@layout/item_newmessage"
+                local:MvxBind="ItemsSource Messages" />
+        </ScrollView>
+        <RelativeLayout
+            android:id="@+id/content_layout"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            local:MvxItemTemplate="@layout/item_newmessage">
+            <EditText
+                android:id="@+id/messageInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:paddingRight="55dp"
+                android:layout_below="@id/scroll_content"
+                android:background="#fff"
+                android:padding="10dp"
+                local:MvxBind="Text MessageText"
+                local:MvxLang="Hint Message"
+                android:focusable="true"
+                android:focusableInTouchMode="true" />
+            <Button
+                android:layout_width="55dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="center"
+                android:background="?attr/colorAccent"
+                android:textColor="#000"
+                tools:text="Send"
+                local:MvxBind="Click SendMessageCommand"
+                local:MvxLang="Text Send" />
+        </RelativeLayout>
+    </RelativeLayout>
 </RelativeLayout>

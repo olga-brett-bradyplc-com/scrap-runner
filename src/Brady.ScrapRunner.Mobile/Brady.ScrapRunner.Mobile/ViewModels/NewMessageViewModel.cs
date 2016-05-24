@@ -20,10 +20,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IMessagesService _messagesService;
         private readonly IDriverService _driverService;
 
-        private string _messageText;
-
-        public NewMessageViewModel(IDriverService driverService, 
-                                   IMessagesService messagesService)
+        public NewMessageViewModel(IDriverService driverService, IMessagesService messagesService)
         {
             _driverService = driverService;
             _messagesService = messagesService;
@@ -32,9 +29,45 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var _messages = await _messagesService.FindMsgsFromAsync(SenderId);
+            var currentUser = await _driverService.GetCurrentDriverStatusAsync();
+            LocalUserId = currentUser.EmployeeId;
 
+            var messages = await _messagesService.FindMsgsFromAsync(RemoteUserId);
+            Messages = new ObservableCollection<MessagesModel>(messages);
             base.Start();
+        }
+
+        public void Init(string remoteUserId)
+        {
+            RemoteUserId = remoteUserId;
+        }
+        
+        private string _remoteUserId;
+        public string RemoteUserId
+        {
+            get { return _remoteUserId; }
+            set { SetProperty(ref _remoteUserId, value); }
+        }
+
+        private ObservableCollection<MessagesModel> _messages;
+        public ObservableCollection<MessagesModel> Messages
+        {
+            get { return _messages; }
+            set { SetProperty(ref _messages, value); }
+        }
+
+        private string _messageText;
+        public string MessageText
+        {
+            get { return _messageText; }
+            set { SetProperty(ref _messageText, value); }
+        }
+
+        private string _localUserId;
+        public string LocalUserId
+        {
+            get { return _localUserId; }
+            set { SetProperty(ref _localUserId, value); }
         }
 
         private IMvxAsyncCommand _sendMessageCommand;
@@ -62,41 +95,35 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             using (var loginData = UserDialogs.Instance.Loading(AppResources.SavingData, maskType: MaskType.Black))
             {
-                var currentUser = await _driverService.GetCurrentDriverStatusAsync();
-
-                var message = await _driverService.SendMessageRemoveAsync(new DriverMessageProcess
+                var message = await _driverService.SendMessageRemoteAsync(new DriverMessageProcess
                 {
-                    EmployeeId = currentUser.EmployeeId,
+                    EmployeeId = LocalUserId,
                     ActionDateTime = DateTime.Now,
-                    SenderId = currentUser.EmployeeId,
-                    ReceiverId = ReceiverId,
+                    SenderId = LocalUserId,
+                    ReceiverId = RemoteUserId,
                     MessageText = MessageText,
                     MessageThread = 0,
-                    UrgentFlag = "N"
+                    UrgentFlag = Constants.No
                 });
 
                 if (message.WasSuccessful)
                 {
                     //Add new message to the chain of messages
-                    _messages.Add(new MessagesModel
+                    Messages.Add(new MessagesModel
                     {
-                        TerminalId = currentUser.TerminalId,
                         CreateDateTime = DateTime.Now,
-                        SenderId = currentUser.EmployeeId,
-                        ReceiverId = SenderId,
+                        SenderId = LocalUserId,
+                        ReceiverId = RemoteUserId,
                         MsgText = MessageText,
                         Ack = "N",
                         MessageThread = 1,
-                        Area = currentUser.DriverArea,
                         SenderName = "", //TODO: get Sender's name
                         ReceiverName = "", //TODO: get Receiver's name
-                        Urgent = "N",
-                        Processed = "N",
+                        Urgent = Constants.No,
+                        Processed = Constants.No,
                         MsgSource = "R",//Driver's source
-                        DeleteFlag = "N"
+                        DeleteFlag = Constants.No
                     });
-
-                    _messageText = String.Empty;
 
                     return true;
                 }
@@ -106,35 +133,5 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 return false;
             }
         }
-        private string _senderId;
-        public string SenderId
-        {
-            get { return _senderId; }
-            set
-            {
-                SetProperty(ref _senderId, value);
-            }
-        }
-        private ObservableCollection<MessagesModel> _messages;
-        public ObservableCollection<MessagesModel> Messages
-        {
-            get { return _messages; }
-            set { SetProperty(ref _messages, value); }
-        }
-
-        public string MessageText
-        {
-            get { return _messageText; }
-            set { SetProperty(ref _messageText, value); }
-        }
-
-        private string _receiverId;
-
-        public string ReceiverId
-        {
-            get { return _receiverId; }
-            set { SetProperty(ref _receiverId, value); }
-        }
-
     }
 }

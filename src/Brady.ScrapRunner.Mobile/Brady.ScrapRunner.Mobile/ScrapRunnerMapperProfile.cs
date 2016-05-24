@@ -13,6 +13,7 @@
             CreateMap<EmployeeMaster, EmployeeMasterModel>();
             CreateMap<Preference, PreferenceModel>();
             CreateMap<PowerMaster, PowerMasterModel>();
+            CreateMap<ContainerMaster, ContainerMasterModel>();
             CreateMap<DriverStatus, DriverStatusModel>();
             CreateMap<Trip, TripModel>();
             CreateMap<TripSegment, TripSegmentModel>();

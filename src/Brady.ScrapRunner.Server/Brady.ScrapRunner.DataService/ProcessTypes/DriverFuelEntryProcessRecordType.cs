@@ -245,18 +245,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     powerFuel.PowerDateOfFuel = driverFuelEntryProcess.ActionDateTime;
 
                     powerFuel.PowerState = driverFuelEntryProcess.State;
+                    powerFuel.PowerCountry = driverFuelEntryProcess.Country;
+
                     powerFuel.PowerOdometer = driverFuelEntryProcess.Odometer;
                     powerFuel.PowerGallons = driverFuelEntryProcess.FuelAmount;
-
-                    ////////////////////////////////////////////////
-                    //Lookup the default country for driver's terminal in preferences
-                    powerFuel.PowerCountry = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
-                                             employeeMaster.TerminalId, PrefDriverConstants.DEFCountry, out fault);
-                    if (null != fault)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
 
                     //Do the insert
                     //The insert function will calculate the PowerFuelSeqNumber
