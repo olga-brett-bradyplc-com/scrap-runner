@@ -14,7 +14,7 @@
             get { return $"{TripNumber};{TripSegContainerSeqNumber};{TripSegNumber}"; }
             set { /* NO-OP SETTER */ }
         }
-
+        
         [MaxLength(10)]
         public string TripNumber { get; set; }
 

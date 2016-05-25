@@ -11,6 +11,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Binding.Droid.Views;
 
 
@@ -21,7 +22,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
     /// </summary>
     public class BindableGroupListAdapter : MvxAdapter
     {
-        int groupTemplateId;
+        private int _groupTemplateId;
         private IEnumerable _itemsSource;
 
         public BindableGroupListAdapter(Context context) : base(context)
@@ -30,12 +31,12 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
 
         public int GroupTemplateId
         {
-            get { return groupTemplateId; }
+            get { return _groupTemplateId; }
             set
             {
-                if (groupTemplateId == value)
+                if (_groupTemplateId == value)
                     return;
-                groupTemplateId = value;
+                _groupTemplateId = value;
 
                 // since the template has changed then let's force the list to redisplay by firing NotifyDataSetChanged()
                 if (ItemsSource != null)
@@ -43,22 +44,22 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
             }
         }
 
-        void OnItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             FlattenAndSetSource(_itemsSource);
         }
 
-        void FlattenAndSetSource(IEnumerable value)
+        private void FlattenAndSetSource(IEnumerable value)
         {
             var list = value.Cast<object>();
             var flattened = list.SelectMany((g) => FlattenHierachy(g));
             base.SetItemsSource(flattened.ToList());
         }
 
-        protected override void SetItemsSource(System.Collections.IEnumerable value)
+        protected override void SetItemsSource(IEnumerable value)
         {
-            if (_itemsSource == value)
-                return;
+            //if (_itemsSource == value)
+            //    return;
             var existingObservable = _itemsSource as INotifyCollectionChanged;
             if (existingObservable != null)
                 existingObservable.CollectionChanged -= OnItemsSourceCollectionChanged;
@@ -83,7 +84,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
             public object Item;
         }
 
-        IEnumerable<Object> FlattenHierachy(object group)
+        private IEnumerable<object> FlattenHierachy(object group)
         {
             yield return new FlatItem { IsGroup = true, Item = group };
             IEnumerable items = group as IEnumerable;
@@ -92,7 +93,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                     yield return new FlatItem { IsGroup = false, Item = d };
         }
 
-        protected override global::Android.Views.View GetBindableView(global::Android.Views.View convertView, object source, int templateId)
+        protected override View GetBindableView(global::Android.Views.View convertView, object source, int templateId)
         {
             FlatItem item = (FlatItem)source;
             if (item.IsGroup)
@@ -100,5 +101,38 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
             else
                 return base.GetBindableView(convertView, item.Item, ItemTemplateId);
         }
+
+        protected override View GetView(int position, View convertView, ViewGroup parent, int templateId)
+        {
+            var tempView = base.GetView(position, convertView, parent, templateId);
+            var item = GetRawItem(position);
+
+            var icon = tempView.FindViewById<ImageView>(Resource.Id.arrow_image);
+
+            // Should note that currently the grouped listview only on transaction stop screen,
+            // but if we decided to use it elsewhere, we may want to move this to a custom
+            // adapter specifically just for the transactions
+            if (icon != null)
+            {
+                var flatItem = (FlatItem)item;
+                var tscm = (TripSegmentContainerModel) flatItem.Item;
+
+                switch (tscm.TripSegContainerComplete)
+                {
+                    case "Y":
+                        icon.SetImageResource(Resource.Drawable.ic_check_circle_green_36dp);
+                        break;
+                    case "N":
+                        icon.SetImageResource(Resource.Drawable.ic_keyboard_arrow_right_black_24dp);
+                        break;
+                    default:
+                        icon.SetImageResource(Resource.Drawable.ic_keyboard_arrow_right_black_24dp);
+                        break;
+                }
+            }
+
+            return tempView;
+        }
+
     }
 }
