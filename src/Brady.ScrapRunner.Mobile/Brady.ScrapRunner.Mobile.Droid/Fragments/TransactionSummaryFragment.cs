@@ -9,6 +9,7 @@ using Android.Views;
 using Android.Widget;
 using Android.Content;
 using Android.Graphics;
+using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
 using Brady.ScrapRunner.Mobile.Models;
@@ -47,8 +48,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 .Commit();
 
             var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
+
             if (ViewModel.Containers != null)
-                listGrouping.ItemsSource = ViewModel.Containers;
+                listGrouping.Adapter.ItemsSource = ViewModel.Containers;
 
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
 
@@ -108,35 +110,17 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 }
                 
                 ViewModel.TransactionScannedCommand.Execute(result.Text);
+                var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
+                //ViewModel.SelectNextTransactionCommand.Execute();
 
                 VibrateDevice();
 
                 Activity.RunOnUiThread(() =>
                 {
-                    var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
-                    var ct = ViewModel.CurrentTransaction;
-                    var okey = ViewModel.CurrentTransaction.TripNumber + ViewModel.CurrentTransaction.TripSegNumber +
-                               ViewModel.CurrentTransaction.TripSegContainerSeqNumber;
-
-                    for (var i = 0; i < listGrouping.Count; i++)
-                    {
-                        var currentListItem = listGrouping.GetChildAt(i);
-                        var tripContainerKey = currentListItem.FindViewById<TextView>(Resource.Id.tripContainerKey)?.Text ?? "";
-
-                        if (tripContainerKey == okey)
-                        {
-                            var listItem = currentListItem.FindViewById<TextView>(Resource.Id.tripContainerInfo);
-                            listItem.SetText(listItem.Text.Replace("<NO NUMBER>", result.Text), TextView.BufferType.Normal);
-
-                            var listImage = currentListItem.FindViewById<ImageView>(Resource.Id.arrow_image);
-                            listImage.SetImageResource(Resource.Drawable.ic_check_circle_green_36dp);
-
-                            ViewModel.SelectNextTransactionCommand.Execute();
-
-                            break;
-                        }
-                    }
-
+                    // Update adapters item source
+                    listGrouping.Adapter.ItemsSource = ViewModel.Containers;
+                    listGrouping.InvalidateViews();
+                    //listGrouping.Invalidate();
                     Toast.MakeText(Activity, "Scanned: " + result.Text, ToastLength.Short).Show();
                 });
 
@@ -148,7 +132,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
             if (ViewModel.Containers != null)
             {
-                listGrouping.ItemsSource = ViewModel.Containers;
+                listGrouping.Adapter.ItemsSource = ViewModel.Containers;
             }
         }
 
