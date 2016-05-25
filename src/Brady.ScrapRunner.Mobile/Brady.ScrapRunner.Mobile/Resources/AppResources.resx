@@ -401,4 +401,14 @@
   <data name="Send" xml:space="preserve">
     <value>Send</value>
   </data>
+  <data name="PublicScaleDetail" xml:space="preserve">
+    <value>Public Scale Detail</value>
+  </data>
+  <data name="PublicScaleSummary" xml:space="preserve">
+    <value>Public Scale</value>
+  </data>
+  <data name="CantProcess" xml:space="preserve">
+    <value>Can't Process</value>
+    <comment>Public Scale Detail</comment>
+  </data>
 </root>

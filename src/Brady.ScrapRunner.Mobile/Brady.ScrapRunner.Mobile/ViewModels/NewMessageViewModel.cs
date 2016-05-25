@@ -32,7 +32,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var currentUser = await _driverService.GetCurrentDriverStatusAsync();
             LocalUserId = currentUser.EmployeeId;
 
-            var messages = await _messagesService.FindMsgsFromAsync(RemoteUserId);
+            var messages = await _messagesService.FindMsgsFromAsync(LocalUserId);
             Messages = new ObservableCollection<MessagesModel>(messages);
             base.Start();
         }
