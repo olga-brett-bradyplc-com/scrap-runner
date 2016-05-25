@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Mobile.Enums;
@@ -31,7 +32,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
-            SubTitle = TripNumber;
+            SubTitle = AppResources.Trip + $" {TripNumber}";
             TransactionScannedCommand = new MvxAsyncCommand<string>(ExecuteTransactionScannedCommandAsync);
             SelectNextTransactionCommand = new MvxCommand(ExecuteSelectNextTransactionCommand);
             ConfirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand);
@@ -123,6 +124,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction.TripNumber,
                     CurrentTransaction.TripSegNumber, CurrentTransaction.TripSegContainerSeqNumber,
                     CurrentTransaction.TripSegContainerNumber);
+
+            // Update local copy of container list
+            var container = await _tripService.FindTripSegmentContainer(CurrentTransaction.TripNumber,
+                CurrentTransaction.TripSegNumber, CurrentTransaction.TripSegContainerSeqNumber);
+
+            UpdateLocalContainers(container);
         }
 
         private void ExecuteSelectNextTransactionCommand()
@@ -151,6 +158,18 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Close(this);
             ShowViewModel<TransactionConfirmationViewModel>(new {tripNumber = TripNumber});
         }
-        
+
+        private void UpdateLocalContainers(TripSegmentContainerModel tripContainer)
+        {
+            var cotainerGroupingPos =
+                Containers.IndexOf(
+                    Containers.First(ts => ts.Key.TripSegNumber == CurrentTransaction.TripSegNumber));
+
+            var containerListPos =
+                Containers[cotainerGroupingPos].IndexOf(Containers[cotainerGroupingPos].First(
+                    tscm => tscm.TripSegContainerSeqNumber == CurrentTransaction.TripSegContainerSeqNumber));
+
+            Containers[cotainerGroupingPos][containerListPos] = tripContainer;
+        }
     }
 }
