@@ -81,8 +81,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 var sendMessageResult = await SaveSendMessageAsync();
                 if (!sendMessageResult)
                     return;
-
-                Close(this);
             }
             catch (Exception exception)
             {
@@ -99,8 +97,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 {
                     EmployeeId = LocalUserId,
                     ActionDateTime = DateTime.Now,
-                    SenderId = LocalUserId,
-                    ReceiverId = RemoteUserId,
+                    SenderId = LocalUserId.Trim(),
+                    ReceiverId = RemoteUserId.Trim(),
                     MessageText = MessageText,
                     MessageThread = 0,
                     UrgentFlag = Constants.No
@@ -124,6 +122,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         MsgSource = "R",//Driver's source
                         DeleteFlag = Constants.No
                     });
+                    
+                    MessageText = "";
 
                     return true;
                 }

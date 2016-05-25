@@ -22,42 +22,43 @@
             android:fillViewport="true"
             android:layout_below="@id/SubNavigationPanel">
             <Mvx.MvxListView
-                android:id="@+id/CurrentContainerList"
+                android:id="@+id/CurrentMessageList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 local:MvxItemTemplate="@layout/item_newmessage"
                 local:MvxBind="ItemsSource Messages" />
         </ScrollView>
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/content_layout"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:orientation="vertical"
-            local:MvxItemTemplate="@layout/item_newmessage">
+            android:layout_alignParentBottom="true"
+            android:background="#fff"
+            android:weightSum="1">
             <EditText
                 android:id="@+id/messageInputField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:paddingRight="55dp"
-                android:layout_below="@id/scroll_content"
-                android:background="#fff"
                 android:padding="10dp"
+                android:layout_marginRight="15dp"
                 local:MvxBind="Text MessageText"
                 local:MvxLang="Hint Message"
                 android:focusable="true"
+                android:layout_weight=".85"
                 android:focusableInTouchMode="true" />
             <Button
+                android:id="@+id/sendMessageButton"
                 android:layout_width="55dp"
-                android:layout_height="40dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"
-                android:layout_gravity="center"
+                android:layout_height="35dp"
+                android:layout_marginBottom="5dp"
+                android:padding="5dp"
+                android:layout_gravity="top|right"
+                android:layout_weight=".15"
                 android:background="?attr/colorAccent"
                 android:textColor="#000"
                 tools:text="Send"
                 local:MvxBind="Click SendMessageCommand"
                 local:MvxLang="Text Send" />
-        </RelativeLayout>
+        </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>
