@@ -75,6 +75,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 case Resource.Id.nav_adddelay:
                     await ViewModel.DelayCommandAsync.ExecuteAsync();
                     break;
+                case Resource.Id.nav_takepicture:
+                    ViewModel.TakePictureCommand.Execute();
+                    break;
             }
         }
     }
