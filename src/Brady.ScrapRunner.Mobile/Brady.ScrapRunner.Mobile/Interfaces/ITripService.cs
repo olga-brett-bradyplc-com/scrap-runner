@@ -54,7 +54,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<int> CompleteTripSegmentAsync(string tripNumber, string tripSegNo);
         Task<bool> IsTripLegAcctTypeScale(string tripNumber);
 
-        Task<int> UpdateTripSegmentContainerCantProcessAsync(string tripNumber, string tripSegNo,
-            short tripSegContainerSeqNumber, string tripSegContainerNumer, string selectedReason);
+        Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessPublicScaleAsync(DriverContainerActionProcess driverContActionProcess);
+        Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessContainerDoneAsync(DriverSegmentDoneProcess driverContActionProcess);
     }
 }

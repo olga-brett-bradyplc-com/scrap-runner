@@ -377,4 +377,8 @@
     <value>No se puede procesar</value>
     <comment>Public Scale Detail</comment>
   </data>
+  <data name="FinishedScale" xml:space="preserve">
+    <value>Acabado con escala</value>
+    <comment>Public Scale Continue</comment>
+  </data>
 </root>
