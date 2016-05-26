@@ -18,18 +18,18 @@ namespace Brady.ScrapRunner.Mobile.Services
 
     public class TripService : ITripService
     {
-        private readonly IConnectionService<DataServiceClient> _connection; 
+        private readonly IConnectionService<DataServiceClient> _connection;
         private readonly IRepository<PreferenceModel> _preferenceRepository;
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
-        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository; 
+        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
 
         public TripService(
             IConnectionService<DataServiceClient> connection,
-            IRepository<PreferenceModel> preferenceRepository, 
-            IRepository<TripModel> tripRepository, 
+            IRepository<PreferenceModel> preferenceRepository,
+            IRepository<TripModel> tripRepository,
             IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository )
+            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
         {
             _connection = connection;
             _preferenceRepository = preferenceRepository;
@@ -378,32 +378,22 @@ namespace Brady.ScrapRunner.Mobile.Services
             return segment.TripSegType.Equals(BasicTripTypeConstants.Scale) ||
                    segment.TripSegType.Equals(BasicTripTypeConstants.ReturnYard);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <param name="tripSegNo"></param>
-        /// <param name="tripSegContainerSeqNumber"></param>
-        /// <param name="tripSegContainerNumer"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateTripSegmentContainerCantProcessAsync(string tripNumber, string tripSegNo, short tripSegContainerSeqNumber, string tripSegContainerNumer,
-            string selectedReason)
+
+        public async Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessPublicScaleAsync(
+           DriverContainerActionProcess driverContainerActionProcess)
         {
-            // @TODO : Not complete
-            var container = await _tripSegmentContainerRepository.AsQueryable()
-                .Where(
-                    tscm =>
-                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo && tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).FirstOrDefaultAsync();
+            var publicScaleProcess =
+                await _connection.GetConnection().UpdateAsync(driverContainerActionProcess, requeryUpdated: false);
+            return publicScaleProcess;
 
-            if (string.IsNullOrEmpty(container.TripSegContainerNumber))
-                container.TripSegContainerNumber = tripSegContainerNumer;
-
-            //TODO: Set processed flag to N and update selected reason from the list
-            //container.TripSegContainerReviewReason = selectedReason;
-            //container.TripSegContainerReviewFlag = Constants.Yes;
-
-            return await _tripSegmentContainerRepository.UpdateAsync(container);
         }
+        public async Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessContainerDoneAsync(
+           DriverSegmentDoneProcess driverSegmentDoneProcess)
+        {
+            var containerProcess =
+                await _connection.GetConnection().UpdateAsync(driverSegmentDoneProcess, requeryUpdated: false);
+            return containerProcess;
 
+        }
     }
 }

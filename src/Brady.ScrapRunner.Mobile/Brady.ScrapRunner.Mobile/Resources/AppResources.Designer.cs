@@ -251,6 +251,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Finished with Scale.
+        /// </summary>
+        public static string FinishedScale {
+            get {
+                return ResourceManager.GetString("FinishedScale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Finish.
         /// </summary>
         public static string FinishLabel {

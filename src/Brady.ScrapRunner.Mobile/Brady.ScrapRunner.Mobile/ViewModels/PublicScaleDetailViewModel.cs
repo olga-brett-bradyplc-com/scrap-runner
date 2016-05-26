@@ -1,6 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 
@@ -15,19 +18,27 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class PublicScaleDetailViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
+        private readonly IDriverService _driverService;
+        private readonly ICodeTableService _codeTableService;
 
-        public PublicScaleDetailViewModel(ITripService tripService)
+        public PublicScaleDetailViewModel(ITripService tripService, IDriverService driverService,
+                                  ICodeTableService codeTableService)
         {
             _tripService = tripService;
+            _driverService = driverService;
+            _codeTableService = codeTableService;
+
             Title = AppResources.PublicScaleDetail;
 
             GrossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand);
             SecondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);
             TareWeightSetCommand = new MvxCommand(ExecuteTareWeightSetCommand, IsGrossWeightSet);
 
-            ContainerCantProcessCommand = new MvxAsyncCommand(ExecuteContainerCantProcessCommandAsync);
-            ContainerContinueCommand = new MvxAsyncCommand(ExecuteContainerContinueCommandAsync);
+            ContinueCommand = new MvxAsyncCommand(ExecuteContinueCommandAsync);
         }
+        private IMvxAsyncCommand _noProcessCommandAsync;
+        public IMvxAsyncCommand NoProcessCommandAsync
+            => _noProcessCommandAsync ?? (_noProcessCommandAsync = new MvxAsyncCommand(ExecuteNoProcessCommandDialog));
 
         public void Init(string tripNumber, string tripSegNumber, short tripSegContainerSeqNumber, string tripSegContainerNumber)
         {
@@ -129,31 +140,110 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Command bindings
-        public IMvxAsyncCommand ContainerCantProcessCommand { get; private set; }
-        public IMvxAsyncCommand ContainerContinueCommand { get; private set; }
+        public IMvxAsyncCommand ContinueCommand { get; private set; }
         public MvxCommand GrossWeightSetCommand { get; private set; }
         public MvxCommand TareWeightSetCommand { get; private set; }
         public MvxCommand SecondGrossWeightSetCommand { get; private set; }
 
         // Command impl
-        private async Task ExecuteContainerContinueCommandAsync()
+        private async Task ExecuteContinueCommandAsync()
         {
-            await _tripService.UpdateTripSegmentContainerWeightTimesAsync(TripNumber, TripSegNumber,
-                                                                           TripSegContainerNumber, GrossTime, SecondGrossTime, TareTime);
-            await _tripService.CompleteTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerSeqNumber, TripSegContainerNumber);
-            await ExecuteNextStage();
+            //popup "Finished with scale"
+            var result = await UserDialogs.Instance.ConfirmAsync(AppResources.FinishedScale);
+            if (result)
+            {
+                var currentUser = await _driverService.GetCurrentDriverStatusAsync();
+
+                var containerProcess = await _tripService.ProcessPublicScaleAsync(new DriverContainerActionProcess
+                {
+                    EmployeeId = currentUser.EmployeeId,
+                    PowerId = currentUser.PowerId,
+                    ActionType = ContainerActionTypeConstants.Done,
+                    ActionDateTime = DateTime.Now,
+                    TripNumber = TripNumber,
+                    TripSegNumber = TripSegNumber,
+                    ContainerNumber = TripSegContainerNumber,
+                    ActionDesc = SelectedReason,
+                    Gross1ActionDateTime = GrossTime,
+                    Gross2ActionDateTime = SecondGrossTime,
+                    TareActionDateTime = TareTime
+                });
+
+                var doneProcess = await _tripService.ProcessContainerDoneAsync(new DriverSegmentDoneProcess
+                {
+                    EmployeeId = currentUser.EmployeeId,
+                    TripNumber = TripNumber,
+                    TripSegNumber = TripSegNumber,
+                    ActionDateTime = DateTime.Now,
+                    PowerId = currentUser.PowerId,
+                    DriverModified = Constants.Yes
+                });
+
+                if (!doneProcess.WasSuccessful)
+                    await UserDialogs.Instance.AlertAsync(doneProcess.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                await ExecuteNextStage();
+            }
+        }
+        private ObservableCollection<CodeTableModel> _reviewReasonsList;
+        public ObservableCollection<CodeTableModel> ReviewReasonsList
+        {
+            get { return _reviewReasonsList; }
+            set { SetProperty(ref _reviewReasonsList, value); }
         }
 
-        private async Task ExecuteContainerCantProcessCommandAsync()
+        /* call DriverContainerActionProcess with an action flag of D for done or E for Exception (Can't process, I think should be treated as an exception). 
+          * After the DriverContainerActionProcess, app calls DriverSegmentDoneProcess with the trip segment info. In the DriverContainerActionProcess, 
+          * the review reason or exception desc would go in the ActionDesc field.
+          * On the server side ReviewReason in the TripSegmentContainer table can be either the review reason or the exception description, 
+          * depending on the action taken on the yard screen (review) or on the stop transaction screen (exception).
+          */
+        protected async Task ExecuteNoProcessCommandDialog()
         {
-            //TODO: popup list of review reasons
+            // Replace this with an actual query of relevant CodeTable objs from SQLite DB 
+            var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
+            ReviewReasonsList = new ObservableCollection<CodeTableModel>(reasons);
 
-            await
-                _tripService.UpdateTripSegmentContainerCantProcessAsync(TripNumber, TripSegNumber,
-                    TripSegContainerSeqNumber,
-                    TripSegContainerNumber, SelectedReason);
+            var alertAsync = await UserDialogs.Instance.ActionSheetAsync("Select Reason Code", "", "Cancel", ReviewReasonsList.Select(cm => cm.CodeDisp1).ToArray());
 
-                Close(this);
+            var currentUser = await _driverService.GetCurrentDriverStatusAsync();
+
+            var reasonItem = ReviewReasonsList.FirstOrDefault(cm => cm.CodeDisp1 == alertAsync);
+
+            if (reasonItem != null)
+            {
+                var containerProcess = await _tripService.ProcessPublicScaleAsync(new DriverContainerActionProcess
+                {
+                    EmployeeId = currentUser.EmployeeId,
+                    PowerId = currentUser.PowerId,
+                    ActionType = ContainerActionTypeConstants.Exception,
+                    ActionDateTime = DateTime.Now,
+                    TripNumber = TripNumber,
+                    TripSegNumber = TripSegNumber,
+                    ContainerNumber = TripSegContainerNumber,
+                    ActionDesc = reasonItem.CodeDisp1
+                });
+
+                if (!containerProcess.WasSuccessful)
+                    await UserDialogs.Instance.AlertAsync(containerProcess.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+
+                var doneProcess = await _tripService.ProcessContainerDoneAsync(new DriverSegmentDoneProcess
+                {
+                    EmployeeId = currentUser.EmployeeId,
+                    TripNumber = TripNumber,
+                    TripSegNumber = TripSegNumber,
+                    ActionDateTime = DateTime.Now,
+                    PowerId = currentUser.PowerId,
+                    DriverModified = Constants.Yes
+                });
+
+                if (!doneProcess.WasSuccessful)
+                    await UserDialogs.Instance.AlertAsync(doneProcess.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+            }
+
+            Close(this);
         }
 
         private async Task ExecuteNextStage()

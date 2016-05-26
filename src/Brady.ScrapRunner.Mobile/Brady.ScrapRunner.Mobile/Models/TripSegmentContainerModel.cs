@@ -49,6 +49,12 @@
 
         public DateTime? TripSegContainerActionDateTime { get; set; }
 
+        [MaxLength(1)]
+        public string TripSegContainerReviewFlag { get; set; }
+
+        [MaxLength(60)]
+        public string TripSegContainerReviewReason { get; set; }
+
         public DateTime? WeightGrossDateTime { get; set; }
 
         public int? TripSegContainerWeightGross { get; set; }
