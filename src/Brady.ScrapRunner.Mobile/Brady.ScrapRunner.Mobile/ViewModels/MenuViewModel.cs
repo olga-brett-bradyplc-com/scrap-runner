@@ -14,16 +14,18 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class MenuViewModel : BaseViewModel
     {
         private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly ICodeTableService _codeTableService;
 
-        public MenuViewModel(IConnectionService<DataServiceClient> connection)
+        public MenuViewModel(IConnectionService<DataServiceClient> connection, ICodeTableService codeTableService)
         {
             _connection = connection;
+            _codeTableService = codeTableService;
         }
 
         private IMvxAsyncCommand _logoutCommand;
         public IMvxAsyncCommand LogoutCommand => _logoutCommand ?? (_logoutCommand = new MvxAsyncCommand(ExecuteLogoutAsync));
 
-        public async Task ExecuteLogoutAsync()
+        private async Task ExecuteLogoutAsync()
         {
             var logoutDialog = await UserDialogs.Instance.ConfirmAsync(
                 AppResources.LogOutMessage, AppResources.LogOut, AppResources.Yes, AppResources.No);
@@ -34,33 +36,51 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 ShowViewModel<SignInViewModel>();
             }
         }
-        private MvxCommand _fuelentryCommand;
-
-        public MvxCommand FuelEntryCommand
+        private IMvxCommand _fuelentryCommand;
+        public IMvxCommand FuelEntryCommand
             => _fuelentryCommand ?? (_fuelentryCommand = new MvxCommand(ExecuteFuelEntryCommand));
 
-        public void ExecuteFuelEntryCommand()
+        private void ExecuteFuelEntryCommand()
         {
             ShowViewModel<FuelEntryViewModel>();
         }
-        private MvxCommand _messagesCommand;
 
-        public MvxCommand MessagesCommand
+        private IMvxCommand _messagesCommand;
+        public IMvxCommand MessagesCommand
             => _messagesCommand ?? (_messagesCommand = new MvxCommand(ExecuteMessagesCommand));
 
-        public void ExecuteMessagesCommand()
+        private void ExecuteMessagesCommand()
         {
             ShowViewModel<MessagesViewModel>(_connection);
         }
 
-        private MvxCommand _newMessageCommand;
-
-        public MvxCommand NewMessageCommand
+        private IMvxCommand _newMessageCommand;
+        public IMvxCommand NewMessageCommand
             => _newMessageCommand ?? (_newMessageCommand = new MvxCommand(ExecuteNewMessageCommand));
 
-        public void ExecuteNewMessageCommand()
+        private void ExecuteNewMessageCommand()
         {
             ShowViewModel<NewMessageViewModel>(_connection);
+        }
+
+        private IMvxAsyncCommand _delayCommandAsync;
+        public IMvxAsyncCommand DelayCommandAsync
+            => _delayCommandAsync ?? (_delayCommandAsync = new MvxAsyncCommand(ExecuteDelayComandAsync));
+
+        private async Task ExecuteDelayComandAsync()
+        {
+            var delays = await _codeTableService.FindCodeTableList("DELAYCODES");
+            var delayAlertAsync =
+                await
+                    UserDialogs.Instance.ActionSheetAsync("Select Delay Reason", "", "Cancel",
+                        delays.Select(ct => ct.CodeDisp1).ToArray());
+
+            if (delayAlertAsync != "Cancel")
+            {
+                var delayReasonObj = delays.FirstOrDefault(ct => ct.CodeDisp1 == delayAlertAsync);
+                ShowViewModel<DelayViewModel>(new {delayReason = delayReasonObj.CodeValue});
+            }
+
         }
     }
 }

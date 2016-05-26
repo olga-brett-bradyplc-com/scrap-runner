@@ -242,6 +242,7 @@
     <Compile Include="Controls\GroupListView\BindableGroupListAdapter.cs" />
     <Compile Include="Controls\GroupListView\BindableGroupListView.cs" />
     <Compile Include="DebugTrace.cs" />
+    <Compile Include="Fragments\DelayFragment.cs" />
     <Compile Include="Fragments\FuelEntryFragment.cs" />
     <Compile Include="Fragments\NbScanFragment.cs" />
     <Compile Include="Fragments\PublicScaleDetailFragment.cs" />
@@ -364,7 +365,7 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\menu\navigation_drawer.axml">
-      <SubType>AndroidResource</SubType>
+      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\fragment_navigation.axml">
       <SubType>AndroidResource</SubType>
@@ -403,6 +404,9 @@
     </AndroidResource>
     <AndroidResource Include="Resources\layout\item_publicscalesummary_listitem.axml">
       <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\fragment_delay.axml">
+      <SubType>AndroidResource</SubType>
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
@@ -1008,6 +1012,21 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\chatbubble_remote_new.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-hdpi\ic_alarm_off_black_36dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-mdpi\ic_alarm_off_black_36dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_alarm_off_black_36dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_alarm_off_black_36dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_alarm_off_black_36dp.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\..\..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\build\Xamarin.Android.Support.Vector.Drawable.targets" Condition="Exists('..\..\..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\build\Xamarin.Android.Support.Vector.Drawable.targets')" />

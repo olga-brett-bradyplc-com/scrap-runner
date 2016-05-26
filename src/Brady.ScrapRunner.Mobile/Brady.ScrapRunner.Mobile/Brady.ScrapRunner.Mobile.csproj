@@ -95,6 +95,7 @@
     <Compile Include="Validators\PasswordValidator.cs" />
     <Compile Include="Validators\PowerUnitValidator.cs" />
     <Compile Include="Validators\UsernameValidator.cs" />
+    <Compile Include="ViewModels\DelayViewModel.cs" />
     <Compile Include="ViewModels\FuelEntryViewModel.cs" />
     <Compile Include="ViewModels\LoadDropContainerViewModel.cs" />
     <Compile Include="ViewModels\MessagesViewModel.cs" />

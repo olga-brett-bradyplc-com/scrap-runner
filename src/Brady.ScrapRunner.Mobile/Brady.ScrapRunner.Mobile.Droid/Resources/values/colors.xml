@@ -22,6 +22,10 @@
   <color name="material_green_300">#5BE326</color>
   <color name="material_green_500">#43b517</color>
   <color name="material_green_700">#2F7F10</color>
+
+  <color name="material_orange_300">#fd8c3e</color>
+  <color name="material_orange_500">#f56400</color>
+  <color name="material_orange_700">#e35d00</color>
   
   <color name="accent">#FFC107</color>
 
@@ -51,6 +55,9 @@
 
   <color name="arrive">@color/material_red_500</color>
   <color name="arrive_pressed">@color/material_red_700</color>
+
+  <color name="delayed">@color/material_orange_500</color>
+  <color name="delayed_pressed">@color/material_orange_700</color>
 
   <color name="incoming_message">@color/material_white</color>
 
