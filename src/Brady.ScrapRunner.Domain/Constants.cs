@@ -297,9 +297,9 @@
         public static readonly string ReceivedDriverCancelSeg = "RECEIVED DRIVER CANCEL SEG";
         /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
         public static readonly string ReceivedDriverAddedSeg = "RECEIVED DRIVER ADDED SEG";
-        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER CONTAINER ACTION SEG</summary>
+        /// <summary>ReceivedDriverContainerAction: RECEIVED DRIVER CONTAINER ACTION</summary>
         public static readonly string ReceivedDriverContainerAction = "RECEIVED DRIVER CONTAINER ACTION";
-        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER NEW CONTAINER</summary>
+        /// <summary>ReceivedDriverNewContainer: RECEIVED DRIVER NEW CONTAINER</summary>
         public static readonly string ReceivedDriverNewContainer = "RECEIVED DRIVER NEW CONTAINER";
     }
     public static class HistoryActionConstants

@@ -122,9 +122,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     //ToDo: Even getting a single ContainerHistory record and deleting it, throws an exception
-                    //var containerHistoryOne = Common.GetContainerHistoryOne(dataService, settings, userCulture, userRoleIds,
-                    //driverNewContainerProcess.ContainerBarcode, 1, out fault);
-                    //changeSetResult = Common.DeleteContainerHistory(dataService, settings, containerHistoryOne);
+                    //var containerHistoryOne = new ContainerHistory();
+                    //containerHistoryOne = Common.GetContainerHistoryOne(dataService, settings, userCulture, userRoleIds,
+                    //                      driverNewContainerProcess.ContainerBarcode, 38, out fault);
+                    //if (containerHistoryOne!= null)
+                    //    changeSetResult = Common.DeleteContainerHistory(dataService, settings, containerHistoryOne);
 
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
