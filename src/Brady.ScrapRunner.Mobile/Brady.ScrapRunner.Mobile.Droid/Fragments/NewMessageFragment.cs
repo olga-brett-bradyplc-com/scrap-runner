@@ -10,10 +10,12 @@ using Android.Support.V4.Content;
 using Android.Views;
 using Android.Widget;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
+using Brady.ScrapRunner.Mobile.Droid.Controls.ChatAdapter;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Droid.BindingContext;
+using MvvmCross.Binding.Droid.Views;
 using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Platform.WeakSubscription;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
@@ -27,5 +29,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         protected override int FragmentId => Resource.Layout.fragment_newmessage;
         protected override bool NavMenuEnabled => false;
 
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            var currentList = View.FindViewById<MvxListView>(Resource.Id.CurrentMessageList);
+            currentList.Adapter = new ChatMessageAdapter(Activity, (MvxAndroidBindingContext)BindingContext);
+            currentList.SetSelection(currentList.Adapter.Count - 1);
+        }
     }
 }
