@@ -167,7 +167,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
-                    //Only associated delay with trip if the trip is in progress
+                    //Only associated fuel entry with trip if the trip is in progress
                     var currentTrip = new Trip();
                     var currentTripSegment = new TripSegment();
 

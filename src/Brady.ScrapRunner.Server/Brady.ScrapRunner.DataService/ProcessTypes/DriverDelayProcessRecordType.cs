@@ -336,8 +336,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             driverDelay.DelayLongitude = driverDelayProcess.Longitude;
 
             //Do the insert
-            //ToDo: The insert function will not work properly with #driverid in the tripnumberfield.
-            //It does not throw an exception. It will just overwrite the record with a seq# of 1
+            //There was a problem with  the insert function not working properly with #driverid in the tripnumber field.
+            //But this has been corrected with a BWF update. Pass false to the GetQuery function.
             //The insert function will calculate the DelaySeqNumber
             log.DebugFormat("SRTEST:Saving DriverDelay Record for DriverId:{0} DelayCode:{1}-Driver Delay.",
                             driverDelay.DriverId, driverDelay.DelayCode);
@@ -358,75 +358,72 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                 return false;
             }
-            if (driverStatus == null)
+            //ToDo: What do we do if there is no driver status record, driver not logged in.
+            //Should we create a new driver status record?
+            if (driverStatus != null)
             {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverDelayProcess:Invalid DriverId: " + driverDelayProcess.EmployeeId));
-                return false;
-            }
 
-            //Set the field values for driver status
-            //Don't store delay or back on duty in previous driver status
-            //if (driverStatus.Status != DriverStatusSRConstants.Delay &&
-            //    driverStatus.Status != DriverStatusSRConstants.BackOnDuty)
-            //{
-            //    driverStatus.PrevDriverStatus = driverStatus.Status;
-            //}
-            driverStatus.Status = DriverStatusSRConstants.Delay;
+                //Set the field values for driver status
+                //Save the original status in the PrevDriverStatus, so that it can be used after the
+                //back on duty is processed.
+                driverStatus.PrevDriverStatus = driverStatus.Status;
+                driverStatus.Status = DriverStatusSRConstants.Delay;
 
-            //For delays store the delay code
-            driverStatus.DelayCode = driverDelayProcess.DelayCode;
+                //For delays store the delay code
+                driverStatus.DelayCode = driverDelayProcess.DelayCode;
 
-            if (driverDelayProcess.TripNumber != null)
-            {
-                driverStatus.TripNumber = driverDelayProcess.TripNumber;
-                driverStatus.TripSegNumber = driverDelayProcess.TripSegNumber;
-                driverStatus.TripSegType = currentTripSegment.TripSegType;
-                driverStatus.TripAssignStatus = currentTrip.TripAssignStatus;
-                driverStatus.TripStatus = currentTrip.TripStatus;
-                driverStatus.TripSegStatus = currentTripSegment.TripSegStatus;
-            }
-            else
-            {
-                driverStatus.TripNumber = null;
-                driverStatus.TripSegNumber = null;
-                driverStatus.TripSegType = null;
-                driverStatus.TripAssignStatus = null;
-                driverStatus.TripStatus = null;
-                driverStatus.TripSegStatus = null;
-            }
-            driverStatus.PowerId = driverDelayProcess.PowerId;
-            driverStatus.MDTId = driverDelayProcess.Mdtid;
-            driverStatus.ActionDateTime = driverDelayProcess.ActionDateTime;
+                if (driverDelayProcess.TripNumber != null)
+                {
+                    driverStatus.TripNumber = driverDelayProcess.TripNumber;
+                    driverStatus.TripSegNumber = driverDelayProcess.TripSegNumber;
+                    driverStatus.TripSegType = currentTripSegment.TripSegType;
+                    driverStatus.TripAssignStatus = currentTrip.TripAssignStatus;
+                    driverStatus.TripStatus = currentTrip.TripStatus;
+                    driverStatus.TripSegStatus = currentTripSegment.TripSegStatus;
+                }
+                else
+                {
+                    driverStatus.TripNumber = null;
+                    driverStatus.TripSegNumber = null;
+                    driverStatus.TripSegType = null;
+                    driverStatus.TripAssignStatus = null;
+                    driverStatus.TripStatus = null;
+                    driverStatus.TripSegStatus = null;
+                }
+                driverStatus.PowerId = driverDelayProcess.PowerId;
+                driverStatus.MDTId = driverDelayProcess.Mdtid;
+                driverStatus.ActionDateTime = driverDelayProcess.ActionDateTime;
 
-            if (null == driverDelayProcess.Latitude || null == driverDelayProcess.Longitude)
-            {
-                driverStatus.GPSXmitFlag = Constants.No;
-            }
-            else
-            {
-                driverStatus.GPSXmitFlag = Constants.Yes;
-            }
+                if (null == driverDelayProcess.Latitude || null == driverDelayProcess.Longitude)
+                {
+                    driverStatus.GPSXmitFlag = Constants.No;
+                }
+                else
+                {
+                    driverStatus.GPSXmitFlag = Constants.Yes;
+                }
 
-            //Do the DriverStatus update
-            changeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
-            log.DebugFormat("SRTEST:Saving DriverStatus Record for DriverId:{0} - Driver Delay.",
-                            driverStatus.EmployeeId);
-            if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
-            {
-                var s = string.Format("Could not update DriverStatus for DriverId:{0}.",
-                    driverStatus.EmployeeId);
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                return false;
-            }
+                //Do the DriverStatus update
+                changeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
+                log.DebugFormat("SRTEST:Saving DriverStatus Record for DriverId:{0} - Driver Delay.",
+                                driverStatus.EmployeeId);
+                if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
+                {
+                    var s = string.Format("Could not update DriverStatus for DriverId:{0}.",
+                        driverStatus.EmployeeId);
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                    return false;
+                }
 
-            ////////////////////////////////////////////////
-            //Add record to the DriverHistory table. 
-            if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
-                ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
-            {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                log.ErrorFormat("InsertDriverHistory failed: {0} during Delay request: {1}", fault.Message, driverDelayProcess);
-                return false;
+                ////////////////////////////////////////////////
+                //Add record to the DriverHistory table. 
+                if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
+                    ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
+                {
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                    log.ErrorFormat("InsertDriverHistory failed: {0} during Delay request: {1}", fault.Message, driverDelayProcess);
+                    return false;
+                }
             }
 
             ////////////////////////////////////////////////
@@ -498,7 +495,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             if (driverDelayList == null)
             {
-                //ToDo: If there is no delay started, should we start one and end it?
+                //ToDo: On a back on duty, if there is no delay started, should we start one and end it?
             }
             
             var driverDelay = driverDelayList.FirstOrDefault();
@@ -548,78 +545,72 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                 return false;
             }
-            if (driverStatus == null)
+            if (driverStatus != null)
             {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverDelayProcess(BackOnDuty):Invalid DriverId: " + driverDelayProcess.EmployeeId));
-                return false;
-            }
+                //Set the field values for driver status
+                //Don't store the current status (Delay) in previous driver status
+                //driverStatus.PrevDriverStatus = driverStatus.Status;
 
-            //Set the field values for driver status
-            //Don't store delay or back on duty in previous driver status
-            //if (driverStatus.Status != DriverStatusSRConstants.Delay &&
-            //    driverStatus.Status != DriverStatusSRConstants.BackOnDuty)
-            //{
-            //    driverStatus.PrevDriverStatus = driverStatus.Status;
-            //}
-            driverStatus.Status = DriverStatusSRConstants.BackOnDuty;
+                driverStatus.Status = DriverStatusSRConstants.BackOnDuty;
 
-            //For Back on duty remove the delay code
-            driverStatus.DelayCode = null;
+                //For Back on duty remove the delay code
+                driverStatus.DelayCode = null;
 
-            if (driverDelayProcess.TripNumber != null)
-            {
-                driverStatus.TripNumber = driverDelayProcess.TripNumber;
-                driverStatus.TripSegNumber = driverDelayProcess.TripSegNumber;
-                driverStatus.TripSegType = currentTripSegment.TripSegType;
-                driverStatus.TripAssignStatus = currentTrip.TripAssignStatus;
-                driverStatus.TripStatus = currentTrip.TripStatus;
-                driverStatus.TripSegStatus = currentTripSegment.TripSegStatus;
-            }
-            else
-            {
-                driverStatus.TripNumber = null;
-                driverStatus.TripSegNumber = null;
-                driverStatus.TripSegType = null;
-                driverStatus.TripAssignStatus = null;
-                driverStatus.TripStatus = null;
-                driverStatus.TripSegStatus = null;
-            }
-            driverStatus.PowerId = driverDelayProcess.PowerId;
-            driverStatus.MDTId = driverDelayProcess.Mdtid;
-            driverStatus.ActionDateTime = driverDelayProcess.ActionDateTime;
+                if (driverDelayProcess.TripNumber != null)
+                {
+                    driverStatus.TripNumber = driverDelayProcess.TripNumber;
+                    driverStatus.TripSegNumber = driverDelayProcess.TripSegNumber;
+                    driverStatus.TripSegType = currentTripSegment.TripSegType;
+                    driverStatus.TripAssignStatus = currentTrip.TripAssignStatus;
+                    driverStatus.TripStatus = currentTrip.TripStatus;
+                    driverStatus.TripSegStatus = currentTripSegment.TripSegStatus;
+                }
+                else
+                {
+                    driverStatus.TripNumber = null;
+                    driverStatus.TripSegNumber = null;
+                    driverStatus.TripSegType = null;
+                    driverStatus.TripAssignStatus = null;
+                    driverStatus.TripStatus = null;
+                    driverStatus.TripSegStatus = null;
+                }
+                driverStatus.PowerId = driverDelayProcess.PowerId;
+                driverStatus.MDTId = driverDelayProcess.Mdtid;
+                driverStatus.ActionDateTime = driverDelayProcess.ActionDateTime;
 
-            if (null == driverDelayProcess.Latitude || null == driverDelayProcess.Longitude)
-            {
-                driverStatus.GPSXmitFlag = Constants.No;
-            }
-            else
-            {
-                driverStatus.GPSXmitFlag = Constants.Yes;
-            }
+                if (null == driverDelayProcess.Latitude || null == driverDelayProcess.Longitude)
+                {
+                    driverStatus.GPSXmitFlag = Constants.No;
+                }
+                else
+                {
+                    driverStatus.GPSXmitFlag = Constants.Yes;
+                }
 
-            ////////////////////////////////////////////////
-            //Add record to the DriverHistory table. 
-            if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
-                ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
-            {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                log.ErrorFormat("InsertDriverHistory failed: {0} during BackOnDuty request: {1}", fault.Message, driverDelayProcess);
-                return false;
-            }
+                ////////////////////////////////////////////////
+                //Add record to the DriverHistory table. 
+                if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
+                    ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
+                {
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                    log.ErrorFormat("InsertDriverHistory failed: {0} during BackOnDuty request: {1}", fault.Message, driverDelayProcess);
+                    return false;
+                }
 
-            //For Back on Duty set the driver status back to the previous status
-            driverStatus.Status = driverStatus.PrevDriverStatus;
+                //For Back on Duty set the driver status back to the previous status
+                driverStatus.Status = driverStatus.PrevDriverStatus;
 
-            //Now do the DriverStatus update
-            changeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
-            log.DebugFormat("SRTEST:Saving DriverStatus Record for DriverId:{0} - Driver Delay.",
-                            driverStatus.EmployeeId);
-            if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
-            {
-                var s = string.Format("Could not update DriverStatus for DriverId:{0}.",
-                    driverStatus.EmployeeId);
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                return false;
+                //Now do the DriverStatus update
+                changeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
+                log.DebugFormat("SRTEST:Saving DriverStatus Record for DriverId:{0} - Driver Delay.",
+                                driverStatus.EmployeeId);
+                if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
+                {
+                    var s = string.Format("Could not update DriverStatus for DriverId:{0}.",
+                        driverStatus.EmployeeId);
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                    return false;
+                }
             }
 
             ////////////////////////////////////////////////
