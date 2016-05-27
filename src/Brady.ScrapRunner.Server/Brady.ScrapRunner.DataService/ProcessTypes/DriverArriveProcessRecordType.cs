@@ -167,11 +167,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
                     ////////////////////////////////////////////////
-                    //Adjust odometer based on previously recorded odometer. 
-                    //If odometer from mobile device (driverEnrouteProcess.Odometer) is less than PowerMaster.PowerOdometer, 
-                    //use the PowerMaster.PowerOdometer instead of the odometer from the mobile device.
-                    //Adjust odometer here before we start using driverEnrouteProcess.Odometer
-                    ////////////////////////////////////////////////
                     // Get the PowerMaster record
                     var powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
                                       driverArriveProcess.PowerId, out fault);
@@ -187,6 +182,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
+                    ////////////////////////////////////////////////
+                    //Adjust odometer based on previously recorded odometer. 
                     //Do not use the odometer from the driver if it is less than the last recorded 
                     //odometer stored in the PowerMaster.
                     if (powerMaster.PowerOdometer != null)
@@ -218,13 +215,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             driverArriveProcess.TripNumber + "-" + driverArriveProcess.TripSegNumber));
                         break;
                     }
-
-                    ////////////////////////////////////////////////
-                    //Adjust odometer based on previously recorded odometer. 
-                    //If odometer from mobile device (driverArriveProcess.Odometer) is less than PowerMaster.PowerOdometer, 
-                    //use the PowerMaster.PowerOdometer instead of the odometer from the mobile device.
-                    //Do we really want to do this?
-                    //If so, we will need to adjust it here before we start using driverArriveProcess.Odometer
 
                     ////////////////////////////////////////////////
                     //Get a list of all containers for the segment
@@ -747,7 +737,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
-                    // TODO: Check if trip is out of order. 
+                    // TODO: Check if trip is out of order. May not need to do this. Should have been done on the enroute.
                     // If trip is out or order, resequence his trips.
                     // Normally we would then send a resequence trips message to  driver.
 

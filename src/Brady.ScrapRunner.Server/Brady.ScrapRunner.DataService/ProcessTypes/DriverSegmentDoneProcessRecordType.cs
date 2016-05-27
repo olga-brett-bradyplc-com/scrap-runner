@@ -843,7 +843,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
 
             ////////////////////////////////////////////////
-            //TODO: Update TripTable - partially complete.
+            //Update TripTable
 
             //////////////////////////////////////////////////////
             //Determine the trip status
@@ -954,7 +954,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
 
             ////////////////////////////////////////////////
-            // TODO: Test Trip Send Flag setting
             // Check if the TripSendFlag in the Trip table should be set to send completed trip information.
             // ScrapRunner sends trips to host only when the trip send flag is set to D=Done.
 
@@ -1023,7 +1022,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }//end of if (prefDEFTHTrip == Constants.Yes)
 
 
-            //TODO: Check if the TripSendScaleNotificationFlag in the Trip table should be set to send a scale notice.
+            ////////////////////////////////////////////////
+            //Check if the TripSendScaleNotificationFlag in the Trip table should be set to send a scale notice.
             //If the trip is supposed to generate a scale notice (TripCommodityScaleMsg = Y)
             //and one has not been generated, send it now by setting the TripSendScaleNotificationFlag to 1
             //This would occur for a trip that did not have a return to yard segment because the driver

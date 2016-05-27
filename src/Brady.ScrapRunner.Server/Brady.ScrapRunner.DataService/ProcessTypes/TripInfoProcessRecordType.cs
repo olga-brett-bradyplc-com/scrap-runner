@@ -170,6 +170,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     // Get the list of trips for driver
                     var tripList = new List<Trip>();
+                    //ToDo: Need to be able to determine if we are sending trips because of a login request or because
+                    //a new trip has been entered or an existing one modified for a driver that is logged in.
+                    //For now bLogin is true;
                     if (bLogin)
                     {
                         tripList = Common.GetTripsForDriverAtLogin(dataService, settings, userCulture, userRoleIds,
