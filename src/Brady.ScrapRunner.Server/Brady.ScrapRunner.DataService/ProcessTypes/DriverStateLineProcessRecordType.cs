@@ -269,11 +269,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     newTripSegmentMileage.TripSegMileageDriverName = Common.GetEmployeeName(employeeMaster);
 
                     //Pass in false to not update ending odometer. 
-                    Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
-                        newTripSegmentMileage, ++tripSegmentMileageCount, out fault);
                     log.DebugFormat("SRTEST:Adding TripSegmentMileage Record for Trip:{0}-{1} State:{2} - StateLine.",
                                     driverStateLineProcess.TripNumber, driverStateLineProcess.TripSegNumber, driverStateLineProcess.State);
-
+                    if(!Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
+                        newTripSegmentMileage, ++tripSegmentMileageCount, out fault))
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        log.ErrorFormat("InsertTripSegmentMileage failed: {0} during state line request: {1}", fault.Message, driverStateLineProcess);
+                        break;
+                    }
 
                     ////////////////////////////////////////////////
                     //Update the DriverStatus table. 
