@@ -440,6 +440,8 @@
         /// Require Driver to Enter Container # for NB# serialized labels?(Y/N):
         /// When this option is set to “Y”, when a driver uses a container with a serialized label and a 
         /// container type of NB#, he will be prompted to enter the correct container number, type and size. 
+        /// If this option is set to "N", when a driver uses a container with a serialized label and a
+        /// container type of NB#, he will be prompted to enter only the type and size.
         /// This will update the container record and will not be required the next time the container is used.
         /// </summary>
         public static readonly string DEFReqEntryContNumberForNB = "DEFReqEntryContNumberForNB";
