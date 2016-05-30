@@ -18,22 +18,23 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
             // InexactRepeating alarms will be batched together across the system for power savings.
             // Timeouts < 1 minute will often be rounded up to 1 minute.
             var alarmManager = AlarmManager.FromContext(Application.Context);
-            alarmManager?.SetInexactRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, timeoutMillis, GetIntent());
+            var pendingIntent = PendingIntent.GetBroadcast(Application.Context, AlarmRequestCode, NewIntent(), 0);
+            alarmManager?.SetInexactRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, timeoutMillis, pendingIntent);
         }
 
         public void Unschedule()
         {
-            var queueServicePendingIntent = GetIntent();
-            queueServicePendingIntent.Cancel();
+            var pendingIntent = PendingIntent.GetBroadcast(Application.Context, AlarmRequestCode, 
+                NewIntent(), PendingIntentFlags.NoCreate);
+            if (pendingIntent == null) return;
+            pendingIntent.Cancel();
             var alarmManager = AlarmManager.FromContext(Application.Context);
-            alarmManager?.Cancel(queueServicePendingIntent);
+            alarmManager?.Cancel(pendingIntent);
         }
 
-        private PendingIntent GetIntent()
+        private static Intent NewIntent()
         {
-            var queueServiceIntent = new Intent(Application.Context, typeof(QueueIntentBroadcastReceiver));
-            var queueServicePendingIntent = PendingIntent.GetBroadcast(Application.Context, AlarmRequestCode, queueServiceIntent, 0);
-            return queueServicePendingIntent;
+            return new Intent(Application.Context, typeof(QueueIntentBroadcastReceiver));
         }
     }
 }
