@@ -18,18 +18,18 @@ namespace Brady.ScrapRunner.Mobile.Services
 
     public class TripService : ITripService
     {
-        private readonly IConnectionService _connection; 
+        private readonly IConnectionService<DataServiceClient> _connection;
         private readonly IRepository<PreferenceModel> _preferenceRepository;
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
-        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository; 
+        private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
 
         public TripService(
-            IConnectionService connection,
-            IRepository<PreferenceModel> preferenceRepository, 
-            IRepository<TripModel> tripRepository, 
+            IConnectionService<DataServiceClient> connection,
+            IRepository<PreferenceModel> preferenceRepository,
+            IRepository<TripModel> tripRepository,
             IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository )
+            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
         {
             _connection = connection;
             _preferenceRepository = preferenceRepository;
@@ -359,6 +359,41 @@ namespace Brady.ScrapRunner.Mobile.Services
                         ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
             tripSegment.TripSegStatus = TripSegStatusConstants.Done;
             return await _tripSegmentRepository.UpdateAsync(tripSegment);
+        }
+        /// <summary>
+        /// Check to see if arriving segment of given trip type is W (Scale) type
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns>bool</returns>
+        public async Task<bool> IsTripLegAcctTypeScale(string tripNumber)
+        {
+            var segment = await _tripSegmentRepository.AsQueryable()
+                .Where(ts =>
+                    ts.TripNumber == tripNumber
+                    &&
+                    (ts.TripSegDestCustType == CustomerTypeConstants.Scale))
+                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
+
+            return segment.TripSegType.Equals(BasicTripTypeConstants.Scale) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.ReturnYard);
+        }
+
+        public async Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessPublicScaleAsync(
+           DriverContainerActionProcess driverContainerActionProcess)
+        {
+            var publicScaleProcess =
+                await _connection.GetConnection().UpdateAsync(driverContainerActionProcess, requeryUpdated: false);
+            return publicScaleProcess;
+
+        }
+        public async Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessContainerDoneAsync(
+           DriverSegmentDoneProcess driverSegmentDoneProcess)
+        {
+            var containerProcess =
+                await _connection.GetConnection().UpdateAsync(driverSegmentDoneProcess, requeryUpdated: false);
+            return containerProcess;
+
         }
     }
 }

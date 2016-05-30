@@ -30,6 +30,8 @@
         public string TripSegOrigCustName { get; set; }
         [MaxLength(10)]
         public string TripSegOrigCustHostCode { get; set; }
+        [MaxLength(1)]
+        public string TripSegDestCustType { get; set; }
         [MaxLength(30)]
         public string TripSegDestCustName { get; set; }
         [MaxLength(10)]

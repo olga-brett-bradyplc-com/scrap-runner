@@ -52,5 +52,9 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<int> CompleteTripAsync(string tripNumber);
 
         Task<int> CompleteTripSegmentAsync(string tripNumber, string tripSegNo);
+        Task<bool> IsTripLegAcctTypeScale(string tripNumber);
+
+        Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessPublicScaleAsync(DriverContainerActionProcess driverContActionProcess);
+        Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessContainerDoneAsync(DriverSegmentDoneProcess driverContActionProcess);
     }
 }

@@ -146,7 +146,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     // Lookup container changes or entire container master
                     if (containersProcess.LastContainerMasterUpdate == null)
                     {
-                        // If no date is provided, we would probably want to get the entire Container list
+                        //ToDo: If no date is provided, we would probably want to get the entire Container list
                         // from the ContainerMaster table instead of the ContainerChange table.
                         log.Debug("SRTEST:ContainerChange Date Not Provided.");
                     }

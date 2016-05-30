@@ -98,6 +98,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t Process.
+        /// </summary>
+        public static string CantProcess {
+            get {
+                return ResourceManager.GetString("CantProcess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change Language.
         /// </summary>
         public static string ChangeLanguage {
@@ -238,6 +247,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finished with Scale.
+        /// </summary>
+        public static string FinishedScale {
+            get {
+                return ResourceManager.GetString("FinishedScale", resourceCulture);
             }
         }
         
@@ -517,6 +535,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string PowerUnitViewTitle {
             get {
                 return ResourceManager.GetString("PowerUnitViewTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Public Scale Detail.
+        /// </summary>
+        public static string PublicScaleDetail {
+            get {
+                return ResourceManager.GetString("PublicScaleDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Public Scale.
+        /// </summary>
+        public static string PublicScaleSummary {
+            get {
+                return ResourceManager.GetString("PublicScaleSummary", resourceCulture);
             }
         }
         

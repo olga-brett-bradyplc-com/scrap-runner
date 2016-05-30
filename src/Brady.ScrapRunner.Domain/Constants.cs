@@ -297,9 +297,9 @@
         public static readonly string ReceivedDriverCancelSeg = "RECEIVED DRIVER CANCEL SEG";
         /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
         public static readonly string ReceivedDriverAddedSeg = "RECEIVED DRIVER ADDED SEG";
-        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER CONTAINER ACTION SEG</summary>
+        /// <summary>ReceivedDriverContainerAction: RECEIVED DRIVER CONTAINER ACTION</summary>
         public static readonly string ReceivedDriverContainerAction = "RECEIVED DRIVER CONTAINER ACTION";
-        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER NEW CONTAINER</summary>
+        /// <summary>ReceivedDriverNewContainer: RECEIVED DRIVER NEW CONTAINER</summary>
         public static readonly string ReceivedDriverNewContainer = "RECEIVED DRIVER NEW CONTAINER";
     }
     public static class HistoryActionConstants
@@ -440,6 +440,8 @@
         /// Require Driver to Enter Container # for NB# serialized labels?(Y/N):
         /// When this option is set to “Y”, when a driver uses a container with a serialized label and a 
         /// container type of NB#, he will be prompted to enter the correct container number, type and size. 
+        /// If this option is set to "N", when a driver uses a container with a serialized label and a
+        /// container type of NB#, he will be prompted to enter only the type and size.
         /// This will update the container record and will not be required the next time the container is used.
         /// </summary>
         public static readonly string DEFReqEntryContNumberForNB = "DEFReqEntryContNumberForNB";

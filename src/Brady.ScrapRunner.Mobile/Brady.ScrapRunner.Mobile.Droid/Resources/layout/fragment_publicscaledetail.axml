@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+  <include
+      layout="@layout/toolbar" />
+  <MvxExt.BindableGroupListView
+      android:id="@+id/PublicScaleDetailListView"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:layout_marginTop="56dp"
+      local:MvxItemTemplate="@layout/item_publicscaledetail_listitem"
+      local:GroupItemTemplate="@layout/item_publicscalesummary" />
+  <TextView
+      android:id="@+id/buttonTitle"
+      android:layout_width="match_parent"
+      android:layout_below="@id/PublicScaleDetailListView"
+      android:layout_height="30dp"
+      android:background="#ffffff"
+      android:textColor="@color/material_gray_900"
+      android:paddingLeft="10dp"
+      android:gravity="left|center_vertical"
+      android:text="Weights" />
+  <Button
+        android:id="@+id/grossButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/buttonTitle"
+        style="?android:attr/borderlessButtonStyle"
+        android:gravity="left|center_vertical"
+        android:textColor="@color/material_gray_900"
+        android:paddingLeft="10dp"
+        android:background="#ffffff"
+        android:drawableLeft="@drawable/ic_keyboard_arrow_right_black_24dp"
+        local:MvxBind="Click GrossWeightSetCommand"
+        local:MvxLang="Text GrossWeight" />
+  <Button
+        android:id="@+id/secondGrossButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/grossButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:gravity="left|center_vertical"
+        android:textColor="@color/material_gray_900"
+        android:paddingLeft="10dp"
+        android:background="#ffffff"
+        android:drawableLeft="@drawable/ic_keyboard_arrow_right_black_24dp"
+        local:MvxBind="Click SecondGrossWeightSetCommand"
+        local:MvxLang="Text SecondGrossWeight" />
+  <Button
+         android:id="@+id/tareButton"
+        android:layout_width="match_parent"
+        android:layout_below="@id/secondGrossButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:gravity="left|center_vertical"
+        android:layout_height="50dp"
+        android:textColor="@color/material_gray_900"
+        android:paddingLeft="10dp"
+        android:drawableLeft="@drawable/ic_keyboard_arrow_right_black_24dp"
+        android:background="#ffffff"
+        local:MvxBind="Click TareWeightSetCommand"
+        local:MvxLang="Text TareWeight" />
+  <LinearLayout
+      android:layout_height="65dp"
+      android:layout_width="match_parent"
+      android:layout_alignParentBottom="true"
+      android:weightSum="1">
+    <Button
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:textColor="#ffffff"
+        android:layout_weight=".5"
+        android:layout_marginRight="1dp"
+        local:MvxBind="Click NoProcessCommandAsync"
+        local:MvxLang="Text CantProcess"
+        android:background="@color/material_gray_900" />
+    <Button
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:textColor="#ffffff"
+        android:layout_marginLeft="1dp"
+        android:layout_weight=".5"
+        local:MvxBind="Click ContinueCommand"
+        local:MvxLang="Text Continue"
+        android:background="@color/material_gray_900" />
+  </LinearLayout>
+</RelativeLayout>

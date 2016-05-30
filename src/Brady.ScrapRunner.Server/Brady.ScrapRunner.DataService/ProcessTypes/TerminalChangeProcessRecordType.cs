@@ -147,7 +147,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     // Lookup terminal changes or entire terminal master
                     if (terminalsProcess.LastTerminalChangeUpdate == null)
                     {
-                        // If no date is provided, we would probably want to get the entire Terminal list
+                        // ToDo:If no date is provided, we would probably want to get the entire Terminal list
                         // from the TerminalMaster table instead of the TerminalChange table.
                         log.Debug("SRTEST:TerminalChange Date Not Provided.");
                     }

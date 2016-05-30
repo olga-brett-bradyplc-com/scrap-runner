@@ -25,6 +25,7 @@ namespace Brady.ScrapRunner.DataService.Validators
             RuleFor(x => x.Odometer).GreaterThan(0);
             RuleFor(x => x.ActionDateTime).NotEmpty();
             RuleFor(x => x.State).NotEmpty();
+            RuleFor(x => x.Country).NotEmpty();
             RuleFor(x => x.FuelAmount).GreaterThan(0);
         }
     }

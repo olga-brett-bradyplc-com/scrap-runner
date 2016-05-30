@@ -367,4 +367,18 @@
   <data name="Send" xml:space="preserve">
     <value>Enviar</value>
   </data>
+  <data name="PublicScaleDetail" xml:space="preserve">
+    <value>Detalle Escala pública</value>
+  </data>
+  <data name="PublicScaleSummary" xml:space="preserve">
+    <value>Escala pública</value>
+  </data>
+  <data name="CantProcess" xml:space="preserve">
+    <value>No se puede procesar</value>
+    <comment>Public Scale Detail</comment>
+  </data>
+  <data name="FinishedScale" xml:space="preserve">
+    <value>Acabado con escala</value>
+    <comment>Public Scale Continue</comment>
+  </data>
 </root>

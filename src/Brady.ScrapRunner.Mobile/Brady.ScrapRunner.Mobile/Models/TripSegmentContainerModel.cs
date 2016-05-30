@@ -14,7 +14,7 @@
             get { return $"{TripNumber};{TripSegContainerSeqNumber};{TripSegNumber}"; }
             set { /* NO-OP SETTER */ }
         }
-
+        
         [MaxLength(10)]
         public string TripNumber { get; set; }
 
@@ -48,6 +48,12 @@
         public string TripSegContainerComment { get; set; }
 
         public DateTime? TripSegContainerActionDateTime { get; set; }
+
+        [MaxLength(1)]
+        public string TripSegContainerReviewFlag { get; set; }
+
+        [MaxLength(60)]
+        public string TripSegContainerReviewReason { get; set; }
 
         public DateTime? WeightGrossDateTime { get; set; }
 

@@ -724,10 +724,21 @@ namespace Brady.ScrapRunner.DataService.Util
             // Note this is a commited snapshot read, a not dirty value, thus we have to keep do our own bookkeeping
             // to support multiple inserts in one txn: callCountThisTxn
 
+            //DriverHistory needs a trip number, but if driver is not on a trip we need to create a substitute trip number.
+            //Construct a number to use that consists of the driver status + driverid
+            //For example the tripnumber for a driver delay would be X802. For a back on duty B802.
+            //For a Login L802. For a Logout O802.
+            string tripNumber = driverStatus.TripNumber;
+            if (null == tripNumber)
+            {
+                tripNumber = driverStatus.Status + driverStatus.EmployeeId;
+            }
+
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the last driver history record for this trip and driver to get the last sequence number used
+            //Pass the constructed trip number to get the last sequence number.
             var driverHistoryMax = Common.GetDriverHistoryLast(dataService, settings, userCulture, userRoleIds,
-                                    driverStatus.EmployeeId, driverStatus.TripNumber, out fault);
+                                    driverStatus.EmployeeId, tripNumber, out fault);
             if (null != fault)
             {
                 return false;
@@ -832,15 +843,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 }
             }
 
-            //////////////////////////////////////////////////////////////////////////////////////
-            //if there is no trip number, construct a number to use that consists of the driver status + driverid
-            string tripNumber = driverStatus.TripNumber;
-            if (null == driverStatus.TripNumber)
-            {
-                tripNumber = driverStatus.Status + driverStatus.EmployeeId;
-            }
-
-            //////////////////////////////////////////////////////////////////////////////////////
+             //////////////////////////////////////////////////////////////////////////////////////
             var driverHistory = new DriverHistory()
             {
                 EmployeeId = driverStatus.EmployeeId,
@@ -2532,6 +2535,40 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         /// CONTAINERMASTER Table queries
         /// <summary>
+        ///  Get a a container master record for a given container bar code.
+        ///  Caller needs to check if the fault is non-null before using the returned record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="containerBarCode"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty ContainerMaster if containerNumber is null or record does not exist for containerNumber</returns>
+        public static ContainerMaster GetContainerByBarCode(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string containerBarCode, out DataServiceFault fault)
+        {
+            fault = null;
+            var container = new ContainerMaster();
+            if (null != containerBarCode)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<ContainerMaster>()
+                    .Filter(y => y.Property(x => x.ContainerBarCodeNo).EqualTo(containerBarCode))
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return container;
+                }
+                container = (ContainerMaster)queryResult.Records.Cast<ContainerMaster>().FirstOrDefault();
+            }
+            return container;
+        }
+        /// CONTAINERMASTER Table queries
+        /// <summary>
         ///  Get a list of container master that are on a given power unit..
         /// </summary>
         /// <param name="dataService"></param>
@@ -2827,6 +2864,8 @@ namespace Brady.ScrapRunner.DataService.Util
         public static DriverDelay GetDriverDelayLast(IDataService dataService, ProcessChangeSetSettings settings,
               string userCulture, IEnumerable<long> userRoleIds, string driverId, string tripNumberOrDriverId, out DataServiceFault fault)
         {
+            //Pass false to GetQuery so that when a # sign is used in the filter, records will be returned.
+            //Otherwise no records will be found to match.
             fault = null;
             var driverDelay = new DriverDelay();
             if (null != driverId && null != tripNumberOrDriverId)
@@ -2837,7 +2876,7 @@ namespace Brady.ScrapRunner.DataService.Util
                         .Filter(t => t.Property(p => p.DriverId).EqualTo(driverId).And()
                         .Property(p => p.TripNumber).EqualTo(tripNumberOrDriverId))
                         .OrderBy(p => p.DelaySeqNumber, Direction.Descending)
-                        .GetQuery()
+                        .GetQuery(false)
                 };
                 var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                 if (null != fault)

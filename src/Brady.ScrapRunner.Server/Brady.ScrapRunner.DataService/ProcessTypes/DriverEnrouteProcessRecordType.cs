@@ -166,34 +166,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-
-                    ////////////////////////////////////////////////
-                    //Get a list of all  segments for the trip
-                    var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
-                                        driverEnrouteProcess.TripNumber, out fault);
-                    if (null != fault)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
-
-                    ////////////////////////////////////////////////
-                    // Get the current TripSegment record
-                    var currentTripSegment = (from item in tripSegList
-                                             where item.TripSegNumber == driverEnrouteProcess.TripSegNumber
-                                             select item).FirstOrDefault();
-                    if (null == currentTripSegment)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid TripSegment: " +
-                            driverEnrouteProcess.TripNumber + "-" + driverEnrouteProcess.TripSegNumber));
-                        break;
-                    }
-
-                    ////////////////////////////////////////////////
-                    //Adjust odometer based on previously recorded odometer. 
-                    //If odometer from mobile device (driverEnrouteProcess.Odometer) is less than PowerMaster.PowerOdometer, 
-                    //use the PowerMaster.PowerOdometer instead of the odometer from the mobile device.
-                    //Adjust odometer here before we start using driverEnrouteProcess.Odometer
                     ////////////////////////////////////////////////
                     // Get the PowerMaster record
                     var powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
@@ -210,6 +182,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
+                    ////////////////////////////////////////////////
+                    //Adjust odometer here before we start using driverEnrouteProcess.Odometer
                     //Do not use the odometer from the driver if it is less than the last recorded 
                     //odometer stored in the PowerMaster.
                     if (powerMaster.PowerOdometer != null)
@@ -218,6 +192,28 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         {
                             driverEnrouteProcess.Odometer = (int)powerMaster.PowerOdometer;
                         }
+                    }
+
+                    ////////////////////////////////////////////////
+                    //Get a list of all  segments for the trip
+                    var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
+                                        driverEnrouteProcess.TripNumber, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+
+                    ////////////////////////////////////////////////
+                    // Get the current TripSegment record
+                    var currentTripSegment = (from item in tripSegList
+                                              where item.TripSegNumber == driverEnrouteProcess.TripSegNumber
+                                              select item).FirstOrDefault();
+                    if (null == currentTripSegment)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid TripSegment: " +
+                            driverEnrouteProcess.TripNumber + "-" + driverEnrouteProcess.TripSegNumber));
+                        break;
                     }
 
                     ////////////////////////////////////////////////
@@ -230,6 +226,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
+
                     ////////////////////////////////////////////////
                     // Get the Customer record for the destination cust host code
                     var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
@@ -542,10 +539,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         //If there is no open-ended mileage record, add a one with just a start odometer.
                         //Pass in false to not update ending odometer. 
-                        Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
-                            currentTripSegment, containersOnPowerId, false, ++tripSegmentMileageCount, out fault);
                         log.DebugFormat("SRTEST:Adding TripSegmentMileage Record for Trip:{0}-{1} - Enroute.",
                                         driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber);
+                        if(!Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
+                            currentTripSegment, containersOnPowerId, false, ++tripSegmentMileageCount, out fault))
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            log.ErrorFormat("InsertTripSegmentMileage failed: {0} during enroute request: {1}", fault.Message, driverEnrouteProcess);
+                            break;
+                        }
                     }
                     else
                     {
