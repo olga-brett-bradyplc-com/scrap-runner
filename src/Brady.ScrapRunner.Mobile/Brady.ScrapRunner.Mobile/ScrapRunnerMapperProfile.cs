@@ -26,9 +26,11 @@
                 .ForMember(m => m.CompositeId, o => o.Ignore());
             // @TODO: TripSegComments cannot be mapped. We are probably using the wrong property here.
             CreateMap<TripSegmentContainer, TripSegmentContainerModel>()
-                .ForMember(tsc => tsc.TripSegComments, opt => opt.Ignore());
+                .ForMember(tsc => tsc.TripSegComments, opt => opt.Ignore())
+                .ForMember(tsc => tsc.CompositeKey, opt => opt.Ignore());
             CreateMap<CodeTable, CodeTableModel>();
-            CreateMap<Messages, MessagesModel>();
+            CreateMap<Messages, MessagesModel>()
+                .ForMember(m => m.MessageThread, o => o.Ignore());
         }
     }
 }
