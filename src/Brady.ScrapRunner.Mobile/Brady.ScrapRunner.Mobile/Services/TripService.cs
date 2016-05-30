@@ -313,7 +313,7 @@
         /// <param name="latitude"></param>
         /// <param name="longitude"></param>
         /// <returns></returns>
-        public async Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo, string tripSegContainerNumber, double? latitude, double? longitude)
+        public async Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo, string tripSegContainerNumber, int? latitude, int? longitude)
         {
 
             // @TODO : Not complete
