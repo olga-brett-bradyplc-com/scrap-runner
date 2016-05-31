@@ -539,10 +539,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         //If there is no open-ended mileage record, add a one with just a start odometer.
                         //Pass in false to not update ending odometer. 
-                        Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
-                            currentTripSegment, containersOnPowerId, false, ++tripSegmentMileageCount, out fault);
                         log.DebugFormat("SRTEST:Adding TripSegmentMileage Record for Trip:{0}-{1} - Enroute.",
                                         driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber);
+                        if(!Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
+                            currentTripSegment, containersOnPowerId, false, ++tripSegmentMileageCount, out fault))
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            log.ErrorFormat("InsertTripSegmentMileage failed: {0} during enroute request: {1}", fault.Message, driverEnrouteProcess);
+                            break;
+                        }
                     }
                     else
                     {

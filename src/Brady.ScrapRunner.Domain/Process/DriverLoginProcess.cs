@@ -11,16 +11,16 @@ namespace Brady.ScrapRunner.Domain.Process
     ///
     public class DriverLoginProcess : IHaveId<string>, IEquatable<DriverLoginProcess>
     {
-        ///The driver id from the phone.
+        ///The driver id from the phone. Required.
         public virtual string EmployeeId { get; set; }
 
-        ///The password from the phone.
+        ///The password from the phone. Required.
         public virtual string Password { get; set; }
 
-        ///The power id from the phone.
+        ///The power id from the phone. Required.
         public virtual string PowerId { get; set; }
 
-        ///The odometer from the phone.
+        ///The odometer from the phone. Required.
         public virtual int? Odometer { get; set; }
 
         ///Currently the locale code from the phone. Driver can change settings.
@@ -29,7 +29,7 @@ namespace Brady.ScrapRunner.Domain.Process
         ///     2058 = Spanish, Mexico
         public virtual int? LocaleCode { get; set; }
 
-        /// <summary>Set this to Y if driver has double checked Odometer and is resubmitting</summary>
+        /// <summary>Set this to Y if driver has double checked Odometer and is resubmitting. Optional.</summary>
         public virtual string OverrideFlag { get; set; }
 
         /// Currently this is the driver id. Probably will not be needed in the future.
@@ -45,7 +45,7 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string AreaId { get; set; }
 
         /// <summary>PndVer is a client version number for the handheld.  Typically used for logging issues.</summary>
-        /// TODO: We'll need something similar for phones
+        /// TODO: We'll need something similar for phones. Required.
         public virtual string PndVer { get; set; }
 
         /// Initially null.  Will be filled in and returned to driver.
@@ -57,7 +57,8 @@ namespace Brady.ScrapRunner.Domain.Process
         /// Initially null.  Will be filled in and returned to driver.
         public virtual string DriverStatus { get; set; }
         
-        /// The LoginDateTime from the phone.  (Q: Why shoud we trust the client or whe do we backfill on server side?)
+        /// The LoginDateTime from the phone.  Required.
+        /// (Q: Why should we trust the client or whe do we backfill on server side?)
         public virtual DateTime LoginDateTime { get; set; }
 
         /// The ContainerMasterDateTime from the phone. Will now be sent to ContainerChangeProcess. 
@@ -106,7 +107,7 @@ namespace Brady.ScrapRunner.Domain.Process
             if (ReferenceEquals(this, other)) return true;
             return EmployeeId == other.EmployeeId;
         }
-        
+       
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;

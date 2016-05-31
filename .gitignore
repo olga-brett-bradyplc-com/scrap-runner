@@ -12,7 +12,7 @@ App_Data/
 *.swp
 *.~
 *.obj
-*.exe
+
 *.pdb
 *.user
 *.aps

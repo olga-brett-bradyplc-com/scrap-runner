@@ -1,34 +1,42 @@
-﻿using System;
-using System.Net;
-using Brady.ScrapRunner.Mobile.Interfaces;
-using BWF.DataServices.PortableClients;
-using BWF.DataServices.PortableClients.Interfaces;
-using MvvmCross.Platform.Core;
-
-namespace Brady.ScrapRunner.Mobile.Services
+﻿namespace Brady.ScrapRunner.Mobile.Services
 {
-    public class ConnectionService : IConnectionService<DataServiceClient>
+    using System;
+    using BWF.DataServices.PortableClients;
+    using BWF.DataServices.PortableClients.Interfaces;
+    using Interfaces;
+    using MvvmCross.Platform;
+
+    public class ConnectionService : IConnectionService
     {
-        private IDataServiceClient Connection { get; set; }
-        
-        public bool CreateConnection(string hosturl, string username, string password, string dataService = null)
+        private DataServiceClient _dataServiceClient;
+        private QueuedDataServiceClient _queuedDataServiceClient;
+
+        public void CreateConnection(string hosturl, string username, string password, string dataService = null)
         {
-            Connection = new DataServiceClient(hosturl, username, password, dataService);
-            return true;
+            _dataServiceClient = new DataServiceClient(hosturl, username, password, dataService);
+            _queuedDataServiceClient = new QueuedDataServiceClient(
+                Mvx.Resolve<INetworkAvailabilityService>(),
+                Mvx.Resolve<IQueueService>(),
+                _dataServiceClient);
         }
 
         public void DeleteConnection()
         {
-            if (Connection != null)
-            {
-                Connection.Dispose();
-                Connection = null;
-            }
+            _queuedDataServiceClient.Dispose();
+            _dataServiceClient.Dispose();
         }
 
-        public DataServiceClient GetConnection()
+        public IDataServiceClient GetConnection(ConnectionType connectionType = ConnectionType.Online)
         {
-            return (DataServiceClient) Connection;
+            switch (connectionType)
+            {
+                case ConnectionType.Online:
+                    return _dataServiceClient;
+                case ConnectionType.Offline:
+                    return _queuedDataServiceClient;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(connectionType), connectionType, null);
+            }
         }
     }
 }

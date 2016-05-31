@@ -2535,6 +2535,40 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         /// CONTAINERMASTER Table queries
         /// <summary>
+        ///  Get a a container master record for a given container bar code.
+        ///  Caller needs to check if the fault is non-null before using the returned record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="containerBarCode"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty ContainerMaster if containerNumber is null or record does not exist for containerNumber</returns>
+        public static ContainerMaster GetContainerByBarCode(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string containerBarCode, out DataServiceFault fault)
+        {
+            fault = null;
+            var container = new ContainerMaster();
+            if (null != containerBarCode)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<ContainerMaster>()
+                    .Filter(y => y.Property(x => x.ContainerBarCodeNo).EqualTo(containerBarCode))
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return container;
+                }
+                container = (ContainerMaster)queryResult.Records.Cast<ContainerMaster>().FirstOrDefault();
+            }
+            return container;
+        }
+        /// CONTAINERMASTER Table queries
+        /// <summary>
         ///  Get a list of container master that are on a given power unit..
         /// </summary>
         /// <param name="dataService"></param>

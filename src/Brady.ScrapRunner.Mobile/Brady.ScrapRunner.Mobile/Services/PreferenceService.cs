@@ -14,12 +14,12 @@ namespace Brady.ScrapRunner.Mobile.Services
 {
     public class PreferenceService : IPreferenceService
     {
-        private readonly IConnectionService<DataServiceClient> _connection; 
+        private readonly IConnectionService _connection; 
         private readonly IRepository<PreferenceModel> _preferenceRepository;
 
         public PreferenceService( 
             IRepository<PreferenceModel> preferenceRepository, 
-            IConnectionService<DataServiceClient> connection)
+            IConnectionService connection)
         {
             _connection = connection;
             _preferenceRepository = preferenceRepository;
@@ -32,7 +32,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <returns></returns>
         public async Task<ChangeResultWithItem<PreferencesProcess>> FindPreferencesRemoteAsync(PreferencesProcess preferenceProcess)
         {
-            var preferences = await _connection.GetConnection().UpdateAsync(preferenceProcess, requeryUpdated: false);
+            var preferences = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(preferenceProcess, requeryUpdated: false);
             return preferences;
         }
         

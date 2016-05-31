@@ -17,13 +17,14 @@ namespace Brady.ScrapRunner.Domain.Process
         /// The ActionDateTime. Required.
         public virtual DateTime ActionDateTime { get; set; }
 
-        /// Container Number. Required.
+        /// Container Number. Required if DEFReqEntryContNumberForNB = Y.
+        ///                   Optional if DEFReqEntryContNumberForNB = N.
         public virtual string ContainerNumber { get; set; }
 
         /// ContainerType. Required.
         public virtual string ContainerType { get; set; }
 
-        ///The ContainerSize. Required.
+        ///The ContainerSize. Optional.
         public virtual string ContainerSize { get; set; }
 
         ///The ContainerBarcode. Required.
