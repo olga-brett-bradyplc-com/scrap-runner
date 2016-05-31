@@ -35,7 +35,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             CurrentContainers = new ObservableCollection<ContainerWrapper>();
 
-            foreach (var container in containers.Where(container => container.ContainerType != "#NB"))
+            foreach (var container in containers.Where(container => container.ContainerType != "NB#"))
                 CurrentContainers.Add(new ContainerWrapper(container, this));
         }
 

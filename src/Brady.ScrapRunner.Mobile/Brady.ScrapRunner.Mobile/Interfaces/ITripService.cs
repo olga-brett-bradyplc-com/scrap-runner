@@ -45,7 +45,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
             string tripSegContainerNumber, DateTime? gsWt, DateTime? gs2Wt, DateTime? trWt);
 
         Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo,
-            string tripSegContainerNumber, double? latitude, double? longitude);
+            string tripSegContainerNumber, int? latitude, int? longitude);
 
         Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo, short tripSegContainerSeqNumber, string tripSegContainerNumber);
 
