@@ -69,7 +69,7 @@
 
         public async Task<ChangeResultWithItem<TripInfoProcess>> FindTripsRemoteAsync(TripInfoProcess tripInfoProcess)
         {
-            var tripProcess = await _connection.GetConnection().UpdateAsync(tripInfoProcess, requeryUpdated: false);
+            var tripProcess = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(tripInfoProcess, requeryUpdated: false);
             return tripProcess;
         }
 

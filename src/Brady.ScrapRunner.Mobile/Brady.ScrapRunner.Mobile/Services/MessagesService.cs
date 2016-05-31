@@ -31,7 +31,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <returns></returns>
         public async Task<ChangeResultWithItem<DriverMessageProcess>> FindMsgsRemoteAsync(DriverMessageProcess driverMessageProcess)
         {
-            var msgsTable = await _connection.GetConnection().UpdateAsync(driverMessageProcess, requeryUpdated: false);
+            var msgsTable = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(driverMessageProcess, requeryUpdated: false);
             return msgsTable;
         }
 

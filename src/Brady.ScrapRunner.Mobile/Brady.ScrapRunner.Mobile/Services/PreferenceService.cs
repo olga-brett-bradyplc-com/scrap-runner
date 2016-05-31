@@ -32,7 +32,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <returns></returns>
         public async Task<ChangeResultWithItem<PreferencesProcess>> FindPreferencesRemoteAsync(PreferencesProcess preferenceProcess)
         {
-            var preferences = await _connection.GetConnection().UpdateAsync(preferenceProcess, requeryUpdated: false);
+            var preferences = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(preferenceProcess, requeryUpdated: false);
             return preferences;
         }
         

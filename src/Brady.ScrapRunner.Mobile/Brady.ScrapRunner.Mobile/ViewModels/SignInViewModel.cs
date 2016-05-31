@@ -166,7 +166,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _queueScheduler.Unschedule();
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
                 // have a need for a login service, leaving this as it is.
-                var loginProcess = await _connection.GetConnection().UpdateAsync(
+                var loginProcess = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(
                     new DriverLoginProcess {
                         EmployeeId = UserName,
                         Password = Password,

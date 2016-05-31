@@ -33,7 +33,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <returns></returns>
         public async Task<ChangeResultWithItem<CodeTableProcess>> FindCodesRemoteAsync(CodeTableProcess codeTableProcess)
         {
-            var codeTable = await _connection.GetConnection().UpdateAsync(codeTableProcess, requeryUpdated: false);
+            var codeTable = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(codeTableProcess, requeryUpdated: false);
             return codeTable;
         }
 
