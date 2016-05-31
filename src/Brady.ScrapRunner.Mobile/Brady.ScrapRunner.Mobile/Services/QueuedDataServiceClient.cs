@@ -8,8 +8,10 @@
     using BWF.DataServices.Metadata.Models;
     using BWF.DataServices.PortableClients;
     using BWF.DataServices.PortableClients.Interfaces;
+    using Domain;
     using Interfaces;
     using Models;
+    using MvvmCross.Platform;
     using Newtonsoft.Json;
 
     public class QueuedDataServiceClient : IDataServiceClient
@@ -90,8 +92,14 @@
         {
             if (IsConnected())
             {
-                var response = await _dataServiceClient.CreateAsync(item, dataService, requeryCreated);
-                if (response.WasSuccessful) return response;
+                try
+                {
+                    return await _dataServiceClient.CreateAsync(item, dataService, requeryCreated);
+                }
+                catch (Exception e)
+                {
+                    Mvx.TaggedWarning(Constants.ScrapRunner, e.Message);
+                }
             }
             var queueItem = CreateQueueItemByObject(item, QueueItemVerb.Create, dataService);
             // The actual id is rarely set at this point, but we can probably extract the type of the id so it's easier to build a ChangeSet.
@@ -104,8 +112,14 @@
         {
             if (IsConnected())
             {
-                var response = await _dataServiceClient.UpdateAsync(item, dataService, requeryUpdated);
-                if (response.WasSuccessful) return response;
+                try
+                {
+                    return await _dataServiceClient.UpdateAsync(item, dataService, requeryUpdated);
+                }
+                catch (Exception e)
+                {
+                    Mvx.TaggedWarning(Constants.ScrapRunner, e.Message);
+                }
             }
             var queueItem = CreateQueueItemByObject(item, QueueItemVerb.Update, dataService);
             SetQueueItemIdFromObject(item, queueItem);
@@ -117,8 +131,14 @@
         {
             if (IsConnected())
             {
-                var response = await _dataServiceClient.DeleteAsync<Tid, Titem>(id, dataService);
-                if (response.WasSuccessful) return response;
+                try
+                {
+                    return await _dataServiceClient.DeleteAsync<Tid, Titem>(id, dataService);
+                }
+                catch (Exception e)
+                {
+                    Mvx.TaggedWarning(Constants.ScrapRunner, e.Message);
+                }
             }
             var queueItem = CreateQueueItemById(id, QueueItemVerb.Delete, dataService);
             await _queueService.EnqueueItemAsync(queueItem);
@@ -129,8 +149,14 @@
         {
             if (IsConnected())
             {
-                var response = await _dataServiceClient.DeleteAsync<Titem>(id, dataService);
-                if (response.WasSuccessful) return response;
+                try
+                {
+                    return await _dataServiceClient.DeleteAsync<Titem>(id, dataService);
+                }
+                catch (Exception e)
+                {
+                    Mvx.TaggedWarning(Constants.ScrapRunner, e.Message);
+                }
             }
             var queueItem = CreateQueueItemById(id, QueueItemVerb.Delete, dataService);
             await _queueService.EnqueueItemAsync(queueItem);
@@ -141,8 +167,14 @@
         {
             if (IsConnected())
             {
-                var response = await _dataServiceClient.DeleteAsync<Titem>(id, dataService);
-                if (response.WasSuccessful) return response;
+                try
+                {
+                    return await _dataServiceClient.DeleteAsync<Titem>(id, dataService);
+                }
+                catch (Exception e)
+                {
+                    Mvx.TaggedWarning(Constants.ScrapRunner, e.Message);
+                }
             }
             var queueItem = CreateQueueItemById(id, QueueItemVerb.Delete, dataService);
             await _queueService.EnqueueItemAsync(queueItem);
