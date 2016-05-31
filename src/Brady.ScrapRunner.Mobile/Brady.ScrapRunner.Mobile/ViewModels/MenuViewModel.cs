@@ -16,14 +16,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     public class MenuViewModel : BaseViewModel
     {
-        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IConnectionService _connection;
+        private readonly IQueueScheduler _queueScheduler;
         private readonly ICodeTableService _codeTableService;
         private readonly IMvxPictureChooserTask _pictureChooserTask;
         private readonly IMvxFileStore _fileStore;
 
-        public MenuViewModel(IConnectionService<DataServiceClient> connection, ICodeTableService codeTableService, IMvxPictureChooserTask pictureChooserTask, IMvxFileStore fileStore)
+        public MenuViewModel(IConnectionService connection, IQueueScheduler queueScheduler, ICodeTableService codeTableService, IMvxPictureChooserTask pictureChooserTask, IMvxFileStore fileStore)
         {
             _connection = connection;
+            _queueScheduler = queueScheduler;
             _codeTableService = codeTableService;
             _pictureChooserTask = pictureChooserTask;
             _fileStore = fileStore;
@@ -39,6 +41,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (logoutDialog)
             {
+                _queueScheduler.Unschedule();
                 _connection.DeleteConnection();
                 ShowViewModel<SignInViewModel>();
             }
