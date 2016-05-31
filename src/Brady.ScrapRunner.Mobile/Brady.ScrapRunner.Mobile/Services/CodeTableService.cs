@@ -17,10 +17,10 @@ namespace Brady.ScrapRunner.Mobile.Services
 
     public class CodeTableService : ICodeTableService
     {
-        private readonly IConnectionService<DataServiceClient> _connection; 
+        private readonly IConnectionService _connection; 
         private readonly IRepository<CodeTableModel> _codeTableRepository;
 
-        public CodeTableService(IRepository<CodeTableModel> codeTableRepository, IConnectionService<DataServiceClient> connection )
+        public CodeTableService(IRepository<CodeTableModel> codeTableRepository, IConnectionService connection )
         {
             _connection = connection;
             _codeTableRepository = codeTableRepository;
@@ -33,7 +33,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <returns></returns>
         public async Task<ChangeResultWithItem<CodeTableProcess>> FindCodesRemoteAsync(CodeTableProcess codeTableProcess)
         {
-            var codeTable = await _connection.GetConnection().UpdateAsync(codeTableProcess, requeryUpdated: false);
+            var codeTable = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(codeTableProcess, requeryUpdated: false);
             return codeTable;
         }
 

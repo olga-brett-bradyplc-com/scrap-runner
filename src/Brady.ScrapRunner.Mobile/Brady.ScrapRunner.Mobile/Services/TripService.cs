@@ -1,31 +1,27 @@
-﻿using System;
-using Brady.ScrapRunner.Domain.Models;
-using Brady.ScrapRunner.Domain.Process;
-using Brady.ScrapRunner.Mobile.Helpers;
-using BWF.DataServices.Domain.Models;
-using BWF.DataServices.Metadata.Models;
-using BWF.DataServices.PortableClients;
-
-namespace Brady.ScrapRunner.Mobile.Services
+﻿namespace Brady.ScrapRunner.Mobile.Services
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using BWF.DataServices.Metadata.Models;
     using Domain;
+    using Domain.Models;
+    using Domain.Process;
     using Interfaces;
     using Models;
     using MvvmCross.Platform;
 
     public class TripService : ITripService
     {
-        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IConnectionService _connection;
         private readonly IRepository<PreferenceModel> _preferenceRepository;
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
 
         public TripService(
-            IConnectionService<DataServiceClient> connection,
+            IConnectionService connection,
             IRepository<PreferenceModel> preferenceRepository,
             IRepository<TripModel> tripRepository,
             IRepository<TripSegmentModel> tripSegmentRepository,
@@ -73,7 +69,7 @@ namespace Brady.ScrapRunner.Mobile.Services
 
         public async Task<ChangeResultWithItem<TripInfoProcess>> FindTripsRemoteAsync(TripInfoProcess tripInfoProcess)
         {
-            var tripProcess = await _connection.GetConnection().UpdateAsync(tripInfoProcess, requeryUpdated: false);
+            var tripProcess = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(tripInfoProcess, requeryUpdated: false);
             return tripProcess;
         }
 
@@ -317,7 +313,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <param name="latitude"></param>
         /// <param name="longitude"></param>
         /// <returns></returns>
-        public async Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo, string tripSegContainerNumber, double? latitude, double? longitude)
+        public async Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo, string tripSegContainerNumber, int? latitude, int? longitude)
         {
 
             // @TODO : Not complete

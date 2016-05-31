@@ -11,13 +11,17 @@ using MvvmCross.Core.ViewModels;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
+    using Services;
+
     public class MenuViewModel : BaseViewModel
     {
-        private readonly IConnectionService<DataServiceClient> _connection;
+        private readonly IConnectionService _connection;
+        private readonly IQueueScheduler _queueScheduler;
 
-        public MenuViewModel(IConnectionService<DataServiceClient> connection)
+        public MenuViewModel(IConnectionService connection, IQueueScheduler queueScheduler)
         {
             _connection = connection;
+            _queueScheduler = queueScheduler;
         }
 
         private IMvxAsyncCommand _logoutCommand;
@@ -30,6 +34,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (logoutDialog)
             {
+                _queueScheduler.Unschedule();
                 _connection.DeleteConnection();
                 ShowViewModel<SignInViewModel>();
             }

@@ -54,6 +54,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.CreateTableAsync<CustomerLocationModel>();
             await asyncConnection.CreateTableAsync<CodeTableModel>();
             await asyncConnection.CreateTableAsync<MessagesModel>();
+            await asyncConnection.CreateTableAsync<QueueItemModel>();
 
             //await asyncConnection.DeleteAllAsync<ContainerMasterModel>();
             //await asyncConnection.DeleteAllAsync<CustomerDirectionsModel>();

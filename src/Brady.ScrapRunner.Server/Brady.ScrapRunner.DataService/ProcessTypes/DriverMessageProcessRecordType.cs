@@ -296,11 +296,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             newMessage.MsgSource = MessagesMsgSourceConstants.FromDriver;
             newMessage.DeleteFlag = Constants.No;
 
-            Common.InsertMessage(dataService, settings,
-                                 userRoleIds,userCulture,log,newMessage,out fault);
-            log.DebugFormat("SRTEST:Saving message received from DriverId:{0} To:{1}-Message:{2}.",
-                            newMessage.SenderId.Trim(),newMessage.ReceiverId.Trim(), newMessage.MsgId);
-            //ToDo: Check for Message Record failure.
+            if(!Common.InsertMessage(dataService, settings,userRoleIds,userCulture,log,newMessage,out fault))
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                log.ErrorFormat("InsertMessage failed: {0} during process message request: {1}", fault.Message, newMessage);
+                return false;
+            }
             return true;
         }
     }
