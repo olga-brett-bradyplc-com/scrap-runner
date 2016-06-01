@@ -27,16 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<CommodityMasterDest, CommodityMasterDest>();
         }
 
-        public override CommodityMasterDest GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new CommodityMasterDest
-            {
-                CommodityCode = identityValues[0],
-                DestTerminalId = identityValues[1]
-            };
-        }
-
         public override Expression<Func<CommodityMasterDest, bool>> GetIdentityPredicate(CommodityMasterDest item)
         {
             return x => x.CommodityCode == item.CommodityCode &&

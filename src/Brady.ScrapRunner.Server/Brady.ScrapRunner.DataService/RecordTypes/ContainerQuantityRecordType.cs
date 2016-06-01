@@ -27,16 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<ContainerQuantity, ContainerQuantity>();
         }
 
-        public override ContainerQuantity GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new ContainerQuantity
-            {
-                CustHostCode = identityValues[0],
-                CustSeqNo = int.Parse(identityValues[1])
-            };
-        }
-
         public override Expression<Func<ContainerQuantity, bool>> GetIdentityPredicate(ContainerQuantity item)
         {
             return x => x.CustHostCode == item.CustHostCode &&
