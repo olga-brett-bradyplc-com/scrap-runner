@@ -103,13 +103,13 @@
                      ts.TripSegStatus == TripSegStatusConstants.Missed))
                 .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
 
-            return segment.TripSegType.Equals(BasicTripTypeConstants.DropEmpty) ||
-                   segment.TripSegType.Equals(BasicTripTypeConstants.DropFull) ||
-                   segment.TripSegType.Equals(BasicTripTypeConstants.PickupEmpty) ||
-                   segment.TripSegType.Equals(BasicTripTypeConstants.PickupFull) ||
-                   segment.TripSegType.Equals(BasicTripTypeConstants.Load) ||
-                   segment.TripSegType.Equals(BasicTripTypeConstants.Unload) ||
-                   segment.TripSegType.Equals(BasicTripTypeConstants.Respot);
+            return segment?.TripSegType == BasicTripTypeConstants.DropEmpty ||
+                   segment?.TripSegType == BasicTripTypeConstants.DropFull ||
+                   segment?.TripSegType == BasicTripTypeConstants.PickupEmpty ||
+                   segment?.TripSegType == BasicTripTypeConstants.PickupFull ||
+                   segment?.TripSegType == BasicTripTypeConstants.Load ||
+                   segment?.TripSegType == BasicTripTypeConstants.Unload ||
+                   segment?.TripSegType == BasicTripTypeConstants.Respot;
         }
 
         /// <summary>
@@ -132,8 +132,8 @@
                      ts.TripSegStatus == TripSegStatusConstants.Missed))
                 .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
 
-            return segment.TripSegType.Equals(BasicTripTypeConstants.Scale) ||
-                   segment.TripSegType.Equals(BasicTripTypeConstants.ReturnYard);
+            return segment?.TripSegType == BasicTripTypeConstants.Scale ||
+                   segment?.TripSegType == BasicTripTypeConstants.ReturnYard;
         }
 
         /// <summary>
@@ -151,8 +151,27 @@
                      ts.TripSegStatus == TripSegStatusConstants.Missed))
                 .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
 
-            return segment.TripSegType.Equals(BasicTripTypeConstants.YardWork) ||
-                   segment.TripSegType.Equals(BasicTripTypeConstants.ReturnYardNC);
+            return segment?.TripSegType == BasicTripTypeConstants.YardWork ||
+                   segment?.TripSegType == BasicTripTypeConstants.ReturnYardNC;
+        }
+
+        /// <summary>
+        /// Check to see if arriving segment of given trip type is W (Scale) type
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns>bool</returns>
+        public async Task<bool> IsTripLegAcctTypeScale(string tripNumber)
+        {
+            var segment = await _tripSegmentRepository.AsQueryable()
+                .Where(ts =>
+                    ts.TripNumber == tripNumber
+                    &&
+                    (ts.TripSegDestCustType == CustomerTypeConstants.Scale))
+                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
+
+            return segment?.TripSegType == BasicTripTypeConstants.Scale ||
+                   segment?.TripSegType == BasicTripTypeConstants.ReturnYard;
         }
 
         /// <summary>
@@ -355,24 +374,6 @@
                         ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
             tripSegment.TripSegStatus = TripSegStatusConstants.Done;
             return await _tripSegmentRepository.UpdateAsync(tripSegment);
-        }
-        /// <summary>
-        /// Check to see if arriving segment of given trip type is W (Scale) type
-        /// 
-        /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <returns>bool</returns>
-        public async Task<bool> IsTripLegAcctTypeScale(string tripNumber)
-        {
-            var segment = await _tripSegmentRepository.AsQueryable()
-                .Where(ts =>
-                    ts.TripNumber == tripNumber
-                    &&
-                    (ts.TripSegDestCustType == CustomerTypeConstants.Scale))
-                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
-
-            return segment.TripSegType.Equals(BasicTripTypeConstants.Scale) ||
-                   segment.TripSegType.Equals(BasicTripTypeConstants.ReturnYard);
         }
 
         public async Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessPublicScaleAsync(

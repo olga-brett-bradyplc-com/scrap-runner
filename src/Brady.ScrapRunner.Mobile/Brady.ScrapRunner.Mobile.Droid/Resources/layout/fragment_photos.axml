@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include
+        layout="@layout/toolbar" />
+    <Mvx.MvxGridView
+        android:id="@+id/PhotosGridView"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_marginTop="70dp"
+        android:columnWidth="110dp"
+        android:numColumns="auto_fit"
+        android:layout_marginLeft="5dp"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        local:MvxBind="ItemsSource Images"
+        local:MvxItemTemplate="@layout/item_image_gridview" />
+    <LinearLayout
+        android:layout_height="70dp"
+        android:layout_width="match_parent"
+        android:background="#fff"
+        android:weightSum="1"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_margin="10dp"
+            android:layout_weight=".5"
+            android:text="Cancel"
+            android:textColor="#fff"
+            style="?android:attr/borderlessButtonStyle"
+            android:gravity="center"
+            android:background="@color/colorPrimary"
+            local:MvxBind="Click CancelPhotosCommand" />
+        <Button
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_margin="10dp"
+            android:layout_weight=".5"
+            android:text="Send"
+            android:textColor="#fff"
+            style="?android:attr/borderlessButtonStyle"
+            android:gravity="center"
+            android:background="@color/colorPrimary"
+            local:MvxBind="Click SendPhotosCommand" />
+    </LinearLayout>
+</RelativeLayout>

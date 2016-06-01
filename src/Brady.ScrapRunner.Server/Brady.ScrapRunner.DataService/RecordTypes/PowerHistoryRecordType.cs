@@ -27,16 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<PowerHistory, PowerHistory>();
         }
 
-        public override PowerHistory GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new PowerHistory
-            {
-                PowerId = identityValues[0],
-                PowerSeqNumber = int.Parse(identityValues[1])
-            };
-        }
-
         public override Expression<Func<PowerHistory, bool>> GetIdentityPredicate(PowerHistory item)
         {
             return x => x.PowerId == item.PowerId &&

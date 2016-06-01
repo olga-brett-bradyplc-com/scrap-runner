@@ -27,16 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<Preference, Preference>();
         }
 
-        public override Preference GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new Preference
-            {
-                Parameter = identityValues[0],
-                TerminalId = identityValues[1]
-            };
-        }
-
         public override Expression<Func<Preference, bool>> GetIdentityPredicate(Preference item)
         {
             return x => x.Parameter == item.Parameter &&

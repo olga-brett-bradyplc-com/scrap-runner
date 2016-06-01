@@ -27,18 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<TripSegmentContainerTime, TripSegmentContainerTime>();
         }
 
-        public override TripSegmentContainerTime GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new TripSegmentContainerTime
-            {
-                SeqNumber = int.Parse(identityValues[0]),
-                TripNumber = identityValues[1],
-                TripSegContainerSeqNumber = int.Parse(identityValues[2]),
-                TripSegNumber = identityValues[3]
-            };
-        }
-
         public override Expression<Func<TripSegmentContainerTime, bool>> GetIdentityPredicate(TripSegmentContainerTime item)
         {
             return x => x.SeqNumber == item.SeqNumber &&

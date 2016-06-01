@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using BWF.DataServices.Domain.Models;
+    using BWF.DataServices.Metadata;
     using BWF.DataServices.Metadata.Interfaces;
     using BWF.DataServices.Metadata.Models;
     using BWF.DataServices.PortableClients;
@@ -229,6 +230,13 @@
                 SerializedId = JsonConvert.SerializeObject(id)
             };
             return queueItem;
+        }
+        
+        public string HostAddress => "https://maunb-jtw10.bradyplc.com:7776";
+
+        public Task<TypeMetadata[]> GetMetadataForTypeAsync(string type, string dataService = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

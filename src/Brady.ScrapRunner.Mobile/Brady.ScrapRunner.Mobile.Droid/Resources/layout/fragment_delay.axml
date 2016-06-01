@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include
+        layout="@layout/toolbar" />
+    <TextView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="{Timer}" />
+    <LinearLayout
+        android:layout_height="70dp"
+        android:layout_width="match_parent"
+        android:background="#fff"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_margin="10dp"
+            android:text="Back On Duty"
+            android:textColor="#fff"
+            style="?android:attr/borderlessButtonStyle"
+            android:gravity="center"
+            local:MvxBind="Click BackOnDutyCommand"
+            android:background="@color/delayed" />
+    </LinearLayout>
+</RelativeLayout>
