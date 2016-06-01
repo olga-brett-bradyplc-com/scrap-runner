@@ -447,41 +447,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         }//end of else if (null == driverStatus.TripNumber)
 
-                        ////////////////////////////////////////////////
-                        //Check for open ended delays 
-                        //CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
-                        //             driverLoginProcess, employeeMaster, driverStatus, ref driverHistoryInsertCount);
-                        
-                        if (CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
-                                     driverLoginProcess, employeeMaster))
-                        {
-                            // Add "Back On Duty" flag to Driver History table.
-                            // For the last open-ended delay that we added an end time, record a back on duty status in the DriverHistory table.
-                            // The driver is logging in, so in effect he is back on duty, no longer on delay.
-                            // No need to actually add it to the DriverStatus table since we will be adding a
-                            // status of login very shortly and he did not actually click on back on duty. 
-                            // Users viewing the driver history wanted to know where the back on duty was.
-                            // We still need to do this even if there was no trip number because the driver can go on delay without being on a trip. 
-                            // In that case the trip number in the DriverDelay table is #driverid
-                            driverStatus.Status = DriverStatusSRConstants.BackOnDuty;
-                            //Add 1 second to the action date time, so the BackOnDuty will display after the Login on the Driver History report
-                            System.TimeSpan tSpan = new System.TimeSpan(0, 0, 0, 1);
-                            driverStatus.ActionDateTime = driverLoginProcess.LoginDateTime + tSpan;
-                            //The delay code is stored in the DriverStatus table but not in the DriverHistory table, so it is not needed.
-                            log.Debug("SRTEST:Add BackOnDuty to DriverHistory");
-
-                            if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
-                                ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
-                            {
-                                if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
-                                {
-                                    break;
-                                }
-                                var s = "DriverLoginProcess:Could not update driver status";
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                                break;
-                            }
-                        }
                         
                         ////////////////////////////////////////////////
                         // Check for power unit change
@@ -522,6 +487,41 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverLoginProcess:Invalid TripNumber: "
                                 + driverLoginProcess.TripNumber + "-" + driverLoginProcess.TripSegNumber));
                             break;
+                        }
+                        ////////////////////////////////////////////////
+                        //Check for open ended delays 
+                        //CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                        //             driverLoginProcess, employeeMaster, driverStatus, ref driverHistoryInsertCount);
+
+                        if (CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                                     driverLoginProcess, employeeMaster, currentTripSegment))
+                        {
+                            // Add "Back On Duty" flag to Driver History table.
+                            // For the last open-ended delay that we added an end time, record a back on duty status in the DriverHistory table.
+                            // The driver is logging in, so in effect he is back on duty, no longer on delay.
+                            // No need to actually add it to the DriverStatus table since we will be adding a
+                            // status of login very shortly and he did not actually click on back on duty. 
+                            // Users viewing the driver history wanted to know where the back on duty was.
+                            // We still need to do this even if there was no trip number because the driver can go on delay without being on a trip. 
+                            // In that case the trip number in the DriverDelay table is #driverid
+                            driverStatus.Status = DriverStatusSRConstants.BackOnDuty;
+                            //Add 1 second to the action date time, so the BackOnDuty will display after the Login on the Driver History report
+                            System.TimeSpan tSpan = new System.TimeSpan(0, 0, 0, 1);
+                            driverStatus.ActionDateTime = driverLoginProcess.LoginDateTime + tSpan;
+                            //The delay code is stored in the DriverStatus table but not in the DriverHistory table, so it is not needed.
+                            log.Debug("SRTEST:Add BackOnDuty to DriverHistory");
+
+                            if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster, currentTripSegment,
+                                ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
+                            {
+                                if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
+                                {
+                                    break;
+                                }
+                                var s = "DriverLoginProcess:Could not update driver status";
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                break;
+                            }
                         }
 
                         ////////////////////////////////////////////////
@@ -586,7 +586,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////
                         // Add record to DriverHistory table
-                        if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
+                        if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster, currentTripSegment,
                                 ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                         {
                             if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
@@ -830,7 +830,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// </summary>
         public bool CheckForOpenEndedDelays(IDataService dataService, ProcessChangeSetSettings settings,
                ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
-               DriverLoginProcess driverLoginProcess, EmployeeMaster employeeMaster)
+               DriverLoginProcess driverLoginProcess, EmployeeMaster employeeMaster, TripSegment currentTripSegment)
         {
             DataServiceFault fault;
             string msgKey = key;

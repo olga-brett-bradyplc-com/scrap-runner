@@ -708,15 +708,16 @@ namespace Brady.ScrapRunner.DataService.Util
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
-        /// <param name="employeeMaster"></param>
         /// <param name="driverStatus"></param>
+        /// <param name="employeeMaster"></param>
+        /// <param name="currentTripSegment"></param>
         /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         public static bool InsertDriverHistory(IDataService dataService, ProcessChangeSetSettings settings,
-            DriverStatus driverStatus, EmployeeMaster employeeMaster, int callCountThisTxn,
+            DriverStatus driverStatus, EmployeeMaster employeeMaster, TripSegment currentTripSegment, int callCountThisTxn,
             IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log, out DataServiceFault fault)
         {
             List<long> userRoleIds = userRoleIdsEnumerable.ToList();
@@ -829,19 +830,23 @@ namespace Brady.ScrapRunner.DataService.Util
             string driverRegionName = driverRegionMaster?.RegionName;
 
             //////////////////////////////////////////////////////////////////////////////////////
+            //do not lookup the trip segment information. It has been set up for an update and hangs
+            //eventually throwing an exception:
+            //Error executing query: NHibernate.Exceptions.GenericADOException: Failed to execute multi criteria
+            //Timeout expired.  The timeout period elapsed prior to completion of the operation or the server is not responding. 
             //If there is a trip number and segment number, look up the TripSegment record to get the
             //destination customer information. (Instead of the cutomer master).
             //Unless the driver is logging in in the middle of the trip, we want this to be null
-            var driverTripSegment = new TripSegment();
-            if (null != driverStatus.TripNumber && null != driverStatus.TripSegNumber)
-            {
-                driverTripSegment = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
-                                              driverStatus.TripNumber, driverStatus.TripSegNumber, out fault);
-                if (null != fault)
-                {
-                    return false;
-                }
-            }
+            //var driverTripSegment = new TripSegment();
+            //if (null != driverStatus.TripNumber && null != driverStatus.TripSegNumber)
+            //{
+            //    driverTripSegment = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
+            //                                  driverStatus.TripNumber, driverStatus.TripSegNumber, out fault);
+            //    if (null != fault)
+            //    {
+            //        return false;
+            //    }
+            //}
 
              //////////////////////////////////////////////////////////////////////////////////////
             var driverHistory = new DriverHistory()
@@ -872,16 +877,16 @@ namespace Brady.ScrapRunner.DataService.Util
                 ActionDateTime = driverStatus.ActionDateTime,
                 DriverCumMinutes = driverStatus.DriverCumMinutes,
                 Odometer = driverStatus.Odometer,
-                DestCustType = driverTripSegment.TripSegDestCustType,
-                DestCustTypeDesc = driverTripSegment.TripSegDestCustTypeDesc,
-                DestCustHostCode = driverTripSegment.TripSegDestCustHostCode,
-                DestCustName = driverTripSegment.TripSegDestCustName,
-                DestCustAddress1 = driverTripSegment.TripSegDestCustAddress1,
-                DestCustAddress2 = driverTripSegment.TripSegDestCustAddress2,
-                DestCustCity = driverTripSegment.TripSegDestCustCity,
-                DestCustState = driverTripSegment.TripSegDestCustState,
-                DestCustZip = driverTripSegment.TripSegDestCustZip,
-                DestCustCountry = driverTripSegment.TripSegDestCustCountry,
+                DestCustType = currentTripSegment.TripSegDestCustType,
+                DestCustTypeDesc = currentTripSegment.TripSegDestCustTypeDesc,
+                DestCustHostCode = currentTripSegment.TripSegDestCustHostCode,
+                DestCustName = currentTripSegment.TripSegDestCustName,
+                DestCustAddress1 = currentTripSegment.TripSegDestCustAddress1,
+                DestCustAddress2 = currentTripSegment.TripSegDestCustAddress2,
+                DestCustCity = currentTripSegment.TripSegDestCustCity,
+                DestCustState = currentTripSegment.TripSegDestCustState,
+                DestCustZip = currentTripSegment.TripSegDestCustZip,
+                DestCustCountry = currentTripSegment.TripSegDestCustCountry,
                 GPSAutoGeneratedFlag = driverStatus.GPSAutoGeneratedFlag,
                 GPSXmitFlag = driverStatus.GPSXmitFlag,
                 MdtVersion = driverStatus.MdtVersion
