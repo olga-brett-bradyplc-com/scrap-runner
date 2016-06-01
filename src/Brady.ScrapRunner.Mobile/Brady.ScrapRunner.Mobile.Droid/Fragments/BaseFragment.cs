@@ -109,6 +109,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     break;
                 default: // MenuFilterEnum.NotOnTrip
                     _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(true);
+                    _navigationView.Menu.FindItem(Resource.Id.nav_adddelay).SetVisible(true);
                     _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(false);
                     _navigationView.Menu.FindItem(Resource.Id.nav_changereturnyard).SetVisible(false);
                     _navigationView.Menu.FindItem(Resource.Id.nav_addreturnyard).SetVisible(false);

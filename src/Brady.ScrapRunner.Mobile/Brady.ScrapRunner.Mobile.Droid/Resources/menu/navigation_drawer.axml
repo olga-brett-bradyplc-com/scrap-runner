@@ -15,6 +15,10 @@
           android:icon="@drawable/ic_directions_bus_black_36dp"
           android:title="Change Power Unit" />
       <item
+          android:id="@+id/nav_adddelay"
+          android:icon="@drawable/ic_alarm_off_black_36dp"
+          android:title="Add Delay" />
+      <item
           android:id="@+id/nav_fuelentry"
           android:icon="@drawable/ic_local_gas_station_black_36dp"
           android:title="Fuel Entry" />

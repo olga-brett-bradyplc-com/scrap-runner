@@ -27,20 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<DriverHistory, DriverHistory>();
         }
 
-        public override DriverHistory GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            //int parsedDriverSeqNumber;
-            //int.TryParse(identityValues[0], out parsedDriverSeqNumber); 
-
-            return new DriverHistory
-            {
-                DriverSeqNumber = int.Parse(identityValues[0]),
-                EmployeeId = identityValues[1],
-                TripNumber = identityValues[2]
-            };
-        }
-
         public override Expression<Func<DriverHistory, bool>> GetIdentityPredicate(DriverHistory item)
         {
             return x => x.DriverSeqNumber == item.DriverSeqNumber &&

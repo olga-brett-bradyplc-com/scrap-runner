@@ -27,17 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<PowerLimits, PowerLimits>();
         }
 
-        public override PowerLimits GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new PowerLimits
-            {
-                ContainerType = identityValues[0],
-                PowerId = identityValues[1],
-                PowerSeqNumber = int.Parse(identityValues[2])
-            };
-        }
-
         public override Expression<Func<PowerLimits, bool>> GetIdentityPredicate(PowerLimits item)
         {
             return x => x.ContainerType == item.ContainerType &&

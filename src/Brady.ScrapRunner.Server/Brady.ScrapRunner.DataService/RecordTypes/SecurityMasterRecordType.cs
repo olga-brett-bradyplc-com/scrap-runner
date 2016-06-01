@@ -27,18 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<SecurityMaster, SecurityMaster>();
         }
 
-        public override SecurityMaster GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new SecurityMaster
-            {
-                SecurityFunction = identityValues[0],
-                SecurityLevel = identityValues[1],
-                SecurityProgram = identityValues[2],
-                SecurityType = identityValues[3]
-            };
-        }
-
         public override Expression<Func<SecurityMaster, bool>> GetIdentityPredicate(SecurityMaster item)
         {
             return x => x.SecurityFunction == item.SecurityFunction &&

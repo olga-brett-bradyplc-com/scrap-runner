@@ -27,17 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<TripTypeAllowCustType, TripTypeAllowCustType>();
         }
 
-        public override TripTypeAllowCustType GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new TripTypeAllowCustType
-            {
-                TripTypeCode = identityValues[0],
-                TripTypeCustType = identityValues[1],
-                TripTypeSeqNumber = int.Parse(identityValues[2])
-            };
-        }
-
         public override Expression<Func<TripTypeAllowCustType, bool>> GetIdentityPredicate(TripTypeAllowCustType item)
         {
             return x => x.TripTypeCode == item.TripTypeCode &&

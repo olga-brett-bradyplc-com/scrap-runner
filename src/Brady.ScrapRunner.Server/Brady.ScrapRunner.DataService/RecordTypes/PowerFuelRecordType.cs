@@ -26,17 +26,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<PowerFuel, PowerFuel>();
         }
 
-        public override PowerFuel GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new PowerFuel
-            {
-                PowerFuelSeqNumber = int.Parse(identityValues[0]),
-                PowerId = identityValues[1],
-                TripNumber = identityValues[2]
-            };
-        }
-
         public override Expression<Func<PowerFuel, bool>> GetIdentityPredicate(PowerFuel item)
         {
             return x => x.PowerFuelSeqNumber == item.PowerFuelSeqNumber &&

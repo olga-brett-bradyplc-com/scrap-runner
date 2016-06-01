@@ -26,19 +26,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<EmployeeChange, EmployeeChange>();
         }
 
-        public override EmployeeChange GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new EmployeeChange
-            {
-                ActionFlag = identityValues[0],
-                EmployeeId = identityValues[1],
-                LoginId = identityValues[2],
-                Password = identityValues[3],
-                RegionId = identityValues[4]
-            };
-        }
-
         public override Expression<Func<EmployeeChange, bool>> GetIdentityPredicate(EmployeeChange item)
         {
             return x => x.ActionFlag == item.ActionFlag &&

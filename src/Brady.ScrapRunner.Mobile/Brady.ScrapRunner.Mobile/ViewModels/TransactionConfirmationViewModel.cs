@@ -80,13 +80,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Close(this);
 
             if (nextTripSegment.Any())
-            {
                 ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
-            }
             else
-            {
                 ShowViewModel<RouteSummaryViewModel>();
-            }
         }
 
     }

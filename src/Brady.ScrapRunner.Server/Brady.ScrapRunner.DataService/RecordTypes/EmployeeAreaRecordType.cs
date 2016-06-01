@@ -26,15 +26,7 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
         {
             var mapping = Mapper.CreateMap<EmployeeArea, EmployeeArea>();
         }
-        public override EmployeeArea GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new EmployeeArea
-            {
-                AreaId = identityValues[0],
-                EmployeeId = identityValues[1]
-            };
-        }
+
         public override Expression<Func<EmployeeArea, bool>> GetIdentityPredicate(EmployeeArea item)
         {
             return x => x.AreaId == item.AreaId &&

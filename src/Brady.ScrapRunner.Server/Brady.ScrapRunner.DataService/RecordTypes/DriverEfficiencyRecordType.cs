@@ -26,16 +26,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<DriverEfficiency, DriverEfficiency>();
         }
 
-        public override DriverEfficiency GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new DriverEfficiency
-            {
-                TripDriverId = identityValues[0],
-                TripNumber = identityValues[1]
-            };
-        }
-
         public override Expression<Func<DriverEfficiency, bool>> GetIdentityPredicate(DriverEfficiency item)
         {
             return x => x.TripDriverId == item.TripDriverId &&

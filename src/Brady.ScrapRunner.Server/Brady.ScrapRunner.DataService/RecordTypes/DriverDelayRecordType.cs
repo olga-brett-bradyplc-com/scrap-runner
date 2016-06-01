@@ -27,20 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<DriverDelay, DriverDelay>();
         }
 
-        public override DriverDelay GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            //int parsedDelaySeqNumber;
-            //int.TryParse(identityValues[0], out parsedDelaySeqNumber); 
-
-            return new DriverDelay
-            {
-                DelaySeqNumber = int.Parse(identityValues[0]),
-                DriverId = identityValues[1],
-                TripNumber = identityValues[2]
-            };
-        }
-
         public override Expression<Func<DriverDelay, bool>> GetIdentityPredicate(DriverDelay item)
         {
             return x => x.DelaySeqNumber == item.DelaySeqNumber && 

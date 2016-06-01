@@ -27,16 +27,6 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
             var mapping = Mapper.CreateMap<CodeTable, CodeTable>();
         }
 
-        public override CodeTable GetIdentityObject(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return new CodeTable
-            {
-                CodeName = identityValues[0],
-                CodeValue = identityValues[1]
-            };
-        }
-
         public override Expression<Func<CodeTable, bool>> GetIdentityPredicate(CodeTable item)
         {
             return x => x.CodeName == item.CodeName &&
