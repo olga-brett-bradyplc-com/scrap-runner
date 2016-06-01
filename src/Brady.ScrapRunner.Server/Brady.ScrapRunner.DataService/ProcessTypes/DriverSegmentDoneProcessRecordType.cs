@@ -717,7 +717,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //For a completed trip, we need to log completed trip info to the driver history.
                     //Add it here, after the trip has been marked done and before we change the driver status
                     //info to show his next trip information
-                    if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster,
+                    if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster, currentTripSegment,
                         ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
