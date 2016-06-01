@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Resources;
-using BWF.DataServices.PortableClients;
 using MvvmCross.Core.ViewModels;
-using MvvmCross.Plugins.File;
-using MvvmCross.Plugins.PictureChooser;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -19,16 +13,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IConnectionService _connection;
         private readonly IQueueScheduler _queueScheduler;
         private readonly ICodeTableService _codeTableService;
-        private readonly IMvxPictureChooserTask _pictureChooserTask;
-        private readonly IMvxFileStore _fileStore;
 
-        public MenuViewModel(IConnectionService connection, IQueueScheduler queueScheduler, ICodeTableService codeTableService, IMvxPictureChooserTask pictureChooserTask, IMvxFileStore fileStore)
+        public MenuViewModel(IConnectionService connection, IQueueScheduler queueScheduler, ICodeTableService codeTableService)
         {
             _connection = connection;
             _queueScheduler = queueScheduler;
             _codeTableService = codeTableService;
-            _pictureChooserTask = pictureChooserTask;
-            _fileStore = fileStore;
         }
 
         private IMvxAsyncCommand _logoutCommand;
@@ -61,7 +51,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private void ExecuteMessagesCommand()
         {
-            ShowViewModel<MessagesViewModel>(_connection);
+            ShowViewModel<MessagesViewModel>();
         }
 
         private IMvxCommand _newMessageCommand;
@@ -70,7 +60,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private void ExecuteNewMessageCommand()
         {
-            ShowViewModel<NewMessageViewModel>(_connection);
+            ShowViewModel<NewMessageViewModel>();
         }
 
         private IMvxAsyncCommand _delayCommandAsync;
@@ -79,12 +69,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteDelayComandAsync()
         {
-            var delays = await _codeTableService.FindCodeTableList("DELAYCODES");
+            var delays = await _codeTableService.FindCodeTableList(CodeTableNameConstants.DelayCodes);
             var delayAlertAsync =
                 await
                     UserDialogs.Instance.ActionSheetAsync("Select Delay Reason", "", "Cancel",
                         delays.Select(ct => ct.CodeDisp1).ToArray());
 
+            // Hitting "Cancel" on an ActionSheet dialog returns a string of "Cancel" ...
             if (delayAlertAsync != "Cancel")
             {
                 var delayReasonObj = delays.FirstOrDefault(ct => ct.CodeDisp1 == delayAlertAsync);
@@ -98,28 +89,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private void ExecuteTakePictureCommand()
         {
-            _pictureChooserTask.TakePicture(400, 50, OnPictureTaken, () => {/*nothing on cancel*/});
-        }
-
-        private void OnPictureTaken(Stream stream)
-        {
-            var memoryStream = new MemoryStream();
-            stream.CopyTo(memoryStream);
-            PictureBytes = memoryStream.ToArray();
-
-            var randomFileName = "SRImage" + Guid.NewGuid().ToString("N");
-            _fileStore.EnsureFolderExists("Images");
-            var path = _fileStore.PathCombine("Images", randomFileName);
-            _fileStore.WriteFile(path, PictureBytes);
-
-            //ShowViewModel<PhotosViewModel>();
-        }
-
-        private byte[] _pictureBytes;
-        public byte[] PictureBytes
-        {
-            get { return _pictureBytes; }
-            set { SetProperty(ref _pictureBytes, value); }
+            ShowViewModel<PhotosViewModel>();
         }
     }
 }

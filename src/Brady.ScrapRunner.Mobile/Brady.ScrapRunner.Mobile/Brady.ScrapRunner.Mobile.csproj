@@ -58,6 +58,7 @@
     <Compile Include="Interfaces\IClientSettings.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
     <Compile Include="Interfaces\ITripService.cs" />
+    <Compile Include="MobileConstants.cs" />
     <Compile Include="Models\CodeTableModel.cs" />
     <Compile Include="Models\CustomerCommodityModel.cs" />
     <Compile Include="Models\CustomerLocationModel.cs" />

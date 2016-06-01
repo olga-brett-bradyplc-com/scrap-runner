@@ -259,6 +259,7 @@
     <Compile Include="Controls\GroupListView\AndroidBindingResource.cs" />
     <Compile Include="Controls\GroupListView\BindableGroupListAdapter.cs" />
     <Compile Include="Controls\GroupListView\BindableGroupListView.cs" />
+    <Compile Include="Controls\ImageGridViewAdapter\ImageGridViewAdapter.cs" />
     <Compile Include="DebugTrace.cs" />
     <Compile Include="Fragments\DelayFragment.cs" />
     <Compile Include="Fragments\FuelEntryFragment.cs" />
@@ -432,6 +433,12 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\fragment_photos.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\menu\addphoto_menu.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\item_image_gridview.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
   </ItemGroup>
