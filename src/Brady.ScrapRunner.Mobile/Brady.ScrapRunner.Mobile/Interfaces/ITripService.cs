@@ -34,6 +34,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<TripModel> FindNextTripAsync();
 
+        Task<TripSegmentModel> FindTripSegmentInfoAsync(string tripNumber, string tripSegmentNumber);
+
         Task<List<TripSegmentModel>> FindNextTripSegmentsAsync(string tripNumber);
 
         Task<List<TripSegmentContainerModel>> FindNextTripSegmentContainersAsync(string tripNumber, string tripSegNo);
@@ -56,5 +58,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessPublicScaleAsync(DriverContainerActionProcess driverContActionProcess);
         Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessContainerDoneAsync(DriverSegmentDoneProcess driverContActionProcess);
+
+        Task<YardModel> FindYardInfo(string terminalId);
+
     }
 }

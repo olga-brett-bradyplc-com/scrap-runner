@@ -16,6 +16,7 @@
             CreateMap<ContainerMaster, ContainerMasterModel>();
             CreateMap<DriverStatus, DriverStatusModel>();
             CreateMap<Trip, TripModel>();
+            CreateMap<TerminalMaster, YardModel>();
             CreateMap<TripSegment, TripSegmentModel>()
                 .ForMember(m => m.CompositeKey, o => o.Ignore());
             CreateMap<CustomerLocation, CustomerLocationModel>()

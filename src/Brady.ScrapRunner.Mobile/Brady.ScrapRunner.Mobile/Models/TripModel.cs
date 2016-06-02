@@ -72,6 +72,9 @@
         [MaxLength(60)]
         public string TripSpecInstructions { get; set; }
 
+        [MaxLength(10)]
+        public string TripTerminalId { get; set; }
+
         [Ignore]
         public string CityStateZipFormatted => $"{TripCustCity}, {TripCustState} {TripCustZip}";
     }
