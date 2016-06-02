@@ -227,6 +227,22 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    // Get the Customer record for the destination cust host code
+                    var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                                             currentTripSegment.TripSegDestCustHostCode, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    if (null == destCustomerMaster)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid CustHostCode: "
+                                        + currentTripSegment.TripSegDestCustHostCode));
+                        break;
+                    }
+
+                    ////////////////////////////////////////////////
                     //Define the TripSegmentContainer for use later
                     TripSegmentContainer tripSegmentContainer = new TripSegmentContainer();
 
@@ -271,9 +287,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                             containerMaster.ContainerCurrentTripNumber = driverArriveProcess.TripNumber;
                             containerMaster.ContainerCurrentTripSegNumber = driverArriveProcess.TripSegNumber;
-                            containerMaster.ContainerLastActionDateTime = driverArriveProcess.ActionDateTime;
                             containerMaster.ContainerCustHostCode = currentTripSegment.TripSegDestCustHostCode;
                             containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
+
+                            DateTime? prevLastActionDateTime = containerMaster.ContainerLastActionDateTime;
+                            containerMaster.ContainerLastActionDateTime = driverArriveProcess.ActionDateTime;
 
                             //Remove these since container has not yet been set down, still on the move.
                             containerMaster.ContainerLocation = null;
@@ -303,7 +321,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                             ////////////////////////////////////////////////
                             //Add record to Container History. 
-                            if (!Common.InsertContainerHistory(dataService, settings, containerMaster, 
+                            if (!Common.InsertContainerHistory(dataService, settings, containerMaster, destCustomerMaster, prevLastActionDateTime,
                                 ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                             {
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -654,7 +672,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Add record to PowerHistory table. 
-                    if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster,
+                    if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, destCustomerMaster,
                         ++powerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -666,19 +684,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Update CustomerMaster.  If driver auto-arrived, update auto-arrive flag for the destination customer.
                     if (driverArriveProcess.GPSAutoFlag == Constants.Yes)
                     {
-                        var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
-                                                   currentTripSegment.TripSegDestCustHostCode, out fault);
-                        if (fault != null)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            break;
-                        }
-                        if (destCustomerMaster == null)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverArriveProcess:Invalid CustHostCode: "
-                                              + currentTripSegment.TripSegDestCustHostCode));
-                            break;
-                        }
                         destCustomerMaster.CustAutoGPSFlag = driverArriveProcess.GPSAutoFlag;
 
                         //Do the update

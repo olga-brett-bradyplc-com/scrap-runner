@@ -170,6 +170,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Only associated fuel entry with trip if the trip is in progress
                     var currentTrip = new Trip();
                     var currentTripSegment = new TripSegment();
+                    var destCustomerMaster = new CustomerMaster();
 
                     if (driverFuelEntryProcess.TripNumber != null &&
                         driverFuelEntryProcess.TripSegNumber != null)
@@ -211,6 +212,21 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             {
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: "
                                    + driverFuelEntryProcess.TripNumber + "-" + driverFuelEntryProcess.TripSegNumber));
+                                break;
+                            }
+                            ////////////////////////////////////////////////
+                            // Get the Customer record for the destination cust host code
+                            destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                                                     currentTripSegment.TripSegDestCustHostCode, out fault);
+                            if (null != fault)
+                            {
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                                break;
+                            }
+                            if (null == destCustomerMaster)
+                            {
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid CustHostCode: "
+                                                + currentTripSegment.TripSegDestCustHostCode));
                                 break;
                             }
                         }
@@ -305,7 +321,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Add record to PowerHistory table. 
-                    if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster,
+                    if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, destCustomerMaster,
                         ++powerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));

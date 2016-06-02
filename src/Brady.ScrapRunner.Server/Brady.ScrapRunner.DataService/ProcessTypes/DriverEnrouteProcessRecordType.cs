@@ -289,9 +289,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             containerMaster.ContainerCurrentTripNumber = driverEnrouteProcess.TripNumber;
                             containerMaster.ContainerCurrentTripSegNumber = driverEnrouteProcess.TripSegNumber;
                             containerMaster.ContainerCurrentTripSegType = currentTripSegment.TripSegType;
-                            containerMaster.ContainerLastActionDateTime = driverEnrouteProcess.ActionDateTime;
                             containerMaster.ContainerCustHostCode = currentTripSegment.TripSegDestCustHostCode;
                             containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
+
+                            DateTime? prevLastActionDateTime = containerMaster.ContainerLastActionDateTime;
+                            containerMaster.ContainerLastActionDateTime = driverEnrouteProcess.ActionDateTime;
 
                             //Remove these since container is now on the move
                             containerMaster.ContainerLocation = null;
@@ -322,7 +324,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                             ////////////////////////////////////////////////
                             //Add record to Container History. 
-                            if (!Common.InsertContainerHistory(dataService, settings, containerMaster,
+                            if (!Common.InsertContainerHistory(dataService, settings, containerMaster, destCustomerMaster, prevLastActionDateTime,
                                 ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                             {
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -694,7 +696,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Add record to PowerHistory table. 
-                    if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, 
+                    if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, destCustomerMaster,
                         ++powerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));

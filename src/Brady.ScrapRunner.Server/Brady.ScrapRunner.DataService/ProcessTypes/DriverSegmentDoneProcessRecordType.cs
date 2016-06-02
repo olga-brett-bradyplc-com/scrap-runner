@@ -269,14 +269,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     //Get a list of incomplete containers for the segment
                     var incompleteTripSegContainerList = (from item in tripContainerList
-                                                          where item.TripSegContainerComplete != Constants.Yes
+                                                          where item.TripSegNumber == currentTripSegment.TripSegNumber
+                                                          && item.TripSegContainerComplete != Constants.Yes
                                                           select item).ToList();
                     if (incompleteTripSegContainerList != null)
                     {
                         foreach (var incompleteTripSegmentContainer in incompleteTripSegContainerList)
                         {
-                            //TODO: Do the delete. DeleteTripSegmentContainer throws an exception
-                            //changeSetResult = Common.DeleteTripSegmentContainer(dataService, settings, incompleteTripSegmentContainer);
+                            //Do the delete. DeleteTripSegmentContainer no longer throws an exception
+                            changeSetResult = Common.DeleteTripSegmentContainer(dataService, settings, incompleteTripSegmentContainer);
                             log.DebugFormat("SRTEST:Deleting TripSegmentContainer Record for Trip:{0}-{1} Container:{2}- Segment Done.",
                                             incompleteTripSegmentContainer.TripNumber, incompleteTripSegmentContainer.TripSegNumber,
                                             incompleteTripSegmentContainer.TripSegContainerNumber);
@@ -527,17 +528,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Set the auto email receipt flag in the trip record
                     currentTrip.TripSendReceiptFlag = currentTripSegment.TripSegSendReceiptFlag;
 
-                    //Do the update
-                    changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
-                    log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Segment Done.",
-                                    currentTrip.TripNumber);
-                    if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
-                    {
-                        var s = string.Format("Segment Done:Could not update Trip for Trip:{0}.",
-                            currentTrip.TripNumber);
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                        break;
-                    }
+                    //Do not update trip table yet. May need to make more changes to the record, if this is the last segment.
 
                     ////////////////////////////////////////////////
                     //Update the PowerMaster table. 
@@ -651,7 +642,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (lastTripSegment.TripSegNumber == driverSegmentDoneProcess.TripSegNumber)
                         {
                             if (!MarkTripDone(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
-                                                driverSegmentDoneProcess, employeeMaster, powerMaster,
+                                                driverSegmentDoneProcess, employeeMaster, powerMaster, destCustomerMaster,
                                                 currentTrip, tripSegList, tripSegContainerList, tripReferenceNumberList, 
                                                 tripSegmentMileageList, tripDelayList))
                             {
@@ -662,6 +653,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             }
                         }
                     }//end of if (lastTripSegment.TripSegNumber
+
 
                     ////////////////////////////////////////////////
                     //Update the DriverStatus table. Do this after the trip might have been marked done
@@ -789,6 +781,18 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
+                    //Now do the update of the trip table
+                    changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
+                    log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Segment Done.",
+                                    currentTrip.TripNumber);
+                    if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
+                    {
+                        var s = string.Format("Segment Done:Could not update Trip for Trip:{0}.",
+                            currentTrip.TripNumber);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        break;
+                    }
+
                 }//end of foreach 
             }//end of if (!changeSetResult.Failed...
 
@@ -821,10 +825,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         }
         public bool MarkTripDone(IDataService dataService, ProcessChangeSetSettings settings,
            ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
-           DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster, 
-           Trip currentTrip, List<TripSegment> tripSegList, List<TripSegmentContainer> tripContainerList,
-            List<TripReferenceNumber> tripReferenceNumberList, List<TripSegmentMileage> tripSegmentMileageList,
-            List<DriverDelay> tripDelayList)
+           DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
+           CustomerMaster destCustomerMaster,Trip currentTrip, List<TripSegment> tripSegList, 
+           List<TripSegmentContainer> tripContainerList,List<TripReferenceNumber> tripReferenceNumberList, 
+           List<TripSegmentMileage> tripSegmentMileageList,List<DriverDelay> tripDelayList)
         {
             DataServiceFault fault = null;
             string msgKey = key;
@@ -1078,17 +1082,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             //If so,  set the Trip.TripStatus to TS_ERRQ (Q)
             //Set the Trip.TripErrorDesc to EXCESS TIME, EXCESS MILEAGE, INSUFFICIENT TIME, INSUFFICIENT MILEAGE
 
-            //Do the update to the trip table
-            changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
-            log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Trip Done.",
-                            currentTrip.TripNumber);
-            if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
-            {
-                var s = string.Format("Trip Done:Could not update Trip for Trip:{0}.",
-                    currentTrip.TripNumber);
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                return false;
-            }
 
             ////////////////////////////////////////////////
             //Update ContainerMaster for each container in the TripSegmentContainer records,
@@ -1131,7 +1124,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     ////////////////////////////////////////////////
                     //Add record to Container History. 
-                    if (!Common.InsertContainerHistory(dataService, settings, containerMaster,
+                    if (!Common.InsertContainerHistory(dataService, settings, containerMaster, destCustomerMaster,null,
                         ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
