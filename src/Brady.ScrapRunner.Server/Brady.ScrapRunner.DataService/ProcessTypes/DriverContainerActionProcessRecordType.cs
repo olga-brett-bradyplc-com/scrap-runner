@@ -311,6 +311,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 containerMaster.ContainerPowerId = null;
             }
 
+            DateTime? prevLastActionDateTime = containerMaster.ContainerLastActionDateTime;
             containerMaster.ContainerLastActionDateTime = driverContainerActionProcess.ActionDateTime;
             containerMaster.ContainerContents = driverContainerActionProcess.ContainerContents;
 
@@ -361,7 +362,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             ////////////////////////////////////////////////
             //Add record to Container History. 
-            if (!Common.InsertContainerHistory(dataService, settings, containerMaster,
+            if (!Common.InsertContainerHistory(dataService, settings, containerMaster, null, prevLastActionDateTime,
                 ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
             {
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -530,9 +531,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 containerMaster.ContainerPrevTripNumber = driverContainerActionProcess.TripNumber;
                 containerMaster.ContainerCurrentTripSegNumber = driverContainerActionProcess.TripSegNumber;
                 containerMaster.ContainerCurrentTripSegType = currentTripSegment.TripSegType;
-                containerMaster.ContainerLastActionDateTime = driverContainerActionProcess.ActionDateTime;
                 containerMaster.ContainerCustHostCode = currentTripSegment.TripSegDestCustHostCode;
                 containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
+
+                DateTime? prevLastActionDateTime = containerMaster.ContainerLastActionDateTime;
+                containerMaster.ContainerLastActionDateTime = driverContainerActionProcess.ActionDateTime;
 
                 //Do not change when container is processed. 
                 //Although it seems like we should, if segment type is PF,PE,LD,UL,RS...
@@ -609,7 +612,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                 ////////////////////////////////////////////////
                 //Add record to Container History. 
-                if (!Common.InsertContainerHistory(dataService, settings, containerMaster,
+                if (!Common.InsertContainerHistory(dataService, settings, containerMaster, destCustomerMaster, prevLastActionDateTime,
                     ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                 {
                     changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));

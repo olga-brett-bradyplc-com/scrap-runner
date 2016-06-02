@@ -489,6 +489,21 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
                         ////////////////////////////////////////////////
+                        // Get the Customer record for the destination cust host code
+                        var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                                                 currentTripSegment.TripSegDestCustHostCode, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        if (null == destCustomerMaster)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid CustHostCode: "
+                                            + currentTripSegment.TripSegDestCustHostCode));
+                            break;
+                        }
+                        ////////////////////////////////////////////////
                         //Check for open ended delays 
                         //CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                         //             driverLoginProcess, employeeMaster, driverStatus, ref driverHistoryInsertCount);
@@ -625,7 +640,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         ////////////////////////////////////////////////
                         // Add record to PowerHistory table
-                        if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster,
+                        if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, destCustomerMaster,
                                 ++powerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                         {
                             if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))

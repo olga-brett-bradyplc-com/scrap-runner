@@ -243,14 +243,15 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="containerMaster"></param>
-        /// <param name="employeeMaster"></param>
+        /// <param name="destCustomerMaster"></param>
+        /// <param name="prevLastActionDate"></param>
         /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         public static bool InsertContainerHistory(IDataService dataService, ProcessChangeSetSettings settings,
-            ContainerMaster containerMaster,  int callCountThisTxn,
+            ContainerMaster containerMaster,  CustomerMaster destCustomerMaster, DateTime? prevLastActionDateTime, int callCountThisTxn,
             IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log, out DataServiceFault fault)
         {
             List<long> userRoleIds = userRoleIdsEnumerable.ToList();
@@ -330,19 +331,6 @@ namespace Brady.ScrapRunner.DataService.Util
             string containerContentsDesc = codeTableContainerContents?.CodeDisp1;
 
             //////////////////////////////////////////////////////////////////////////////////////
-            //If there is a host code, look up the Customer record to get the
-            // customer information. 
-            var containerCustomerMaster = new CustomerMaster();
-            if (null != containerMaster.ContainerCustHostCode)
-            {
-                containerCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
-                                      containerMaster.ContainerCustHostCode, out fault);
-                if (null != fault)
-                {
-                    return false;
-                }
-            }
-            //////////////////////////////////////////////////////////////////////////////////////
             //If there is a customer type, look up the description in the CodeTable CUSTOMERTYPE
             //Generally, for logins, this information should be null
             var codeTableCustomerType = new CodeTable();
@@ -375,19 +363,10 @@ namespace Brady.ScrapRunner.DataService.Util
                 //Container has to be on the truck (not an exception)
                 if (containerMaster.ContainerPowerId != null)
                 {
-                    //////////////////////////////////////////////////////////////////////////////////////
-                    //Lookup the LastActionDateTime in the ContainerMaster table 
-                    //This will be the original value, since change has not been committed.
-                    var origContainerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
-                                        containerMaster.ContainerNumber, out fault);
-                    if (null != fault)
-                    {
-                        return false;
-                    }
-                    if (origContainerMaster.ContainerLastActionDateTime != null && containerMaster.ContainerLastActionDateTime != null)
+                    if (prevLastActionDateTime != null && containerMaster.ContainerLastActionDateTime != null)
                     {
                         daysAtSite = (int)(containerMaster.ContainerLastActionDateTime.Value.Subtract
-                                          (origContainerMaster.ContainerLastActionDateTime.Value).TotalDays);
+                                          (prevLastActionDateTime.Value).TotalDays);
                     }
                 }
             }
@@ -424,16 +403,16 @@ namespace Brady.ScrapRunner.DataService.Util
                 ContainerPowerId = containerMaster.ContainerPowerId,
                 ContainerShortTerm = containerMaster.ContainerShortTerm,
                 ContainerCustHostCode = containerMaster.ContainerCustHostCode,
-                ContainerCustName = containerCustomerMaster?.CustName,
-                ContainerCustAddress1 = containerCustomerMaster?.CustAddress1,
-                ContainerCustAddress2 = containerCustomerMaster?.CustAddress2,
-                ContainerCustCity = containerCustomerMaster?.CustCity,
-                ContainerCustState = containerCustomerMaster?.CustState,
-                ContainerCustZip = containerCustomerMaster?.CustZip,
-                ContainerCustCountry = containerCustomerMaster?.CustCountry,
-                ContainerCustCounty = containerCustomerMaster?.CustCounty,
-                ContainerCustTownship = containerCustomerMaster?.CustTownship,
-                ContainerCustPhone1 = containerCustomerMaster?.CustPhone1,
+                ContainerCustName = destCustomerMaster?.CustName,
+                ContainerCustAddress1 = destCustomerMaster?.CustAddress1,
+                ContainerCustAddress2 = destCustomerMaster?.CustAddress2,
+                ContainerCustCity = destCustomerMaster?.CustCity,
+                ContainerCustState = destCustomerMaster?.CustState,
+                ContainerCustZip = destCustomerMaster?.CustZip,
+                ContainerCustCountry = destCustomerMaster?.CustCountry,
+                ContainerCustCounty = destCustomerMaster?.CustCounty,
+                ContainerCustTownship = destCustomerMaster?.CustTownship,
+                ContainerCustPhone1 = destCustomerMaster?.CustPhone1,
                 ContainerLevel = containerMaster.ContainerLevel,
                 ContainerLatitude = containerMaster.ContainerLatitude,
                 ContainerLongitude = containerMaster.ContainerLongitude,
@@ -485,7 +464,6 @@ namespace Brady.ScrapRunner.DataService.Util
                 return false;
             }
             return true;
-
         }
         /// <summary>
         /// Insert a ContainerMaster record
@@ -700,8 +678,6 @@ namespace Brady.ScrapRunner.DataService.Util
 
             return true;
         }
-
-
 
         /// <summary>
         /// Insert a DriverHistory record.
@@ -1020,7 +996,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         public static bool InsertPowerHistory(IDataService dataService, ProcessChangeSetSettings settings,
-            PowerMaster powerMaster, EmployeeMaster employeeMaster, int callCountThisTxn,
+            PowerMaster powerMaster, EmployeeMaster employeeMaster, CustomerMaster destCustomerMaster, int callCountThisTxn,
             IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log, out DataServiceFault fault)
         {
             List<long> userRoleIds = userRoleIdsEnumerable.ToList();
@@ -1081,20 +1057,6 @@ namespace Brady.ScrapRunner.DataService.Util
             string powerStatusDesc = codeTablePowerStatus?.CodeDisp1;
 
             //////////////////////////////////////////////////////////////////////////////////////
-            //If there is a host code, look up the Customer record to get the
-            // customer information. 
-            //Generally, for logins, this information should be null
-            var powerCustomerMaster = new CustomerMaster();
-            if (null != powerMaster.PowerCustHostCode)
-            {
-                powerCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
-                                      powerMaster.PowerCustHostCode, out fault);
-                if (null != fault)
-                {
-                    return false;
-                }
-            }
-            //////////////////////////////////////////////////////////////////////////////////////
             //If there is a customer type, look up the description in the CodeTable CUSTOMERTYPE
             //Generally, for logins, this information should be null
             var codeTableCustomerType = new CodeTable();
@@ -1145,16 +1107,16 @@ namespace Brady.ScrapRunner.DataService.Util
                 MdtId = powerMaster.MdtId,
                 PrimaryPowerType = null,
                 PowerCustHostCode = powerMaster.PowerCustHostCode,
-                PowerCustName = powerCustomerMaster?.CustName,
-                PowerCustAddress1 = powerCustomerMaster?.CustAddress1,
-                PowerCustAddress2 = powerCustomerMaster?.CustAddress2,
-                PowerCustCity = powerCustomerMaster?.CustCity,
-                PowerCustState = powerCustomerMaster?.CustState,
-                PowerCustZip = powerCustomerMaster?.CustZip,
-                PowerCustCountry = powerCustomerMaster?.CustCountry,
-                PowerCustCounty = powerCustomerMaster?.CustCounty,
-                PowerCustTownship = powerCustomerMaster?.CustTownship,
-                PowerCustPhone1 = powerCustomerMaster?.CustPhone1,
+                PowerCustName = destCustomerMaster.CustName,
+                PowerCustAddress1 = destCustomerMaster.CustAddress1,
+                PowerCustAddress2 = destCustomerMaster.CustAddress2,
+                PowerCustCity = destCustomerMaster.CustCity,
+                PowerCustState = destCustomerMaster.CustState,
+                PowerCustZip = destCustomerMaster.CustZip,
+                PowerCustCountry = destCustomerMaster.CustCountry,
+                PowerCustCounty = destCustomerMaster.CustCounty,
+                PowerCustTownship = destCustomerMaster.CustTownship,
+                PowerCustPhone1 = destCustomerMaster.CustPhone1,
                 PowerLastActionDateTime = powerMaster.PowerLastActionDateTime,
                 PowerStatusDesc = powerStatusDesc,
                 PowerCurrentTripNumber = powerMaster.PowerCurrentTripNumber,

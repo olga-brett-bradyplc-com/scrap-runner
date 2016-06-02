@@ -190,6 +190,22 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    // Get the Customer record for the destination cust host code
+                    var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                                             currentTripSegment.TripSegDestCustHostCode, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    if (null == destCustomerMaster)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid CustHostCode: "
+                                        + currentTripSegment.TripSegDestCustHostCode));
+                        break;
+                    }
+
+                    ////////////////////////////////////////////////
                     //Adjust odometer based on previously recorded odometer. 
                     //If odometer from mobile device (driverStateLineProcess.Odometer) is less than PowerMaster.PowerOdometer, 
                     //use the PowerMaster.PowerOdometer instead of the odometer from the mobile device.
@@ -235,27 +251,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    if (null != tripSegmentMileage)
-                    {
-                        //State must be different than previously recorded.
-                        if (tripSegmentMileage.TripSegMileageState != driverStateLineProcess.State)
-                        {
-                            tripSegmentMileage.TripSegMileageOdometerEnd = driverStateLineProcess.Odometer;
-
-                            //Do the update
-                            changeSetResult = Common.UpdateTripSegmentMileage(dataService, settings, tripSegmentMileage);
-                            log.DebugFormat("SRTEST:Saving TripSegmentMileage Record for Trip:{0}-{1} State:{2} - StateLine.",
-                                            driverStateLineProcess.TripNumber, driverStateLineProcess.TripSegNumber, driverStateLineProcess.State);
-                            if (Common.LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
-                            {
-                                var s = string.Format("DriverStateLineProcess:Could not update TripSegmentMileage for Trip:{0}-{1} State:{2}.",
-                                      driverStateLineProcess.TripNumber, driverStateLineProcess.TripSegNumber, driverStateLineProcess.State);
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                                break;
-                            }
-                        }
-                    }
-                    //Next start a new TripSegmentMileage record
+                    //Before we update start a new TripSegmentMileage record
                     var newTripSegmentMileage = new TripSegmentMileage();
                     newTripSegmentMileage.TripNumber = currentTripSegment.TripNumber;
                     newTripSegmentMileage.TripSegNumber = currentTripSegment.TripSegNumber;
@@ -277,6 +273,29 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         log.ErrorFormat("InsertTripSegmentMileage failed: {0} during state line request: {1}", fault.Message, driverStateLineProcess);
                         break;
+                    }
+                    //Now do the update on the open ended delay
+                    if (null != tripSegmentMileage)
+                    {
+                        //For now always close out the open ended delay
+                        //State must be different than previously recorded.
+                        //if (tripSegmentMileage.TripSegMileageState != driverStateLineProcess.State)
+                        //{
+                        tripSegmentMileage.TripSegMileageOdometerEnd = driverStateLineProcess.Odometer;
+
+                        //Do the update
+                        //ToDo: This throws the Exception getting single or default.
+                        changeSetResult = Common.UpdateTripSegmentMileage(dataService, settings, tripSegmentMileage);
+                        log.DebugFormat("SRTEST:Saving TripSegmentMileage Record for Trip:{0}-{1} State:{2} - StateLine.",
+                                        driverStateLineProcess.TripNumber, driverStateLineProcess.TripSegNumber, driverStateLineProcess.State);
+                        if (Common.LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
+                        {
+                            var s = string.Format("DriverStateLineProcess:Could not update TripSegmentMileage for Trip:{0}-{1} State:{2}.",
+                                  driverStateLineProcess.TripNumber, driverStateLineProcess.TripSegNumber, driverStateLineProcess.State);
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            break;
+                        }
+                        //}
                     }
 
                     ////////////////////////////////////////////////
@@ -364,7 +383,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Add record to PowerHistory table. 
-                    if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster,
+                    if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, destCustomerMaster,
                         ++powerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
