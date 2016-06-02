@@ -36,6 +36,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 ShowViewModel<SignInViewModel>();
             }
         }
+        //TODO: put in the appropriate spot, called on receiving logoff packet from dispatch (do we have mechanism for receiving packets yet?)
+        private IMvxAsyncCommand _forcedLogoffCommand;
+        public IMvxAsyncCommand ForcedLogoffCommand => _forcedLogoffCommand ?? (_forcedLogoffCommand = new MvxAsyncCommand(ExecuteForcedLogoffAsync));
+
+        private async Task ExecuteForcedLogoffAsync()
+        {
+            await UserDialogs.Instance.AlertAsync(
+                            AppResources.ForcedLogoffMessage, AppResources.ForcedLogoff, AppResources.OK);
+
+            _queueScheduler.Unschedule();
+            _connection.DeleteConnection();
+            ShowViewModel<SignInViewModel>();
+        }
         private IMvxCommand _fuelentryCommand;
         public IMvxCommand FuelEntryCommand
             => _fuelentryCommand ?? (_fuelentryCommand = new MvxCommand(ExecuteFuelEntryCommand));

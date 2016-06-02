@@ -4,6 +4,7 @@ using Brady.ScrapRunner.Mobile.Enums;
 using Brady.ScrapRunner.Mobile.Helpers;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain;
@@ -235,7 +236,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         EmployeeId = currentDriver.EmployeeId,
                         PowerId = currentDriver.PowerId,
                         TripNumber = TripNumber,
-                        TripSegNumber = "01",
+                        TripSegNumber = "01", //TODO: why it's hardcoded? we need to pass segment number into route detail
                         ActionDateTime = DateTime.Now,
                         Odometer = currentDriver.Odometer ?? default(int),
                     });
@@ -243,6 +244,28 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     if (setDriverArrived.WasSuccessful)
                     {
                         CurrentStatus = DriverStatusConstants.Arrive;
+
+                        //TODO: GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
+                        var tripInfo = await _tripService.FindTripAsync(TripNumber);
+                        {
+                            //condition to check for lat/lon
+                            var yardInfo = await _tripService.FindYardInfo(tripInfo.TripTerminalId);
+
+                            if (yardInfo != null)
+                            {
+                                if (yardInfo.CustLatitude == "0" || yardInfo.CustLongitude == "0")
+                                {
+                                    var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
+                                        AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
+                                        AppResources.No);
+
+                                    if (gpsCaptureDialog)
+                                    {
+                                        //TODO: add saving routine to capture current log/lat
+                                    }
+                                }
+                            }
+                        }
                     }
                     else
                     {

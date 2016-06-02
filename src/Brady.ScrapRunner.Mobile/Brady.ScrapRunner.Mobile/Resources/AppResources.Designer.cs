@@ -278,11 +278,49 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Forced Logoff.
+        /// </summary>
+        public static string ForcedLogoff {
+            get {
+                return ResourceManager.GetString("ForcedLogoff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are being logged off of the application by dispatch. 
+        ///
+        ///You will now be sent back to the login..
+        /// </summary>
+        public static string ForcedLogoffMessage {
+            get {
+                return ResourceManager.GetString("ForcedLogoffMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fuel Entry.
         /// </summary>
         public static string FuelEntry {
             get {
                 return ResourceManager.GetString("FuelEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GPS Capture.
+        /// </summary>
+        public static string GPSCapture {
+            get {
+                return ResourceManager.GetString("GPSCapture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Would you like to add the current GPS coordinates as an arrival point for future usage?.
+        /// </summary>
+        public static string GPSCaptureMessage {
+            get {
+                return ResourceManager.GetString("GPSCaptureMessage", resourceCulture);
             }
         }
         

@@ -19,19 +19,22 @@
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
+        private readonly IRepository<YardModel> _yardInfoRepository;
 
         public TripService(
             IConnectionService connection,
             IRepository<PreferenceModel> preferenceRepository,
             IRepository<TripModel> tripRepository,
             IRepository<TripSegmentModel> tripSegmentRepository,
-            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository)
+            IRepository<TripSegmentContainerModel> tripSegmentContainerRepository,
+            IRepository<YardModel> yardInfoRepository)
         {
             _connection = connection;
             _preferenceRepository = preferenceRepository;
             _tripRepository = tripRepository;
             _tripSegmentRepository = tripSegmentRepository;
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
+            _yardInfoRepository = yardInfoRepository;
         }
 
         /// <summary>
@@ -63,13 +66,17 @@
         /// <returns></returns>
         public Task UpdateTripSegmentContainers(IEnumerable<TripSegmentContainer> tripSegmentContainers)
         {
-            var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegmentContainer>, IEnumerable<TripSegmentContainerModel>>(tripSegmentContainers);
+            var mapped =
+                AutoMapper.Mapper.Map<IEnumerable<TripSegmentContainer>, IEnumerable<TripSegmentContainerModel>>(
+                    tripSegmentContainers);
             return _tripSegmentContainerRepository.InsertRangeAsync(mapped);
         }
 
         public async Task<ChangeResultWithItem<TripInfoProcess>> FindTripsRemoteAsync(TripInfoProcess tripInfoProcess)
         {
-            var tripProcess = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(tripInfoProcess, requeryUpdated: false);
+            var tripProcess =
+                await
+                    _connection.GetConnection(ConnectionType.Online).UpdateAsync(tripInfoProcess, requeryUpdated: false);
             return tripProcess;
         }
 
@@ -167,11 +174,11 @@
                 .Where(ts =>
                     ts.TripNumber == tripNumber
                     &&
-                    (ts.TripSegDestCustType == CustomerTypeConstants.Scale))
+                    (ts.TripSegType == CustomerTypeConstants.Scale))
                 .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
 
-            return segment?.TripSegType == BasicTripTypeConstants.Scale ||
-                   segment?.TripSegType == BasicTripTypeConstants.ReturnYard;
+            return segment.TripSegType.Equals(BasicTripTypeConstants.Scale) ||
+                   segment.TripSegType.Equals(BasicTripTypeConstants.ReturnYard);
         }
 
         /// <summary>
@@ -210,6 +217,18 @@
             return sortedTrips.FirstOrDefault();
         }
 
+        public async Task<TripSegmentModel> FindTripSegmentInfoAsync(string tripNumber, string tripSegmentNumber)
+        {
+            var segment = await _tripSegmentRepository.AsQueryable()
+                .Where(ts =>
+                    ts.TripNumber == tripNumber
+                    &&
+                    ts.TripSegNumber == tripSegmentNumber)
+                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
+
+            return segment;
+        }
+
         /// <summary>
         /// Find all trip segments for the given leg of a trip
         /// </summary>
@@ -220,7 +239,9 @@
             var segments = await _tripSegmentRepository.AsQueryable()
                 .Where(ts =>
                     ts.TripNumber == tripNumber
-                    && (ts.TripSegStatus == TripSegStatusConstants.Pending || ts.TripSegStatus == TripSegStatusConstants.Missed))
+                    &&
+                    (ts.TripSegStatus == TripSegStatusConstants.Pending ||
+                     ts.TripSegStatus == TripSegStatusConstants.Missed))
                 .OrderBy(ts => ts.TripSegNumber)
                 .ToListAsync();
             if (!segments.Any())
@@ -239,7 +260,8 @@
         /// <param name="tripNumber"></param>
         /// <param name="tripSegNo"></param>
         /// <returns></returns>
-        public async Task<List<TripSegmentContainerModel>> FindNextTripSegmentContainersAsync(string tripNumber, string tripSegNo)
+        public async Task<List<TripSegmentContainerModel>> FindNextTripSegmentContainersAsync(string tripNumber,
+            string tripSegNo)
         {
             var containers = await _tripSegmentContainerRepository.AsQueryable()
                 .Where(tscm => tscm.TripNumber == tripNumber
@@ -280,13 +302,15 @@
         /// <param name="tripSegContainerSeqNumber"></param>
         /// <param name="tripSegContainerNumer"></param>
         /// <returns></returns>
-        public async Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo, short tripSegContainerSeqNumber, string tripSegContainerNumer)
+        public async Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo,
+            short tripSegContainerSeqNumber, string tripSegContainerNumer)
         {
             // @TODO : Not complete
             var container = await _tripSegmentContainerRepository.AsQueryable()
                 .Where(
                     tscm =>
-                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo && tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).FirstOrDefaultAsync();
+                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
+                        tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).FirstOrDefaultAsync();
 
             if (string.IsNullOrEmpty(container.TripSegContainerNumber))
                 container.TripSegContainerNumber = tripSegContainerNumer;
@@ -307,7 +331,8 @@
         /// <param name="gs2Wt"></param>
         /// <param name="trWt"></param>
         /// <returns></returns>
-        public async Task<int> UpdateTripSegmentContainerWeightTimesAsync(string tripNumber, string tripSegNo, string tripSegContainerNumber, DateTime? gsWt, DateTime? gs2Wt, DateTime? trWt)
+        public async Task<int> UpdateTripSegmentContainerWeightTimesAsync(string tripNumber, string tripSegNo,
+            string tripSegContainerNumber, DateTime? gsWt, DateTime? gs2Wt, DateTime? trWt)
         {
             // @TODO : Not complete
             var container = await _tripSegmentContainerRepository.AsQueryable()
@@ -332,7 +357,8 @@
         /// <param name="latitude"></param>
         /// <param name="longitude"></param>
         /// <returns></returns>
-        public async Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo, string tripSegContainerNumber, int? latitude, int? longitude)
+        public async Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo,
+            string tripSegContainerNumber, int? latitude, int? longitude)
         {
 
             // @TODO : Not complete
@@ -371,26 +397,34 @@
         {
             var tripSegment =
                 await _tripSegmentRepository.FindAsync(
-                        ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
+                    ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
             tripSegment.TripSegStatus = TripSegStatusConstants.Done;
             return await _tripSegmentRepository.UpdateAsync(tripSegment);
         }
 
         public async Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessPublicScaleAsync(
-           DriverContainerActionProcess driverContainerActionProcess)
+            DriverContainerActionProcess driverContainerActionProcess)
         {
             var publicScaleProcess =
                 await _connection.GetConnection().UpdateAsync(driverContainerActionProcess, requeryUpdated: false);
             return publicScaleProcess;
 
         }
+
         public async Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessContainerDoneAsync(
-           DriverSegmentDoneProcess driverSegmentDoneProcess)
+            DriverSegmentDoneProcess driverSegmentDoneProcess)
         {
             var containerProcess =
                 await _connection.GetConnection().UpdateAsync(driverSegmentDoneProcess, requeryUpdated: false);
             return containerProcess;
 
+        }
+
+        public Task<YardModel> FindYardInfo(string terminalId)
+        {
+            var yardInfo = _yardInfoRepository.AsQueryable()
+                .Where(y => y.TerminalId == terminalId).FirstOrDefaultAsync();
+            return yardInfo;
         }
     }
 }
