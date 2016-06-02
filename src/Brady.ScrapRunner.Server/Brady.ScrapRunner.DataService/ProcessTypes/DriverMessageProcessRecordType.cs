@@ -239,6 +239,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 message.Processed = Constants.Yes;
 
                 //Do the update
+                //ToDo: This now throws an exception Exception getting single or default
                 scratchChangeSetResult = Common.UpdateMessages(dataService, settings, message);
                 log.DebugFormat("SRTEST:Saving Message sent to DriverId:{0} From:{1}-Message:{2}.",
                                 message.ReceiverId.Trim(),message.SenderId.Trim(), message.MsgId);
