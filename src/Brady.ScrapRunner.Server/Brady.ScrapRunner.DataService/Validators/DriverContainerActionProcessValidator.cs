@@ -22,10 +22,11 @@ namespace Brady.ScrapRunner.DataService.Validators
         {
             RuleFor(x => x.EmployeeId).NotEmpty();
             RuleFor(x => x.PowerId).NotEmpty();
-            RuleFor(x => x.ContainerNumber).NotEmpty();
             RuleFor(x => x.ActionType).NotEmpty();
             RuleFor(x => x.ActionDateTime).NotEmpty();
-            RuleFor(x => x.ContainerContents).NotEmpty();
+            //Exception actions will have no container number
+            //RuleFor(x => x.ContainerNumber).NotEmpty();
+            //RuleFor(x => x.ContainerContents).NotEmpty();
         }
     }
 }
