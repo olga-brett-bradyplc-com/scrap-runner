@@ -271,10 +271,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             foreach (var container in containerHistory)
                             {
                                 ////////////////////////////////////////////////
-                                // Delete the original record.
-                                //ToDo: DeleteContainerHistory method throws an exception
-                                //NHibernate.NonUniqueObjectException: 
-                                //a different object with the same identifier value was already associated with the session: 
+                                //Do the delete. Deleting records with composite keys is now fixed
                                 changeSetResult = Common.DeleteContainerHistory(dataService, settings, container);
                                 log.DebugFormat("SRTEST:Deleting ContainerHistory Record for Container:{0} Seq:{1}- NewContainer.",
                                                 container.ContainerNumber, container.ContainerSeqNumber);

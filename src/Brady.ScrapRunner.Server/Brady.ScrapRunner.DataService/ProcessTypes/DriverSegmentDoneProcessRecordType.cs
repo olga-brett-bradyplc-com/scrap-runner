@@ -276,7 +276,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         foreach (var incompleteTripSegmentContainer in incompleteTripSegContainerList)
                         {
-                            //Do the delete. DeleteTripSegmentContainer no longer throws an exception
+                            //Do the delete. Deleting records with composite keys is now fixed.
                             changeSetResult = Common.DeleteTripSegmentContainer(dataService, settings, incompleteTripSegmentContainer);
                             log.DebugFormat("SRTEST:Deleting TripSegmentContainer Record for Trip:{0}-{1} Container:{2}- Segment Done.",
                                             incompleteTripSegmentContainer.TripNumber, incompleteTripSegmentContainer.TripSegNumber,
