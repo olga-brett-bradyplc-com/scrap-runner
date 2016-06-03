@@ -42,6 +42,8 @@
             _locationWatcher.Stop();
         }
 
+        public MvxGeoLocation CurrentLocation => _locationWatcher.CurrentLocation;
+
         private void OnLocationChange(MvxGeoLocation location)
         {
             if (_locationPath.Count == 0)
