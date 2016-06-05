@@ -505,14 +505,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Update the TripSegmentMileage record.
                     if (currentTripSegment.TripSegNumber == Constants.FirstSegment)
                     {
-                        //TODO: Delete any existing trip segment mileage records for this segment
+                        //Delete any existing trip segment mileage records for this segment
                         //Driver might be starting this trip again. Maybe he went enroute/arrived, logged out and is now going enroute again.
                         var oldTripSegmentMileageList = Common.GetTripSegmentMileage(dataService, settings, userCulture, userRoleIds,
                                                 driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber, out fault);
                         foreach (var oldTripSegmentMileage in oldTripSegmentMileageList)
                         {
-                            //TODO: Do the delete. DeleteTripSegmentMileage throws an exception
-                            //changeSetResult = Common.DeleteTripSegmentMileage(dataService, settings, oldTripSegmentMileage);
+                            //Do the delete. Deleting records with composite keys is now fixed.
+                            changeSetResult = Common.DeleteTripSegmentMileage(dataService, settings, oldTripSegmentMileage);
                             log.DebugFormat("SRTEST:Deleting TripSegmentMileage Record for Trip:{0}-{1} Seq:{2}- Enroute.",
                                             oldTripSegmentMileage.TripNumber, oldTripSegmentMileage.TripSegNumber,
                                             oldTripSegmentMileage.TripSegMileageSeqNumber);
@@ -526,7 +526,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             }
                         }
                     }
-
+                    //ToDo: When we delete records, they are not commited.  So when we get the max seq no, it will retrieve
+                    //data before the delete. How to fix? Always pass in a sequence number?
                     //Normally for enroutes, we need to add a mileage record, but just in case there is an open-ended
                     //mileage record, we would need to overwrite the information
                     //Get the last open-ended trip segment mileage 
