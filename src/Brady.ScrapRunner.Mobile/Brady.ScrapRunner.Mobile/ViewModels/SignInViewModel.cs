@@ -29,6 +29,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IConnectionService _connection;
         private readonly IMessagesService _messagesService;
         private readonly IQueueScheduler _queueScheduler;
+        private readonly ILocationService _locationService;
 
 
         public SignInViewModel(
@@ -41,7 +42,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ICodeTableService codeTableService,
             IMessagesService messagesService,
             IConnectionService connection, 
-            IQueueScheduler queueScheduler)
+            IQueueScheduler queueScheduler, 
+            ILocationService locationService)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -54,6 +56,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             _connection = connection;
             _queueScheduler = queueScheduler;
+            _locationService = locationService;
             Title = AppResources.SignInTitle;
             SignInCommand = new MvxAsyncCommand(ExecuteSignInCommandAsync, CanExecuteSignInCommand);
         }
@@ -164,6 +167,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
                 _queueScheduler.Unschedule();
+                _locationService.Stop();
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
                 // have a need for a login service, leaving this as it is.
                 var loginProcess = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(
@@ -290,6 +294,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             }
             _queueScheduler.Schedule(60000);
+            _locationService.Start();
             return true;
         }
 
