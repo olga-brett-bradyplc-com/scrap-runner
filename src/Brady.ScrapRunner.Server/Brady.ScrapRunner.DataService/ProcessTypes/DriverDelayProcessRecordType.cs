@@ -364,9 +364,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
 
                 //Set the field values for driver status
-                //Save the original status in the PrevDriverStatus, so that it can be used after the
-                //back on duty is processed.
-                driverStatus.PrevDriverStatus = driverStatus.Status;
+                //Save the original status in the PrevDriverStatus, so that it can be used after the back on duty is processed.
+                //As a precaution, do not store delays or back on duties in previous status
+                if (driverStatus.Status != DriverStatusSRConstants.Delay ||
+                    driverStatus.Status != DriverStatusSRConstants.BackOnDuty)
+                {
+                    driverStatus.PrevDriverStatus = driverStatus.Status;
+                }
                 driverStatus.Status = DriverStatusSRConstants.Delay;
 
                 //For delays store the delay code
@@ -497,24 +501,22 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
                 //ToDo: On a back on duty, if there is no delay started, should we start one and end it?
             }
-            
-            var driverDelay = driverDelayList.FirstOrDefault();
+            //List is in order of delay start date desc
+            var lastDriverDelay = driverDelayList.FirstOrDefault();
 
             //Delete all but the last open ended delay. There should be none.
-            foreach (var item in driverDelayList)
+            foreach (var oldDriverDelay in driverDelayList)
             {
-                if (item != driverDelay)
+                if (oldDriverDelay != lastDriverDelay)
                 {
-                    //ToDo: DeleteDriverDelay method throws an exception
-                    //NHibernate.NonUniqueObjectException: 
-                    //a different object with the same identifier value was already associated with the session: 
-                    //changeSetResult = Common.DeleteDriverDelay(dataService, settings, driverDelay);
+                    //Do the delete. Deleting records with composite keys is now fixed.
+                    changeSetResult = Common.DeleteDriverDelay(dataService, settings, oldDriverDelay);
                     log.DebugFormat("SRTEST:Deleting DriverDelay Record for DriverId:{0} Seq#:{1} Trip:{2} - BackOnDuty.",
-                                    driverDelay.DriverId, driverDelay.DelaySeqNumber, driverDelay.TripNumber);
-                    if (Common.LogChangeSetFailure(changeSetResult, driverDelay, log))
+                                    oldDriverDelay.DriverId, oldDriverDelay.DelaySeqNumber, oldDriverDelay.TripNumber);
+                    if (Common.LogChangeSetFailure(changeSetResult, oldDriverDelay, log))
                     {
                         var s = string.Format("DriverDelayProcess:Could not update DriverDelay for DriverId:{0} Seq#:{1} Trip:{2}.",
-                                driverDelay.DriverId, driverDelay.DelaySeqNumber, driverDelay.TripNumber);
+                                oldDriverDelay.DriverId, oldDriverDelay.DelaySeqNumber, oldDriverDelay.TripNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
                     }
@@ -522,16 +524,16 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
 
             //Set the end date/time for the delay
-            driverDelay.DelayEndDateTime = driverDelayProcess.ActionDateTime;
+            lastDriverDelay.DelayEndDateTime = driverDelayProcess.ActionDateTime;
 
             //Do the driverDelay update
-            changeSetResult = Common.UpdateDriverDelay(dataService, settings, driverDelay);
-            log.DebugFormat("SRTEST:Saving DriverDelay Record for DriverId:{0} - Driver BackOnDuty.",
-                            driverDelay.DriverId);
-            if (Common.LogChangeSetFailure(changeSetResult, driverDelay, log))
+            changeSetResult = Common.UpdateDriverDelay(dataService, settings, lastDriverDelay);
+            log.DebugFormat("SRTEST:Saving DriverDelay Record for DriverId:{0} Seq#:{1} Trip:{2} - Driver BackOnDuty.",
+                            lastDriverDelay.DriverId, lastDriverDelay.DelaySeqNumber,lastDriverDelay.TripNumber);
+            if (Common.LogChangeSetFailure(changeSetResult, lastDriverDelay, log))
             {
-                var s = string.Format("DriverDelayProcess(BackOnDuty):Could not update DriverDelay for DriverId:{0}.",
-                    driverDelay.DriverId);
+                var s = string.Format("DriverDelayProcess(BackOnDuty):Could not update DriverDelay for DriverId:{0} Seq#:{1} Trip:{2}.",
+                    lastDriverDelay.DriverId, lastDriverDelay.DelaySeqNumber, lastDriverDelay.TripNumber);
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                 return false;
             }
