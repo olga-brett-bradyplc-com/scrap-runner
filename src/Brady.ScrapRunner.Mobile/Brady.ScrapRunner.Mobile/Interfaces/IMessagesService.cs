@@ -7,6 +7,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Models;
+    using Messages = Domain.Models.Messages;
 
     public interface IMessagesService
     {

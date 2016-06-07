@@ -13,6 +13,7 @@ namespace Brady.ScrapRunner.Mobile.Services
     using Interfaces;
     using Models;
     using MvvmCross.Platform;
+    using Messages = Domain.Models.Messages;
 
     public class MessagesService : IMessagesService
     {
