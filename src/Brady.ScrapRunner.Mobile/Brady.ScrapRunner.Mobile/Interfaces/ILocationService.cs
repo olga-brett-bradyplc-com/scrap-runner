@@ -1,6 +1,6 @@
 ﻿namespace Brady.ScrapRunner.Mobile.Interfaces
 {
-    using MvvmCross.Plugins.Location;
+    using Models;
 
     public interface ILocationService
     {
@@ -8,6 +8,6 @@
 
         void Stop();
 
-        MvxGeoLocation CurrentLocation { get; }
+        LocationModel CurrentLocation { get; }
     }
 }
