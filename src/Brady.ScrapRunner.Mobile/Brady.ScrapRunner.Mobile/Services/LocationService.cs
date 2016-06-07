@@ -13,11 +13,16 @@
     {
         private readonly IMvxLocationWatcher _locationWatcher;
         private readonly IMvxMessenger _mvxMessenger;
+        private readonly ILocationPathService _locationPathService;
 
-        public LocationService(IMvxLocationWatcher locationWatcher, IMvxMessenger mvxMessenger)
+        public LocationService(
+            IMvxLocationWatcher locationWatcher, 
+            IMvxMessenger mvxMessenger, 
+            ILocationPathService locationPathService)
         {
             _locationWatcher = locationWatcher;
             _mvxMessenger = mvxMessenger;
+            _locationPathService = locationPathService;
             _locationWatcher.OnPermissionChanged += OnPermissionChange;
         }
 
@@ -34,12 +39,14 @@
             Mvx.Resolve<IMvxMainThreadDispatcher>().RequestMainThreadAction(() =>
             {
                 _locationWatcher.Start(options, OnLocationChange, OnLocationError);
+                _locationPathService.Start();
             });
         }
 
         public void Stop()
         {
             if (!_locationWatcher.Started) return;
+            _locationPathService.Stop();
             _locationWatcher.Stop();
         }
 

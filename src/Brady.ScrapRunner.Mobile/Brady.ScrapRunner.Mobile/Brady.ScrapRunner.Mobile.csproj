@@ -47,6 +47,7 @@
     <Compile Include="Interfaces\ICustomerService.cs" />
     <Compile Include="Interfaces\IDbService.cs" />
     <Compile Include="Interfaces\IDriverService.cs" />
+    <Compile Include="Interfaces\ILocationPathService.cs" />
     <Compile Include="Interfaces\ILocationService.cs" />
     <Compile Include="Interfaces\IMessagesService.cs" />
     <Compile Include="Interfaces\INetworkAvailabilityService.cs" />
@@ -58,11 +59,13 @@
     <Compile Include="Interfaces\IClientSettings.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
     <Compile Include="Interfaces\ITripService.cs" />
+    <Compile Include="Messages\LocationModelMessage.cs" />
     <Compile Include="MobileConstants.cs" />
     <Compile Include="Models\CodeTableModel.cs" />
     <Compile Include="Models\CustomerCommodityModel.cs" />
     <Compile Include="Models\CustomerLocationModel.cs" />
     <Compile Include="Models\DriverStatusModel.cs" />
+    <Compile Include="Models\LocationModel.cs" />
     <Compile Include="Models\MessagesModel.cs" />
     <Compile Include="Models\PowerMasterModel.cs" />
     <Compile Include="Models\ContainerMasterModel.cs" />
@@ -92,6 +95,7 @@
     <Compile Include="Services\ConnectionService.cs" />
     <Compile Include="Services\DemoClientSettings.cs" />
     <Compile Include="Services\DriverService.cs" />
+    <Compile Include="Services\LocationPathService.cs" />
     <Compile Include="Services\LocationService.cs" />
     <Compile Include="Services\MessagesService.cs" />
     <Compile Include="Services\QueuedDataServiceClient.cs" />
