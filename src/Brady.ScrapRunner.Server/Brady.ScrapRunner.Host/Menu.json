@@ -50,6 +50,10 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverNewContainerProcess"
         },
         {
+          "text": "DriverOdomUpdateProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverOdomUpdateProcess"
+        },
+        {
           "text": "DriverSegmentDoneProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverSegmentDoneProcess"
         },
