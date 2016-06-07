@@ -235,7 +235,8 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return errorsDetected;
         }
-
+        ////////////////////////////////////////////////////////////////
+        ///TABLE INSERTS
         /// <summary>
         /// Insert a ContainerHistory record.
         ///  Note:  caller must handle faults.  E.G. if( handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
@@ -245,7 +246,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="containerMaster"></param>
         /// <param name="destCustomerMaster"></param>
         /// <param name="prevLastActionDate"></param>
-        /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
+        /// <param name="callCountThisTxn">Start with 1 and increment if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
         /// <param name="fault"></param>
@@ -437,6 +438,8 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return true;
         }
+
+        ///TABLE INSERTS
         /// <summary>
         /// Insert a ContainerHistory record
         /// </summary>
@@ -465,6 +468,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return true;
         }
+        ///TABLE INSERTS
         /// <summary>
         /// Insert a ContainerMaster record
         /// </summary>
@@ -495,6 +499,7 @@ namespace Brady.ScrapRunner.DataService.Util
             return true;
 
         }
+        ///TABLE INSERTS
         /// <summary>
         /// Insert a DriverDelay record.
         ///  Note:  caller must handle faults.  
@@ -551,6 +556,20 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return true;
         }
+        ///TABLE INSERTS
+        /// <summary>
+        /// Insert a Driver Efficiency Record
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userRoleIdsEnumerable"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="log"></param>
+        /// <param name="trip"></param>
+        /// <param name="tripSegmentList"></param>
+        /// <param name="tripDelayList"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
         public static bool InsertDriverEfficiency(IDataService dataService, ProcessChangeSetSettings settings,
              IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log,
               Trip trip, List<TripSegment> tripSegmentList, List<DriverDelay> tripDelayList, out DataServiceFault fault)
@@ -679,6 +698,7 @@ namespace Brady.ScrapRunner.DataService.Util
             return true;
         }
 
+        ///TABLE INSERTS
         /// <summary>
         /// Insert a DriverHistory record.
         /// </summary>
@@ -882,6 +902,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return true;
         }
+        ///TABLE INSERTS
         /// <summary>
         /// Insert a Message Record
         /// </summary>
@@ -925,6 +946,7 @@ namespace Brady.ScrapRunner.DataService.Util
             return true;
         }
 
+        ///TABLE INSERTS
         /// <summary>
         /// Insert a PowerFuel record.
         ///  Note:  caller must handle faults.  
@@ -982,6 +1004,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return true;
         }
+        ///TABLE INSERTS
         /// <summary>
         /// Insert a PowerHistory record.
         ///  Note:  caller must handle faults.  E.G. if( handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
@@ -1081,50 +1104,50 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             string tripTypeBasicDesc = tripTypeBasic?.TripTypeDesc;
 
-            var powerHistory = new PowerHistory()
+            var powerHistory = new PowerHistory();
+            powerHistory.PowerId = powerMaster.PowerId;
+            powerHistory.PowerSeqNumber = powerSeqNo;
+            powerHistory.PowerType = powerMaster.PowerType;
+            powerHistory.PowerDesc = powerMaster.PowerDesc;
+            powerHistory.PowerSize = powerMaster.PowerSize;
+            powerHistory.PowerLength = powerMaster.PowerLength;
+            powerHistory.PowerTareWeight = powerMaster.PowerTareWeight;
+            powerHistory.PowerCustType = powerMaster.PowerCustType;
+            powerHistory.PowerCustTypeDesc = powerCustTypeDesc;
+            powerHistory.PowerTerminalId = powerMaster.PowerTerminalId;
+            powerHistory.PowerTerminalName = powerTerminalName;
+            powerHistory.PowerRegionId = powerMaster.PowerRegionId;
+            powerHistory.PowerRegionName = powerRegionName;
+            powerHistory.PowerLocation = powerMaster.PowerLocation;
+            powerHistory.PowerStatus = powerMaster.PowerStatus;
+            powerHistory.PowerDateOutOfService = powerMaster.PowerDateOutOfService;
+            powerHistory.PowerDateInService = powerMaster.PowerDateInService;
+            powerHistory.PowerDriverId = powerMaster.PowerDriverId;
+            powerHistory.PowerDriverName = Common.GetEmployeeName(employeeMaster);
+            powerHistory.PowerOdometer = powerMaster.PowerOdometer;
+            powerHistory.PowerComments = powerMaster.PowerComments;
+            powerHistory.MdtId = powerMaster.MdtId;
+            powerHistory.PrimaryPowerType = null;
+            powerHistory.PowerCustHostCode = powerMaster.PowerCustHostCode;
+            powerHistory.PowerLastActionDateTime = powerMaster.PowerLastActionDateTime;
+            powerHistory.PowerStatusDesc = powerStatusDesc;
+            powerHistory.PowerCurrentTripNumber = powerMaster.PowerCurrentTripNumber;
+            powerHistory.PowerCurrentTripSegNumber = powerMaster.PowerCurrentTripSegNumber;
+            powerHistory.PowerCurrentTripSegType = powerMaster.PowerCurrentTripSegType;
+            powerHistory.PowerCurrentTripSegTypeDesc = tripTypeBasicDesc;
+            if (null != destCustomerMaster)
             {
-                PowerId = powerMaster.PowerId,
-                PowerSeqNumber = powerSeqNo,
-                PowerType = powerMaster.PowerType,
-                PowerDesc = powerMaster.PowerDesc,
-                PowerSize = powerMaster.PowerSize,
-                PowerLength = powerMaster.PowerLength,
-                PowerTareWeight = powerMaster.PowerTareWeight,
-                PowerCustType = powerMaster.PowerCustType,
-                PowerCustTypeDesc = powerCustTypeDesc,
-                PowerTerminalId = powerMaster.PowerTerminalId,
-                PowerTerminalName = powerTerminalName,
-                PowerRegionId = powerMaster.PowerRegionId,
-                PowerRegionName = powerRegionName,
-                PowerLocation = powerMaster.PowerLocation,
-                PowerStatus = powerMaster.PowerStatus,
-                PowerDateOutOfService = powerMaster.PowerDateOutOfService,
-                PowerDateInService = powerMaster.PowerDateInService,
-                PowerDriverId = powerMaster.PowerDriverId,
-                PowerDriverName = Common.GetEmployeeName(employeeMaster),
-                PowerOdometer = powerMaster.PowerOdometer,
-                PowerComments = powerMaster.PowerComments,
-                MdtId = powerMaster.MdtId,
-                PrimaryPowerType = null,
-                PowerCustHostCode = powerMaster.PowerCustHostCode,
-                PowerCustName = destCustomerMaster.CustName,
-                PowerCustAddress1 = destCustomerMaster.CustAddress1,
-                PowerCustAddress2 = destCustomerMaster.CustAddress2,
-                PowerCustCity = destCustomerMaster.CustCity,
-                PowerCustState = destCustomerMaster.CustState,
-                PowerCustZip = destCustomerMaster.CustZip,
-                PowerCustCountry = destCustomerMaster.CustCountry,
-                PowerCustCounty = destCustomerMaster.CustCounty,
-                PowerCustTownship = destCustomerMaster.CustTownship,
-                PowerCustPhone1 = destCustomerMaster.CustPhone1,
-                PowerLastActionDateTime = powerMaster.PowerLastActionDateTime,
-                PowerStatusDesc = powerStatusDesc,
-                PowerCurrentTripNumber = powerMaster.PowerCurrentTripNumber,
-                PowerCurrentTripSegNumber = powerMaster.PowerCurrentTripSegNumber,
-                PowerCurrentTripSegType = powerMaster.PowerCurrentTripSegType,
-                PowerCurrentTripSegTypeDesc = tripTypeBasicDesc
-            };
-
+                powerHistory.PowerCustName = destCustomerMaster.CustName;
+                powerHistory.PowerCustAddress1 = destCustomerMaster.CustAddress1;
+                powerHistory.PowerCustAddress2 = destCustomerMaster.CustAddress2;
+                powerHistory.PowerCustCity = destCustomerMaster.CustCity;
+                powerHistory.PowerCustState = destCustomerMaster.CustState;
+                powerHistory.PowerCustZip = destCustomerMaster.CustZip;
+                powerHistory.PowerCustCountry = destCustomerMaster.CustCountry;
+                powerHistory.PowerCustCounty = destCustomerMaster.CustCounty;
+                powerHistory.PowerCustTownship = destCustomerMaster.CustTownship;
+                powerHistory.PowerCustPhone1 = destCustomerMaster.CustPhone1;
+            }
             // Insert PowerHistory 
             var recordType = (PowerHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "PowerHistory");
             var changeSet = (ChangeSet<string, PowerHistory>)recordType.GetNewChangeSet();
@@ -1139,6 +1162,7 @@ namespace Brady.ScrapRunner.DataService.Util
             return true;
         }
 
+        ///TABLE INSERTS
         /// <summary>
         /// Add history trip, trip segment, trip segment container, trip reference number, trip segment mileage records
         /// </summary>
@@ -1480,6 +1504,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             return true;
         }
+        ///TABLE INSERTS
         /// <summary>
         /// Insert a TripSegmentMileage record.
         /// </summary>
@@ -1538,6 +1563,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
         }
 
+        ///TABLE INSERTS
         /// <summary>
         /// Insert a TripSegmentMileage record.
         ///  Note:  caller must handle faults.  E.G. if( handleFault(changeSetResult, msgKey, fault, driverLoginProcess)) { break; }
@@ -1613,7 +1639,7 @@ namespace Brady.ScrapRunner.DataService.Util
             return true;
         }
  
-            ///TABLE INSERTS
+        ///TABLE INSERTS
         /// <summary>
         /// Add/Update an EventLog record.
         /// </summary>
@@ -1630,6 +1656,8 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
+        //////////////////////////////////////////////////////////////////////////
         ///TABLE UPDATES
         /// <summary>
         /// Update a ContainerHistory record.
@@ -1683,6 +1711,23 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         ///TABLE UPDATES
         /// <summary>
+        /// Update a DriverHistory record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="driverHistory"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdateDriverHistory(IDataService dataService, ProcessChangeSetSettings settings,
+                                              DriverHistory driverHistory)
+        {
+            var recordType = (DriverHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "DriverHistory");
+            var changeSet = (ChangeSet<string, DriverHistory>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(driverHistory.Id, driverHistory);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+        ///TABLE UPDATES
+        /// <summary>
         /// Updates a Messages record.
         /// </summary>
         /// <param name="dataService"></param>
@@ -1695,6 +1740,39 @@ namespace Brady.ScrapRunner.DataService.Util
             var recordType = (MessagesRecordType)dataService.RecordTypes.Single(x => x.TypeName == "Messages");
             var changeSet = (ChangeSet<int, Messages>)recordType.GetNewChangeSet();
             changeSet.AddUpdate(messages.Id, messages);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+        /// <summary>
+        /// Update a UpdatePowerFuel record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="powerFuel"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdatePowerFuel(IDataService dataService, ProcessChangeSetSettings settings,
+            PowerFuel powerFuel)
+        {
+            var recordType = (PowerFuelRecordType)dataService.RecordTypes.Single(x => x.TypeName == "PowerFuel");
+            var changeSet = (ChangeSet<string, PowerFuel>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(powerFuel.Id, powerFuel);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+        ///TABLE UPDATES
+        /// <summary>
+        /// Update a PowerHistory record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="powerHistory"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdatePowerHistory(IDataService dataService, ProcessChangeSetSettings settings,
+                                              PowerHistory powerHistory)
+        {
+            var recordType = (PowerHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "PowerHistory");
+            var changeSet = (ChangeSet<string, PowerHistory>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(powerHistory.Id, powerHistory);
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
@@ -1800,6 +1878,56 @@ namespace Brady.ScrapRunner.DataService.Util
         }
 
         /// <summary>
+        /// Update a TripSegmentMileage record using TripSegment information.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="tripSegmentMileage"></param>
+        /// <param name="tripSegment"></param>
+        /// <param name="containersOnPowerId"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdateTripSegmentMileageFromSegment(IDataService dataService, ProcessChangeSetSettings settings,
+            TripSegmentMileage tripSegmentMileage, TripSegment tripSegment, List<ContainerMaster> containersOnPowerId)
+        {
+            tripSegmentMileage.TripSegMileageOdometerEnd = tripSegment.TripSegOdometerEnd;
+            //We don't need to set State and Country. It should have been already set. But just in case....
+            if (null == tripSegmentMileage.TripSegMileageState)
+                tripSegmentMileage.TripSegMileageState = tripSegment.TripSegDestCustState;
+            if (null == tripSegmentMileage.TripSegMileageCountry)
+                tripSegmentMileage.TripSegMileageCountry = tripSegment.TripSegDestCustCountry;
+            if (null != containersOnPowerId && containersOnPowerId.Count() > 0)
+            {
+                tripSegmentMileage.TripSegLoadedFlag = Common.GetSegmentLoadedFlag(tripSegment, containersOnPowerId);
+            }
+            tripSegmentMileage.TripSegMileagePowerId = tripSegment.TripSegPowerId;
+            tripSegmentMileage.TripSegMileageDriverId = tripSegment.TripSegDriverId;
+            tripSegmentMileage.TripSegMileageDriverName = tripSegment.TripSegDriverName;
+
+            var recordType = (TripSegmentMileageRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegmentMileage");
+            var changeSet = (ChangeSet<string, TripSegmentMileage>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(tripSegmentMileage.Id, tripSegmentMileage);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+
+        /// <summary>
+        /// Update a UpdateTripSegmentMileage record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="tripSegmentMileage"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdateTripSegmentMileage(IDataService dataService, ProcessChangeSetSettings settings,
+            TripSegmentMileage tripSegmentMileage)
+        {
+            var recordType = (TripSegmentMileageRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegmentMileage");
+            var changeSet = (ChangeSet<string, TripSegmentMileage>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(tripSegmentMileage.Id, tripSegmentMileage);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+        //////////////////////////////////////////////////////////////////////////
+        /// <summary>
         /// Delete a ContainerHistory record.
         /// </summary>
         /// <param name="dataService"></param>
@@ -1867,38 +1995,6 @@ namespace Brady.ScrapRunner.DataService.Util
             return changeSetResult;
         }
         /// <summary>
-        /// Update a TripSegmentMileage record using TripSegment information.
-        /// </summary>
-        /// <param name="dataService"></param>
-        /// <param name="settings"></param>
-        /// <param name="tripSegmentMileage"></param>
-        /// <param name="tripSegment"></param>
-        /// <param name="containersOnPowerId"></param>
-        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
-        public static ChangeSetResult<string> UpdateTripSegmentMileageFromSegment(IDataService dataService, ProcessChangeSetSettings settings,
-            TripSegmentMileage tripSegmentMileage, TripSegment tripSegment, List<ContainerMaster> containersOnPowerId)
-        {
-            tripSegmentMileage.TripSegMileageOdometerEnd = tripSegment.TripSegOdometerEnd;
-            //We don't need to set State and Country. It should have been already set. But just in case....
-            if (null == tripSegmentMileage.TripSegMileageState)
-                tripSegmentMileage.TripSegMileageState = tripSegment.TripSegDestCustState;
-            if (null == tripSegmentMileage.TripSegMileageCountry)
-                tripSegmentMileage.TripSegMileageCountry = tripSegment.TripSegDestCustCountry;
-            if (null != containersOnPowerId && containersOnPowerId.Count() > 0)
-            {
-                tripSegmentMileage.TripSegLoadedFlag = Common.GetSegmentLoadedFlag(tripSegment, containersOnPowerId);
-            }
-            tripSegmentMileage.TripSegMileagePowerId = tripSegment.TripSegPowerId;
-            tripSegmentMileage.TripSegMileageDriverId = tripSegment.TripSegDriverId;
-            tripSegmentMileage.TripSegMileageDriverName = tripSegment.TripSegDriverName;
-
-            var recordType = (TripSegmentMileageRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegmentMileage");
-            var changeSet = (ChangeSet<string, TripSegmentMileage>)recordType.GetNewChangeSet();
-            changeSet.AddUpdate(tripSegmentMileage.Id, tripSegmentMileage);
-            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            return changeSetResult;
-        }
-        /// <summary>
         /// Delete a TripSegmentMileage record.
         /// </summary>
         /// <param name="dataService"></param>
@@ -1914,22 +2010,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-        /// <summary>
-        /// Update a UpdateTripSegmentMileage record.
-        /// </summary>
-        /// <param name="dataService"></param>
-        /// <param name="settings"></param>
-        /// <param name="tripSegmentMileage"></param>
-        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
-        public static ChangeSetResult<string> UpdateTripSegmentMileage(IDataService dataService, ProcessChangeSetSettings settings,
-            TripSegmentMileage tripSegmentMileage)
-        {
-            var recordType = (TripSegmentMileageRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegmentMileage");
-            var changeSet = (ChangeSet<string, TripSegmentMileage>)recordType.GetNewChangeSet();
-            changeSet.AddUpdate(tripSegmentMileage.Id, tripSegmentMileage);
-            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            return changeSetResult;
-        }
+
 
         /// AREAMASTER Table queries
         /// <summary>
@@ -2925,6 +3006,44 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return driver;
         }
+        /// DRIVERHISTORY Table queries
+        /// <summary>
+        ///  Get driver history records for a given trip
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if areaId is null or no entries are found</returns>
+        public static List<DriverHistory> GetDriverHistoryForTrip(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string driverId, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var driverHistory = new List<DriverHistory>();
+            if (null != driverId && null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<DriverHistory>()
+                        .Filter(y => y.Property(x => x.EmployeeId).EqualTo(driverId)
+                        .And().Property(x => x.TripNumber).EqualTo(tripNumber))
+                        .GetQuery()
+                };
+
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return driverHistory;
+                }
+                driverHistory = queryResult.Records.Cast<DriverHistory>().ToList();
+            }
+            return driverHistory;
+        }
+
         /// DRIVERHISTORY Table  queries
         /// <summary>
         ///  Get the last driver history record for a given driver and trip number
@@ -3222,7 +3341,80 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return messages;
         }
+        /// POWERFUEL Table queries
+        /// <summary>
+        ///  Get power fuel records for a given trip
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="powerId"></param>
+        /// <param name="loginDateTime"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if areaId is null or no entries are found</returns>
+        public static List<PowerFuel> GetPowerFuelSinceLogin(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string powerId, DateTime? loginDateTime, out DataServiceFault fault)
+        {
+            fault = null;
+            var powerFuel = new List<PowerFuel>();
+            if (null != powerId && null != loginDateTime)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<PowerFuel>()
+                        .Filter(y => y.Property(x => x.PowerId).EqualTo(powerId)
+                        .And().Property(x => x.PowerDateOfFuel).GreaterThanOrEqualTo(loginDateTime))
+                        .GetQuery()
+                };
 
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return powerFuel;
+                }
+                powerFuel = queryResult.Records.Cast<PowerFuel>().ToList();
+            }
+            return powerFuel;
+        }
+        /// POWERFUEL Table queries
+        /// <summary>
+        ///  Get power fuel records for a given trip
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="powerId"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if areaId is null or no entries are found</returns>
+        public static List<PowerFuel> GetPowerFuelForTrip(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string powerId, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var powerFuel = new List<PowerFuel>();
+            if (null != powerId && null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<PowerFuel>()
+                        .Filter(y => y.Property(x => x.PowerId).EqualTo(powerId)
+                        .And().Property(x => x.TripNumber).EqualTo(tripNumber))
+                        .GetQuery()
+                };
+
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return powerFuel;
+                }
+                powerFuel = queryResult.Records.Cast<PowerFuel>().ToList();
+            }
+            return powerFuel;
+        }
         /// POWERFUEL Table queries
         /// <summary>
         /// Get the last power fuel record for powerid and tripnumber/driver id
@@ -3258,6 +3450,43 @@ namespace Brady.ScrapRunner.DataService.Util
                 powerFuel = queryResult.Records.Cast<PowerFuel>().FirstOrDefault();
             }
             return powerFuel;
+        }
+        /// POWERHISTORY Table queries
+        /// <summary>
+        ///  Get power history records for a given trip
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="powerId"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if areaId is null or no entries are found</returns>
+        public static List<PowerHistory> GetPowerHistoryForTrip(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string powerId, string tripNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var powerHistory = new List<PowerHistory>();
+            if (null != powerId && null != tripNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<PowerHistory>()
+                        .Filter(y => y.Property(x => x.PowerId).EqualTo(powerId)
+                        .And().Property(x => x.PowerCurrentTripNumber).EqualTo(tripNumber))
+                        .GetQuery()
+                };
+
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return powerHistory;
+                }
+                powerHistory = queryResult.Records.Cast<PowerHistory>().ToList();
+            }
+            return powerHistory;
         }
 
         /// POWERHISTORY Table  queries
@@ -3632,6 +3861,46 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         /// TRIP Table  queries
         /// <summary>
+        ///  Get a list of all trips for given driver and powerid.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="powerId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null or no entries are found </returns>
+        public static List<Trip> GetTripsForDriverAndPowerId(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string driverId, string powerId, out DataServiceFault fault)
+        {
+            fault = null;
+            var trips = new List<Trip>();
+            if (null != driverId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Trip>()
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverId)
+                    .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
+                    .And().Property(x => x.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
+                    .And().Property(x => x.TripSendFlag).In(TripSendFlagValue.Ready, TripSendFlagValue.SentToDriver)
+                    .And().Property(x => x.TripPowerId).EqualTo(powerId))
+                    .OrderBy(x => x.TripSequenceNumber)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return trips;
+                }
+                trips = queryResult.Records.Cast<Trip>().ToList();
+            }
+            return trips;
+        }
+        /// TRIP Table  queries
+        /// <summary>
         ///  Get a list of all trips to be sent to a given driver at login time.
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
@@ -3955,6 +4224,47 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="settings"></param>
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
+        /// <param name="tripList"></param>
+        /// <param name="powerId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if tripNumber is null or no entries are found</returns>
+        public static List<TripSegment> GetTripSegmentsForDriverAndPowerId(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, List<Trip> tripList,string powerId, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripSegments = new List<TripSegment>();
+            if (null != tripList)
+            {
+                foreach (var trip in tripList)
+                {
+                    Query query = new Query
+                    {
+                        CurrentQuery = new QueryBuilder<TripSegment>()
+                        .Filter(y => y.Property(x => x.TripNumber).EqualTo(trip.TripNumber)
+                        .And().Property(x => x.TripSegPowerId).EqualTo(powerId))
+                        .OrderBy(x => x.TripNumber)
+                        .OrderBy(x => x.TripSegNumber)
+                        .GetQuery()
+                    };
+                    var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (null != fault)
+                    {
+                        return tripSegments;
+                    }
+                    tripSegments.AddRange(queryResult.Records.Cast<TripSegment>().ToList());
+                }
+            }
+            return tripSegments;
+        }
+        /// TRIPSEGMENT queries
+        /// <summary>
+        ///  Get a list of all trip segments for a given trip.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
         /// <param name="tripNumber"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if tripNumber is null or no entries are found</returns>
@@ -3981,7 +4291,6 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegments;
         }
-   
         /// TRIPSEGMENT queries
         /// <summary>
         ///  Get a list of trip segments to be sent to a given driver for a given trip.
@@ -4244,6 +4553,48 @@ namespace Brady.ScrapRunner.DataService.Util
                 tripSegmentContainer = queryResult.Records.Cast<TripSegmentContainer>().FirstOrDefault();
             }
             return tripSegmentContainer;
+        }
+        /// TRIPSEGMENTMILEAGE Table  queries
+        /// <summary>
+        ///  Gets the trip segment mileage records for a given trip.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripList"></param>
+        /// <param name="powerId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if tripNumber or tripSegNumber is null or no entries are found</returns>
+        public static List<TripSegmentMileage> GetTripSegmentMileageForDriverAndPowerId(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, List<Trip> tripList, string powerId, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripSegmentMileage = new List<TripSegmentMileage>();
+            if (null != tripList)
+            {
+                foreach (var trip in tripList)
+                {
+                    Query query = new Query
+                    {
+                        CurrentQuery = new QueryBuilder<TripSegmentMileage>()
+                        .Filter(t => t.Property(p => p.TripNumber).EqualTo(trip.TripNumber)
+                        .And().Property(x => x.TripSegMileagePowerId).EqualTo(powerId))
+                        .OrderBy(x => x.TripNumber)
+                        .OrderBy(x => x.TripSegNumber)
+                        .OrderBy(p => p.TripSegMileageSeqNumber)
+                        .GetQuery()
+                    };
+                    var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (null != fault)
+                    {
+                        return tripSegmentMileage;
+                    }
+                    tripSegmentMileage.AddRange(queryResult.Records.Cast<TripSegmentMileage>().ToList());
+                }
+            }
+            return tripSegmentMileage;
         }
         /// TRIPSEGMENTMILEAGE Table  queries
         /// <summary>
