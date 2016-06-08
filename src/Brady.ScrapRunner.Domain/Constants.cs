@@ -293,6 +293,8 @@
         public static readonly string ReceivedDriverSegDone = "RECEIVED DRIVER SEG DONE";
         /// <summary>ReceivedDriverOdomUpdate: RECEIVED DRIVER ODOM UPDATE</summary>
         public static readonly string ReceivedDriverOdomUpdate = "RECEIVED DRIVER ODOM UPDATE";
+        /// <summary>ReceivedDriverPowerUnitChange: RECEIVED DRIVER POWER UNIT CHANGE</summary>
+        public static readonly string ReceivedDriverPowerUnitChange = "RECEIVED DRIVER POWER UNIT CHANGE";
         /// <summary>ReceivedDriverCancelSeg: RECEIVED DRIVER CANCEL SEG</summary>
         public static readonly string ReceivedDriverCancelSeg = "RECEIVED DRIVER CANCEL SEG";
         /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
