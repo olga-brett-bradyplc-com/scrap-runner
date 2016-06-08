@@ -70,6 +70,8 @@ src/Brady.ScrapRunner.Mobile/.vs/config/applicationhost.config
 /packages/SQLite.Net.Async-PCL.*
 /packages/SQLite.Net-PCL.*
 /packages/LINQPad.*
+/packages/Microsoft.*
+/packages/System.Spatial.*
 
 /packages/Splat.1.6.2
 /packages/FluentValidation.6.2.1-beta1
