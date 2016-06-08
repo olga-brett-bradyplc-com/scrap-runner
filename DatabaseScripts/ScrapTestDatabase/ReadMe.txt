@@ -3,6 +3,10 @@
 
 2. Unzip the file to produce a ScrapTest 20160527bwf.bak backup that can be restored to as a ScrapTest database using SQL Management Studio. SQL version must be 2012 or later. SQL Express can also be used.
 
-The database includes the BWF explorer and membership tables as well as all BWF update scripts and ScrapRunner update scripts as of 05/27/2016.
+The database includes the BWF explorer and membership tables as well as all BWF update scripts and ScrapRunner update scripts as of 06/03/2016.
+
+READ_COMMITTED_SNAPSHOT is ON
+To check, run:
+SELECT is_read_committed_snapshot_on FROM sys.databases WHERE name= 'ScrapTest'
 
 

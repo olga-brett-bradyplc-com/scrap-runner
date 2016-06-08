@@ -72,6 +72,7 @@
     <Compile Include="Models\QueueItemModel.cs" />
     <Compile Include="Models\SqliteRepository.cs" />
     <Compile Include="Models\Route.cs" />
+    <Compile Include="Models\YardModel.cs" />
     <Compile Include="Models\TransactionDetail.cs" />
     <Compile Include="Models\TripModel.cs" />
     <Compile Include="Models\TripSegmentContainerModel.cs" />

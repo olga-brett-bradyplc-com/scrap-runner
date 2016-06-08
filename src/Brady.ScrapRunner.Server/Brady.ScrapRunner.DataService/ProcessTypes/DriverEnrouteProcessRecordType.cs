@@ -18,6 +18,7 @@ using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.Util;
+using Brady.ScrapRunner.Domain.Enums;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -289,9 +290,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             containerMaster.ContainerCurrentTripNumber = driverEnrouteProcess.TripNumber;
                             containerMaster.ContainerCurrentTripSegNumber = driverEnrouteProcess.TripSegNumber;
                             containerMaster.ContainerCurrentTripSegType = currentTripSegment.TripSegType;
-                            containerMaster.ContainerLastActionDateTime = driverEnrouteProcess.ActionDateTime;
                             containerMaster.ContainerCustHostCode = currentTripSegment.TripSegDestCustHostCode;
                             containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
+
+                            DateTime? prevLastActionDateTime = containerMaster.ContainerLastActionDateTime;
+                            containerMaster.ContainerLastActionDateTime = driverEnrouteProcess.ActionDateTime;
 
                             //Remove these since container is now on the move
                             containerMaster.ContainerLocation = null;
@@ -322,7 +325,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                             ////////////////////////////////////////////////
                             //Add record to Container History. 
-                            if (!Common.InsertContainerHistory(dataService, settings, containerMaster,
+                            if (!Common.InsertContainerHistory(dataService, settings, containerMaster, destCustomerMaster, prevLastActionDateTime,
                                 ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                             {
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -503,14 +506,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Update the TripSegmentMileage record.
                     if (currentTripSegment.TripSegNumber == Constants.FirstSegment)
                     {
-                        //TODO: Delete any existing trip segment mileage records for this segment
+                        //Delete any existing trip segment mileage records for this segment
                         //Driver might be starting this trip again. Maybe he went enroute/arrived, logged out and is now going enroute again.
                         var oldTripSegmentMileageList = Common.GetTripSegmentMileage(dataService, settings, userCulture, userRoleIds,
                                                 driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber, out fault);
                         foreach (var oldTripSegmentMileage in oldTripSegmentMileageList)
                         {
-                            //TODO: Do the delete. DeleteTripSegmentMileage throws an exception
-                            //changeSetResult = Common.DeleteTripSegmentMileage(dataService, settings, oldTripSegmentMileage);
+                            //Do the delete. Deleting records with composite keys is now fixed.
+                            changeSetResult = Common.DeleteTripSegmentMileage(dataService, settings, oldTripSegmentMileage);
                             log.DebugFormat("SRTEST:Deleting TripSegmentMileage Record for Trip:{0}-{1} Seq:{2}- Enroute.",
                                             oldTripSegmentMileage.TripNumber, oldTripSegmentMileage.TripSegNumber,
                                             oldTripSegmentMileage.TripSegMileageSeqNumber);
@@ -524,7 +527,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             }
                         }
                     }
-
+                    //ToDo: When we delete records, they are not commited.  So when we get the max seq no, it will retrieve
+                    //data before the delete. How to fix? Always pass in a sequence number?
                     //Normally for enroutes, we need to add a mileage record, but just in case there is an open-ended
                     //mileage record, we would need to overwrite the information
                     //Get the last open-ended trip segment mileage 
@@ -594,8 +598,45 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     currentTrip.TripInProgressFlag = Constants.Yes;
 
-                    //TODO: Set the flag to send the scale notice, if applicable.
+                    //Set the flag to send the scale notice, if applicable.
                     //Check if this enroute is returning to yard after picking up or loading a commodity
+                    ////////////////////////////////////////////////
+                    //Initially set the send flag not to send completed trip information to the host.
+                    currentTrip.TripSendScaleNotificationFlag = TripSendScaleFlagValue.NoScale;
+ 
+                    ////////////////////////////////////////////////
+                    // Preferences:  Lookup the yard preference "DEFTHScale".  
+                    // If preference DEFTHScale set to Y then set the send scale flag.
+                    string preDEFTHScale = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                           currentTrip.TripTerminalId, PrefYardConstants.DEFTHScale, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    //First, this flag must be set to Y or nothing will be sent.
+                    if (preDEFTHScale == Constants.Yes)
+                    {
+                        //Also these flags must be set on the trip record
+                        if (currentTrip.TripCommodityScaleMsg == Constants.Yes ||
+                            currentTrip.TripCommodityPurchase == Constants.Yes)
+                        {
+                            //And the segment type must be return to yard
+                            if (currentTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard)
+                            {
+                                //If there is any container on this segment that is loaded
+                                string loaded = (from item in containersOnPowerId
+                                                 where item.ContainerContents == ContainerContentsConstants.Loaded
+                                                 select item.ContainerContents).FirstOrDefault();
+
+                                if (loaded != null)
+                                {
+                                    //Set the scale notice flag to send
+                                    currentTrip.TripSendScaleNotificationFlag = TripSendScaleFlagValue.ScaleReady;
+                                }
+                            }//end of if (currentTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard)
+                        }//end of if (currentTrip.TripCommodityScaleMsg == Constants.Yes 
+                    }//end of if (preDEFTHScale == Constants.Yes)
 
                     //Do the update
                     changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
@@ -694,11 +735,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Add record to PowerHistory table. 
-                    if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, 
+                    if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, destCustomerMaster,
                         ++powerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        log.ErrorFormat("InsertPowerHistory failed: {0} during enorute request: {1}", fault.Message, driverEnrouteProcess);
+                        log.ErrorFormat("InsertPowerHistory failed: {0} during enroute request: {1}", fault.Message, driverEnrouteProcess);
                         break;
                     }
 

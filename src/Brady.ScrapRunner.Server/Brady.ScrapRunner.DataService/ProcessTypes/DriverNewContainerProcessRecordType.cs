@@ -121,13 +121,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //ToDo: Even getting a single ContainerHistory record and deleting it, throws an exception
-                    //var containerHistoryOne = new ContainerHistory();
-                    //containerHistoryOne = Common.GetContainerHistoryOne(dataService, settings, userCulture, userRoleIds,
-                    //                      driverNewContainerProcess.ContainerBarcode, 38, out fault);
-                    //if (containerHistoryOne!= null)
-                    //    changeSetResult = Common.DeleteContainerHistory(dataService, settings, containerHistoryOne);
-
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
@@ -148,7 +141,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     // Get the Container record. Container Number in the table is the incoming bar code number.
                     // We are about to change the Container number to the incoming container number.
                     var containerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
-                                                    driverNewContainerProcess.ContainerNumber, out fault);
+                                                    driverNewContainerProcess.ContainerBarcode, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -220,7 +213,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //insert a new record and delete the old.
                         ////////////////////////////////////////////////
                         //Delete the original record.
-                        //ToDo: Delete ContainerMaster method does NOT throw an exception
                         changeSetResult = Common.DeleteContainerMaster(dataService, settings, containerMaster);
                         log.DebugFormat("SRTEST:Deleting ContainerMaster Record for Container:{0}- NewContainer.",
                                         containerMaster.ContainerNumber);
@@ -279,11 +271,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             foreach (var container in containerHistory)
                             {
                                 ////////////////////////////////////////////////
-                                // Delete the original record.
-                                //ToDo: DeleteContainerHistory method throws an exception
-                                //NHibernate.NonUniqueObjectException: 
-                                //a different object with the same identifier value was already associated with the session: 
-                                // changeSetResult = Common.DeleteContainerHistory(dataService, settings, container);
+                                //Do the delete. Deleting records with composite keys is now fixed
+                                changeSetResult = Common.DeleteContainerHistory(dataService, settings, container);
                                 log.DebugFormat("SRTEST:Deleting ContainerHistory Record for Container:{0} Seq:{1}- NewContainer.",
                                                 container.ContainerNumber, container.ContainerSeqNumber);
                                 if (Common.LogChangeSetFailure(changeSetResult, container, log))
