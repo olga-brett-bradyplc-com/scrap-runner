@@ -31,6 +31,11 @@ namespace Brady.ScrapRunner.DataService.Mappings
                 map.Property(y => y.EmployeeId, m => m.Generated(PropertyGeneration.Never));
             });
 
+            Id(x => x.EmployeeId, m =>
+            {
+                m.Generator(Generators.Assigned);
+            });
+
             //Property(x => x.TripSegNumber);
             //Property(x => x.DriverStatus);
             //Property(x => x.RegionId);
