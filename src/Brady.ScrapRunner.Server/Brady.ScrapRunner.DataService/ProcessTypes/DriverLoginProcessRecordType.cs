@@ -217,7 +217,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         if (null == powerMaster)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverLoginProcess:Invalid Power ID " + driverLoginProcess.PowerId));
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Power ID " + driverLoginProcess.PowerId));
                             break;
                         }
                         //For testing
@@ -235,7 +235,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (PowerStatusConstants.Shop == powerMaster.PowerStatus)
                         {
                             var s = string.Format("Do not use Power unit {0}.  It is scheduled for the shop. ", driverLoginProcess.PowerId);
-                            log.Error(s);
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
@@ -247,7 +246,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         {
                             var s = string.Format("Power unit {0} in use by another driver.  Change power unit number or call Dispatch.",
                                 driverLoginProcess.PowerId);
-                            log.Error(s);
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
