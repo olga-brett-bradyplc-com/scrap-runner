@@ -159,12 +159,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Load ||
                         driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Dropped)
                     {
-                        if (!ContainerLoadDrop(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                        if (!ContainerLoadDrop(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                     driverContainerActionProcess, employeeMaster, containerHistoryInsertCount))
                         {
-                            var s = string.Format("Could not Process Action{0} for Container:{1}.",
-                               driverContainerActionProcess.ActionType, driverContainerActionProcess.ContainerNumber);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
                 
@@ -172,25 +169,18 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Exception action type
                     else if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Exception)
                     {
-                        if (!ContainerException(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                        if (!ContainerException(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                     driverContainerActionProcess, employeeMaster))
                         {
-                            var s = string.Format("Could not Process Container Action{0} for Trip:{1}-{2}.",
-                               driverContainerActionProcess.ActionType, driverContainerActionProcess.TripNumber,
-                               driverContainerActionProcess.TripSegNumber);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
                     }
                     //Done, Review action type
                     else
                     {
-                        if (!ContainerDone(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                        if (!ContainerDone(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                     driverContainerActionProcess, employeeMaster, containerHistoryInsertCount))
                         {
-                            var s = string.Format("Could not Process Action{0} for Container:{1}.",
-                               driverContainerActionProcess.ActionType, driverContainerActionProcess.ContainerNumber);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
                     }
@@ -282,7 +272,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="changeSetResult"></param>
-        /// <param name="key"></param>
+        /// <param name="msgKey"></param>
         /// <param name="userRoleIds"></param>
         /// <param name="userCulture"></param>
         /// <param name="driverContainerActionProcess"></param>
@@ -290,12 +280,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="containerHistoryInsertCount"></param>
         /// <returns></returns>
         public bool ContainerLoadDrop(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
+           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
            DriverContainerActionProcess driverContainerActionProcess, EmployeeMaster employeeMaster, 
            int containerHistoryInsertCount)
         {
             DataServiceFault fault = null;
-            string msgKey = key;
             ////////////////////////////////////////////////
             //Update Container Information
             var containerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
@@ -397,7 +386,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="changeSetResult"></param>
-        /// <param name="key"></param>
+        /// <param name="msgKey"></param>
         /// <param name="userRoleIds"></param>
         /// <param name="userCulture"></param>
         /// <param name="driverContainerActionProcess"></param>
@@ -405,12 +394,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="containerHistoryInsertCount"></param>
         /// <returns></returns>
         public bool ContainerDone(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
+           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
            DriverContainerActionProcess driverContainerActionProcess, EmployeeMaster employeeMaster, 
            int containerHistoryInsertCount)
         {
             DataServiceFault fault = null;
-            string msgKey = key;
 
             ////////////////////////////////////////////////
             // Get the Trip record
@@ -804,18 +792,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="changeSetResult"></param>
-        /// <param name="key"></param>
+        /// <param name="msgKey"></param>
         /// <param name="userRoleIds"></param>
         /// <param name="userCulture"></param>
         /// <param name="driverContainerActionProcess"></param>
         /// <param name="employeeMaster"></param>
         /// <returns></returns>
         public bool ContainerException(IDataService dataService, ProcessChangeSetSettings settings,
-          ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
+          ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
           DriverContainerActionProcess driverContainerActionProcess, EmployeeMaster employeeMaster)
         {
             DataServiceFault fault = null;
-            string msgKey = key;
 
             ////////////////////////////////////////////////
             // Get the Trip record
