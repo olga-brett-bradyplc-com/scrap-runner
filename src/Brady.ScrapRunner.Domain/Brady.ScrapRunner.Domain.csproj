@@ -59,6 +59,7 @@
     <Compile Include="Metadata\DriverEnrouteProcessMetadata.cs" />
     <Compile Include="Metadata\DriverMessageProcessMetadata.cs" />
     <Compile Include="Metadata\DriverNewContainerProcessMetadata.cs" />
+    <Compile Include="Metadata\DriverOdomUpdateProcessMetadata.cs" />
     <Compile Include="Metadata\DriverSegmentDoneProcessMetadata.cs" />
     <Compile Include="Metadata\DriverStateLineProcessMetadata.cs" />
     <Compile Include="Metadata\DriverTripAckProcessMetadata.cs" />
@@ -180,6 +181,7 @@
     <Compile Include="Process\DriverLoginProcess.cs" />
     <Compile Include="Process\DriverMessageProcess.cs" />
     <Compile Include="Process\DriverNewContainerProcess.cs" />
+    <Compile Include="Process\DriverOdomUpdateProcess.cs" />
     <Compile Include="Process\DriverSegmentDoneProcess.cs" />
     <Compile Include="Process\DriverStateLineProcess.cs" />
     <Compile Include="Process\DriverTripAckProcess.cs" />
