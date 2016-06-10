@@ -7,6 +7,7 @@ using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 
+/* TODO: Add process of time out for public scale - after certain period of time delay screen pops up*/
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
     using System;
@@ -22,7 +23,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ICodeTableService _codeTableService;
 
         public PublicScaleDetailViewModel(ITripService tripService, IDriverService driverService,
-                                  ICodeTableService codeTableService)
+            ICodeTableService codeTableService)
         {
             _tripService = tripService;
             _driverService = driverService;
@@ -30,17 +31,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             Title = AppResources.PublicScaleDetail;
 
+            CantProcessLabel = AppResources.CantProcess; //init
+
             GrossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand);
             SecondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);
             TareWeightSetCommand = new MvxCommand(ExecuteTareWeightSetCommand, IsGrossWeightSet);
 
             ContinueCommand = new MvxAsyncCommand(ExecuteContinueCommandAsync);
         }
+
         private IMvxAsyncCommand _noProcessCommandAsync;
+
         public IMvxAsyncCommand NoProcessCommandAsync
             => _noProcessCommandAsync ?? (_noProcessCommandAsync = new MvxAsyncCommand(ExecuteNoProcessCommandDialog));
 
-        public void Init(string tripNumber, string tripSegNumber, short tripSegContainerSeqNumber, string tripSegContainerNumber)
+        public void Init(string tripNumber, string tripSegNumber, short tripSegContainerSeqNumber,
+            string tripSegContainerNumber)
         {
             TripNumber = tripNumber;
             TripSegNumber = tripSegNumber;
@@ -63,18 +69,35 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
 
             if (list.Any())
+            {
+                Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
                 Containers = list;
+            }
 
             base.Start();
         }
 
         // Listview bindings
         private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
+
         public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
         {
             get { return _containers; }
             set { SetProperty(ref _containers, value); }
         }
+
+        private string _cantProcessLabel;
+
+        public string CantProcessLabel
+        {
+            get { return _cantProcessLabel; }
+            set
+            {
+                SetProperty(ref _cantProcessLabel, value);
+                NoProcessCommandAsync.RaiseCanExecuteChanged();
+            }
+        }
+
 
         // Field bindings
         private string _tripNumber;
@@ -146,6 +169,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public MvxCommand SecondGrossWeightSetCommand { get; private set; }
 
         // Command impl
+        /*When driver selects the “Continue” button, the message “Finished with scale?” displays.
+        When driver selects Yes, segment is complete.*/
         private async Task ExecuteContinueCommandAsync()
         {
             //popup "Finished with scale"
@@ -182,6 +207,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (!doneProcess.WasSuccessful)
                     await UserDialogs.Instance.AlertAsync(doneProcess.Failure.Summary,
                         AppResources.Error, AppResources.OK);
+
                 await ExecuteNextStage();
             }
         }
@@ -192,58 +218,75 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _reviewReasonsList, value); }
         }
 
-        /* call DriverContainerActionProcess with an action flag of D for done or E for Exception (Can't process, I think should be treated as an exception). 
-          * After the DriverContainerActionProcess, app calls DriverSegmentDoneProcess with the trip segment info. In the DriverContainerActionProcess, 
-          * the review reason or exception desc would go in the ActionDesc field.
-          * On the server side ReviewReason in the TripSegmentContainer table can be either the review reason or the exception description, 
-          * depending on the action taken on the yard screen (review) or on the stop transaction screen (exception).
-          */
+        /*Selecting “Can’t Process” displays the exception list.
+         "Reason for not being able to process container xxxxx” is displayed with a drop-down list of exceptions.
+          Driver selects an exception and then clicks OK button.
+
+          Then the Scale screen displays  and the “Can’t Process” button now displays as “Can Process.”
+          If “Can Process” is selected, the button changes back to “Can’t Process.”
+
+          If “Can’t Process” is selected, BG marks container as an exception, ReviewFlag is set to E = Exception, ReviewReason is set to exception description (reason desc).
+          Segment status is set to E = Exception, Trip status is set to E = Exception*/
         protected async Task ExecuteNoProcessCommandDialog()
         {
-            // Replace this with an actual query of relevant CodeTable objs from SQLite DB 
-            var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
-            ReviewReasonsList = new ObservableCollection<CodeTableModel>(reasons);
-
-            var alertAsync = await UserDialogs.Instance.ActionSheetAsync("Select Reason Code", "", "Cancel", ReviewReasonsList.Select(cm => cm.CodeDisp1).ToArray());
-
-            var currentUser = await _driverService.GetCurrentDriverStatusAsync();
-
-            var reasonItem = ReviewReasonsList.FirstOrDefault(cm => cm.CodeDisp1 == alertAsync);
-
-            if (reasonItem != null)
+            if (CantProcessLabel.Equals(AppResources.CantProcess))
             {
-                var containerProcess = await _tripService.ProcessPublicScaleAsync(new DriverContainerActionProcess
+                // Replace this with an actual query of relevant CodeTable objs from SQLite DB 
+                var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
+                ReviewReasonsList = new ObservableCollection<CodeTableModel>(reasons);
+
+                var alertAsync =
+                    await
+                        UserDialogs.Instance.ActionSheetAsync("Select Reason Code", "", "Cancel",
+                            ReviewReasonsList.Select(cm => cm.CodeDisp1).ToArray());
+
+                var currentUser = await _driverService.GetCurrentDriverStatusAsync();
+
+                var reasonItem = ReviewReasonsList.FirstOrDefault(cm => cm.CodeDisp1 == alertAsync);
+
+                if (reasonItem != null)
                 {
-                    EmployeeId = currentUser.EmployeeId,
-                    PowerId = currentUser.PowerId,
-                    ActionType = ContainerActionTypeConstants.Exception,
-                    ActionDateTime = DateTime.Now,
-                    TripNumber = TripNumber,
-                    TripSegNumber = TripSegNumber,
-                    ContainerNumber = TripSegContainerNumber,
-                    ActionDesc = reasonItem.CodeDisp1
-                });
+                    var containerProcess = await _tripService.ProcessPublicScaleAsync(new DriverContainerActionProcess
+                    {
+                        EmployeeId = currentUser.EmployeeId,
+                        PowerId = currentUser.PowerId,
+                        ActionType = ContainerActionTypeConstants.Exception,
+                        ActionDateTime = DateTime.Now,
+                        TripNumber = TripNumber,
+                        TripSegNumber = TripSegNumber,
+                        ContainerNumber = TripSegContainerNumber,
+                        ActionDesc = reasonItem.CodeDisp1
+                    });
 
-                if (!containerProcess.WasSuccessful)
-                    await UserDialogs.Instance.AlertAsync(containerProcess.Failure.Summary,
-                        AppResources.Error, AppResources.OK);
+                    if (!containerProcess.WasSuccessful)
+                        await UserDialogs.Instance.AlertAsync(containerProcess.Failure.Summary,
+                            AppResources.Error, AppResources.OK);
 
-                var doneProcess = await _tripService.ProcessContainerDoneAsync(new DriverSegmentDoneProcess
-                {
-                    EmployeeId = currentUser.EmployeeId,
-                    TripNumber = TripNumber,
-                    TripSegNumber = TripSegNumber,
-                    ActionDateTime = DateTime.Now,
-                    PowerId = currentUser.PowerId,
-                    DriverModified = Constants.Yes
-                });
+                    var doneProcess = await _tripService.ProcessContainerDoneAsync(new DriverSegmentDoneProcess
+                    {
+                        EmployeeId = currentUser.EmployeeId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = TripSegNumber,
+                        ActionDateTime = DateTime.Now,
+                        PowerId = currentUser.PowerId,
+                        DriverModified = Constants.Yes
+                    });
 
-                if (!doneProcess.WasSuccessful)
-                    await UserDialogs.Instance.AlertAsync(doneProcess.Failure.Summary,
-                        AppResources.Error, AppResources.OK);
+                    if (!doneProcess.WasSuccessful)
+                        await UserDialogs.Instance.AlertAsync(doneProcess.Failure.Summary,
+                            AppResources.Error, AppResources.OK);
+
+                    await _tripService.MarkExceptionTripAsync(TripNumber);
+                    await _tripService.MarkExceptionTripSegmentAsync(TripNumber, TripSegNumber);
+                }
+                CantProcessLabel = AppResources.CanProcess;
+                //TODO: how to disable all buttons Gross, 2nd gross, tare, material grading
             }
-
-            Close(this);
+            else
+            {
+                CantProcessLabel = AppResources.CantProcess;
+                //TODO: 2nd gross, tare, material grading should be disabled (except Gross)
+            }
         }
 
         private async Task ExecuteNextStage()
@@ -271,6 +314,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private void ExecuteGrossWeightSetCommand()
         {
             GrossTime = DateTime.Now;
+            //TODO: enable 2nd gross, tare button (not material grading)
         }
 
         private void ExecuteSecondGrossWeightSetCommand()

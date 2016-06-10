@@ -98,6 +98,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can Process.
+        /// </summary>
+        public static string CanProcess {
+            get {
+                return ResourceManager.GetString("CanProcess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t Process.
         /// </summary>
         public static string CantProcess {
@@ -251,7 +260,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Finished with Scale.
+        ///   Looks up a localized string similar to Finished with Scale?.
         /// </summary>
         public static string FinishedScale {
             get {

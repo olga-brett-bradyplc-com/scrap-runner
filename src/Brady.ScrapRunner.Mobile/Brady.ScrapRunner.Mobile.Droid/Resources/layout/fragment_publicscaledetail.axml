@@ -74,8 +74,7 @@
         android:textColor="#ffffff"
         android:layout_weight=".5"
         android:layout_marginRight="1dp"
-        local:MvxBind="Click NoProcessCommandAsync"
-        local:MvxLang="Text CantProcess"
+        local:MvxBind="Text CantProcessLabel; Click NoProcessCommandAsync"
         android:background="@color/material_gray_900" />
     <Button
         android:layout_height="match_parent"
