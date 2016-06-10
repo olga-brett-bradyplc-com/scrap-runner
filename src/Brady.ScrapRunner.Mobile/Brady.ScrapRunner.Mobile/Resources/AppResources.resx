@@ -412,7 +412,7 @@
     <comment>Public Scale Detail</comment>
   </data>
   <data name="FinishedScale" xml:space="preserve">
-    <value>Finished with Scale</value>
+    <value>Finished with Scale?</value>
     <comment>Public Scale Continue</comment>
   </data>
   <data name="ForcedLogoff" xml:space="preserve">
@@ -430,5 +430,9 @@ You will now be sent back to the login.</value>
   </data>
   <data name="GPSCaptureMessage" xml:space="preserve">
     <value>Would you like to add the current GPS coordinates as an arrival point for future usage?</value>
+  </data>
+  <data name="CanProcess" xml:space="preserve">
+    <value>Can Process</value>
+    <comment>Public Scale Detail Button label text</comment>
   </data>
 </root>
