@@ -21,6 +21,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             TimeProperty(x => x.ActionDateTime);
             StringProperty(x => x.PowerId);
             IntegerProperty(x => x.Odometer);
+            StringProperty(x => x.OverrideFlag);
             StringProperty(x => x.Mdtid);
 
             ViewDefaults()
@@ -28,6 +29,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.ActionDateTime)
             .Property(x => x.PowerId)
             .Property(x => x.Odometer)
+            .Property(x => x.OverrideFlag)
             .Property(x => x.Mdtid)
 
             .OrderBy(x => x.EmployeeId);

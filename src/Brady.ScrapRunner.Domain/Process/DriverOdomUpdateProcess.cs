@@ -23,6 +23,9 @@ namespace Brady.ScrapRunner.Domain.Process
         ///The odometer. Required.
         public virtual int Odometer { get; set; }
 
+        /// Set this to Y if driver has double checked Odometer and is resubmitting. Optional.
+        public virtual string OverrideFlag { get; set; }
+
         /// Currently this is the driver id. Probably will not be needed in the future.
         public virtual string Mdtid { get; set; }
 

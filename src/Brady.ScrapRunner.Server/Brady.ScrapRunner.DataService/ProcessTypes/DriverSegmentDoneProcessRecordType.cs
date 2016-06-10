@@ -641,14 +641,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         if (lastTripSegment.TripSegNumber == driverSegmentDoneProcess.TripSegNumber)
                         {
-                            if (!MarkTripDone(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                            if (!MarkTripDone(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                                 driverSegmentDoneProcess, employeeMaster, powerMaster, destCustomerMaster,
                                                 currentTrip, tripSegList, tripSegContainerList, tripReferenceNumberList, 
                                                 tripSegmentMileageList, tripDelayList))
                             {
-                                var s = string.Format("Segment Done:Could not Mark Trip Done for Trip:{0}.",
-                                                      currentTrip.TripNumber);
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                 break;
                             }
                         }
@@ -823,15 +820,34 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             return changeSetResult;
         }
+        /// <summary>
+        /// Marks an entire trip done.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="changeSetResult"></param>
+        /// <param name="msgKey"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="driverSegmentDoneProcess"></param>
+        /// <param name="employeeMaster"></param>
+        /// <param name="powerMaster"></param>
+        /// <param name="destCustomerMaster"></param>
+        /// <param name="currentTrip"></param>
+        /// <param name="tripSegList"></param>
+        /// <param name="tripContainerList"></param>
+        /// <param name="tripReferenceNumberList"></param>
+        /// <param name="tripSegmentMileageList"></param>
+        /// <param name="tripDelayList"></param>
+        /// <returns></returns>
         public bool MarkTripDone(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
+           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
            DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
            CustomerMaster destCustomerMaster,Trip currentTrip, List<TripSegment> tripSegList, 
            List<TripSegmentContainer> tripContainerList,List<TripReferenceNumber> tripReferenceNumberList, 
            List<TripSegmentMileage> tripSegmentMileageList,List<DriverDelay> tripDelayList)
         {
             DataServiceFault fault = null;
-            string msgKey = key;
             int containerHistoryInsertCount = 0;
             int tripHistoryInsertCount = 0;
 

@@ -208,13 +208,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (driverDelayProcess.ActionType == DelayActionTypeConstants.Delay)
                     {
                         //Processing a delay
-                        if (!ProcessDelay(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                        if (!ProcessDelay(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                     driverDelayProcess, employeeMaster, currentTrip, currentTripSegment,
                                     driverDelayInsertCount, driverHistoryInsertCount))
                         {
-                            var s = string.Format("DriverDelayProcess:Could not process delay Driver:{0}.",
-                                                  driverDelayProcess.EmployeeId);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
 
@@ -222,13 +219,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     else
                     {
                         //Processing a back on duty
-                        if (!ProcessBackOnDuty(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                        if (!ProcessBackOnDuty(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                     driverDelayProcess, employeeMaster, currentTrip, currentTripSegment,
                                     driverDelayInsertCount, driverHistoryInsertCount))
                         {
-                            var s = string.Format("DriverDelayProcess:Could not process back on duty Driver:{0}.",
-                                                  driverDelayProcess.EmployeeId);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
                     }
@@ -263,12 +257,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             return changeSetResult;
         }
         public bool ProcessDelay(IDataService dataService, ProcessChangeSetSettings settings,
-                ChangeSetResult<string> changeSetResult, string key, IEnumerable<long> userRoleIds, string userCulture,
+                ChangeSetResult<string> changeSetResult, string msgKey, IEnumerable<long> userRoleIds, string userCulture,
                 DriverDelayProcess driverDelayProcess, EmployeeMaster employeeMaster, Trip currentTrip, TripSegment currentTripSegment, 
                 int driverDelayInsertCount, int driverHistoryInsertCount)
         {
             DataServiceFault fault = null;
-            string msgKey = key;
 
             ////////////////////////////////////////////////
             //Add a new DriverDelay Record
@@ -481,12 +474,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             return true;
         }
         public bool ProcessBackOnDuty(IDataService dataService, ProcessChangeSetSettings settings,
-                 ChangeSetResult<string> changeSetResult, string key, IEnumerable<long> userRoleIds, string userCulture,
+                 ChangeSetResult<string> changeSetResult, string msgKey, IEnumerable<long> userRoleIds, string userCulture,
                  DriverDelayProcess driverDelayProcess, EmployeeMaster employeeMaster, Trip currentTrip, TripSegment currentTripSegment,
                  int driverDelayInsertCount, int driverHistoryInsertCount)
         {
             DataServiceFault fault = null;
-            string msgKey = key;
 
             ////////////////////////////////////////////////
             //Find the last open ended DriverDelay Record
