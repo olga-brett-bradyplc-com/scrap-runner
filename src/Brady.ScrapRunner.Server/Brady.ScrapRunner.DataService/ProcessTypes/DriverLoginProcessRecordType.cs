@@ -110,11 +110,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DriverLoginProcess driverLoginProcess = (DriverLoginProcess) changeSetResult.GetSuccessfulUpdateForId(key);
+                    string msgKey = key;
                     try
                     {
-
                         DataServiceFault fault;
-                        string msgKey = key;
                         ChangeSetResult<string> scratchChangeSetResult;
 
                         int powerHistoryInsertCount = 0;
@@ -451,7 +450,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // There has to be a trip number and trip segment number...
                         if (null != driverLoginProcess.TripNumber && null != driverLoginProcess.TripSegNumber)
                         {
-                            CheckForPowerIdChange(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                            CheckForPowerIdChange(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                                 driverLoginProcess, powerMaster, employeeMaster);
                         }
 
@@ -506,7 +505,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                         //             driverLoginProcess, employeeMaster, driverStatus, ref driverHistoryInsertCount);
 
-                        if (CheckForOpenEndedDelays(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                        if (CheckForOpenEndedDelays(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                      driverLoginProcess, employeeMaster, currentTripSegment))
                         {
                             // Add "Back On Duty" flag to Driver History table.
@@ -803,7 +802,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     catch (Exception ex)
                     {
                         log.ErrorFormat("Unhandled general exception: {0} within driver login: {1}.", ex, driverLoginProcess);
-                        changeSetResult.FailedUpdates.Add(key,
+                        changeSetResult.FailedUpdates.Add(msgKey,
                             new MessageSet(string.Format("Unable to log in driver {0}.  A general error occured", 
                                 driverLoginProcess.EmployeeId)));
                         break;
@@ -842,11 +841,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// Check for open ended delays for this driver
         /// </summary>
         public bool CheckForOpenEndedDelays(IDataService dataService, ProcessChangeSetSettings settings,
-               ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
+               ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
                DriverLoginProcess driverLoginProcess, EmployeeMaster employeeMaster, TripSegment currentTripSegment)
         {
             DataServiceFault fault;
-            string msgKey = key;
             var driverDelays = Common.GetDriverDelaysOpenEnded(dataService, settings, userCulture, userRoleIds,
                                              driverLoginProcess.EmployeeId, out fault);
             if (null != fault)
@@ -918,12 +916,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         // Here I think, we just want to get the last one, since our purpose here is to adjust the power id
         // not to close open-ended entries.
         public static void CheckForPowerIdChange(IDataService dataService, ProcessChangeSetSettings settings,
-                   ChangeSetResult<string> changeSetResult,String key, IEnumerable<long> userRoleIds, string userCulture,
+                   ChangeSetResult<string> changeSetResult,String msgKey, IEnumerable<long> userRoleIds, string userCulture,
                    DriverLoginProcess driverLoginProcess, PowerMaster powerMaster, EmployeeMaster employeeMaster)
         {
             ChangeSetResult<string> scratchChangeSetResult;
             DataServiceFault fault;
-            string msgKey = key;
             //Get the current trip segment if open-ended
             var tripSegment = Common.GetTripSegmentOpenEnded(dataService, settings, userCulture, userRoleIds,
                                     driverLoginProcess.TripNumber, driverLoginProcess.TripSegNumber, out fault);
