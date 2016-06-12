@@ -47,6 +47,7 @@
     <Compile Include="Interfaces\ICustomerService.cs" />
     <Compile Include="Interfaces\IDbService.cs" />
     <Compile Include="Interfaces\IDriverService.cs" />
+    <Compile Include="Interfaces\ILocationOdometerService.cs" />
     <Compile Include="Interfaces\ILocationPathService.cs" />
     <Compile Include="Interfaces\ILocationService.cs" />
     <Compile Include="Interfaces\IMessagesService.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Services\ConnectionService.cs" />
     <Compile Include="Services\DemoClientSettings.cs" />
     <Compile Include="Services\DriverService.cs" />
+    <Compile Include="Services\LocationOdometerService.cs" />
     <Compile Include="Services\LocationPathService.cs" />
     <Compile Include="Services\LocationService.cs" />
     <Compile Include="Services\MessagesService.cs" />
