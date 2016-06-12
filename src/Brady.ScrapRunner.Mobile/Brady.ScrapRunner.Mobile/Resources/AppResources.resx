@@ -435,4 +435,20 @@ You will now be sent back to the login.</value>
     <value>Can Process</value>
     <comment>Public Scale Detail Button label text</comment>
   </data>
+  <data name="TransactionDetail" xml:space="preserve">
+    <value>Transaction Detail</value>
+    <comment>TransactionDetailViewModel</comment>
+  </data>
+  <data name="Complete" xml:space="preserve">
+    <value>Complete</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="UnableToProcess" xml:space="preserve">
+    <value>Unable To Process</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="Photos" xml:space="preserve">
+    <value>Photos</value>
+    <comment>PhotosViewModel</comment>
+  </data>
 </root>
