@@ -60,7 +60,7 @@ namespace Brady.ScrapRunner.DataService.Tests
             QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
 
             Assert.AreEqual(100, queryResult.Records.Count);
-            Assert.AreEqual(501, queryResult.TotalCount, queryString);
+            Assert.AreEqual(509, queryResult.TotalCount, queryString);
         }
 
         [TestMethod]
@@ -73,7 +73,7 @@ namespace Brady.ScrapRunner.DataService.Tests
             string queryString = codeTableQuery.GetQuery();
             QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
 
-            Assert.AreEqual(7, queryResult.TotalCount, queryString);
+            Assert.AreEqual(9, queryResult.TotalCount, queryString);
             foreach (CodeTable codeTableInstance in queryResult.Records)
             {
                 Assert.AreEqual("CUSTOMERTYPE", codeTableInstance.CodeName, queryString);
@@ -265,7 +265,7 @@ namespace Brady.ScrapRunner.DataService.Tests
                 .OrderBy(x => x.CodeValue);
             var queryString = codeTableQuery.GetQuery();
             QueryResult<CodeTable> queryResult = _client.QueryAsync(codeTableQuery).Result;
-            Assert.AreEqual(7, queryResult.TotalCount, queryString);
+            Assert.AreEqual(9, queryResult.TotalCount, queryString);
             foreach (CodeTable codeTableInstance in queryResult.Records)
             {
                 Assert.AreEqual("CUSTOMERTYPE", codeTableInstance.CodeName, queryString);
@@ -278,7 +278,7 @@ namespace Brady.ScrapRunner.DataService.Tests
             //
             var queryString2 = "CodeTables?$filter=CodeName='CUSTOMERTYPE' &$orderby=CodeName,CodeValue";
             QueryResult queryResult2 = _client.QueryAsync(queryString2).Result;
-            Assert.AreEqual(7, queryResult2.TotalCount, queryString);
+            Assert.AreEqual(9, queryResult2.TotalCount, queryString);
             Assert.AreEqual(queryResult.TotalCount, queryResult2.TotalCount, "The two approaches are not the same!");
             for (int i = 0; i < queryResult.TotalCount; i++)
             {

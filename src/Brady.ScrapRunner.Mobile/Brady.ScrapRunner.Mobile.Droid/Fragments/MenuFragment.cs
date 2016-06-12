@@ -78,6 +78,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 case Resource.Id.nav_takepicture:
                     ViewModel.TakePictureCommand.Execute();
                     break;
+                case Resource.Id.nav_loadcontainer:
+                    ViewModel.LoadDropContainersCommand.Execute();
+                    break;
             }
         }
     }

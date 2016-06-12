@@ -412,7 +412,7 @@
     <comment>Public Scale Detail</comment>
   </data>
   <data name="FinishedScale" xml:space="preserve">
-    <value>Finished with Scale</value>
+    <value>Finished with Scale?</value>
     <comment>Public Scale Continue</comment>
   </data>
   <data name="ForcedLogoff" xml:space="preserve">
@@ -431,20 +431,8 @@ You will now be sent back to the login.</value>
   <data name="GPSCaptureMessage" xml:space="preserve">
     <value>Would you like to add the current GPS coordinates as an arrival point for future usage?</value>
   </data>
-  <data name="TransactionDetail" xml:space="preserve">
-    <value>Transaction Detail</value>
-    <comment>TransactionDetailViewModel</comment>
-  </data>
-  <data name="Complete" xml:space="preserve">
-    <value>Complete</value>
-    <comment>Transaction Detail View</comment>
-  </data>
-  <data name="UnableToProcess" xml:space="preserve">
-    <value>Unable To Process</value>
-    <comment>Transaction Detail View</comment>
-  </data>
-  <data name="Photos" xml:space="preserve">
-    <value>Photos</value>
-    <comment>PhotosViewModel</comment>
+  <data name="CanProcess" xml:space="preserve">
+    <value>Can Process</value>
+    <comment>Public Scale Detail Button label text</comment>
   </data>
 </root>
