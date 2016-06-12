@@ -397,4 +397,16 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
   <data name="GPSCaptureMessage" xml:space="preserve">
     <value>¿Quieres añadir el GPS coordenadas actuales como punto de llegada para el uso futuro?</value>
   </data>
+  <data name="TransactionDetail" xml:space="preserve">
+    <value>Transaction Detail ( Spanish)</value>
+    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
+  </data>
+  <data name="Complete" xml:space="preserve">
+    <value>Complete ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; Transaction Detail View</comment>
+  </data>
+  <data name="UnableToProcess" xml:space="preserve">
+    <value>Unable To Process ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; Transaction Detail View</comment>
+  </data>
 </root>

@@ -49,8 +49,8 @@
             android:textSize="40dp"
             android:spinnerMode="dialog"
             android:id="@+id/MvxTypeSpinner"
-            local:MvxItemTemplate="@layout/item_state"
-            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown"
+            local:MvxItemTemplate="@layout/item_codetable"
+            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
             local:MvxBind="ItemsSource TypeList" />
         <MvxSpinner
             android:layout_width="match_parent"
@@ -63,8 +63,8 @@
             android:layout_marginRight="15dip"
             android:textSize="40dp"
             android:id="@+id/MvxSizeSpinner"
-            local:MvxItemTemplate="@layout/item_state"
-            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown"
+            local:MvxItemTemplate="@layout/item_codetable"
+            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
             local:MvxBind="ItemsSource SizeList" />
         <MvxSpinner
             android:layout_width="match_parent"
@@ -77,8 +77,8 @@
             android:layout_marginRight="15dip"
             android:textSize="40dp"
             android:id="@+id/MvxLevelSpinner"
-            local:MvxItemTemplate="@layout/item_state"
-            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown"
+            local:MvxItemTemplate="@layout/item_codetable"
+            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
             local:MvxBind="ItemsSource LevelList" />
     </LinearLayout>
     <LinearLayout

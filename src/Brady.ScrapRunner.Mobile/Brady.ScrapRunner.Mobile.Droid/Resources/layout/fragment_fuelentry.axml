@@ -41,8 +41,8 @@
             android:spinnerMode="dialog"
             android:textSize="40dp"
             android:id="@+id/MvxStateSpinner"
-            local:MvxItemTemplate="@layout/item_state"
-            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown"
+            local:MvxItemTemplate="@layout/item_codetable"
+            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
             local:MvxBind="ItemsSource StatesList;SelectedItem SelectedState" />
         <Button
             local:MvxBind="Click SaveFuelEntryCommand"

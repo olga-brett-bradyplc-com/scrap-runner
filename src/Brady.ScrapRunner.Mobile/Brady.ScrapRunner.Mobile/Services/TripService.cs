@@ -271,7 +271,7 @@
                 Mvx.TaggedError(Constants.ScrapRunner, $"Couldn't find next containers for trip {tripNumber}.");
                 return Enumerable.Empty<TripSegmentContainerModel>().ToList();
             }
-            return containers.TakeWhile(tscm => tscm.TripSegContainerComplete != Constants.Yes).ToList();
+            return containers.ToList();
         }
 
         /// <summary>
@@ -301,11 +301,11 @@
         /// <param name="tripSegNo"></param>
         /// <param name="tripSegContainerSeqNumber"></param>
         /// <param name="tripSegContainerNumer"></param>
+        /// <param name="segmentComplete"></param>
         /// <returns></returns>
         public async Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo,
             short tripSegContainerSeqNumber, string tripSegContainerNumer)
         {
-            // @TODO : Not complete
             var container = await _tripSegmentContainerRepository.AsQueryable()
                 .Where(
                     tscm =>
@@ -317,6 +317,33 @@
 
             container.TripSegContainerActionDateTime = DateTime.Now;
             container.TripSegContainerComplete = Constants.Yes;
+
+            return await _tripSegmentContainerRepository.UpdateAsync(container);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNo"></param>
+        /// <param name="tripSegContainerSeqNumber"></param>
+        /// <param name="tripSegContainerNumer"></param>
+        /// <param name="tripSegmentComplete"></param>
+        /// <returns></returns>
+        public async Task<int> ProcessTripSegmentContainerAsync(string tripNumber, string tripSegNo,
+            short tripSegContainerSeqNumber, string tripSegContainerNumer, bool tripSegmentComplete)
+        {
+            var container = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(
+                    tscm =>
+                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
+                        tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).FirstOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(container.TripSegContainerNumber))
+                container.TripSegContainerNumber = tripSegContainerNumer;
+
+            container.TripSegContainerActionDateTime = DateTime.Now;
+            container.TripSegContainerComplete = (tripSegmentComplete) ? Constants.Yes : Constants.No;
 
             return await _tripSegmentContainerRepository.UpdateAsync(container);
         }

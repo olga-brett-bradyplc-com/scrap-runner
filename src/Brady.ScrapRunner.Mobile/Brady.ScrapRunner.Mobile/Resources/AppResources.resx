@@ -431,4 +431,16 @@ You will now be sent back to the login.</value>
   <data name="GPSCaptureMessage" xml:space="preserve">
     <value>Would you like to add the current GPS coordinates as an arrival point for future usage?</value>
   </data>
+  <data name="TransactionDetail" xml:space="preserve">
+    <value>Transaction Detail</value>
+    <comment>TransactionDetailViewModel</comment>
+  </data>
+  <data name="Complete" xml:space="preserve">
+    <value>Complete</value>
+    <comment>Transaction Detail View</comment>
+  </data>
+  <data name="UnableToProcess" xml:space="preserve">
+    <value>Unable To Process</value>
+    <comment>Transaction Detail View</comment>
+  </data>
 </root>
