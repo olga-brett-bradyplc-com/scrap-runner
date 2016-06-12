@@ -48,9 +48,8 @@
             local:MvxBind="Click SaveFuelEntryCommand"
             local:MvxLang="Text Save"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:foreground="#ffffff" />
+            style="@style/ScrapRunnerTheme.StandardButtonStyle"
+            android:layout_marginTop="4dp" />
     </LinearLayout>
     <include
         layout="@layout/toolbar" />

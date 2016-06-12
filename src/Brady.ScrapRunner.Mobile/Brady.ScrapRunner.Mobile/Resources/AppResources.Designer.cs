@@ -89,6 +89,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Back On Duty.
+        /// </summary>
+        public static string BackOnDuty {
+            get {
+                return ResourceManager.GetString("BackOnDuty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string Cancel {

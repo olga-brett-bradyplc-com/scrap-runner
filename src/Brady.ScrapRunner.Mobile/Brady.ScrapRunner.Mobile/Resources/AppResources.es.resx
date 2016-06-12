@@ -417,4 +417,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Photos</value>
     <comment>NEEDS TRANSLATION; PhotosViewModel</comment>
   </data>
+  <data name="BackOnDuty" xml:space="preserve">
+    <value>Back On Duty (Spanish)</value>
+    <comment>NEEDS TRANSLATION; DelayViewModel</comment>
+  </data>
 </root>

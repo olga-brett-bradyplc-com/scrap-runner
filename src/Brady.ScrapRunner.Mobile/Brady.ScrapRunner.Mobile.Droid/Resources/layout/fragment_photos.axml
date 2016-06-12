@@ -22,31 +22,20 @@
         local:MvxBind="ItemsSource Images"
         local:MvxItemTemplate="@layout/item_image_gridview" />
     <LinearLayout
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:background="#fff"
         android:weightSum="1"
         android:layout_alignParentBottom="true">
         <Button
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:layout_margin="10dp"
+            style="@style/ScrapRunnerTheme.StandardButtonStyle"
             android:layout_weight=".5"
             android:text="Cancel"
-            android:textColor="#fff"
-            style="?android:attr/borderlessButtonStyle"
-            android:gravity="center"
             android:background="@color/colorPrimary"
             local:MvxBind="Click CancelPhotosCommand" />
         <Button
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:layout_margin="10dp"
+            style="@style/ScrapRunnerTheme.StandardButtonStyle"
             android:layout_weight=".5"
             android:text="Send"
-            android:textColor="#fff"
-            style="?android:attr/borderlessButtonStyle"
-            android:gravity="center"
             android:background="@color/colorPrimary"
             local:MvxBind="Click SendPhotosCommand" />
     </LinearLayout>

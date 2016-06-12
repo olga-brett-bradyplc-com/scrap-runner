@@ -24,13 +24,11 @@
         local:MvxBind="ItemClick TransactionSelectedCommand" />
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="#ffffff"
+            style="@style/ScrapRunnerTheme.StandardButtonStyle"
             android:background="@color/material_red_500"
             local:MvxBind="Click ConfirmationSelectedCommand"
             local:MvxLang="Text FinishLabel" />

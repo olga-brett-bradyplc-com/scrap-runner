@@ -88,21 +88,17 @@
         </android.support.design.widget.TextInputLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:weightSum="1">
             <Button
-                android:layout_height="match_parent"
-                android:layout_width="match_parent"
-                android:textColor="#ffffff"
+                style="@style/ScrapRunnerTheme.StandardButtonStyle"
                 android:layout_weight=".5"
                 local:MvxBind="Click TransactionUnableToProcessCommand"
                 local:MvxLang="Text UnableToProcess"
                 android:background="@drawable/cta_button_border_arrived" />
             <Button
-                android:layout_height="match_parent"
-                android:layout_width="match_parent"
-                android:textColor="#ffffff"
+                style="@style/ScrapRunnerTheme.StandardButtonStyle"
                 android:layout_weight=".5"
                 local:MvxBind="Click TransactionCompleteCommand"
                 local:MvxLang="Text Complete"

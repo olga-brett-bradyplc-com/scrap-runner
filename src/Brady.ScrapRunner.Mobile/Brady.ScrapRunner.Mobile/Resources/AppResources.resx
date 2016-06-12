@@ -451,4 +451,8 @@ You will now be sent back to the login.</value>
     <value>Photos</value>
     <comment>PhotosViewModel</comment>
   </data>
+  <data name="BackOnDuty" xml:space="preserve">
+    <value>Back On Duty</value>
+    <comment>DelayViewModel</comment>
+  </data>
 </root>
