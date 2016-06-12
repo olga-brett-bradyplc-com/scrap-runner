@@ -443,4 +443,8 @@ You will now be sent back to the login.</value>
     <value>Unable To Process</value>
     <comment>Transaction Detail View</comment>
   </data>
+  <data name="Photos" xml:space="preserve">
+    <value>Photos</value>
+    <comment>PhotosViewModel</comment>
+  </data>
 </root>

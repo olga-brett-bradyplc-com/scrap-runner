@@ -409,4 +409,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Unable To Process ( Spanish )</value>
     <comment>NEEDS TRANSLATION; Transaction Detail View</comment>
   </data>
+  <data name="Photos" xml:space="preserve">
+    <value>Photos</value>
+    <comment>NEEDS TRANSLATION; PhotosViewModel</comment>
+  </data>
 </root>

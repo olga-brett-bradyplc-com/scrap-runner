@@ -568,6 +568,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Photos.
+        /// </summary>
+        public static string Photos {
+            get {
+                return ResourceManager.GetString("Photos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pickup Full.
         /// </summary>
         public static string PickupFull {
