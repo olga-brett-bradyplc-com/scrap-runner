@@ -120,10 +120,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                 switch (tscm.TripSegContainerComplete)
                 {
                     case "Y":
-                        icon.SetImageResource(Resource.Drawable.ic_check_circle_green_36dp);
+                        icon.SetImageResource(Resource.Drawable.check_circle_green_tint_icon);
                         break;
                     case "N":
-                        icon.SetImageResource(Resource.Drawable.ic_keyboard_arrow_right_black_24dp);
+                        icon.SetImageResource(Resource.Drawable.cancelled_red_tint_icon);
                         break;
                     default:
                         icon.SetImageResource(Resource.Drawable.ic_keyboard_arrow_right_black_24dp);

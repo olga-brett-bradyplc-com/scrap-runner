@@ -43,9 +43,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public MvxCommand<TripModel> RouteSelectedCommand { get; private set; }
 
+        // @TODO : Put in logic that makes this read-only if driver is currently on a trip
         public void ExecuteRouteSelectedCommand(TripModel selectedTrip)
         {
-            Close(this); // temporary fix
             ShowViewModel<RouteDetailViewModel>(new {tripNumber = selectedTrip.TripNumber});
         }
     }

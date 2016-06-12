@@ -89,6 +89,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Back On Duty.
+        /// </summary>
+        public static string BackOnDuty {
+            get {
+                return ResourceManager.GetString("BackOnDuty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string Cancel {
@@ -130,6 +139,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Commodity {
             get {
                 return ResourceManager.GetString("Commodity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Complete.
+        /// </summary>
+        public static string Complete {
+            get {
+                return ResourceManager.GetString("Complete", resourceCulture);
             }
         }
         
@@ -568,6 +586,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Photos.
+        /// </summary>
+        public static string Photos {
+            get {
+                return ResourceManager.GetString("Photos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pickup Full.
         /// </summary>
         public static string PickupFull {
@@ -739,6 +766,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Transaction Detail.
+        /// </summary>
+        public static string TransactionDetail {
+            get {
+                return ResourceManager.GetString("TransactionDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Transactions.
         /// </summary>
         public static string Transactions {
@@ -798,6 +834,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string TruckIdRequired {
             get {
                 return ResourceManager.GetString("TruckIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable To Process.
+        /// </summary>
+        public static string UnableToProcess {
+            get {
+                return ResourceManager.GetString("UnableToProcess", resourceCulture);
             }
         }
         

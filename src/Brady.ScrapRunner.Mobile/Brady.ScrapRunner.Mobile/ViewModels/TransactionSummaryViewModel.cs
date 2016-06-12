@@ -35,7 +35,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             SubTitle = AppResources.Trip + $" {TripNumber}";
             TransactionScannedCommand = new MvxAsyncCommand<string>(ExecuteTransactionScannedCommandAsync);
             SelectNextTransactionCommand = new MvxCommand(ExecuteSelectNextTransactionCommand);
-            ConfirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand);
+            ConfirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand, CanExecuteConfirmationSelectedCommand);
             TransactionSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteTransactionSelectedCommand);
         }
 
@@ -121,9 +121,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentTransaction.TripSegContainerNumber = scannedNumber;
 
             await
-                _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction.TripNumber,
+                _tripService.ProcessTripSegmentContainerAsync(CurrentTransaction.TripNumber,
                     CurrentTransaction.TripSegNumber, CurrentTransaction.TripSegContainerSeqNumber,
-                    CurrentTransaction.TripSegContainerNumber);
+                    CurrentTransaction.TripSegContainerNumber, true);
 
             // Update local copy of container list
             var container = await _tripService.FindTripSegmentContainer(CurrentTransaction.TripNumber,
@@ -144,12 +144,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private void ExecuteTransactionSelectedCommand(TripSegmentContainerModel tripContainer)
         {
+            var temp = tripContainer;
             ShowViewModel<TransactionDetailViewModel>(
                 new
                 {
                     tripNumber = tripContainer.TripNumber,
                     tripSegmentNumber = tripContainer.TripSegNumber,
-                    tripSegmentContainerNumber = tripContainer.TripSegContainerNumber
+                    tripSegmentSeqNo = tripContainer.TripSegContainerSeqNumber
                 });
         }
 
@@ -157,6 +158,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             Close(this);
             ShowViewModel<TransactionConfirmationViewModel>(new {tripNumber = TripNumber});
+        }
+
+        private bool CanExecuteConfirmationSelectedCommand()
+        {
+            return true;
+            //return !Containers.Select(container2 => container2.First(tscm => string.IsNullOrEmpty(tscm?.TripSegContainerComplete))).Any();
         }
 
         private void UpdateLocalContainers(TripSegmentContainerModel tripContainer)

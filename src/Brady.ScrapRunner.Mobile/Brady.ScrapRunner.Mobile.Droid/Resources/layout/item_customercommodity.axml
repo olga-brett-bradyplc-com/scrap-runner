@@ -6,10 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
-        android:id="@+id/state_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_margin_half"
-        local:MvxBind="Text CodeDisp1" />
+        android:id="@+id/commodity_spinner_value"
+        style="@style/ScrapRunnerTheme.SpinnerSelection"
+        local:MvxBind="Text CustCommodityCode + ' ' + CustCommodityDesc" />
 </RelativeLayout>

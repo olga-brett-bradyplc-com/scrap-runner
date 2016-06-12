@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.Models
+﻿using SQLite.Net;
+
+namespace Brady.ScrapRunner.Mobile.Models
 {
     using System;
     using System.Collections.Generic;
@@ -11,10 +13,12 @@
     public class SqliteRepository<T> : IRepository<T> where T : class, new()
     {
         private readonly SQLiteAsyncConnection _connection;
+        private readonly SQLiteConnectionWithLock _connectionWithLock;
 
         public SqliteRepository(IMvxSqliteConnectionFactory sqliteConnectionFactory)
         {
-            _connection = sqliteConnectionFactory.GetAsyncConnection("scraprunner");
+            _connectionWithLock = sqliteConnectionFactory.GetConnectionWithLock(MobileConstants.Database);
+            _connection = new SQLiteAsyncConnection(() => _connectionWithLock);
         }
 
         public Task<List<T>> AllAsync()
