@@ -152,6 +152,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Performing this action will complete this trip.
+        /// </summary>
+        public static string CompleteTrip {
+            get {
+                return ResourceManager.GetString("CompleteTrip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Completing Trip Segment.
         /// </summary>
         public static string CompletingTripSegment {

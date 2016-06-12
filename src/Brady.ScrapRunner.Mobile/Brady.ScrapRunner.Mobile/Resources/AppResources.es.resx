@@ -421,4 +421,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Back On Duty (Spanish)</value>
     <comment>NEEDS TRANSLATION; DelayViewModel</comment>
   </data>
+  <data name="CompleteTrip" xml:space="preserve">
+    <value>Performing this action will complete this trip ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; Scale Detail</comment>
+  </data>
 </root>
