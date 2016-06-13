@@ -1,11 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
   <declare-styleable name="MvxListView">
-    <attr name="GroupItemTemplate" format="string"/>
+    <attr name="GroupItemTemplate" format="reference"/>
   </declare-styleable>
   <item type="id" name="MvxBindingTagUnique"/>
   <item type="id" name="MvxBindableListItemTagUnique"/>
-  <declare-styleable name="MvxHttpImageView">
-    <attr name="MvxHttpSource" format="string"/>
-  </declare-styleable>
 </resources>

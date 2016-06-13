@@ -142,7 +142,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 //await
                 //    _tripService.UpdateTripSegmentContainerLongLatAsync(TripNumber, TripSegNumber,
                 //        TripSegContainerNumber, Latitude, Longitude);
-                await _tripService.CompleteTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerSeqNumber, TripSegContainerNumber);
+                await _tripService.ProcessTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerSeqNumber, TripSegContainerNumber, true);
                 await ExecuteNextStage();
             }
         }

@@ -8,6 +8,8 @@ namespace Brady.ScrapRunner.Mobile
 {
     public static class MobileConstants
     {
+        public static readonly string Database = "scraprunner";
+
         public static readonly string ImagesDirectory = "Images";
 
         // These could possibly configurable options instead of constants

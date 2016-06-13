@@ -65,26 +65,20 @@
         local:MvxLang="Text TareWeight" />
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:weightSum="1">
         <Button
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:textColor="#ffffff"
+            style="@style/ScrapRunnerTheme.StandardButtonStyle"
             android:layout_weight=".5"
-            android:layout_marginRight="1dp"
             local:MvxBind="Click ContainerSetDownCommand"
             local:MvxLang="Text LeftOnTruck"
-            android:background="@color/material_gray_900" />
+            android:background="@drawable/cta_button_border_arrived" />
         <Button
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:textColor="#ffffff"
-            android:layout_marginLeft="1dp"
+            style="@style/ScrapRunnerTheme.StandardButtonStyle"
             android:layout_weight=".5"
             local:MvxBind="Click ContainerSetDownCommand"
             local:MvxLang="Text SetDown"
-            android:background="@color/material_gray_900" />
+            android:background="@color/material_red_500" />
     </LinearLayout>
 </RelativeLayout>

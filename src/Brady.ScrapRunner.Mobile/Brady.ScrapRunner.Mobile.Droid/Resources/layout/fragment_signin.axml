@@ -24,7 +24,7 @@
             android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/employeeIdInputField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
             android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/passwordInputField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
             android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/powerUnitIdInputField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
             android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/odometerInputField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

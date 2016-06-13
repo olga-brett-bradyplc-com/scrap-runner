@@ -6,59 +6,103 @@
     android:layout_height="match_parent">
     <include
         layout="@layout/toolbar" />
-    <android.support.design.widget.TextInputLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:layout_marginBottom="4dp">
-        <EditText
-            android:id="@+id/containerId"
+        android:layout_height="match_parent">
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/containerid_input_field"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Segment Container Number" />
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:layout_marginBottom="4dp">
-        <EditText
-            android:id="@+id/containerId"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginBottom="1dp"
+            android:background="@drawable/background_white_bottom_border">
+            <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:hint="Segment Container Number"
+                local:MvxBind="Text ContainerId"
+                android:background="@color/material_gray_100" />
+        </android.support.design.widget.TextInputLayout>
+        <TextView
+            android:id="@+id/customer_location_label"
+            style="@style/ScrapRunnerTheme.SpinnerLabel"
+            android:layout_below="@id/containerid_input_field"
+            android:text="Location" />
+        <LinearLayout
+            android:id="@+id/custom_location_container"
+            android:layout_below="@id/customer_location_label"
+            style="@style/ScrapRunnerTheme.SpinnerContainer">
+            <MvxSpinner
+                android:id="@+id/customer_location_spinner"
+                style="@style/ScrapRunnerTheme.SpinnerBase"
+                local:MvxItemTemplate="@layout/item_customerlocation"
+                local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_customerlocation"
+                local:MvxBind="ItemsSource CustomerLocationList" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/customer_commodity_label"
+            style="@style/ScrapRunnerTheme.SpinnerLabel"
+            android:layout_below="@id/custom_location_container"
+            android:text="Commodity" />
+        <LinearLayout
+            android:id="@+id/custom_commodity_container"
+            android:layout_below="@id/customer_commodity_label"
+            style="@style/ScrapRunnerTheme.SpinnerContainer">
+            <MvxSpinner
+                android:id="@+id/customer_commodity_spinner"
+                style="@style/ScrapRunnerTheme.SpinnerBase"
+                local:MvxItemTemplate="@layout/item_customercommodity"
+                local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_customercommodity"
+                local:MvxBind="ItemsSource CustomerCommodityList" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/customer_level_label"
+            style="@style/ScrapRunnerTheme.SpinnerLabel"
+            android:layout_below="@id/custom_commodity_container"
+            android:text="Level" />
+        <LinearLayout
+            android:id="@+id/customer_level_container"
+            android:layout_below="@id/customer_level_label"
+            style="@style/ScrapRunnerTheme.SpinnerContainer">
+            <MvxSpinner
+                android:id="@+id/level_spinner"
+                style="@style/ScrapRunnerTheme.SpinnerBase"
+                local:MvxItemTemplate="@layout/item_codetable"
+                local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
+                local:MvxBind="ItemsSource LevelList" />
+        </LinearLayout>
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/notes_input_field"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Location" />
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:layout_marginBottom="4dp">
-        <EditText
-            android:id="@+id/containerId"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/customer_level_container"
+            android:padding="10dp"
+            android:layout_marginBottom="1dp"
+            android:background="@drawable/background_white_bottom_border">
+            <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:hint="Notes"
+                local:MvxBind="Text Notes"
+                android:background="@color/material_gray_100" />
+        </android.support.design.widget.TextInputLayout>
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Commodity" />
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:layout_marginBottom="4dp">
-        <EditText
-            android:id="@+id/containerId"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Level" />
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:layout_marginBottom="4dp">
-        <EditText
-            android:id="@+id/containerId"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Notes" />
-    </android.support.design.widget.TextInputLayout>
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:weightSum="1">
+            <Button
+                style="@style/ScrapRunnerTheme.StandardButtonStyle"
+                android:layout_weight=".5"
+                local:MvxBind="Click TransactionUnableToProcessCommand"
+                local:MvxLang="Text UnableToProcess"
+                android:background="@drawable/cta_button_border_arrived" />
+            <Button
+                style="@style/ScrapRunnerTheme.StandardButtonStyle"
+                android:layout_weight=".5"
+                local:MvxBind="Click TransactionCompleteCommand"
+                local:MvxLang="Text Complete"
+                android:background="@color/arrive" />
+        </LinearLayout>
+    </RelativeLayout>
 </LinearLayout>

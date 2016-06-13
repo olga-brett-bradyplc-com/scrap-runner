@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Plugins.File;
 using MvvmCross.Plugins.PictureChooser;
@@ -20,7 +21,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             _pictureChooserTask = pictureChooserTask;
             _fileStore = fileStore;
-            Title = "Photos";
+            Title = AppResources.Photos;
         }
 
         public override async void Start()
@@ -28,14 +29,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Images = new ObservableCollection<string>();
 
             // Make sure all previous photos have been deleted from previous use
-            _fileStore.DeleteFolder(MobileConstants.ImagesDirectory, true);
+            if ( _fileStore.FolderExists(MobileConstants.ImagesDirectory) )
+                _fileStore.DeleteFolder(MobileConstants.ImagesDirectory, true);
 
             // Open the camera app on first load of viewmodel
             // There's currently an issue ( at least on samsung devices ), that the camera app will 
             // save a photo ( at full image quality settings ) along with our manual save below 
             // ( w/ customized image quality settings )
             _pictureChooserTask.TakePicture(MobileConstants.MaxPixelDimension, MobileConstants.ImageQuality, OnPictureTaken, () => {/*nothing on cancel*/});
-
         }
 
         // My thinking here is that it may be better to temporarily store the images on disk
