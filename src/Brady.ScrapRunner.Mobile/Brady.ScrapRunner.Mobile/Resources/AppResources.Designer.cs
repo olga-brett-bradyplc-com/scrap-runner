@@ -721,6 +721,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Signature.
+        /// </summary>
+        public static string Signature {
+            get {
+                return ResourceManager.GetString("Signature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Signature Receipt.
         /// </summary>
         public static string SignatureReceipt {

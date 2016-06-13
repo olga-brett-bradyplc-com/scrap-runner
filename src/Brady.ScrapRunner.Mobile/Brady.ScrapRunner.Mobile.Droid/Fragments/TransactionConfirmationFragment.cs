@@ -10,6 +10,7 @@ using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Droid.Views;
 using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Platform.WeakSubscription;
+using SignaturePad;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
@@ -30,6 +31,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 listGrouping.ItemsSource = ViewModel.Containers;
 
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
+
+            var signaturePad = View.FindViewById<SignaturePadView>(Resource.Id.SignatureView);
+            signaturePad.BackgroundColor = Color.ParseColor("#f3f3f3");
+            //signaturePad.BackgroundColor = new Color(ContextCompat.GetColor(Activity, Resource.Color.material_gray_300));
+            signaturePad.StrokeColor = Color.Black;
         }
 
         public override void OnDestroyView()

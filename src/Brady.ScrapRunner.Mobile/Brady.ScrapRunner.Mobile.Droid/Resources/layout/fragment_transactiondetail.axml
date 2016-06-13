@@ -25,7 +25,7 @@
         </android.support.design.widget.TextInputLayout>
         <TextView
             android:id="@+id/customer_location_label"
-            style="@style/ScrapRunnerTheme.SpinnerLabel"
+            style="@style/ScrapRunnerTheme.Label"
             android:layout_below="@id/containerid_input_field"
             android:text="Location" />
         <LinearLayout
@@ -41,7 +41,7 @@
         </LinearLayout>
         <TextView
             android:id="@+id/customer_commodity_label"
-            style="@style/ScrapRunnerTheme.SpinnerLabel"
+            style="@style/ScrapRunnerTheme.Label"
             android:layout_below="@id/custom_location_container"
             android:text="Commodity" />
         <LinearLayout
@@ -57,7 +57,7 @@
         </LinearLayout>
         <TextView
             android:id="@+id/customer_level_label"
-            style="@style/ScrapRunnerTheme.SpinnerLabel"
+            style="@style/ScrapRunnerTheme.Label"
             android:layout_below="@id/custom_commodity_container"
             android:text="Level" />
         <LinearLayout
