@@ -9,15 +9,18 @@
         layout="@layout/toolbar" />
     <MvxExt.BindableGroupListView
         android:id="@+id/TransactionConfirmationListView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
+        android:layout_marginBottom="250dp"
         android:orientation="vertical"
         local:MvxItemTemplate="@layout/item_transactions_listitem"
         local:GroupItemTemplate="@layout/item_transactions" />
     <LinearLayout
+        android:id="@+id/confirm_transactions_container"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:elevation="10dp"
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
         <Button
@@ -25,5 +28,36 @@
             android:background="@color/arrive"
             local:MvxBind="Click ConfirmTransactionsCommand"
             local:MvxLang="Text FinishLabel" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/signature_container"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:elevation="10dp"
+        android:background="#ffffff"
+        android:layout_above="@id/confirm_transactions_container">
+        <TextView
+            android:id="@+id/signature_label"
+            style="@style/ScrapRunnerTheme.Label"
+            local:MvxLang="Text Signature" />
+        <SignaturePad.SignaturePadView
+            android:id="@+id/SignatureView"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="4dp" />
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/name_input_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_marginBottom="1dp"
+            android:background="#ffffff">
+            <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                local:MvxBind="Text PrintedName"
+                android:hint="Name" />
+        </android.support.design.widget.TextInputLayout>
     </LinearLayout>
 </RelativeLayout>

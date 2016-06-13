@@ -62,7 +62,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private IMvxAsyncCommand _transactionCompleteCommand;
         // Command bindings
         public IMvxAsyncCommand TransactionCompleteCommand
-            => _transactionCompleteCommand ?? (_transactionCompleteCommand = new MvxAsyncCommand(ExecuteTransactionCompleteCommand));
+            => _transactionCompleteCommand ?? (_transactionCompleteCommand = new MvxAsyncCommand(ExecuteTransactionCompleteCommand, CanExecuteTransactionCompleteCommand));
 
 
         private async Task ExecuteTransactionCompleteCommand()
@@ -76,6 +76,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
+        }
+
+        private bool CanExecuteTransactionCompleteCommand()
+        {
+            return !string.IsNullOrEmpty(ContainerId);
         }
 
         private IMvxAsyncCommand _transactionUnableToProcessCommand;
@@ -134,6 +139,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set
             {
                 SetProperty(ref _containerId, value);
+                TransactionCompleteCommand.RaiseCanExecuteChanged();
             }
         }
 

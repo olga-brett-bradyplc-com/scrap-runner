@@ -130,8 +130,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // Command impl
         private async Task ExecuteContainerSetDownCommandAsync()
         {
+            var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
+
+            var completeMessage = (nextTripSegment.TakeWhile( ts => ts.TripSegNumber != TripSegNumber).Any() ||
+                                   tripSegmentContainers.TakeWhile(
+                                       tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete) && tscm.TripSegContainerNumber != TripSegContainerNumber).Any())
+                ? AppResources.SetDownContainerMessage
+                : AppResources.SetDownContainerMessage + "\n\n" + AppResources.CompleteTrip;
+
             // @TODO : Determine if this is last leg of trip, and then give warning that this action will complete said trip
-            var result = await UserDialogs.Instance.ConfirmAsync(AppResources.SetDownContainerMessage, AppResources.SetDown);
+            var result = await UserDialogs.Instance.ConfirmAsync(completeMessage, AppResources.SetDown);
             if (result)
             {
                 // @TODO : This won't work with bulk processing
@@ -160,11 +169,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             // Are there any more containers that need to be weighed?
             // Check to see if any containers/segments exists
-            // If not, delete the trip and return to route summary
+            // If not, mark the trip as complete and return to route summary
             // Otherwise, we'd go to the next point in the trip
             var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
 
-            if (!tripSegmentContainers.Any())
+            if (!tripSegmentContainers.TakeWhile(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)).Any())
             {
                 await _tripService.CompleteTripAsync(TripNumber);
                 await _tripService.CompleteTripSegmentAsync(TripNumber, TripSegNumber);
