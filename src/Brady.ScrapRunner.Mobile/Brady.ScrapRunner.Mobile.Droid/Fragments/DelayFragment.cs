@@ -14,12 +14,18 @@ using MvvmCross.Droid.Shared.Attributes;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame, true)]
+    [MvxFragment(typeof (MainViewModel), Resource.Id.content_frame, true)]
     [Register("brady.scraprunner.mobile.droid.fragments.DelayFragment")]
     public class DelayFragment : BaseFragment<DelayViewModel>
     {
         protected override int FragmentId => Resource.Layout.fragment_delay;
         protected override bool NavMenuEnabled => false;
         protected override int NavColor => Resource.Color.delayed;
+
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        {
+            var timer = View.FindViewById<Chronometer>(Resource.Id.chronometer);
+            timer.Start();
+        }
     }
 }
