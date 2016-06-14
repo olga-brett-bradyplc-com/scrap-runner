@@ -64,7 +64,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public IMvxAsyncCommand TransactionCompleteCommand
             => _transactionCompleteCommand ?? (_transactionCompleteCommand = new MvxAsyncCommand(ExecuteTransactionCompleteCommand, CanExecuteTransactionCompleteCommand));
 
-
         private async Task ExecuteTransactionCompleteCommand()
         {
             var confirm = await UserDialogs.Instance.ConfirmAsync("Mark this container as complete?", "Segment Complete");
