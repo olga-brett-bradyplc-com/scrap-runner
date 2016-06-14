@@ -2,9 +2,9 @@
 {
     public interface ILocationOdometerService
     {
-        void Start(int startingOdometer);
+        void Start(double startingOdometer);
         void Stop();
 
-        int? CurrentOdometer { get; }
+        double? CurrentOdometer { get; }
     }
 }
