@@ -49,12 +49,17 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo,
             string tripSegContainerNumber, int? latitude, int? longitude);
 
-        Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo, short tripSegContainerSeqNumber, string tripSegContainerNumber);
+        Task<int> ProcessTripSegmentContainerAsync(string tripNumber, string tripSegNo, short tripSegContainerSeqNumber, string tripSegContainerNumber, bool tripSegmentComplete);
 
         Task<int> CompleteTripAsync(string tripNumber);
 
         Task<int> CompleteTripSegmentAsync(string tripNumber, string tripSegNo);
+
         Task<bool> IsTripLegAcctTypeScale(string tripNumber);
+
+        Task<int> MarkExceptionTripAsync(string tripNumber);
+
+        Task<int> MarkExceptionTripSegmentAsync(string tripNumber, string tripSegNo);
 
         Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessPublicScaleAsync(DriverContainerActionProcess driverContActionProcess);
         Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessContainerDoneAsync(DriverSegmentDoneProcess driverContActionProcess);

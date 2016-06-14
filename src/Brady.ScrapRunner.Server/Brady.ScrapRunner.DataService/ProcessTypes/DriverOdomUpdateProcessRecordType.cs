@@ -138,21 +138,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
-                    // Get the PowerMaster record
-                    var powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
-                                      driverOdomUpdateProcess.PowerId, out fault);
-                    if (null != fault)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
-                    if (null == powerMaster)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverOdomUpdateProcess:Invalid PowerId: "
-                                        + driverOdomUpdateProcess.PowerId));
-                        break;
-                    }
-                    ////////////////////////////////////////////////
                     // Get the DriverStatus record
                     var driverStatus = Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
                                       driverOdomUpdateProcess.EmployeeId, out fault);
@@ -167,33 +152,27 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         + driverOdomUpdateProcess.PowerId));
                         break;
                     }
-                    /////////////////////////////////////////////////
-                    //ToDo: Add validation for Power Unit In Shop.
-                    //ToDo: Add validation for Power Unit In Use vs Available.
-                    //ToDo: Add validation of Odometer Range.
 
                     /////////////////////////////////////////////////
                     //Split the processing into one of two functions:
                     //Load/drop action type
                     if (driverOdomUpdateProcess.PowerId != driverStatus.PowerId)
                     {
-                        if (!ChangePowerUnit(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
-                                    driverOdomUpdateProcess, employeeMaster, powerMaster, driverStatus))
+                        if (!ChangePowerUnit(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
+                                    driverOdomUpdateProcess, employeeMaster, driverStatus))
                         {
                             var s = string.Format("Could not change for PowerId:{0} Odom:{1}.",
                                     driverOdomUpdateProcess.PowerId, driverOdomUpdateProcess.Odometer);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
                     }
                     else
                     {
-                        if (!CorrectOdometer(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
-                                    driverOdomUpdateProcess, employeeMaster, powerMaster, driverStatus))
+                        if (!CorrectOdometer(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
+                                    driverOdomUpdateProcess, employeeMaster, driverStatus))
                         {
                             var s = string.Format("Could not correct odometer for PowerId:{0} Odom:{1}.",
                                     driverOdomUpdateProcess.PowerId, driverOdomUpdateProcess.Odometer);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
                     }
@@ -236,23 +215,124 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="changeSetResult"></param>
-        /// <param name="key"></param>
+        /// <param name="msgKey"></param>
         /// <param name="userRoleIds"></param>
         /// <param name="userCulture"></param>
         /// <param name="driverOdomUpdateProcess"></param>
         /// <param name="employeeMaster"></param>
-        /// <param name="powerMaster"></param>
         /// <param name="driverStatus"></param>
         /// <returns></returns>
         public bool ChangePowerUnit(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
-           DriverOdomUpdateProcess driverOdomUpdateProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
-           DriverStatus driverStatus)
+           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+           DriverOdomUpdateProcess driverOdomUpdateProcess, EmployeeMaster employeeMaster, DriverStatus driverStatus)
         {
             DataServiceFault fault = null;
-            string msgKey = key;
             int powerHistoryInsertCount = 0;
             int origPowerHistoryInsertCount = 0;
+
+            ////////////////////////////////////////////////
+            // Preferences:  Lookup the system preference "DEFAllowAnyPowerUnit".  
+            // If preference prefAllowAnyPowerUnit is set to Y, then allow any power unit to be valid
+            // Otherwise the power unit's region must match the driver's region. This is the norm.
+            string prefAllowAnyPowerUnit = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                           Constants.SystemTerminalId, PrefSystemConstants.DEFAllowAnyPowerUnit, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            // Get the PowerMaster record
+            // PowerId must be a valid PowerId in the PowerMaster 
+            var powerMaster = new PowerMaster();
+            if (prefAllowAnyPowerUnit == Constants.Yes)
+            {
+                powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
+                                          driverOdomUpdateProcess.PowerId, out fault);
+            }
+            else
+            {
+                powerMaster = Common.GetPowerUnitForRegion(dataService, settings, userCulture, userRoleIds,
+                                          driverOdomUpdateProcess.PowerId, employeeMaster.RegionId, out fault);
+            }
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (null == powerMaster)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Power ID " + driverOdomUpdateProcess.PowerId));
+                return false;
+            }
+            //For testing
+            log.Debug("SRTEST:GetPowerUnit or GetPowerUnitForRegion");
+            log.DebugFormat("SRTEST:PowerId:{0} Driver:{1} Odom:{2} PowerStatus:{3} AllowAnyPowerUnit:{4} Region:{5}",
+                             powerMaster.PowerId,
+                             powerMaster.PowerDriverId,
+                             powerMaster.PowerOdometer,
+                             powerMaster.PowerStatus,
+                             prefAllowAnyPowerUnit,
+                             powerMaster.PowerRegionId);
+
+            ////////////////////////////////////////////////
+            // Check power unit status: Scheduled for the shop? PS_SHOP = "S"
+            if (PowerStatusConstants.Shop == powerMaster.PowerStatus)
+            {
+                var s = string.Format("Do not use Power unit {0}.  It is scheduled for the shop. ",
+                        driverOdomUpdateProcess.PowerId);
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            // Is unit in use by another driver? PS_INUSE = "I"
+            if (powerMaster.PowerStatus == PowerStatusConstants.InUse &&
+                powerMaster.PowerDriverId != employeeMaster.EmployeeId)
+            {
+                var s = string.Format("Power unit {0} in use by another driver.  Change power unit number or call Dispatch.",
+                        driverOdomUpdateProcess.PowerId);
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            // If no odometer record for this unit, accept as sent by the handheld.  
+            // If overrride flag = "Y", accept as sent by the handheld.  
+            // Otherwise lookup the preference to determine the acceptable range of values for the tolerance check.
+            // If the override flag is not set, and the odometer is within the range preference then accept the odometer 
+            if (driverOdomUpdateProcess.OverrideFlag != Constants.Yes && powerMaster.PowerOdometer != null)
+            {
+                //Get the preference DEFOdomWarnRange which is an integer representing the + or - range, typically 5 
+                string prefOdomWarnRange = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                            employeeMaster.TerminalId, PrefDriverConstants.DEFOdomWarnRange, out fault);
+                if (null != fault)
+                {
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                    return false;
+                }
+                if (null != prefOdomWarnRange)
+                {
+                    //For testing
+                    log.Debug("SRTEST:Check Odometer");
+                    log.DebugFormat("SRTEST:OdomRange:{0} PowerId:{1} Odom:{2} OdomFromDriver:{3}",
+                                     prefOdomWarnRange,
+                                     powerMaster.PowerId,
+                                     powerMaster.PowerOdometer,
+                                     driverOdomUpdateProcess.Odometer);
+
+                    var deltaMiles = int.Parse(prefOdomWarnRange);
+                    if (driverOdomUpdateProcess.Odometer < powerMaster.PowerOdometer.Value - deltaMiles ||
+                        driverOdomUpdateProcess.Odometer > powerMaster.PowerOdometer.Value + deltaMiles)
+                    {
+                        var s = "Warning! Please check odometer and log in again.";
+                        //log.Warn(s);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        return false;
+                    }
+                }
+            }
 
             ////////////////////////////////////////////////
             //Update PowerMaster for the original power unit
@@ -510,21 +590,34 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="changeSetResult"></param>
-        /// <param name="key"></param>
+        /// <param name="msgKey"></param>
         /// <param name="userRoleIds"></param>
         /// <param name="userCulture"></param>
         /// <param name="driverOdomUpdateProcess"></param>
         /// <param name="employeeMaster"></param>
-        /// <param name="powerMaster"></param>
         /// <param name="driverStatus"></param>
         /// <returns></returns>
         public bool CorrectOdometer(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
-           DriverOdomUpdateProcess driverOdomUpdateProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
-           DriverStatus driverStatus)
+           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+           DriverOdomUpdateProcess driverOdomUpdateProcess, EmployeeMaster employeeMaster, DriverStatus driverStatus)
         {
             DataServiceFault fault = null;
-            string msgKey = key;
+
+            ////////////////////////////////////////////////
+            // Get the PowerMaster record.  
+            var powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
+                              driverOdomUpdateProcess.PowerId, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (null == powerMaster)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverOdomUpdateProcess:Invalid PowerId: "
+                                + driverOdomUpdateProcess.PowerId));
+                return false;
+            }
 
             // original odometer should not be null, but if it is, set to 0
             if (powerMaster.PowerOdometer == null)

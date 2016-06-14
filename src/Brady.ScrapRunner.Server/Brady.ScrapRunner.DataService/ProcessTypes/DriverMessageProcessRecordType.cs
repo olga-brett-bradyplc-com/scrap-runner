@@ -142,12 +142,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (driverMessageProcess.SenderId == null)
                     {
                         //Sending message(s)
-                        if (!SendMessage(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
+                        if (!SendMessage(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                     driverMessageProcess, employeeMaster))
                         {
-                            var s = string.Format("DriverMessageProcess:Could not Send Message for Driver:{0}.",
-                                                  driverMessageProcess.EmployeeId);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
                     }
@@ -157,9 +154,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (!ProcessMessage(dataService, settings, changeSetResult, key, userRoleIds, userCulture,
                                     driverMessageProcess, employeeMaster))
                         {
-                            var s = string.Format("DriverMessageProcess:Could not Process Message for Driver:{0}.",
-                                                  driverMessageProcess.EmployeeId);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
                     }
@@ -200,18 +194,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="changeSetResult"></param>
-        /// <param name="key"></param>
+        /// <param name="msgKey"></param>
         /// <param name="userRoleIds"></param>
         /// <param name="userCulture"></param>
         /// <param name="driverMessageProcess"></param>
         /// <param name="employeeMaster"></param>
         /// <returns></returns>
         public bool SendMessage(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, string key, IEnumerable<long> userRoleIds, string userCulture,
+           ChangeSetResult<string> changeSetResult, string msgKey, IEnumerable<long> userRoleIds, string userCulture,
            DriverMessageProcess driverMessageProcess, EmployeeMaster employeeMaster)
         {
             DataServiceFault fault = null;
-            string msgKey = key;
             ChangeSetResult<int> scratchChangeSetResult;
 
             //Process will return the following list.
@@ -256,11 +249,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             return true;
         }
         public bool ProcessMessage(IDataService dataService, ProcessChangeSetSettings settings,
-                   ChangeSetResult<string> changeSetResult, String key, IEnumerable<long> userRoleIds, string userCulture,
+                   ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
                    DriverMessageProcess driverMessageProcess, EmployeeMaster employeeMaster)
         {
             DataServiceFault fault = null;
-            string msgKey = key;
 
             var receiverEmpMaster = Common.GetEmployeeMaster(dataService, settings, userCulture, userRoleIds,
                                  driverMessageProcess.ReceiverId, out fault);

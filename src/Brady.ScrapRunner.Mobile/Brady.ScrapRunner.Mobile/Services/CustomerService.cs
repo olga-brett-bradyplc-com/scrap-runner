@@ -63,5 +63,25 @@ namespace Brady.ScrapRunner.Mobile.Services
                     customerCommodities);
             return _customerCommodityRepository.InsertRangeAsync(mapped);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<CustomerCommodityModel>> FindCustomerCommodites()
+        {
+            var commodities = await _customerCommodityRepository.AllAsync();
+            return commodities;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<CustomerLocationModel>> FindCustomerLocations()
+        {
+            var locations = await _customerLocationRepository.AllAsync();
+            return locations;
+        }
     }
 }

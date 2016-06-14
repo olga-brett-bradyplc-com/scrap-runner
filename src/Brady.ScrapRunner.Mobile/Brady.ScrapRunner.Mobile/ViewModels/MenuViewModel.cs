@@ -100,6 +100,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
+
         private IMvxCommand _takePictureCommand;
         public IMvxCommand TakePictureCommand
             => _takePictureCommand ?? (_takePictureCommand = new MvxCommand(ExecuteTakePictureCommand));
@@ -107,6 +108,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private void ExecuteTakePictureCommand()
         {
             ShowViewModel<PhotosViewModel>();
+        }
+
+        private IMvxCommand _loadDropContainersCommand;
+        public IMvxCommand LoadDropContainersCommand
+            => _loadDropContainersCommand ?? (_loadDropContainersCommand = new MvxCommand(ExecuteLoadDropContainersCommand));
+
+        private void ExecuteLoadDropContainersCommand()
+        {
+            ShowViewModel<LoadDropContainerViewModel>();
         }
     }
 }

@@ -55,7 +55,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
 
             await Task.Delay(1000);
-
             Scan();
 
         }
@@ -81,7 +80,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             base.OnResume();
 
             await Task.Delay(1000);
-
             Scan();
         }
 
@@ -109,7 +107,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     return;
                 }
                 
-                ViewModel.TransactionScannedCommand.Execute(result.Text);
+                ViewModel.TransactionScannedCommandAsync.Execute(result.Text);
                 var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
                 //ViewModel.SelectNextTransactionCommand.Execute();
 
@@ -120,7 +118,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     // Update adapters item source
                     listGrouping.Adapter.ItemsSource = ViewModel.Containers;
                     listGrouping.InvalidateViews();
-                    //listGrouping.Invalidate();
                     Toast.MakeText(Activity, "Scanned: " + result.Text, ToastLength.Short).Show();
                 });
 

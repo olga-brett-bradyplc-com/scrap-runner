@@ -5,7 +5,8 @@
   <color name="colorAccent">@color/material_100</color>
   
   <!-- You can generate a material palette from: http://mcg.mbitson.com/#/ -->
-  
+
+  <color name="material_gray_100">#eeeeee</color>
   <color name="material_gray_300">#d6d6d6</color>
   <color name="material_gray_500">#bdbdbd</color>
   <color name="material_gray_700">#515151</color>
@@ -15,6 +16,7 @@
   <color name="material_blue_500">#2196F3</color>
   <color name="material_blue_700">#1976D2</color>
 
+  <color name="material_red_100">#C54848</color>
   <color name="material_red_300">#E32626</color>
   <color name="material_red_500">#b51717</color>
   <color name="material_red_700">#7F1010</color>
@@ -44,6 +46,9 @@
   <color name="material_A400">#3e3e3e</color>
   <color name="material_A700">#101010</color>
 
+  <color name="button_border_primarydark">#444444</color>
+  <color name="button_border_arrive">#bd2f2f</color>
+  
   <color name="material_white">#ffffff</color>
   <color name="material_orange">#ffac43</color>
   
@@ -55,6 +60,7 @@
 
   <color name="arrive">@color/material_red_500</color>
   <color name="arrive_pressed">@color/material_red_700</color>
+  <color name="arrived_disabled">@color/material_red_100</color>
 
   <color name="delayed">@color/material_orange_500</color>
   <color name="delayed_pressed">@color/material_orange_700</color>
