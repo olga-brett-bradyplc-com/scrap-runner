@@ -18,7 +18,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             _tripService = tripService;
             Title = AppResources.SignatureReceipt;
-            ConfirmTransactionsCommand = new MvxAsyncCommand(ExecuteConfirmTransactionsCommandAsync);
         }
 
         public void Init(string tripNumber)
@@ -54,6 +53,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _tripNumber, value); }
         }
 
+        private string _printedName;
+        public string PrintedName
+        {
+            get { return _printedName; }
+            set
+            {
+                SetProperty(ref _printedName, value);
+                ConfirmTransactionsCommand.RaiseCanExecuteChanged();
+            }
+        }
+
         // Listview bindings
         private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
         public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
@@ -63,7 +73,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Command bindings
-        public IMvxAsyncCommand ConfirmTransactionsCommand { get; private set; }
+        private IMvxAsyncCommand _confirmTransactionsCommand;
+        public IMvxAsyncCommand ConfirmTransactionsCommand => _confirmTransactionsCommand ?? (_confirmTransactionsCommand = new MvxAsyncCommand(ExecuteConfirmTransactionsCommandAsync, CanExecuteConfirmTransactionsCommandAsync));
 
         // Command Impl
         private async Task ExecuteConfirmTransactionsCommandAsync()
@@ -83,6 +94,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
             else
                 ShowViewModel<RouteSummaryViewModel>();
+        }
+
+        private bool CanExecuteConfirmTransactionsCommandAsync()
+        {
+            return !string.IsNullOrEmpty(PrintedName);
         }
 
     }

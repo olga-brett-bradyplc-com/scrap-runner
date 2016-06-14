@@ -152,6 +152,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Performing this action will complete this trip.
+        /// </summary>
+        public static string CompleteTrip {
+            get {
+                return ResourceManager.GetString("CompleteTrip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Completing Trip Segment.
         /// </summary>
         public static string CompletingTripSegment {
@@ -708,6 +717,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signature.
+        /// </summary>
+        public static string Signature {
+            get {
+                return ResourceManager.GetString("Signature", resourceCulture);
             }
         }
         

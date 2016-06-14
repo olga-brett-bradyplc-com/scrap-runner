@@ -30,7 +30,7 @@
                 .ForMember(tsc => tsc.TripSegComments, opt => opt.Ignore())
                 .ForMember(tsc => tsc.CompositeKey, opt => opt.Ignore());
             CreateMap<CodeTable, CodeTableModel>();
-            CreateMap<Messages, MessagesModel>()
+            CreateMap<Domain.Models.Messages, MessagesModel>()
                 .ForMember(m => m.MessageThread, o => o.Ignore());
         }
     }

@@ -1,22 +1,28 @@
 ﻿namespace Brady.ScrapRunner.Mobile.Services
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Interfaces;
+    using Messages;
+    using Models;
     using MvvmCross.Platform;
     using MvvmCross.Platform.Core;
     using MvvmCross.Plugins.Location;
+    using MvvmCross.Plugins.Messenger;
 
     public class LocationService : ILocationService
     {
         private readonly IMvxLocationWatcher _locationWatcher;
-        private readonly List<MvxGeoLocation> _locationPath = new List<MvxGeoLocation>();
-        private bool _isMoving;
+        private readonly IMvxMessenger _mvxMessenger;
+        private readonly ILocationPathService _locationPathService;
 
-        public LocationService(IMvxLocationWatcher locationWatcher)
+        public LocationService(
+            IMvxLocationWatcher locationWatcher, 
+            IMvxMessenger mvxMessenger, 
+            ILocationPathService locationPathService)
         {
             _locationWatcher = locationWatcher;
+            _mvxMessenger = mvxMessenger;
+            _locationPathService = locationPathService;
             _locationWatcher.OnPermissionChanged += OnPermissionChange;
         }
 
@@ -33,27 +39,42 @@
             Mvx.Resolve<IMvxMainThreadDispatcher>().RequestMainThreadAction(() =>
             {
                 _locationWatcher.Start(options, OnLocationChange, OnLocationError);
+                _locationPathService.Start();
             });
         }
 
         public void Stop()
         {
             if (!_locationWatcher.Started) return;
+            _locationPathService.Stop();
             _locationWatcher.Stop();
         }
 
-        public MvxGeoLocation CurrentLocation => _locationWatcher.CurrentLocation;
+        public LocationModel CurrentLocation => _locationWatcher.CurrentLocation == null ? 
+                null : 
+                ConvertMvxGeoLocation(_locationWatcher.CurrentLocation);
+
+        private LocationModel ConvertMvxGeoLocation(MvxGeoLocation location)
+        {
+            return new LocationModel
+            {
+                Accuracy = location.Coordinates.Accuracy,
+                Heading = location.Coordinates.Heading,
+                HeadingAccuracy = location.Coordinates.HeadingAccuracy,
+                Latitude = location.Coordinates.Latitude,
+                Longitude = location.Coordinates.Longitude,
+                Speed = location.Coordinates.Speed,
+                Timestamp = location.Timestamp
+            };
+        }
 
         private void OnLocationChange(MvxGeoLocation location)
         {
-            if (_locationPath.Count == 0)
+            var locationModel = ConvertMvxGeoLocation(location);
+            _mvxMessenger.Publish(new LocationModelMessage(this)
             {
-                _locationPath.Add(location);
-                return;
-            }
-            var previousLocation = _locationPath.Last();
-            // @TODO: Finish implementing point collecting logic.
-            // @TODO: Add support for _isMoving. GPS transmissions to the server will be throttled in this mode.
+                Location = locationModel
+            });
         }
 
         private void OnLocationError(MvxLocationError locationError)

@@ -2,12 +2,9 @@
 {
     using Models;
 
-    public interface ILocationService
+    public interface ILocationPathService
     {
         void Start();
-
         void Stop();
-
-        LocationModel CurrentLocation { get; }
     }
 }

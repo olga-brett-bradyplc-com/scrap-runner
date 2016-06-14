@@ -231,8 +231,8 @@
             };
             return queueItem;
         }
-        
-        public string HostAddress => "https://maunb-jtw10.bradyplc.com:7776";
+
+        public string HostAddress => _dataServiceClient.HostAddress;
 
         public Task<TypeMetadata[]> GetMetadataForTypeAsync(string type, string dataService = null)
         {
