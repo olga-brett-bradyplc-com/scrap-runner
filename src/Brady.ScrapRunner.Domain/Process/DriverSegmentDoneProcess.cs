@@ -20,6 +20,9 @@ namespace Brady.ScrapRunner.Domain.Process
         /// Trip Segment Number.  Required.
         public virtual string TripSegNumber { get; set; }
 
+        ///The Action Type: D=Done,X=Canceled,P=Pending. Required.
+        public virtual string ActionType { get; set; }
+
         /// The ActionDateTime. Required.
         public virtual DateTime ActionDateTime { get; set; }
 
@@ -31,6 +34,10 @@ namespace Brady.ScrapRunner.Domain.Process
 
         /// Longitude of the segment done.
         public virtual int? Longitude { get; set; }
+
+        /// Destination customer host code set to the terminal's host code when driver has changed 
+        /// the terminal or added a return to yard segment to a terminal.
+         public virtual string DestCustHostCode { get; set; }
 
         /// Flag indicating the driver added this segment (RT)
         public virtual string DriverGenerated { get; set; }
