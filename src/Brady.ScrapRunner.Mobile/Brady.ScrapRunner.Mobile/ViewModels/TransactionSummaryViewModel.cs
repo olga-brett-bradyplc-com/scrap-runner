@@ -33,10 +33,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             TripNumber = tripNumber;
             SubTitle = AppResources.Trip + $" {TripNumber}";
-            TransactionScannedCommand = new MvxAsyncCommand<string>(ExecuteTransactionScannedCommandAsync);
-            SelectNextTransactionCommand = new MvxCommand(ExecuteSelectNextTransactionCommand);
-            ConfirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand, CanExecuteConfirmationSelectedCommand);
-            TransactionSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteTransactionSelectedCommand);
+            //SelectNextTransactionCommand = new MvxCommand(ExecuteSelectNextTransactionCommand);
         }
 
         // Grab all relevant data
@@ -75,17 +72,27 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Command bindings
-        public IMvxCommand TransactionSelectedCommand { get; private set; }
-        public IMvxAsyncCommand TransactionScannedCommand { get; private set; }
-        public IMvxCommand SelectNextTransactionCommand { get; private set; }
-        public IMvxCommand ConfirmationSelectedCommand { get; private set; }
+        private IMvxCommand _transactionSelectedCommand;
+        public IMvxCommand TransactionSelectedCommand => _transactionSelectedCommand ?? (_transactionSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteTransactionSelectedCommand));
+
+        private IMvxAsyncCommand _transactionScannedCommandAsync;
+        public IMvxAsyncCommand TransactionScannedCommandAsync => _transactionScannedCommandAsync ?? (_transactionScannedCommandAsync = new MvxAsyncCommand<string>(ExecuteTransactionScannedCommandAsync));
+        //public IMvxCommand SelectNextTransactionCommand { get; private set; }
+
+        private IMvxCommand _confirmationSelectedCommand;
+        public IMvxCommand ConfirmationSelectedCommand => _confirmationSelectedCommand ?? (_confirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand, CanExecuteConfirmationSelectedCommand));
 
         // Field bindings
         private TripSegmentContainerModel _currentTransaction;
         public TripSegmentContainerModel CurrentTransaction
         {
             get {  return _currentTransaction; }
-            set { SetProperty(ref _currentTransaction, value); }
+            set
+            {
+                SetProperty(ref _currentTransaction, value);
+                // Used for scanning and when to determine whether we can go to signature page
+                ConfirmationSelectedCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private string _tripNumber;
@@ -144,7 +151,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private void ExecuteTransactionSelectedCommand(TripSegmentContainerModel tripContainer)
         {
-            var temp = tripContainer;
             ShowViewModel<TransactionDetailViewModel>(
                 new
                 {
@@ -162,8 +168,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private bool CanExecuteConfirmationSelectedCommand()
         {
-            return true;
-            //return !Containers.Select(container2 => container2.First(tscm => string.IsNullOrEmpty(tscm?.TripSegContainerComplete))).Any();
+            return Containers.All(container => !container.All(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)));
         }
 
         private void UpdateLocalContainers(TripSegmentContainerModel tripContainer)

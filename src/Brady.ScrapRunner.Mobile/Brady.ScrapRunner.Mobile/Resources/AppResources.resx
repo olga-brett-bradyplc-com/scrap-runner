@@ -455,4 +455,12 @@ You will now be sent back to the login.</value>
     <value>Back On Duty</value>
     <comment>DelayViewModel</comment>
   </data>
+  <data name="CompleteTrip" xml:space="preserve">
+    <value>Performing this action will complete this trip</value>
+    <comment>Scale Detail</comment>
+  </data>
+  <data name="Signature" xml:space="preserve">
+    <value>Signature</value>
+    <comment>Transaction Summary</comment>
+  </data>
 </root>
