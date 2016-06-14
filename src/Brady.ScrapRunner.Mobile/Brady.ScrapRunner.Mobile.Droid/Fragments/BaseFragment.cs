@@ -41,6 +41,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             var baseActivity = ((MainActivity)Activity);
             _toolbar = view.FindViewById<Toolbar>(Resource.Id.toolbar);
 
+            // By default, set drawerlayout as locked so a user can't swipe the menu when it shouldn't be accessible
+            baseActivity.DrawerLayout.SetDrawerLockMode(DrawerLayout.LockModeLockedClosed);
+
             if (_toolbar != null)
             {
                 baseActivity.SetSupportActionBar(_toolbar);
@@ -64,7 +67,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                         Resource.String.drawer_open,
                         Resource.String.drawer_close);
 
-                    baseActivity.DrawerLayout.SetDrawerListener(_drawerToggle);
+                    baseActivity.DrawerLayout.AddDrawerListener(_drawerToggle);
+                    baseActivity.DrawerLayout.SetDrawerLockMode(DrawerLayout.LockModeUnlocked);
                 }
 
                 if (!string.IsNullOrEmpty(ViewModel.Title))
