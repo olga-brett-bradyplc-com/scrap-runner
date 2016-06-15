@@ -1977,7 +1977,22 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-
+        /// <summary>
+        /// Delete a TripSegment record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="tripSegment"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> DeleteTripSegment(IDataService dataService, ProcessChangeSetSettings settings,
+            TripSegment tripSegment)
+        {
+            var recordType = (TripSegmentRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegment");
+            var changeSet = (ChangeSet<string, TripSegment>)recordType.GetNewChangeSet();
+            changeSet.AddDelete(tripSegment.Id);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
         /// <summary>
         /// Delete a TripSegmentContainer record.
         /// </summary>
@@ -2827,6 +2842,43 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return customer;
         }
+        /// <summary>
+        /// Get customer record from the customer master for a given terminal
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="terminalId"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static CustomerMaster GetCustomerForTerminal(IDataService dataService, ProcessChangeSetSettings settings,
+        string userCulture, IEnumerable<long> userRoleIds, string terminalId, out DataServiceFault fault)
+        {
+            fault = null;
+
+            fault = null;
+            var customer = new CustomerMaster();
+            if (null != terminalId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<CustomerMaster>()
+                          .Filter(t => t.Property(p => p.ServingTerminalId).EqualTo(terminalId)
+                          .And().Property(p => p.CustType).EqualTo(CustomerTypeConstants.Yard))
+                          .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return customer;
+                }
+                customer = (CustomerMaster)queryResult.Records.Cast<CustomerMaster>().FirstOrDefault();
+            }
+            return customer;
+        }
+
         /// DRIVERDELAY Table queries
         /// <summary>
         ///  Get an employee record from the EmployeeMaster
@@ -3760,7 +3812,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="fault"></param>
         /// <returns>An empty list if dateTime or regionId is null or no entries are found</returns>
         public static List<TerminalChange> GetTerminalChangesByRegion(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, string regionId, out DataServiceFault fault)
+             string userCulture, IEnumerable<long> userRoleIds, DateTime? dateTime, string regionId, out DataServiceFault fault)
         {
             fault = null;
             var terminals = new List<TerminalChange>();
@@ -3798,7 +3850,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="fault"></param>
         /// <returns>An empty list if dateTime or areaId is null or no entries are found</returns>
         public static List<TerminalChange> GetTerminalChangesByArea(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, string areaId, out DataServiceFault fault)
+             string userCulture, IEnumerable<long> userRoleIds, DateTime? dateTime, string areaId, out DataServiceFault fault)
         {
             fault = null;
             var terminalsInArea = new List<string>();
@@ -3824,6 +3876,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return terminals;
         }
+
         /// TERMINALMASTER Table queries
         /// <summary>
         ///  Get a a terminal master record for a given terminal.
@@ -3858,6 +3911,77 @@ namespace Brady.ScrapRunner.DataService.Util
                 terminal = (TerminalMaster)queryResult.Records.Cast<TerminalMaster>().FirstOrDefault();
             }
             return terminal;
+        }
+        /// TERMINALMASTER Table queries
+        /// <summary>
+        /// Gets a list of terminals by area
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="areaId"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static List<TerminalMaster> GetTerminalMastersByArea(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string areaId, out DataServiceFault fault)
+        {
+            fault = null;
+            var terminalsInArea = new List<string>();
+            var terminals = new List<TerminalMaster>();
+            if (null != areaId)
+            {
+                terminalsInArea = Common.GetTerminalsByArea
+                    (dataService, settings, userCulture, userRoleIds, areaId, out fault);
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TerminalMaster>()
+                    .Filter(y => y.Property(x => x.TerminalId).In(terminalsInArea.ToArray()))
+                    .OrderBy(x => x.TerminalId)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return terminals;
+                }
+                terminals = queryResult.Records.Cast<TerminalMaster>().ToList();
+            }
+            return terminals;
+        }
+        /// TERMINALMASTER Table queries
+        /// <summary>
+        /// Gets a list of terminals by region
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static List<TerminalMaster> GetTerminalMastersByRegion(IDataService dataService, ProcessChangeSetSettings settings,
+            string userCulture, IEnumerable<long> userRoleIds, string regionId, out DataServiceFault fault)
+        {
+            fault = null;
+            var terminals = new List<TerminalMaster>();
+            if (null != regionId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TerminalMaster>()
+                    .Filter(y => y.Property(x => x.Region).EqualTo(regionId))
+                    .OrderBy(x => x.TerminalId)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return terminals;
+                }
+                terminals = queryResult.Records.Cast<TerminalMaster>().ToList();
+            }
+            return terminals;
         }
         /// TRIP Table  queries
         /// <summary>

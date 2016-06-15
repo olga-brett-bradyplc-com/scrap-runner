@@ -17,7 +17,7 @@ namespace Brady.ScrapRunner.Domain.Process
         /// Mandatory input paramter
         /// </summary>
         public virtual string EmployeeId { get; set; }
-        public virtual DateTime LastTerminalChangeUpdate { get; set; }
+        public virtual DateTime? LastTerminalChangeUpdate { get; set; }
         public virtual string TerminalId { get; set; }
 
         /// <summary>

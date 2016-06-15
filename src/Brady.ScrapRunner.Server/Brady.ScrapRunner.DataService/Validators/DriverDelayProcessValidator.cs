@@ -23,6 +23,7 @@ namespace Brady.ScrapRunner.DataService.Validators
             RuleFor(x => x.EmployeeId).NotEmpty();
             RuleFor(x => x.PowerId).NotEmpty();
             RuleFor(x => x.ActionDateTime).NotEmpty();
+            RuleFor(x => x.ActionType).NotEmpty();
             RuleFor(x => x.DelayCode).NotEmpty();
         }
     }
