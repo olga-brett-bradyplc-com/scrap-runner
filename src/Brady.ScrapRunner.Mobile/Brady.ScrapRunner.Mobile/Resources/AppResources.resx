@@ -463,4 +463,20 @@ You will now be sent back to the login.</value>
     <value>Signature</value>
     <comment>Transaction Summary</comment>
   </data>
+  <data name="ReturnToYardAdd" xml:space="preserve">
+    <value>Add Return To Yard</value>
+    <comment>ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="ReturnToYardEdit" xml:space="preserve">
+    <value>Edit Return To Yard</value>
+    <comment>ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="Delay" xml:space="preserve">
+    <value>Delay</value>
+    <comment>DelayViewModel</comment>
+  </data>
+  <data name="ConfirmBackOnDuty" xml:space="preserve">
+    <value>Are you back on duty?</value>
+    <comment>DelayViewModel</comment>
+  </data>
 </root>

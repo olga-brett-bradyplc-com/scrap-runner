@@ -429,4 +429,20 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Signature</value>
     <comment>Transaction Summary</comment>
   </data>
+  <data name="ReturnToYardAdd" xml:space="preserve">
+    <value>Add Return To Yard (Spanish)</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="ReturnToYardEdit" xml:space="preserve">
+    <value>Edit Return To Yard (Spanish)</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="Delay" xml:space="preserve">
+    <value>Delay (Spanish)</value>
+    <comment>NEEDS TRANSLATION; DelayViewModel</comment>
+  </data>
+  <data name="ConfirmBackOnDuty" xml:space="preserve">
+    <value>Are you back on duty? (Spanish)</value>
+    <comment>NEEDS TRANSLATION; DelayViewModel</comment>
+  </data>
 </root>

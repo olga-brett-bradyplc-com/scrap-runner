@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
+using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
@@ -17,7 +19,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public DelayViewModel(ICodeTableService codeTableService)
         {
             _codeTableService = codeTableService;
-            Title = "Delay";
+            Title = AppResources.Delay;
         }
 
         public void Init(string delayReason)
@@ -27,7 +29,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var reasonList = await _codeTableService.FindCodeTableList("DELAYCODES");
+            var reasonList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.DelayCodes);
             var reasonDesc = reasonList.FirstOrDefault(ct => ct.CodeValue == DelayReason);
             SubTitle = reasonDesc.CodeDisp1;
         }
@@ -45,11 +47,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteBackOnDutyCommand()
         {
-            var confirm = await UserDialogs.Instance.ConfirmAsync("Are You Back On Duty?", "Confirm", "OK", "Cancel");
+            var confirm = await UserDialogs.Instance.ConfirmAsync(AppResources.ConfirmBackOnDuty, AppResources.BackOnDuty, AppResources.Yes, AppResources.No);
             if (confirm)
-            {
                 Close(this);
-            }
         }
     }
 }
