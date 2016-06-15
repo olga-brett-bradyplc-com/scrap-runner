@@ -762,6 +762,15 @@
         public static readonly string GateCheck = "GT";
     }
     /// <summary>
+    /// Terminal Change internal codes
+    /// </summary>
+    public static class TerminalChangeConstants
+    {
+        public static readonly string Add = "A";
+        public static readonly string Delete = "D";
+        public static readonly string Modify = "M";
+    }
+    /// <summary>
     /// The Trip Assign Status internal codes.  Used in the Trip table.
     /// </summary>
     public static class TripAssignStatusConstants
@@ -780,6 +789,14 @@
         public static readonly string Driver = "D";
         /// <summary>Manual: M</summary>
         public static readonly string Manual = "M";
+    }
+    /// <summary>
+    /// The trip segment action type codes.
+    /// </summary>
+    public static class TripSegmentActionTypeConstants
+    {
+        public static readonly string Done = "D";
+        public static readonly string Canceled = "X";
     }
 
     /// <summary>

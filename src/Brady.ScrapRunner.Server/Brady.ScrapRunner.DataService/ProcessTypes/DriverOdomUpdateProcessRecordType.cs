@@ -725,8 +725,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 //Update the odometers in the TripSegment records
                 foreach (var tripSegment in tripSegList)
                 {
-                    if (-1 == tripSegment.TripSegNumber.CompareTo(currentTripSegment.TripSegNumber) ||
-                        0 == tripSegment.TripSegNumber.CompareTo(currentTripSegment.TripSegNumber))
+                    if (0 >= tripSegment.TripSegNumber.CompareTo(currentTripSegment.TripSegNumber)) 
                     {
                         if (tripSegment.TripSegOdometerStart != null)
                             tripSegment.TripSegOdometerStart += odometerDifference;
@@ -762,8 +761,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Update the odometers in the TripSegmentMileage records
                     foreach (var tripMileage in tripMileageList)
                     {
-                        if (-1 == tripMileage.TripSegNumber.CompareTo(currentTripSegment.TripSegNumber) ||
-                            0 == tripMileage.TripSegNumber.CompareTo(currentTripSegment.TripSegNumber))
+                        if (0 >= tripMileage.TripSegNumber.CompareTo(currentTripSegment.TripSegNumber)) 
                         {
                             if (tripMileage.TripSegMileageOdometerStart != null)
                                 tripMileage.TripSegMileageOdometerStart += odometerDifference;
