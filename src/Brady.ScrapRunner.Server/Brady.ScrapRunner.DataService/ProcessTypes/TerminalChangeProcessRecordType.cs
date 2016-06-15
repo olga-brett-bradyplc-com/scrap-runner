@@ -143,8 +143,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    //Process will return the following lists.
-                    List<TerminalChange> fullTerminalChangeList = new List<TerminalChange>();
 
                     //To contain the list of terminals
                     var terminalChangeList = new List<TerminalChange>();
@@ -158,12 +156,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         var terminalMasterList = new List<TerminalMaster>();
                         if (prefSendOnlyYardsForArea == Constants.Yes)
                         {
-                            terminalMasterList = Common.GetTerminalMastersByArea(dataService, settings, userCulture, userRoleIds,
+                            terminalMasterList = Common.GetTerminalMastersForArea(dataService, settings, userCulture, userRoleIds,
                                               employeeMaster.AreaId, out fault);
                         }
                         else
                         {
-                            terminalMasterList = Common.GetTerminalMastersByRegion(dataService, settings, userCulture, userRoleIds,
+                            terminalMasterList = Common.GetTerminalMastersForRegion(dataService, settings, userCulture, userRoleIds,
                                               employeeMaster.RegionId, out fault);
                         }
                         if (fault != null)
@@ -220,21 +218,18 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             terminalChangeList.Add(terminalChange);
                         }//end of foreach (var terminal in terminalMasterList)
 
-                        //Save the list for sending to driver
-                        fullTerminalChangeList.AddRange(terminalChangeList);
-
                     }//end of if (terminalsProcess.LastTerminalChangeUpdate == null)
                     else
                     {
                         //Since the date is provided, get the terminal changes since the last terminal update was provided to this driver.
                         if (prefSendOnlyYardsForArea == Constants.Yes)
                         {
-                            terminalChangeList = Common.GetTerminalChangesByArea(dataService, settings, userCulture, userRoleIds,
+                            terminalChangeList = Common.GetTerminalChangesForArea(dataService, settings, userCulture, userRoleIds,
                               terminalsProcess.LastTerminalChangeUpdate, employeeMaster.AreaId, out fault);
                         }
                         else
                         {
-                            terminalChangeList = Common.GetTerminalChangesByRegion(dataService, settings, userCulture, userRoleIds,
+                            terminalChangeList = Common.GetTerminalChangesForRegion(dataService, settings, userCulture, userRoleIds,
                               terminalsProcess.LastTerminalChangeUpdate, employeeMaster.RegionId, out fault);
                         }
                         if (fault != null)
@@ -246,7 +241,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     // Don't forget to actually backfill the TerminalProcess object contained within 
                     // the ChangeSetResult that exits this method and is returned to the caller.
-                    terminalsProcess.Terminals = fullTerminalChangeList;
+                    terminalsProcess.Terminals = terminalChangeList;
                     //Set the return values
 
                     //Now using log4net.ILog implementation to test results of query.

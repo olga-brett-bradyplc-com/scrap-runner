@@ -17,7 +17,7 @@ namespace Brady.ScrapRunner.Domain.Process
         /// Mandatory input paramter
         /// </summary>
         public virtual string EmployeeId { get; set; }
-        public virtual DateTime LastContainerMasterUpdate { get; set; }
+        public virtual DateTime? LastContainerMasterUpdate { get; set; }
         public virtual string ContainerNumber { get; set; }
 
         /// <summary>
