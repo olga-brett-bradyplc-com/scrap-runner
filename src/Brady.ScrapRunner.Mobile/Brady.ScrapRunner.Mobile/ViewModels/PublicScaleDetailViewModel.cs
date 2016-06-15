@@ -302,7 +302,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 await _tripService.CompleteTripAsync(TripNumber);
                 await _tripService.CompleteTripSegmentAsync(TripNumber, TripSegNumber);
                 Close(this);
-                ShowViewModel<RouteSummaryViewModel>();
+                if (await _tripService.IsTripLegTypePublicScale(TripNumber))
+                    ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                else
+                    ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
             }
             else
             {
@@ -329,7 +332,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private bool IsGrossWeightSet()
         {
-            return GrossTime == null;
+            return GrossTime != null;
         }
 
     }
