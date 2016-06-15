@@ -65,5 +65,8 @@
 
         [MaxLength(300)]
         public string CustDriverInstructions { get; set; }
+
+        [Ignore]
+        public string CityStateZipFormatted => $"{CustCity}, {CustState} {CustZip}";
     }
 }

@@ -20,13 +20,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         private readonly ITripService _tripService;
         private readonly IDriverService _driverService;
+        private readonly IPreferenceService _preferenceService;
 
         private string _custHostCode;
 
-        public RouteDetailViewModel(ITripService tripService, IDriverService driverService)
+        public RouteDetailViewModel(ITripService tripService, IDriverService driverService, IPreferenceService preferenceService)
         {
             _tripService = tripService;
             _driverService = driverService;
+            _preferenceService = preferenceService;
+
             DirectionsCommand = new MvxCommand(ExecuteDrivingDirectionsCommand);
             EnRouteCommand = new MvxAsyncCommand(ExecuteEnRouteCommandAsync);
             ArriveCommand = new MvxAsyncCommand(ExecuteArriveCommandAsync);
@@ -74,6 +77,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     }
                 }
             }
+
+            // Is the user allowed to edit a rty segment?
+            // Rtn must already exist as a segment
+            var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
+            var doesRtnSegExist = tripSegments.Any(sg => sg.TripSegType == BasicTripTypeConstants.ReturnYard);
+            // User preference DEFAllowAddRT must be set to 'Y'
+            var defAllowChangeRt = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAllowChangeRT);
+
+            AllowRtnEdit = doesRtnSegExist && Constants.Yes.Equals(defAllowChangeRt);
 
             MenuFilter = MenuFilterEnum.NotOnTrip; // Reset for when we start a new trip segment
             base.Start();
@@ -156,6 +168,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _nextActionLabel, value);  }
         }
 
+        private bool? _allowRtnEdit;
+        public bool? AllowRtnEdit
+        {
+            get { return _allowRtnEdit; }
+            set { SetProperty(ref _allowRtnEdit, value); }
+        }
+
         private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers; 
         public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
         {
@@ -164,16 +183,26 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Command bindings
-        public MvxCommand DirectionsCommand { get; private set; }
+        public IMvxCommand DirectionsCommand { get; private set; }
         public IMvxAsyncCommand EnRouteCommand { get; private set; }
         public IMvxAsyncCommand ArriveCommand { get; private set; }
         public IMvxAsyncCommand NextStageCommand { get; private set; }
+
+        private IMvxCommand _addReturnToYardCommand;
+
+        public IMvxCommand AddReturnToYardCommand
+            => _addReturnToYardCommand ?? (_addReturnToYardCommand = new MvxCommand(ExecuteAddReturnToYardCommand));
 
         // Command impl
         private void ExecuteDrivingDirectionsCommand()
         {
             if (!string.IsNullOrEmpty(_custHostCode))
                 ShowViewModel<RouteDirectionsViewModel>(new {custHostCode = _custHostCode});
+        }
+
+        private void ExecuteAddReturnToYardCommand()
+        {
+            ShowViewModel<ModifyReturnToYardViewModel>(new {changeType = TerminalChangeEnum.Edit, tripNumber = TripNumber});
         }
 
         private async Task ExecuteEnRouteCommandAsync()

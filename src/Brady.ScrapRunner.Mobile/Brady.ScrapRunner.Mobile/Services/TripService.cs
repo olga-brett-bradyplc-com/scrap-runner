@@ -214,6 +214,15 @@
             return sortedTrips.FirstOrDefault();
         }
 
+        public async Task<List<TripSegmentModel>> FindAllSegmentsForTripAsync(string tripNumber)
+        {
+            var tripSegments = await _tripSegmentRepository.AsQueryable()
+                .Where(t => t.TripNumber == tripNumber)
+                .OrderBy(t => t.TripSegNumber)
+                .ToListAsync();
+            return tripSegments;
+        }
+
         public async Task<TripSegmentModel> FindTripSegmentInfoAsync(string tripNumber, string tripSegmentNumber)
         {
             var segment = await _tripSegmentRepository.AsQueryable()

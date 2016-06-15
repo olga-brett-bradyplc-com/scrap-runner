@@ -100,7 +100,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-
         private IMvxCommand _takePictureCommand;
         public IMvxCommand TakePictureCommand
             => _takePictureCommand ?? (_takePictureCommand = new MvxCommand(ExecuteTakePictureCommand));

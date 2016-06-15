@@ -188,6 +188,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you back on duty?.
+        /// </summary>
+        public static string ConfirmBackOnDuty {
+            get {
+                return ResourceManager.GetString("ConfirmBackOnDuty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are about to go en route to:{0}{2}{1}{3}{1}{4}{0}Are you sure you want to start this trip?.
         /// </summary>
         public static string ConfirmEnRouteMessage {
@@ -202,6 +211,33 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string ConfirmEnrouteTitle {
             get {
                 return ResourceManager.GetString("ConfirmEnrouteTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm.
+        /// </summary>
+        public static string ConfirmLabel {
+            get {
+                return ResourceManager.GetString("ConfirmLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are about to add the following terminal as a Return To Yard segment :{0}{2}{1}{3}{1}{4}{0}Are you sure you want to add this?.
+        /// </summary>
+        public static string ConfirmReturnToYardAdd {
+            get {
+                return ResourceManager.GetString("ConfirmReturnToYardAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are about to change the Return To Yard Segment from :{0}{2}{1}{3}{1}{4}{0}To:{0}{5}{1}{6}{1}{7}{0}Are you sure you want to change this?.
+        /// </summary>
+        public static string ConfirmReturnToYardEdit {
+            get {
+                return ResourceManager.GetString("ConfirmReturnToYardEdit", resourceCulture);
             }
         }
         
@@ -238,6 +274,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string CustomerLocation {
             get {
                 return ResourceManager.GetString("CustomerLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delay.
+        /// </summary>
+        public static string Delay {
+            get {
+                return ResourceManager.GetString("Delay", resourceCulture);
             }
         }
         
@@ -649,6 +694,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Return To Yard.
+        /// </summary>
+        public static string ReturnToYardAdd {
+            get {
+                return ResourceManager.GetString("ReturnToYardAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit Return To Yard.
+        /// </summary>
+        public static string ReturnToYardEdit {
+            get {
+                return ResourceManager.GetString("ReturnToYardEdit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Route Summary.
         /// </summary>
         public static string RouteSummary {
@@ -681,6 +744,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string SecondGrossWeight {
             get {
                 return ResourceManager.GetString("SecondGrossWeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select A Yard.
+        /// </summary>
+        public static string SelectYard {
+            get {
+                return ResourceManager.GetString("SelectYard", resourceCulture);
             }
         }
         

@@ -26,17 +26,42 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     {
         private IDisposable _containersToken;
         private IDisposable _currentStatusToken;
+        private IDisposable _allowRtnEditToken;
 
         protected override int FragmentId => Resource.Layout.fragment_routedetail;
         protected override bool NavMenuEnabled => true;
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
+            // Right now, we only have one context menu option avaliable for this view
+            // We'll have to change this if we add more options in the future
+            if(ViewModel.AllowRtnEdit.HasValue)
+                HasOptionsMenu = ViewModel.AllowRtnEdit.Value; 
+
             if (ViewModel.Containers != null)
                 LoadContainers(ViewModel.Containers);
 
+            _allowRtnEditToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnEdit, OnAllowRtnEditChanged);
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
             _currentStatusToken = ViewModel.WeakSubscribe(() => ViewModel.CurrentStatus, OnCurrentStatusChanged);
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            inflater.Inflate(Resource.Menu.routedetail_menu, menu);
+            base.OnCreateOptionsMenu(menu, inflater);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case Resource.Id.edit_rtn_nav:
+                    ViewModel.AddReturnToYardCommand.Execute();
+                    return true;
+                default:
+                    return base.OnOptionsItemSelected(item);
+            }
         }
 
         public override void OnDestroyView()
@@ -54,6 +79,18 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 _currentStatusToken.Dispose();
                 _currentStatusToken = null;
             }
+
+            if (_allowRtnEditToken != null)
+            {
+                _allowRtnEditToken.Dispose();
+                _allowRtnEditToken = null;
+            }
+        }
+
+        private void OnAllowRtnEditChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (ViewModel.AllowRtnEdit.HasValue)
+                HasOptionsMenu = ViewModel.AllowRtnEdit.Value;
         }
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)

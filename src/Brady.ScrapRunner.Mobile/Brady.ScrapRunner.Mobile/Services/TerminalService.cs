@@ -31,6 +31,11 @@ namespace Brady.ScrapRunner.Mobile.Services
             return terminalChanges;
         }
 
+        public async Task<List<TerminalChangeModel>> FindAllTerminalChanges()
+        {
+            return await _terminalChangeRepository.AllAsync();
+        }
+
         public Task UpdateTerminalChange(IEnumerable<TerminalChange> terminalChanges)
         {
             var mapped =

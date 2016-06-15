@@ -40,6 +40,7 @@
     <Compile Include="Converters\DateTimeValueConverter.cs" />
     <Compile Include="CustomLanguageBindingParser.cs" />
     <Compile Include="Enums\MenuFilterEnum.cs" />
+    <Compile Include="Enums\TerminalChangeEnum.cs" />
     <Compile Include="Helpers\ChangeSetExtensions.cs" />
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\ICodeTableService.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="ViewModels\FuelEntryViewModel.cs" />
     <Compile Include="ViewModels\LoadDropContainerViewModel.cs" />
     <Compile Include="ViewModels\MessagesViewModel.cs" />
+    <Compile Include="ViewModels\ModifyReturnToYardViewModel.cs" />
     <Compile Include="ViewModels\NewMessageViewModel.cs" />
     <Compile Include="ViewModels\NbScanViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

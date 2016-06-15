@@ -445,4 +445,20 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Are you back on duty? (Spanish)</value>
     <comment>NEEDS TRANSLATION; DelayViewModel</comment>
   </data>
+  <data name="ConfirmReturnToYardAdd" xml:space="preserve">
+    <value>You are about to add the following terminal as a Return To Yard segment :{0}{2}{1}{3}{1}{4}{0}Are you sure you want to add this?</value>
+    <comment>ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="ConfirmReturnToYardEdit" xml:space="preserve">
+    <value>You are about to change the Return To Yard Segment from :{0}{2}{1}{3}{1}{4}{0}To:{0}{5}{1}{6}{1}{7}{0}Are you sure you want to change this? ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="SelectYard" xml:space="preserve">
+    <value>Select A Yard ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="ConfirmLabel" xml:space="preserve">
+    <value>Confirm (Spanish)</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
 </root>

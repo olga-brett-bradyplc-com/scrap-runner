@@ -31,6 +31,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     {
         private IDisposable _containersToken;
         private IDisposable _currentTransactionToken;
+        private IDisposable _allowRtnAddToken;
         private ZXingScannerFragment _scannerFragment;
 
         protected override int FragmentId => Resource.Layout.fragment_transactionsummary;
@@ -49,14 +50,36 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
 
+            if (ViewModel.AllowRtnAdd.HasValue)
+                HasOptionsMenu = ViewModel.AllowRtnAdd.Value;
+
             if (ViewModel.Containers != null)
                 listGrouping.Adapter.ItemsSource = ViewModel.Containers;
 
+            _allowRtnAddToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnAdd, OnAllowRtnAddChanged);
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
 
             await Task.Delay(1000);
             Scan();
 
+        }
+        
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            inflater.Inflate(Resource.Menu.transactionsummary_menu, menu);
+            base.OnCreateOptionsMenu(menu, inflater);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case Resource.Id.add_rtn_nav:
+                    ViewModel.AddRtnYardCommand.Execute();
+                    return true;
+                default:
+                    return base.OnOptionsItemSelected(item);
+            }
         }
 
         public override void OnDestroyView()
@@ -122,6 +145,12 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 });
 
             }, MobileBarcodeScanningOptions.Default);
+        }
+
+        private void OnAllowRtnAddChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (ViewModel.AllowRtnAdd.HasValue)
+                HasOptionsMenu = ViewModel.AllowRtnAdd.Value;
         }
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)

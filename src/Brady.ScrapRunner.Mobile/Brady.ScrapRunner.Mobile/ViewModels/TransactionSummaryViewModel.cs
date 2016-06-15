@@ -21,10 +21,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class TransactionSummaryViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
+        private readonly IPreferenceService _preferenceService;
 
-        public TransactionSummaryViewModel(ITripService tripService)
+        public TransactionSummaryViewModel(ITripService tripService, IPreferenceService preferenceService)
         {
             _tripService = tripService;
+            _preferenceService = preferenceService;
             Title = AppResources.Transactions;
         }
 
@@ -58,6 +60,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentTransaction = Containers.FirstOrDefault().FirstOrDefault();
             }
 
+            // Is the user allowed to add a rtn segment?
+            // Rtn must not exist as last segment
+            var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
+            var doesRtnSegExistAtEnd = tripSegments.All(sg => sg.TripSegType != BasicTripTypeConstants.ReturnYard);
+            // User preference DEFAllowAddRT must be set to 'Y'
+            var defAllowAddRt = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAllowAddRT);
+
+            AllowRtnAdd = doesRtnSegExistAtEnd && Constants.Yes.Equals(defAllowAddRt);
+
             MenuFilter = MenuFilterEnum.OnTrip; // Make sure we reset in case coming back from transaction detail
 
             base.Start();
@@ -82,6 +93,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private IMvxCommand _confirmationSelectedCommand;
         public IMvxCommand ConfirmationSelectedCommand => _confirmationSelectedCommand ?? (_confirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand, CanExecuteConfirmationSelectedCommand));
 
+        private IMvxCommand _addRtnYardCommand;
+        public IMvxCommand AddRtnYardCommand => _addRtnYardCommand ?? (_addRtnYardCommand = new MvxCommand(ExecuteAddRtnYardCommand));
+
+        private void ExecuteAddRtnYardCommand()
+        {
+            ShowViewModel<ModifyReturnToYardViewModel>(
+                new {changeType = TerminalChangeEnum.Add, tripNumber = TripNumber});
+        }
+
         // Field bindings
         private TripSegmentContainerModel _currentTransaction;
         public TripSegmentContainerModel CurrentTransaction
@@ -93,6 +113,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 // Used for scanning and when to determine whether we can go to signature page
                 ConfirmationSelectedCommand.RaiseCanExecuteChanged();
             }
+        }
+
+        private bool? _allowRtnAdd;
+        public bool? AllowRtnAdd
+        {
+            get { return _allowRtnAdd; }
+            set { SetProperty(ref _allowRtnAdd, value); }
         }
 
         private string _tripNumber;

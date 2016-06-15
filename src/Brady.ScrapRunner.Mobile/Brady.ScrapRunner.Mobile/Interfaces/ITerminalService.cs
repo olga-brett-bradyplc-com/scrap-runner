@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
+using Brady.ScrapRunner.Mobile.Models;
 using BWF.DataServices.Metadata.Models;
 
 namespace Brady.ScrapRunner.Mobile.Interfaces
@@ -13,6 +14,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
     {
         Task<ChangeResultWithItem<TerminalChangeProcess>> FindTerminalChangesRemoteAsync(
             TerminalChangeProcess terminalChangeProcess);
+        Task<List<TerminalChangeModel>> FindAllTerminalChanges();
         Task UpdateTerminalChange(IEnumerable<TerminalChange> terminalChanges);
     }
 }

@@ -34,6 +34,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<TripModel> FindNextTripAsync();
 
+        Task<List<TripSegmentModel>> FindAllSegmentsForTripAsync(string tripNumber);
+
         Task<TripSegmentModel> FindTripSegmentInfoAsync(string tripNumber, string tripSegmentNumber);
 
         Task<List<TripSegmentModel>> FindNextTripSegmentsAsync(string tripNumber);
