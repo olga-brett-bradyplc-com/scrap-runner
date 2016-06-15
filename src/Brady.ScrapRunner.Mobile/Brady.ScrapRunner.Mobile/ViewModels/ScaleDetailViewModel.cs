@@ -204,7 +204,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private bool IsGrossWeightSet()
         {
-            return GrossTime == null;
+            return GrossTime != null;
         }
     }
 }

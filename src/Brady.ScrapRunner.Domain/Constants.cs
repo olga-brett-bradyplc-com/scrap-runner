@@ -129,7 +129,15 @@
         public static readonly string System = "S";
         public static readonly string User = "U";
     }
-
+    /// <summary>
+    /// Container Change internal codes
+    /// </summary>
+    public static class ContainerChangeConstants
+    {
+        public static readonly string Add = "A";
+        public static readonly string Delete = "D";
+        public static readonly string Modify = "C";
+    }
     /// <summary>
     /// The Container Contents internal codes.  Used in the ContainerMaster table.
     /// </summary>

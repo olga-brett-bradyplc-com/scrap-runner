@@ -168,14 +168,16 @@
         /// </summary>
         /// <param name="tripNumber"></param>
         /// <returns>bool</returns>
-        public async Task<bool> IsTripLegAcctTypeScale(string tripNumber)
+        public async Task<bool> IsTripLegTypePublicScale(string tripNumber)
         {
             var segment = await _tripSegmentRepository.AsQueryable()
                 .Where(ts =>
-                    ts.TripNumber == tripNumber)
+                    ts.TripNumber == tripNumber
+                    && (ts.TripSegStatus == TripSegStatusConstants.Pending ||
+                     ts.TripSegStatus == TripSegStatusConstants.Missed))
                 .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
 
-           return segment.TripSegType.Equals(BasicTripTypeConstants.Scale);
+            return segment?.TripSegType == BasicTripTypeConstants.Scale;
         }
 
         /// <summary>

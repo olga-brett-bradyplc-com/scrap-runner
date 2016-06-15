@@ -57,7 +57,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<int> CompleteTripSegmentAsync(string tripNumber, string tripSegNo);
 
-        Task<bool> IsTripLegAcctTypeScale(string tripNumber);
+        Task<bool> IsTripLegTypePublicScale(string tripNumber);
 
         Task<int> MarkExceptionTripAsync(string tripNumber);
 
