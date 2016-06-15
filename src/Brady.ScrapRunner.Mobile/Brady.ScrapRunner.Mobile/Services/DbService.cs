@@ -41,6 +41,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.DropTableAsync<CodeTableModel>();
             await asyncConnection.DropTableAsync<MessagesModel>();
             await asyncConnection.DropTableAsync<YardModel>();
+            await asyncConnection.DropTableAsync<TerminalChangeModel>();
 
             await asyncConnection.CreateTableAsync<ContainerMasterModel>();
             await asyncConnection.CreateTableAsync<CustomerDirectionsModel>();
@@ -57,18 +58,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.CreateTableAsync<MessagesModel>();
             await asyncConnection.CreateTableAsync<QueueItemModel>();
             await asyncConnection.CreateTableAsync<YardModel>();
-
-            //await asyncConnection.DeleteAllAsync<ContainerMasterModel>();
-            //await asyncConnection.DeleteAllAsync<CustomerDirectionsModel>();
-            //await asyncConnection.DeleteAllAsync<DriverStatusModel>();
-            //await asyncConnection.DeleteAllAsync<EmployeeMasterModel>();
-            //await asyncConnection.DeleteAllAsync<PowerMasterModel>();
-            //await asyncConnection.DeleteAllAsync<PreferenceModel>();
-            //await asyncConnection.DeleteAllAsync<TripModel>();
-            //await asyncConnection.DeleteAllAsync<TripSegmentModel>();
-            //await asyncConnection.DeleteAllAsync<TripSegmentContainerModel>();
-            //await asyncConnection.DeleteAllAsync<CustomerCommodityModel>();
-            //await asyncConnection.DeleteAllAsync<CustomerLocationModel>();
+            await asyncConnection.CreateTableAsync<TerminalChangeModel>();
         }
 
     }

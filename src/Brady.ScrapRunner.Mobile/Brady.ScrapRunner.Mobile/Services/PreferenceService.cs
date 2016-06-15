@@ -54,7 +54,6 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <returns></returns>
         public Task UpdatePreferences(IEnumerable<Preference> preferences)
         {
-
             var mapped =
                 AutoMapper.Mapper.Map<IEnumerable<Preference>, IEnumerable<PreferenceModel>>(
                     preferences);
