@@ -249,6 +249,23 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
 
                 // Retrieve container info from remote server and populate local DB
+                var containerChanges =
+                    await _containerService.FindContainerChangesRemoteAsync(new ContainerChangeProcess
+                    {
+                        EmployeeId = UserName
+                    });
+
+                if (containerChanges.WasSuccessful)
+                {
+                    if (containerChanges.Item?.Containers?.Count > 0)
+                        await _containerService.UpdateContainerChange(containerChanges.Item.Containers);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(containerChanges.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
 
                 // Retrieve terminal change info and populate local DB
                 var terminalChanges =

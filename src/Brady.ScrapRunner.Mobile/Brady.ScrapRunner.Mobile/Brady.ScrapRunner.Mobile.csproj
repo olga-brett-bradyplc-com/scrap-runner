@@ -65,6 +65,7 @@
     <Compile Include="Messages\LocationModelMessage.cs" />
     <Compile Include="MobileConstants.cs" />
     <Compile Include="Models\CodeTableModel.cs" />
+    <Compile Include="Models\ContainerChangeModel.cs" />
     <Compile Include="Models\CustomerCommodityModel.cs" />
     <Compile Include="Models\CustomerLocationModel.cs" />
     <Compile Include="Models\DriverStatusModel.cs" />
