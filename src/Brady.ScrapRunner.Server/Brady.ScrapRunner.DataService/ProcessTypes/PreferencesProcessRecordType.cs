@@ -118,7 +118,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     string userCulture = "en-GB";
                     IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
-                    // It appears, in the gernal case, I may need to backfill any additional user input values other than driverID.
+                    // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
                     PreferencesProcess backfillPreferencesProcess;
                     if (changeSet.Update.TryGetValue(key, out backfillPreferencesProcess))
@@ -131,6 +131,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Unable to process preferences for Driver ID " + preferencesProcess.EmployeeId));
                         break;
                     }
+
+                    ////////////////////////////////////////////////
+                    //PreferencesProcess has been called
+                    log.DebugFormat("SRTEST:PreferencesProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:PreferencesProcess Driver:{0}",
+                                     preferencesProcess.EmployeeId);
 
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster
@@ -151,14 +157,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     // Lookup preferences.  
                     var preferences = new List<Preference>();
                     preferences = Common.GetPreferenceByTerminal(dataService, settings, userCulture, userRoleIds,
-                                                  employeeMaster.TerminalId, out fault);
+                                  employeeMaster.TerminalId, out fault);
                     if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    log.Debug("SRTEST:PreferenceProcess - Employee");
-                    log.DebugFormat("SRTEST:EmployeeId:{0} TerminalId:{1} SecurityLevel:{2}",                                    employeeMaster.EmployeeId,
+                    log.DebugFormat("SRTEST:PreferenceProcess:EmployeeId:{0} TerminalId:{1} SecurityLevel:{2}",                                    employeeMaster.EmployeeId,
                                     employeeMaster.EmployeeId,
                                     employeeMaster.TerminalId,
                                     employeeMaster.SecurityLevel);
@@ -172,8 +177,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    log.Debug("SRTEST:PreferenceProcess - Terminal");
-                    log.DebugFormat("SRTEST:TerminalId:{0} TimeZoneFactor:{1} DaylightSavings:{2}",
+                    log.DebugFormat("SRTEST:PreferenceProcess:TerminalId:{0} TimeZoneFactor:{1} DaylightSavings:{2}",
                                     terminalMaster.TerminalId,
                                     terminalMaster.TimeZoneFactor,
                                     terminalMaster.DaylightSavings);
@@ -243,10 +247,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     preferencesProcess.Preferences = preferenceList;
                     //For testing
-                    log.Debug("SRTEST:PreferenceProcess - Preferences");
                     foreach (var preference in preferenceList)
                     {
-                        log.DebugFormat("SRTEST:TerminalId:{0} Parameter:{1} ParameterValue:{2}",
+                        log.DebugFormat("SRTEST:PreferenceProcess:TerminalId:{0} Parameter:{1} ParameterValue:{2}",
                                     preference.TerminalId,
                                     preference.Parameter,
                                     preference.ParameterValue);
