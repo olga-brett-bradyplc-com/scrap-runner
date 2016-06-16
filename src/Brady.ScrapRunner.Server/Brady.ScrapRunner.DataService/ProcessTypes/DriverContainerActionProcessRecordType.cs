@@ -124,6 +124,116 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //Validate the ActionType
+                    var actions = new List<string> {ContainerActionTypeConstants.Done,
+                                                    ContainerActionTypeConstants.Exception,
+                                                    ContainerActionTypeConstants.Review,
+                                                    ContainerActionTypeConstants.Load,
+                                                    ContainerActionTypeConstants.Dropped};
+                    if (!actions.Contains(driverContainerActionProcess.ActionType))
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid ActionType: "
+                                        + driverContainerActionProcess.ActionType));
+                        break;
+                    }
+                    ////////////////////////////////////////////////
+                    //DriverContainerActionProcess has been called
+                    log.DebugFormat("SRTEST:DriverContainerActionProcess Called by {0}", key);
+                    if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Load)
+                    {
+                        log.DebugFormat("SRTEST:DriverContainerActionProcess:LOAD Driver:{0} Container:{1} DT:{2} MethodOfEntry:{3}",
+                                         driverContainerActionProcess.EmployeeId, driverContainerActionProcess.ContainerNumber,
+                                         driverContainerActionProcess.ActionDateTime, driverContainerActionProcess.MethodOfEntry);
+                    }
+                    if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Dropped)
+                    {
+                        log.DebugFormat("SRTEST:DriverContainerActionProcess:DROPPED Driver:{0} Container:{1} DT:{2} MethodOfEntry:{3} Contents:{4} Lat:{5} Lon:{6}",
+                                         driverContainerActionProcess.EmployeeId, driverContainerActionProcess.ContainerNumber,
+                                         driverContainerActionProcess.ActionDateTime, driverContainerActionProcess.MethodOfEntry,
+                                         driverContainerActionProcess.ContainerContents, driverContainerActionProcess.Latitude,
+                                         driverContainerActionProcess.Longitude);
+                    }
+                    if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Done)
+                    {
+                        log.DebugFormat("SRTEST:DriverContainerActionProcess:DONE Driver:{0} Container:{1} DT:{2} MethodOfEntry:{3} Contents:{4} Lat:{5} Lon:{6}",
+                                         driverContainerActionProcess.EmployeeId, driverContainerActionProcess.ContainerNumber,
+                                         driverContainerActionProcess.ActionDateTime, driverContainerActionProcess.MethodOfEntry,
+                                         driverContainerActionProcess.ContainerContents, driverContainerActionProcess.Latitude,
+                                         driverContainerActionProcess.Longitude);
+                    }
+                    if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Review)
+                    {
+                        log.DebugFormat("SRTEST:DriverContainerActionProcess:REVIEW Driver:{0} Container:{1} DT:{2} MethodOfEntry:{3} Contents:{4} Lat:{5} Lon:{6} Code:{7} Desc:{8}",
+                                         driverContainerActionProcess.EmployeeId, driverContainerActionProcess.ContainerNumber,
+                                         driverContainerActionProcess.ActionDateTime, driverContainerActionProcess.MethodOfEntry,
+                                         driverContainerActionProcess.ContainerContents, driverContainerActionProcess.Latitude,
+                                         driverContainerActionProcess.Longitude, driverContainerActionProcess.ActionCode,
+                                         driverContainerActionProcess.ActionDesc);
+                    }
+                    if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Exception)
+                    {
+                        log.DebugFormat("SRTEST:DriverContainerActionProcess:EXCEPTION Driver:{0} Container:{1} DT:{2} MethodOfEntry:{3} Contents:{4} Lat:{5} Lon:{6} Code:{7} Desc:{8}",
+                                         driverContainerActionProcess.EmployeeId, driverContainerActionProcess.ContainerNumber,
+                                         driverContainerActionProcess.ActionDateTime, driverContainerActionProcess.MethodOfEntry,
+                                         driverContainerActionProcess.ContainerContents, driverContainerActionProcess.Latitude,
+                                         driverContainerActionProcess.Longitude, driverContainerActionProcess.ActionCode,
+                                         driverContainerActionProcess.ActionDesc);
+                    }
+                    ////////////////////////////////////////////////
+                    //Exceptions may not have a ContainerNumber. Otherwise it is required
+                    if (driverContainerActionProcess.ActionType != ContainerActionTypeConstants.Exception)
+                    {
+                        if (driverContainerActionProcess.ContainerNumber == null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("ContainerNumber is required for ActionType:"
+                                                              + driverContainerActionProcess.ActionType));
+                            break;
+                        }
+                        if (driverContainerActionProcess.MethodOfEntry == null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("MethodOfEntry is required for ActionType:"
+                                                              + driverContainerActionProcess.ActionType));
+                            break;
+                        }
+                        if (driverContainerActionProcess.MethodOfEntry != ContainerMethodOfEntry.Manual &&
+                            driverContainerActionProcess.MethodOfEntry != ContainerMethodOfEntry.Scanned)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid MethodOfEntry:"
+                                                              + driverContainerActionProcess.MethodOfEntry));
+                            break;
+                        }
+                    }
+
+                    ////////////////////////////////////////////////
+                    //Trip Number is required for Action Type:D=Done,E=Exception,R=Review.
+                    if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Done ||
+                        driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Exception ||
+                        driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Review)
+                    {
+                        if (driverContainerActionProcess.TripNumber == null ||
+                            driverContainerActionProcess.TripSegNumber == null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("TripNumber and TripSegNumber are required for ActionType:"
+                                                              + driverContainerActionProcess.ActionType));
+                            break;
+                        }
+                    }
+
+                    ////////////////////////////////////////////////
+                    //Action Code and Action Desc are required for Action Type:E=Exception,R=Review.
+                    if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Exception ||
+                        driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Review)
+                    {
+                        if (driverContainerActionProcess.ActionCode == null ||
+                            driverContainerActionProcess.ActionDesc == null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Action Code and Desc are required for ActionType:"
+                                                              + driverContainerActionProcess.ActionType));
+                            break;
+                        }
+                    }
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                          driverContainerActionProcess.EmployeeId, out fault);
@@ -138,6 +248,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         + driverContainerActionProcess.EmployeeId));
                         break;
                     }
+
                     ////////////////////////////////////////////////
                     // Get the PowerMaster record
                     var powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
@@ -153,6 +264,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         + driverContainerActionProcess.PowerId));
                         break;
                     }
+
                     /////////////////////////////////////////////////
                     //Split the processing into one of two functions:
                     //Load/drop action type
@@ -395,7 +507,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <returns></returns>
         public bool ContainerDone(IDataService dataService, ProcessChangeSetSettings settings,
            ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
-           DriverContainerActionProcess driverContainerActionProcess, EmployeeMaster employeeMaster, 
+           DriverContainerActionProcess driverContainerActionProcess, EmployeeMaster employeeMaster,
            int containerHistoryInsertCount)
         {
             DataServiceFault fault = null;
@@ -446,10 +558,49 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     driverContainerActionProcess.TripNumber + "-" + driverContainerActionProcess.TripSegNumber));
                 return false;
             }
+            if (currentTripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
+               currentTripSegment.TripSegType == BasicTripTypeConstants.Load)
+            { 
+                ////////////////////////////////////////////////////////
+                // Lookup Preference: DEFUseContainerLevel
+                string prefUseContainerLevel = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                               employeeMaster.TerminalId, PrefDriverConstants.DEFUseContainerLevel, out fault);
+                if (fault != null)
+                {
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                    return false;
+                }
+                if (prefUseContainerLevel == Constants.Yes)
+                {
+                    if(driverContainerActionProcess.ContainerLevel == null)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Container Level is required for: " +
+                            driverContainerActionProcess.ContainerNumber));
+                        return false;
+                    }
+                }
+            }
+            if (currentTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard)
+            {
+                if (driverContainerActionProcess.SetInYardFlag == null)
+                {
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("SetInYardFlag is required for: " +
+                        driverContainerActionProcess.ContainerNumber));
+                    return false;
+                }
+                if (driverContainerActionProcess.SetInYardFlag != Constants.Yes &&
+                    driverContainerActionProcess.SetInYardFlag != Constants.No)
+                {
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid SetInYardFlag for: " +
+                        driverContainerActionProcess.ContainerNumber));
+                    return false;
+                }
+            }
+
             ////////////////////////////////////////////////
             //Get a list of all containers for the segment
             var tripSegContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
-                                       driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber, out fault);
+                                    driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber, out fault);
             if (null != fault)
             {
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));

@@ -125,6 +125,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         + driverArriveProcess.EmployeeId));
                         break;
                     }
+                    ////////////////////////////////////////////////
+                    //DriverArriveProcess has been called
+                    log.DebugFormat("SRTEST:DriverArriveProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:DriverArriveProcess Driver:{0} Trip:{1} Seg:{2} DT:{3} PowerId:{4} Odom:{5} GPSAuto:{6} Lat:{7} Lon:{8} MDT:{9}",
+                                     driverArriveProcess.EmployeeId, driverArriveProcess.TripNumber,
+                                     driverArriveProcess.TripSegNumber, driverArriveProcess.ActionDateTime,
+                                     driverArriveProcess.PowerId, driverArriveProcess.Odometer,
+                                     driverArriveProcess.GPSAutoFlag, driverArriveProcess.Latitude,
+                                     driverArriveProcess.Longitude, driverArriveProcess.Mdtid);
 
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
@@ -166,6 +175,29 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         driverArriveProcess.TripNumber);
                         break;
                     }
+
+                    ////////////////////////////////////////////////////////
+                    //If the MDTId is not provided by the mobile app, build it using the MDT Prefix (if it exists) plus the employee id.
+                    if (driverArriveProcess.Mdtid == null)
+                    {
+                        // Lookup Preference: DEFMDTPrefix
+                        string prefMDTPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                      Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
+                        if (fault != null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        driverArriveProcess.Mdtid = prefMDTPrefix + driverArriveProcess.EmployeeId;
+                    }
+
+                    ////////////////////////////////////////////////
+                    // If the GPS Auto flag is not provided default it to N
+                    if (driverArriveProcess.GPSAutoFlag == null)
+                    {
+                        driverArriveProcess.GPSAutoFlag = Constants.No;
+                    }
+
                     ////////////////////////////////////////////////
                     // Get the PowerMaster record
                     var powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,

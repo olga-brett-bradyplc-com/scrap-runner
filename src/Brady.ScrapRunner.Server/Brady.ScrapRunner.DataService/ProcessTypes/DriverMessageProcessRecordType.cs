@@ -120,11 +120,19 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             + driverMessageProcess.EmployeeId));
                         break;
                     }
+                    ////////////////////////////////////////////////
+                    //DriverMessageProcess has been called
+                    log.DebugFormat("SRTEST:DriverMessageProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:DriverMessageProcess Driver:{0} DT:{1} SenderId:{2} ReceiverId:{3} MessageId:{4} Thread:{5}",
+                                     driverMessageProcess.EmployeeId, driverMessageProcess.ActionDateTime,
+                                     driverMessageProcess.SenderId, driverMessageProcess.ReceiverId,
+                                     driverMessageProcess.MessageId, driverMessageProcess.MessageThread);
+
 
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
-                                         driverMessageProcess.EmployeeId, out fault);
+                                    driverMessageProcess.EmployeeId, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -254,6 +262,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             DataServiceFault fault = null;
 
+            if (driverMessageProcess.ReceiverId == null)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("ReceiverId is required from Driver: "
+                                + driverMessageProcess.EmployeeId));
+                return false;
+            }
             var receiverEmpMaster = Common.GetEmployeeMaster(dataService, settings, userCulture, userRoleIds,
                                  driverMessageProcess.ReceiverId, out fault);
             if (null != fault)
@@ -267,13 +281,30 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 + driverMessageProcess.ReceiverId));
                 return false;
             }
+            if (driverMessageProcess.ActionDateTime == null)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("ActionDateTime is required from Driver: "
+                                + driverMessageProcess.EmployeeId));
+                return false;
+            }
+            if (driverMessageProcess.MessageText == null)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("MessageText is required from Driver: "
+                                + driverMessageProcess.EmployeeId));
+                return false;
+            }
+            if (driverMessageProcess.UrgentFlag == null)
+            {
+                driverMessageProcess.UrgentFlag = Constants.No;
+            }
 
             ////////////////////////////////////////////////
             // Process the Message record
             var newMessage = new Messages();
+
             newMessage.MsgId = 0;
             newMessage.TerminalId = employeeMaster.TerminalId;
-            newMessage.CreateDateTime = driverMessageProcess.ActionDateTime;
+            newMessage.CreateDateTime = (DateTime)driverMessageProcess.ActionDateTime;
             newMessage.SenderId = driverMessageProcess.EmployeeId;
             newMessage.SenderName = Common.GetEmployeeName(employeeMaster);
             newMessage.ReceiverId = driverMessageProcess.ReceiverId;

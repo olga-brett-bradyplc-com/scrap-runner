@@ -127,6 +127,16 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //DriverEnrouteProcess has been called
+                    log.DebugFormat("SRTEST:DriverEnrouteProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:DriverEnrouteProcess Driver:{0} Trip:{1} Seg:{2} DT:{3} PowerId:{4} Odom:{5} GPSAuto:{6} Lat:{7} Lon:{8} MDT:{9}",
+                                     driverEnrouteProcess.EmployeeId, driverEnrouteProcess.TripNumber,
+                                     driverEnrouteProcess.TripSegNumber, driverEnrouteProcess.ActionDateTime,
+                                     driverEnrouteProcess.PowerId, driverEnrouteProcess.Odometer,
+                                     driverEnrouteProcess.GPSAutoFlag, driverEnrouteProcess.Latitude,
+                                     driverEnrouteProcess.Longitude,driverEnrouteProcess.Mdtid);
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   driverEnrouteProcess.EmployeeId, out fault);
@@ -167,10 +177,32 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
+                    ////////////////////////////////////////////////////////
+                    //If the MDTId is not provided by the mobile app, build it using the MDT Prefix (if it exists) plus the employee id.
+                    if (driverEnrouteProcess.Mdtid == null)
+                    {
+                        // Lookup Preference: DEFMDTPrefix
+                        string prefMDTPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                      Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
+                        if (fault != null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        driverEnrouteProcess.Mdtid = prefMDTPrefix + driverEnrouteProcess.EmployeeId;                        
+                    }
+
+                    ////////////////////////////////////////////////
+                    // If the GPS Auto flag is not provided default it to N
+                    if (driverEnrouteProcess.GPSAutoFlag == null)
+                    {
+                        driverEnrouteProcess.GPSAutoFlag = Constants.No;
+                    }
+
                     ////////////////////////////////////////////////
                     // Get the PowerMaster record
                     var powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
-                                      driverEnrouteProcess.PowerId, out fault);
+                                    driverEnrouteProcess.PowerId, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -313,7 +345,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                             //Do the update
                             changeSetResult = Common.UpdateContainerMaster(dataService, settings, containerMaster);
-                            log.DebugFormat("SRTEST:Saving ContainerMaster Record for ContainerNumber:{0} - Enroute.",
+                            log.DebugFormat("SRTEST:DriverEnrouteProcess:Saving ContainerMaster Record for ContainerNumber:{0} - Enroute.",
                                             containerOnPowerId.ContainerNumber);
                             if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
                             {
@@ -386,7 +418,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                             //Do the update
                             changeSetResult = Common.UpdateTripSegmentContainer(dataService, settings, tripSegmentContainer);
-                            log.DebugFormat("SRTEST:Saving TripSegmentContainerRecord for ContainerNumber:{0} - Enroute.",
+                            log.DebugFormat("SRTEST:DriverEnrouteProcess:Saving TripSegmentContainerRecord for ContainerNumber:{0} - Enroute.",
                                             tripSegmentContainer.TripSegContainerNumber);
                             if (Common.LogChangeSetFailure(changeSetResult, tripSegmentContainer, log))
                             {
@@ -445,7 +477,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     //Do the update
                     changeSetResult = Common.UpdateTripSegment(dataService, settings, currentTripSegment);
-                    log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Enroute.",
+                    log.DebugFormat("SRTEST:DriverEnrouteProcess:Saving TripSegment Record for Trip:{0}-{1} - Enroute.",
                                     currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
                     if (Common.LogChangeSetFailure(changeSetResult, currentTripSegment, log))
                     {
@@ -490,7 +522,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                             //Do the update
                             changeSetResult = Common.UpdateTripSegment(dataService, settings, previousTripSegment);
-                            log.DebugFormat("SRTEST:Saving previous TripSegment Record for Trip:{0}-{1} - Enroute.",
+                            log.DebugFormat("SRTEST:DriverEnrouteProcess:Saving previous TripSegment Record for Trip:{0}-{1} - Enroute.",
                                             previousTripSegment.TripNumber, previousTripSegment.TripSegNumber);
                             if (Common.LogChangeSetFailure(changeSetResult, previousTripSegment, log))
                             {
@@ -514,7 +546,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         {
                             //Do the delete. Deleting records with composite keys is now fixed.
                             changeSetResult = Common.DeleteTripSegmentMileage(dataService, settings, oldTripSegmentMileage);
-                            log.DebugFormat("SRTEST:Deleting TripSegmentMileage Record for Trip:{0}-{1} Seq:{2}- Enroute.",
+                            log.DebugFormat("SRTEST:DriverEnrouteProcess:Deleting TripSegmentMileage Record for Trip:{0}-{1} Seq:{2}- Enroute.",
                                             oldTripSegmentMileage.TripNumber, oldTripSegmentMileage.TripSegNumber,
                                             oldTripSegmentMileage.TripSegMileageSeqNumber);
                             if (Common.LogChangeSetFailure(changeSetResult, oldTripSegmentMileage, log))
@@ -543,7 +575,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         //If there is no open-ended mileage record, add a one with just a start odometer.
                         //Pass in false to not update ending odometer. 
-                        log.DebugFormat("SRTEST:Adding TripSegmentMileage Record for Trip:{0}-{1} - Enroute.",
+                        log.DebugFormat("SRTEST:DriverEnrouteProcess:Adding TripSegmentMileage Record for Trip:{0}-{1} - Enroute.",
                                         driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber);
                         if(!Common.InsertTripSegmentMileage(dataService, settings, userRoleIds, userCulture, log,
                             currentTripSegment, containersOnPowerId, false, ++tripSegmentMileageCount, out fault))
@@ -558,7 +590,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //Do the update
                         changeSetResult = Common.UpdateTripSegmentMileageFromSegment
                             (dataService, settings, tripSegmentMileage, currentTripSegment, containersOnPowerId);
-                        log.DebugFormat("SRTEST:Saving TripSegmentMileage Record for Trip:{0}-{1} - Enroute.",
+                        log.DebugFormat("SRTEST:DriverEnrouteProcess:Saving TripSegmentMileage Record for Trip:{0}-{1} - Enroute.",
                                         driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber);
                         if (Common.LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
                         {
@@ -640,7 +672,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     //Do the update
                     changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
-                    log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Enroute.",
+                    log.DebugFormat("SRTEST:DriverEnrouteProcess:Saving Trip Record for Trip:{0} - Enroute.",
                                     currentTrip.TripNumber);
                     if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
                     {
@@ -688,7 +720,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     //Do the update
                     changeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
-                    log.DebugFormat("SRTEST:Saving DriverStatus Record for DriverId:{0} - Enroute.",
+                    log.DebugFormat("SRTEST:DriverEnrouteProcess:Saving DriverStatus Record for DriverId:{0} - Enroute.",
                                     driverStatus.EmployeeId);
                     if (Common.LogChangeSetFailure(changeSetResult, driverStatus, log))
                     {
@@ -723,7 +755,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     //Do the update
                     changeSetResult = Common.UpdatePowerMaster(dataService, settings, powerMaster);
-                    log.DebugFormat("SRTEST:Saving PowerMaster Record for PowerId:{0} - Enroute.",
+                    log.DebugFormat("SRTEST:DriverEnrouteProcess:Saving PowerMaster Record for PowerId:{0} - Enroute.",
                                     driverEnrouteProcess.PowerId);
                     if (Common.LogChangeSetFailure(changeSetResult, powerMaster, log))
                     {
@@ -764,7 +796,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         //Do the update
                         changeSetResult = Common.UpdateCustomerMaster(dataService, settings, originCustomerMaster);
-                        log.DebugFormat("SRTEST:Saving CustomerMaster Record for CustHostCode:{0} - Enroute.",
+                        log.DebugFormat("SRTEST:DriverEnrouteProcess:Saving CustomerMaster Record for CustHostCode:{0} - Enroute.",
                                         currentTripSegment.TripSegOrigCustHostCode);
                         if (Common.LogChangeSetFailure(changeSetResult, originCustomerMaster, log))
                         {
@@ -819,7 +851,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ChangeSetResult<int> eventChangeSetResult;
                     eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
-                    log.Debug("SRTEST:Saving EventLog Record - Enroute");
+                    log.Debug("SRTEST:DriverEnrouteProcess:Saving EventLog Record - Enroute");
                     //Check for EventLog failure.
                     if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
                     {
@@ -850,12 +882,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedDeletions.Any())
             {
                 transaction.Rollback();
-                log.Debug("SRTEST:Transaction Rollback - Enroute");
+                log.Debug("SRTEST:DriverEnrouteProcess:Transaction Rollback - Enroute");
             }
             else
             {
                 transaction.Commit();
-                log.Debug("SRTEST:Transaction Committed - Enroute");
+                log.Debug("SRTEST:DriverEnrouteProcess:Transaction Committed - Enroute");
                 // We need to notify that data has changed for any types we have updated
                 // We always need to notify for the current type
                 dataService.NotifyOfExternalChangesToData();

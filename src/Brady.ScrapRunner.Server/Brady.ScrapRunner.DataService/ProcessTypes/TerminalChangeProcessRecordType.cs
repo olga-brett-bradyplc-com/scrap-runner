@@ -120,6 +120,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //TerminalChangeProcess has been called
+                    log.DebugFormat("SRTEST:TerminalChangeProcess Called by {0}",key);
+                    log.DebugFormat("SRTEST:TerminalChangeProcess Driver:{0} ContainerLastActionDateTime:{1}",
+                                     terminalsProcess.EmployeeId, terminalsProcess.LastTerminalChangeUpdate);
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   terminalsProcess.EmployeeId, out fault);
@@ -245,18 +251,20 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Set the return values
 
                     //Now using log4net.ILog implementation to test results of query.
-                    log.Debug("SRTEST:TerminalChangeProcess");
-                    foreach (var item in terminalChangeList)
-                    {
-                        log.DebugFormat("SRTEST:TerminalId:{0} RegionId:{1} Yard:{2} {3} ChgDateTime:{4} ChgActionFlag:{5}",
-                                        item.TerminalId,
-                                        item.RegionId,
-                                        item.CustHostCode,
-                                        item.CustName,
-                                        item.ChgDateTime,
-                                        item.ChgActionFlag);
-                    }
-                   ////////////////////////////////////////////////
+                    log.DebugFormat("SRTEST:TerminalChangeProcess sending {0} terminals.",
+                                     terminalChangeList.Count());
+                   // foreach (var item in terminalChangeList)
+                   // {
+                   //     log.DebugFormat("SRTEST:TerminalChangeProcess:TerminalId:{0} RegionId:{1} Yard:{2} {3} ChgDateTime:{4} ChgActionFlag:{5}",
+                   //                     item.TerminalId,
+                   //                     item.RegionId,
+                   //                     item.CustHostCode,
+                   //                     item.CustName,
+                   //                     item.ChgDateTime,
+                   //                     item.ChgActionFlag);
+                   // }
+
+                    ////////////////////////////////////////////////
                     //Now update the TerminalMasterDateTime in the DriverStatus record
                     //If there is no record yet, I guess we will have to add one.
                     var driverStatus = Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
@@ -292,7 +300,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
                     {
-                        var s = string.Format("Could not update DriverStatus for Driver {0}.",
+                        var s = string.Format("TerminalChangeProcess:Update DriverStatus failed for Driver {0}.",
                                                 terminalsProcess.EmployeeId);
                         scratchChangeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
@@ -311,10 +319,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedDeletions.Any())
             {
                 transaction.Rollback();
+                log.Debug("SRTEST:TerminalChangeProcess:Transaction Rollback - Teriminal Updates");
             }
             else
             {
                 transaction.Commit();
+                log.Debug("SRTEST:TerminalChangeProcess:Transaction Committed - Teriminal Updates");
                 // We need to notify that data has changed for any types we have updated
                 // We always need to notify for the current type
                 dataService.NotifyOfExternalChangesToData();

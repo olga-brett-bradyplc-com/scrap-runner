@@ -274,8 +274,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 containerSeqNo = containerHistoryMax.ContainerSeqNumber + callCountThisTxn;
             }
             //For testing
-            log.Debug("SRTEST:Add ContainerHistory");
-            log.DebugFormat("SRTEST:ContainerNumber:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add ContainerHistory:ContainerNumber:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
                              containerMaster.ContainerNumber,
                              containerMaster.ContainerCurrentTripNumber,
                              containerMaster.ContainerCurrentTripSegNumber,
@@ -533,8 +532,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
 
             //For testing
-            log.Debug("SRTEST:Add DriverDelay");
-            log.DebugFormat("SRTEST:DriverId:{0} TripNumber:{1}-{2} StartDate:{3} DelayCode:{4} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add DriverDelay:DriverId:{0} TripNumber:{1}-{2} StartDate:{3} DelayCode:{4} Seq#:{5}",
                              driverDelay.DriverId,
                              driverDelay.TripNumber,
                              driverDelay.TripSegNumber,
@@ -746,8 +744,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 driverSeqNo = driverHistoryMax.DriverSeqNumber + callCountThisTxn;
             }
             //For testing
-            log.Debug("SRTEST:Add DriverHistory");
-            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add DriverHistory:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
                              driverStatus.EmployeeId,
                              driverStatus.TripNumber,
                              driverStatus.TripSegNumber,
@@ -921,8 +918,7 @@ namespace Brady.ScrapRunner.DataService.Util
             List<long> userRoleIds = userRoleIdsEnumerable.ToList();
 
             //For testing
-            log.Debug("SRTEST:Add Message");
-            log.DebugFormat("SRTEST:Sender:{0}-{1} Receiver:{2}-{3} Msg:{4}",
+            log.DebugFormat("SRTEST:Add Message:Sender:{0}-{1} Receiver:{2}-{3} Msg:{4}",
                              message.SenderId,
                              message.SenderName,
                              message.ReceiverId,
@@ -980,8 +976,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
               
             //For testing
-            log.Debug("SRTEST:Add PowerFuel");
-            log.DebugFormat("SRTEST:PowerId:{0} TripNumber:{1}-{2} Date:{3} State:{4} Amt:{5} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add PowerFuel:PowerId:{0} TripNumber:{1}-{2} Date:{3} State:{4} Amt:{5} Seq#:{5}",
                              powerFuel.PowerId,
                              powerFuel.TripNumber,
                              powerFuel.TripSegNumber,
@@ -1041,8 +1036,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 powerSeqNo = powerHistoryMax.PowerSeqNumber + callCountThisTxn;
             }
             //For testing
-            log.Debug("SRTEST:Add PowerHistory");
-            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add PowerHistory:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
                              powerMaster.PowerDriverId,
                              powerMaster.PowerCurrentTripNumber,
                              powerMaster.PowerCurrentTripSegNumber,
@@ -1615,8 +1609,7 @@ namespace Brady.ScrapRunner.DataService.Util
             tripSegmentMileage.TripSegMileageDriverName = tripSegment.TripSegDriverName;
             
             //For testing
-            log.Debug("SRTEST:Add TripSegmentMileage");
-            log.DebugFormat("SRTEST:TripNumber:{0} Seg:{1} Start:{2} End:{3} State:{4} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add TripSegmentMileage:TripNumber:{0} Seg:{1} Start:{2} End:{3} State:{4} Seq#:{5}",
                              tripSegmentMileage.TripNumber,
                              tripSegmentMileage.TripSegNumber,
                              tripSegmentMileage.TripSegMileageOdometerStart,
@@ -2305,7 +2298,46 @@ namespace Brady.ScrapRunner.DataService.Util
             codeTableEntry = queryResult.Records.Cast<CodeTable>().FirstOrDefault();
             return codeTableEntry;
         }
- 
+        /// CODETABLE Table queries
+        /// <summary>
+        /// Get a single codetable record for a given state and country code
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="codeName"></param>
+        /// <param name="state"></param>
+        /// <param name="country"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static CodeTable GetCodeTableEntryForStateCountry(IDataService dataService, ProcessChangeSetSettings settings,
+            string userCulture, IEnumerable<long> userRoleIds, string codeName, string state, string country, out DataServiceFault fault)
+        {
+            fault = null;
+            var codeTableEntry = new CodeTable();
+            if (null != state && null != country)
+            {
+                codeName += country;
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<CodeTable>()
+                        .Filter(y => y.Property(x => x.CodeName).EqualTo(codeName)
+                        .And(x => x.CodeValue).EqualTo(state)
+                        .And(x => x.CodeDisp2).EqualTo(country))
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return codeTableEntry;
+                }
+                codeTableEntry = queryResult.Records.Cast<CodeTable>().FirstOrDefault();
+            }
+            return codeTableEntry;
+        }
+
+
         /// COMMODITYMASTER Table queries
         /// <summary>
         /// Get a list of all commodities with the universal flag set to Y.
