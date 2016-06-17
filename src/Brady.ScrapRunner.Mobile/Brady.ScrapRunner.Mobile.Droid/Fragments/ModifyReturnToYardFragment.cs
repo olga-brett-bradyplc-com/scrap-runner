@@ -14,12 +14,11 @@ using MvvmCross.Droid.Shared.Attributes;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame)]
+    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame, true)]
     [Register("brady.scraprunner.mobile.droid.fragments.ModifyReturnToYardFragment")]
     public class ModifyReturnToYardFragment : BaseFragment<ModifyReturnToYardViewModel>
     {
         protected override int FragmentId => Resource.Layout.fragment_modifyreturntoyard;
-
         protected override bool NavMenuEnabled => false;
     }
 }

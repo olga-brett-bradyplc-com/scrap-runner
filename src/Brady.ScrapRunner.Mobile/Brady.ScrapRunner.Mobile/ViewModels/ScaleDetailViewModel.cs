@@ -35,7 +35,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripSegNumber = tripSegNumber;
             TripSegContainerSeqNumber = tripSegContainerSeqNumber;
             TripSegContainerNumber = tripSegContainerNumber;
-            SubTitle = $"Trip {TripNumber}";
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
         }
 
         public override async void Start()

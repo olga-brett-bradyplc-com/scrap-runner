@@ -72,12 +72,15 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            var baseActivity = ((MainActivity)Activity);
             switch (item.ItemId)
             {
                 case Resource.Id.add_rtn_nav:
+                    baseActivity.CloseOptionsMenu();
                     ViewModel.AddRtnYardCommand.Execute();
                     return true;
                 default:
+                    baseActivity.CloseOptionsMenu();
                     return base.OnOptionsItemSelected(item);
             }
         }

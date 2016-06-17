@@ -28,8 +28,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             _navigationView.SetNavigationItemSelectedListener(this);
 
             _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(false);
-            _navigationView.Menu.FindItem(Resource.Id.nav_changereturnyard).SetVisible(false);
-            _navigationView.Menu.FindItem(Resource.Id.nav_addreturnyard).SetVisible(false);
             _navigationView.Menu.FindItem(Resource.Id.nav_unabletoprocess).SetVisible(false);
 
             return view;

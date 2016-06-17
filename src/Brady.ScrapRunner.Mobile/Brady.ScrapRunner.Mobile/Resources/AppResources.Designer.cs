@@ -523,6 +523,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New Segment Successfully Created.
+        /// </summary>
+        public static string NewSegmentCreated {
+            get {
+                return ResourceManager.GetString("NewSegmentCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Next Stage.
         /// </summary>
         public static string NextStageLabel {
@@ -640,6 +649,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Performing this action will complete this trip. {0} Are you sure you want to do this?.
+        /// </summary>
+        public static string PerformActionLabel {
+            get {
+                return ResourceManager.GetString("PerformActionLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Photos.
         /// </summary>
         public static string Photos {
@@ -744,6 +762,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string SecondGrossWeight {
             get {
                 return ResourceManager.GetString("SecondGrossWeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trip Segment Successfully Updated!.
+        /// </summary>
+        public static string SegmentUpdated {
+            get {
+                return ResourceManager.GetString("SegmentUpdated", resourceCulture);
             }
         }
         

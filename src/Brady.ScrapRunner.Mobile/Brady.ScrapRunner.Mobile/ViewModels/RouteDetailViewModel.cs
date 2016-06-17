@@ -62,7 +62,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     _custHostCode = trip.TripCustHostCode;
                     Title = trip.TripTypeDesc;
-                    SubTitle = AppResources.Trip + $" {trip.TripNumber}";
+                    SubTitle = $"{AppResources.Trip} {trip.TripNumber}";
                     TripType = trip.TripType;
                     TripFor = trip.TripCustName;
 
@@ -81,7 +81,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             // Is the user allowed to edit a rty segment?
             // Rtn must already exist as a segment
             var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
-            var doesRtnSegExist = tripSegments.Any(sg => sg.TripSegType == BasicTripTypeConstants.ReturnYard);
+            var doesRtnSegExist = tripSegments.Any(sg => sg.TripSegType == BasicTripTypeConstants.ReturnYard || sg.TripSegType == BasicTripTypeConstants.ReturnYardNC);
             // User preference DEFAllowAddRT must be set to 'Y'
             var defAllowChangeRt = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAllowChangeRT);
 
@@ -302,46 +302,50 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             AppResources.Error, AppResources.OK);
                     }
 
-                    if (await _tripService.IsTripLegTransactionAsync(TripNumber))
-                    {
+                    if (_tripService.IsTripLegTransactionAsync(Containers.First().Key))
                         NextActionLabel = AppResources.Transactions;
-                    }
-                    else if (await _tripService.IsTripLegScaleAsync(TripNumber))
-                    {
+                    else if (_tripService.IsTripLegScaleAsync(Containers.First().Key))
                         NextActionLabel = AppResources.YardScaleLabel;
-                    }
-                    else if (await _tripService.IsTripLegNoScreenAsync(TripNumber))
-                    {
+                    else if (_tripService.IsTripLegNoScreenAsync(Containers.First().Key))
                         NextActionLabel = AppResources.FinishTripLabel;
-                    }
                 }
             }
         }
 
         private async Task ExecuteNextStageCommandAsync()
         {
-            if (await _tripService.IsTripLegTransactionAsync(TripNumber))
+            if (_tripService.IsTripLegTransactionAsync(Containers.First().Key))
             {
                 Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
-            else if (await _tripService.IsTripLegScaleAsync(TripNumber))
+            else if (_tripService.IsTripLegScaleAsync(Containers.First().Key))
             {
                 Close(this);
 
-                if (await _tripService.IsTripLegTypePublicScale(TripNumber))
+                if (_tripService.IsTripLegTypePublicScale(Containers.First().Key))
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
                 else
                     ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
             }
-            else if (await _tripService.IsTripLegNoScreenAsync(TripNumber))
+            else if (_tripService.IsTripLegNoScreenAsync(Containers.First().Key))
             {
-                Close(this);
-                foreach (var groupings in Containers)
-                    await _tripService.CompleteTripSegmentAsync(TripNumber, groupings.Key.TripSegNumber);
+                var message = string.Format(AppResources.PerformActionLabel, "\n\n");
+                var confirm =
+                    await
+                        UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes,
+                            AppResources.No);
 
-                await _tripService.CompleteTripAsync(TripNumber);
-                ShowViewModel<RouteSummaryViewModel>();
+                if (confirm)
+                {
+                    foreach (var groupings in Containers)
+                        await _tripService.CompleteTripSegmentAsync(TripNumber, groupings.Key.TripSegNumber);
+
+                    await _tripService.CompleteTripAsync(TripNumber);
+
+                    Close(this);
+                    ShowViewModel<RouteSummaryViewModel>();
+                }
             }
         }
     }

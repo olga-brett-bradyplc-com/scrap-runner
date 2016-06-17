@@ -54,12 +54,15 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
+            var baseActivity = ((MainActivity) Activity);
             switch (item.ItemId)
             {
                 case Resource.Id.edit_rtn_nav:
+                    baseActivity.CloseOptionsMenu();
                     ViewModel.AddReturnToYardCommand.Execute();
                     return true;
                 default:
+                    baseActivity.CloseOptionsMenu();
                     return base.OnOptionsItemSelected(item);
             }
         }
@@ -155,23 +158,31 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 tempTitle.Text = element.Key.TripSegTypeDesc;
                 tempTitle.Id = 1; // Kind of a hacky way to do this.
 
-                // We'd use a listview for this usually, but since we're mocking our collapsable lists ( not implemented in prototype ),
-                // only show the first TripSegmentContainer for each TripSegment
-                var firstTripSegmentContainer = element.First();
+                if (element.FirstOrDefault() == null)
+                {
+                    var tempType = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerTypeText);
+                    tempType.Text = "NO CONTAINERS";
+                }
+                else
+                {
+                    // We'd use a listview for this usually, but since we're mocking our collapsable lists ( not implemented in prototype ),
+                    // only show the first TripSegmentContainer for each TripSegment
+                    var firstTripSegmentContainer = element.First();
 
-                var tempType = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerTypeText);
-                tempType.Text = firstTripSegmentContainer.DefaultTripSegContainerNumber +
-                    " " + firstTripSegmentContainer.TripSegContainerType +
-                    "-" + firstTripSegmentContainer.TripSegContainerSize;
-                tempType.Id = 2;
+                    var tempType = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerTypeText);
+                    tempType.Text = firstTripSegmentContainer.DefaultTripSegContainerNumber +
+                        " " + firstTripSegmentContainer.TripSegContainerType +
+                        "-" + firstTripSegmentContainer.TripSegContainerSize;
+                    tempType.Id = 2;
 
-                var tempCommodity = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerCommodityDescText);
-                tempCommodity.Text = firstTripSegmentContainer.TripSegContainerCommodityDesc;
-                tempCommodity.Id = 3;
+                    var tempCommodity = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerCommodityDescText);
+                    tempCommodity.Text = firstTripSegmentContainer.TripSegContainerCommodityDesc;
+                    tempCommodity.Id = 3;
 
-                var tempLocation = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContianerLocationText);
-                tempLocation.Text = firstTripSegmentContainer.TripSegContainerLocation;
-                tempLocation.Id = 4;
+                    var tempLocation = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContianerLocationText);
+                    tempLocation.Text = firstTripSegmentContainer.TripSegContainerLocation;
+                    tempLocation.Id = 4;
+                }
             }
         }
     }

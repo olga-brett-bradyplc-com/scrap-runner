@@ -3,6 +3,7 @@ using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
+using MvvmCross.Core.Platform;
 
 namespace Brady.ScrapRunner.Mobile.Interfaces
 {
@@ -20,11 +21,17 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<ChangeResultWithItem<TripInfoProcess>> FindTripsRemoteAsync(TripInfoProcess tripInfoProcess);
 
-        Task<bool> IsTripLegTransactionAsync(string tripNumber);
+        bool IsTripLegTransactionAsync(TripSegmentModel tripSegment);
 
-        Task<bool> IsTripLegScaleAsync(string tripNumber);
+        bool IsTripLegScaleAsync(TripSegmentModel tripSegmentContainer);
 
-        Task<bool> IsTripLegNoScreenAsync(string tripNumber);
+        bool IsTripLegNoScreenAsync(TripSegmentModel tripSegmentContainer);
+
+        bool IsTripLegTypePublicScale(TripSegmentModel tripSegmentContainer);
+
+        bool IsContainerDropped(TripSegmentModel tripSegment);
+
+        bool IsContainerLoaded(TripSegmentModel tripSegment);
 
         Task<bool> IsTripSequenceEnforcedAsync();
 
@@ -35,6 +42,9 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<TripModel> FindNextTripAsync();
 
         Task<List<TripSegmentModel>> FindAllSegmentsForTripAsync(string tripNumber);
+
+        Task<List<TripSegmentContainerModel>> FindAllContainersForTripSegmentAsync(string tripNumber,
+            string tripSegNumber);
 
         Task<TripSegmentModel> FindTripSegmentInfoAsync(string tripNumber, string tripSegmentNumber);
 
@@ -57,8 +67,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<int> CompleteTripSegmentAsync(string tripNumber, string tripSegNo);
 
-        Task<bool> IsTripLegTypePublicScale(string tripNumber);
-
         Task<int> MarkExceptionTripAsync(string tripNumber);
 
         Task<int> MarkExceptionTripSegmentAsync(string tripNumber, string tripSegNo);
@@ -68,5 +76,10 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<YardModel> FindYardInfo(string terminalId);
 
+        Task<int> CreateTripSegmentAsync(TripSegmentModel tripSegment);
+
+        Task<int> UpdateTripSegmentAsync(TripSegmentModel tripSegment);
+
+        Task<int> CreateTripSegmentContainerAsync(TripSegmentContainerModel tripSegmentContainer);
     }
 }

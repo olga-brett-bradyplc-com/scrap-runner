@@ -495,4 +495,16 @@ You will now be sent back to the login.</value>
     <value>Confirm</value>
     <comment>ModifyReturnToYardViewModel</comment>
   </data>
+  <data name="PerformActionLabel" xml:space="preserve">
+    <value>Performing this action will complete this trip. {0} Are you sure you want to do this?</value>
+    <comment>TransactionConfirmationViewModel</comment>
+  </data>
+  <data name="NewSegmentCreated" xml:space="preserve">
+    <value>New Segment Successfully Created</value>
+    <comment>ModifyReturnToYardFragment</comment>
+  </data>
+  <data name="SegmentUpdated" xml:space="preserve">
+    <value>Trip Segment Successfully Updated!</value>
+    <comment>ModifyReturnToYardFragment</comment>
+  </data>
 </root>

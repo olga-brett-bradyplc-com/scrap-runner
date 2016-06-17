@@ -23,7 +23,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
-            SubTitle = AppResources.Trip + $" {tripNumber}";
+            SubTitle = $"{AppResources.Trip} {tripNumber}";
         }
 
         public override async void Start()
@@ -79,21 +79,48 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // Command Impl
         private async Task ExecuteConfirmTransactionsCommandAsync()
         {
+            // Check to see if this is the last leg of the trip, and if so, warn them.
+            // We can't use FindNextTripSegment like we normally do because we haven't
+            // marked the segment as complete yet.
+            var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
+            var lastSegment = tripSegments.Last();
+
+            if (Containers.Any(ts => ts.Key.TripSegNumber == lastSegment.TripSegNumber))
+            {
+                var message = string.Format(AppResources.PerformActionLabel, "\n\n");
+                var confirm =
+                    await
+                        UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes,
+                            AppResources.No);
+                if (confirm)
+                    await FinishTripLeg();
+            }
+            else
+            {
+                await FinishTripLeg();
+            }
+        }
+
+        private async Task FinishTripLeg()
+        {
             using (var completeTripSegment = UserDialogs.Instance.Loading("Completing Trip Segment", maskType: MaskType.Clear))
             {
                 foreach (var grouping in Containers)
-                {
                     await _tripService.CompleteTripSegmentAsync(TripNumber, grouping.Key.TripSegNumber);
-                }
             }
 
             var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             Close(this);
 
             if (nextTripSegment.Any())
+            {
                 ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
+            }
             else
+            {
+                await _tripService.CompleteTripAsync(TripNumber);
                 ShowViewModel<RouteSummaryViewModel>();
+            }
         }
 
         private bool CanExecuteConfirmTransactionsCommandAsync()

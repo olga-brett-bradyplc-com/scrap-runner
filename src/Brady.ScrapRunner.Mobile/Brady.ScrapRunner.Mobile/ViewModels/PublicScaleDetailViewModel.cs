@@ -302,10 +302,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 await _tripService.CompleteTripAsync(TripNumber);
                 await _tripService.CompleteTripSegmentAsync(TripNumber, TripSegNumber);
                 Close(this);
-                if (await _tripService.IsTripLegTypePublicScale(TripNumber))
+                //if (await _tripService.IsTripLegTypePublicScale(TripNumber))
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
-                else
-                    ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                //else
+                //    ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
             }
             else
             {

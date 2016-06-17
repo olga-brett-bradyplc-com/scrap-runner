@@ -31,14 +31,6 @@
           android:title="Take Picture"
           android:icon="@drawable/ic_add_a_photo_black_36dp" />
       <item
-          android:id="@+id/nav_changereturnyard"
-          android:title="Change Return To Yard"
-          android:icon="@drawable/ic_redo_black_36dp" />
-      <item
-          android:id="@+id/nav_addreturnyard"
-          android:title="Add Return To Yard"
-          android:icon="@drawable/ic_queue_black_36dp" />
-      <item
           android:id="@+id/nav_unabletoprocess"
           android:title="Unable To Process"
           android:icon="@drawable/ic_block_black_36dp"/>

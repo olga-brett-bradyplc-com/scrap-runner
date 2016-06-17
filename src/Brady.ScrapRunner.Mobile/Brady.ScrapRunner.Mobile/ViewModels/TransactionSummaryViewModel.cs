@@ -63,7 +63,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             // Is the user allowed to add a rtn segment?
             // Rtn must not exist as last segment
             var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
-            var doesRtnSegExistAtEnd = tripSegments.All(sg => sg.TripSegType != BasicTripTypeConstants.ReturnYard);
+            var doesRtnSegExistAtEnd = tripSegments.All(sg => sg.TripSegType != BasicTripTypeConstants.ReturnYard && sg.TripSegType != BasicTripTypeConstants.ReturnYardNC);
             // User preference DEFAllowAddRT must be set to 'Y'
             var defAllowAddRt = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAllowAddRT);
 

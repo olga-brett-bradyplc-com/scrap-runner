@@ -68,10 +68,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ConfirmReturnToYard(TerminalChangeModel terminalChange)
         {
+
+            var tripSegments = await _tripService.FindAllSegmentsForTripAsync(CurrentTripNumber);
+
             if (ChangeType == TerminalChangeEnum.Edit)
             {
-                var tripSegments = await _tripService.FindAllSegmentsForTripAsync(CurrentTripNumber);
-                var rty = tripSegments.FirstOrDefault(ts => ts.TripSegType == BasicTripTypeConstants.ReturnYard);
+                var rty = tripSegments.FirstOrDefault(ts => ts.TripSegType == BasicTripTypeConstants.ReturnYard || ts.TripSegType == BasicTripTypeConstants.ReturnYardNC);
 
                 var message = string.Format(AppResources.ConfirmReturnToYardEdit, 
                     "\n\n", 
@@ -84,8 +86,26 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     terminalChange.CityStateZipFormatted);
 
                 var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes, AppResources.No);
+
+                if (confirm)
+                {
+                    rty.TripSegDestCustName = terminalChange.CustName;
+                    rty.TripSegDestCustAddress1 = terminalChange.CustAddress1;
+                    rty.TripSegDestCustAddress2 = terminalChange.CustAddress2;
+                    rty.TripSegDestCustCity = terminalChange.CustCity;
+                    rty.TripSegDestCustState = terminalChange.CustState;
+                    rty.TripSegDestCustZip = terminalChange.CustZip;
+                    rty.TripSegDestCustHostCode = terminalChange.CustHostCode;
+
+                    await _tripService.UpdateTripSegmentAsync(rty);
+
+                    UserDialogs.Instance.InfoToast(AppResources.SegmentUpdated);
+
+                    Close(this);
+                }
+
             }
-            else
+            else // TerminalChangeEnum.Add
             {
                 var message = string.Format(AppResources.ConfirmReturnToYardAdd,
                     "\n\n",
@@ -95,6 +115,57 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     terminalChange.CityStateZipFormatted);
 
                 var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes, AppResources.No);
+
+                if (confirm)
+                {
+                    var lastSegment = tripSegments.Last();
+                    var tripSegType = _tripService.IsContainerDropped(lastSegment)
+                        ? BasicTripTypeConstants.ReturnYardNC
+                        : BasicTripTypeConstants.ReturnYard;
+                    
+                    var newTripSegNumber = (int.Parse(tripSegments.Last().TripSegNumber) + 1).ToString("D2");
+
+                    // @TODO : pull down TripTypeBasic table to get descriptions from DB
+                    var tripSegDesc = (tripSegType == BasicTripTypeConstants.ReturnYardNC) ? "RTN NC" : "RTN TO YARD";
+
+                    var tripSegment = new TripSegmentModel
+                    {
+                        TripNumber = CurrentTripNumber,
+                        TripSegNumber = newTripSegNumber,
+                        TripSegStatus = TripSegStatusConstants.Pending,
+                        TripSegType = tripSegType,
+                        TripSegTypeDesc = tripSegDesc,
+                        TripSegOrigCustName = lastSegment.TripSegOrigCustName,
+                        TripSegOrigCustHostCode = lastSegment.TripSegOrigCustHostCode,
+                        TripSegDestCustType = "W",
+                        TripSegDestCustName = terminalChange.CustName,
+                        TripSegDestCustHostCode = terminalChange.CustHostCode,
+                        TripSegDestCustAddress1 = terminalChange.CustAddress1,
+                        TripSegDestCustAddress2 = terminalChange.CustAddress2,
+                        TripSegDestCustCity = terminalChange.CustCity,
+                        TripSegDestCustState = terminalChange.CustState,
+                        TripSegDestCustZip = terminalChange.CustZip
+                    };
+
+                    // Create new trip segment
+                    await _tripService.CreateTripSegmentAsync(tripSegment);
+
+                    // If segment has containers, add them
+                    if (tripSegment.TripSegType.Equals(BasicTripTypeConstants.ReturnYard))
+                    {
+                        var containers = await _tripService.FindAllContainersForTripSegmentAsync(CurrentTripNumber,
+                            lastSegment.TripSegNumber);
+
+                        foreach (var container in containers)
+                        {
+                            container.TripSegNumber = newTripSegNumber;
+                            await _tripService.CreateTripSegmentContainerAsync(container);
+                        }
+                    }
+
+                    UserDialogs.Instance.InfoToast(AppResources.NewSegmentCreated);
+                    Close(this);
+                }
             }
         }
 
