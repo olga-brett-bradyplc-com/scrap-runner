@@ -400,6 +400,7 @@
             return await _tripSegmentContainerRepository.UpdateAsync(container);
         }
 
+
         /// <summary>
         /// Complete a given trip
         /// </summary>
@@ -479,6 +480,17 @@
             var yardInfo = _yardInfoRepository.AsQueryable()
                 .Where(y => y.TerminalId == terminalId).FirstOrDefaultAsync();
             return yardInfo;
+        }
+        public async Task<int> MarkExceptionTripSegmentContainerAsync(string tripNumber, string tripSegNumber, string tripSegContainerNumber,
+            string reviewReason)
+        {
+            var tripSegmentContainer =
+                await _tripSegmentContainerRepository.FindAsync(
+                    ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
+            tripSegmentContainer.TripSegContainerReviewFlag = TripSegStatusConstants.Exception;
+            tripSegmentContainer.TripSegContainerReviewReason = reviewReason;
+
+            return await _tripSegmentContainerRepository.UpdateAsync(tripSegmentContainer);
         }
     }
 }

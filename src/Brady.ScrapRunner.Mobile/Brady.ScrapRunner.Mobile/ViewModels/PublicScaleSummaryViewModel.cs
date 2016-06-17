@@ -23,12 +23,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Title = AppResources.PublicScaleSummary;
             ContainerSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteContainerSelectedCommand);
         }
-        public void Init(string tripNumber)
+        public void Init(string tripNumber, string methodOfEntry)
         {
             TripNumber = tripNumber;
+            MethodOfEntry = methodOfEntry;
             SubTitle = AppResources.Trip + $" {TripNumber}";
         }
+        private string _methodOfEntry;
 
+        public string MethodOfEntry
+        {
+            get { return _methodOfEntry; }
+            set { SetProperty(ref _methodOfEntry, value); }
+        }
         public override async void Start()
         {
             using (var tripDataLoad = UserDialogs.Instance.Loading(AppResources.LoadingTripData, maskType: MaskType.Clear))
@@ -83,7 +90,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 tripNumber = selectedSegment.TripNumber,
                 tripSegNumber = selectedSegment.TripSegNumber,
                 tripSegContainerSeqNumber = selectedSegment.TripSegContainerSeqNumber,
-                tripSegContainerNumber = selectedSegment.TripSegContainerNumber
+                tripSegContainerNumber = selectedSegment.TripSegContainerNumber,
+                methodOfEntry = MethodOfEntry
             });
         }
     }
