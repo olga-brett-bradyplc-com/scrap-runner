@@ -119,6 +119,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //CommodityMasterProcess has been called
+                    log.DebugFormat("SRTEST:CommodityMasterProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:CommodityMasterProcess Driver:{0}",
+                                     commodityMasterProcess.EmployeeId);
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                     commodityMasterProcess.EmployeeId, out fault);
@@ -136,7 +142,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     // Lookup Preference: DEFSendMasterCommodities
                     string prefSendMasterCommodities = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
-                                                    employeeMaster.TerminalId, PrefDriverConstants.DEFSendMasterCommodities, out fault);
+                                                       employeeMaster.TerminalId, PrefDriverConstants.DEFSendMasterCommodities, out fault);
                     if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -144,11 +150,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     ////////////////////////////////////////////////
                     // Lookup universal commodities.  
-                   var commoditymasters = new List<CommodityMaster>();
+                   var commodityMasterList = new List<CommodityMaster>();
                     if (prefSendMasterCommodities == Constants.Yes)
                     {
-                        //This query includes container level
-                        commoditymasters = Common.GetMasterCommoditiesForDriver(dataService, settings, userCulture, userRoleIds,
+                        //This query gets all universal commodities from the CommodityMaster
+                        commodityMasterList = Common.GetMasterCommoditiesForDriver(dataService, settings, userCulture, userRoleIds,
                                             out fault);
                     }
                     if (fault != null)
@@ -159,18 +165,19 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     // Don't forget to actually backfill the CommodityMasterProcess object contained within 
                     // the ChangeSetResult that exits this method and is returned to the caller.
-                    commodityMasterProcess.CommodityMasters = commoditymasters;
+                    commodityMasterProcess.CommodityMasters = commodityMasterList;
 
                     //Now using log4net.ILog implementation to test results of query.
-                    log.Debug("SRTEST:CommodityMasterProcess");
-                    foreach (var commoditymaster in commoditymasters)
-                    {
-                        log.DebugFormat("SRTEST:CommodityCode:{0} Desc:{1} InactiveFlag:{2} UniversalFlag:{3}",
-                                        commoditymaster.CommodityCode,
-                                        commoditymaster.CommodityDesc,
-                                        commoditymaster.InactiveFlag,
-                                        commoditymaster.UniversalFlag);
-                    }
+                    log.DebugFormat("SRTEST:CommodityMasterProcess sending {0} commodities.",
+                                     commodityMasterList.Count());
+                    //foreach (var commoditymaster in commodityMasterList)
+                    //{
+                    //    log.DebugFormat("SRTEST:CommodityMasterProcess:CommodityCode:{0} Desc:{1} InactiveFlag:{2} UniversalFlag:{3}",
+                    //                    commoditymaster.CommodityCode,
+                    //                    commoditymaster.CommodityDesc,
+                    //                    commoditymaster.InactiveFlag,
+                    //                    commoditymaster.UniversalFlag);
+                    //}
                 }
             }
 

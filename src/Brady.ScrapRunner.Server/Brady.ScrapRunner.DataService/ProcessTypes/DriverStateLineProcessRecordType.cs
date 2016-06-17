@@ -126,6 +126,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //DriverStateLineProcess has been called
+                    log.DebugFormat("SRTEST:DriverStateLineProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:DriverStateLineProcess Driver:{0} DT:{1} Trip:{2}-{3} PowerId:{4} Odom:{5} ST:{6} Ctry:{7} GPSAuto:{8} Lat:{9} Lon:{10} MDT:{11}",
+                                     driverStateLineProcess.EmployeeId, driverStateLineProcess.ActionDateTime,
+                                     driverStateLineProcess.TripNumber, driverStateLineProcess.TripSegNumber,
+                                     driverStateLineProcess.PowerId, driverStateLineProcess.Odometer,
+                                     driverStateLineProcess.State, driverStateLineProcess.Country,
+                                     driverStateLineProcess.GPSAutoFlag, driverStateLineProcess.Latitude,
+                                     driverStateLineProcess.Longitude, driverStateLineProcess.Mdtid);
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   driverStateLineProcess.EmployeeId, out fault);
@@ -234,6 +245,66 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         {
                             driverStateLineProcess.Odometer = (int)powerMaster.PowerOdometer;
                         }
+                    }
+                    ////////////////////////////////////////////////////////
+                    //If the MDTId is not provided by the mobile app, build it using the MDT Prefix (if it exists) plus the employee id.
+                    if (driverStateLineProcess.Mdtid == null)
+                    {
+                        // Lookup Preference: DEFMDTPrefix
+                        string prefMDTPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                      Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
+                        if (fault != null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        driverStateLineProcess.Mdtid = prefMDTPrefix + driverStateLineProcess.EmployeeId;
+                    }
+                    ////////////////////////////////////////////////
+                    //First validate country
+                    var codeTableCountry = new CodeTable();
+                    if (null != driverStateLineProcess.Country)
+                    {
+                        codeTableCountry = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                              CodeTableNameConstants.Countries, driverStateLineProcess.Country, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        if (null == codeTableCountry)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverStateLineProcess:Invalid Country: "
+                                            + driverStateLineProcess.Country));
+                            break;
+                        }
+                    }
+                    ////////////////////////////////////////////////
+                    //Now validate state and country combination
+                    var codeTableStateCountry = new CodeTable();
+                    if (null != driverStateLineProcess.State && 
+                        null != driverStateLineProcess.Country)
+                    {
+                        codeTableStateCountry = Common.GetCodeTableEntryForStateCountry(dataService, settings, userCulture, userRoleIds,
+                                              CodeTableNameConstants.States, driverStateLineProcess.State, driverStateLineProcess.Country, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        if (null == codeTableStateCountry)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverStateLineProcess:Invalid State/Country: "
+                                            + driverStateLineProcess.State + "/" + driverStateLineProcess.Country));
+                            break;
+                        }
+                    }
+
+                    ////////////////////////////////////////////////
+                    // If the GPS Auto flag is not provided default it to N
+                    if (driverStateLineProcess.GPSAutoFlag == null)
+                    {
+                        driverStateLineProcess.GPSAutoFlag = Constants.No;
                     }
 
                     //Note that we may not have any container numbers at the state line crossing because the driver may not have

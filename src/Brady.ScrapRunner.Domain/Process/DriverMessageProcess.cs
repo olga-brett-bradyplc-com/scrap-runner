@@ -15,7 +15,7 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string EmployeeId { get; set; }
 
         /// The ActionDateTime. Required.
-        public virtual DateTime ActionDateTime { get; set; }
+        public virtual DateTime? ActionDateTime { get; set; }
 
         /// Sender Id. Required for received messages.
         public virtual string SenderId { get; set; }

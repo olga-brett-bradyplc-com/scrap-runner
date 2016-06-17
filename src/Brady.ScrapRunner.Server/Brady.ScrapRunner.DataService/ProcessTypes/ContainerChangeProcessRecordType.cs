@@ -119,6 +119,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //ContainerChangeProcess has been called
+                    log.DebugFormat("SRTEST:ContainerChangeProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:ContainerChangeProcess Driver:{0} ContainerLastActionDateTime:{1}",
+                                     containersProcess.EmployeeId, containersProcess.LastContainerMasterUpdate);
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   containersProcess.EmployeeId, out fault);
@@ -208,18 +214,20 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     containersProcess.Containers = containerChangeList;
 
                     //Now using log4net.ILog implementation to test results of query.
-                    log.Debug("SRTEST:ContainerChangeProcess");
-                    foreach (var container in containerChangeList)
-                    {
-                        log.DebugFormat("SRTEST:ContainerNumber:{0} Type:{1} Size:{2} Date:{3} Flag:{4} TerminalId:{5} BarCode:{6}",
-                                        container.ContainerNumber,
-                                        container.ContainerType,
-                                        container.ContainerSize,
-                                        container.ActionDate,
-                                        container.ActionFlag,
-                                        container.TerminalId,
-                                        container.ContainerBarCodeNo);
-                    }
+                    log.DebugFormat("SRTEST:ContainerChangeProcess sending {0} containers.",
+                                     containerChangeList.Count());
+                   // foreach (var container in containerChangeList)
+                   // {
+                   //     log.DebugFormat("SRTEST:ContainerChangeProcess:ContainerNumber:{0} Type:{1} Size:{2} Date:{3} Flag:{4} TerminalId:{5} BarCode:{6}",
+                   //                     container.ContainerNumber,
+                   //                     container.ContainerType,
+                   //                     container.ContainerSize,
+                   //                     container.ActionDate,
+                   //                     container.ActionFlag,
+                   //                     container.TerminalId,
+                   //                     container.ContainerBarCodeNo);
+                   // }
+
                     ////////////////////////////////////////////////
                     //Now update the ContainerMasterDateTime in the DriverStatus record
                     //If there is no record yet, I guess we will have to add one.
@@ -240,22 +248,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         };
                     }
                     //Now there is a driverStatus
-                    //For testing
-                    log.Debug("SRTEST:GetDriverStatus");
-                    log.DebugFormat("SRTEST:DriverId:{0} LastContainerMasterUpdate:{1}",
-                                                        driverStatus.EmployeeId,
-                                                        driverStatus.ContainerMasterDateTime);
                     driverStatus.ContainerMasterDateTime = DateTime.Now;
                     scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
 
-                    log.DebugFormat("SRTEST:Saving DriverStatus Record: DriverId:{0} ContainerMasterUpdate:{1}",
-                                driverStatus.EmployeeId,
-                                driverStatus.ContainerMasterDateTime);
+                    log.DebugFormat("SRTEST:ContainerChangeProcess Saving DriverStatus Record: DriverId:{0} ContainerMasterDateTime:{1}",
+                                     driverStatus.EmployeeId,
+                                     driverStatus.ContainerMasterDateTime);
 
                     if (Common.LogChangeSetFailure(scratchChangeSetResult, driverStatus, log))
                     {
-                        var s = string.Format("Could not update DriverStatus for Driver {0}.",
-                                                containersProcess.EmployeeId);
+                        var s = string.Format("ContainerChangeProcess:Update DriverStatus failed for Driver {0}.",
+                                               containersProcess.EmployeeId);
                         scratchChangeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
                     }
@@ -273,10 +276,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedDeletions.Any())
             {
                 transaction.Rollback();
+                log.Debug("SRTEST:ContainerChangeProcess:Transaction Rollback - Container Updates");
             }
             else
             {
                 transaction.Commit();
+                log.Debug("SRTEST:ContainerChangeProcess:Transaction Committed - Container Updates");
                 // We need to notify that data has changed for any types we have updated
                 // We always need to notify for the current type
                 dataService.NotifyOfExternalChangesToData();

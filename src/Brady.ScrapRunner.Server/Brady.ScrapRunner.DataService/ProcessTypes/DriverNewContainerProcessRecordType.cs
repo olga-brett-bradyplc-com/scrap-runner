@@ -122,6 +122,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //DriverNewContainerProcess has been called
+                    log.DebugFormat("SRTEST:DriverNewContainerProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:DriverNewContainerProcess Driver:{0} DT:{1} Container#:{2} Type:{3} Size:{4} BarCode:{5}",
+                                     driverNewContainerProcess.EmployeeId, driverNewContainerProcess.ActionDateTime,
+                                     driverNewContainerProcess.ContainerNumber, driverNewContainerProcess.ContainerType,
+                                     driverNewContainerProcess.ContainerSize, driverNewContainerProcess.ContainerBarcode);
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   driverNewContainerProcess.EmployeeId, out fault);

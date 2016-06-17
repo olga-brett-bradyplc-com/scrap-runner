@@ -126,6 +126,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //DriverFuelEntryProcess has been called
+                    log.DebugFormat("SRTEST:DriverFuelEntryProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:DriverFuelEntryProcess Driver:{0} DT:{1} Trip:{2}-{3} PowerId:{4} Odom:{5} ST:{6} Ctry:{7} Amt:{8} MDT:{9}",
+                                     driverFuelEntryProcess.EmployeeId, driverFuelEntryProcess.ActionDateTime,
+                                     driverFuelEntryProcess.TripNumber, driverFuelEntryProcess.TripSegNumber,
+                                     driverFuelEntryProcess.PowerId, driverFuelEntryProcess.Odometer,
+                                     driverFuelEntryProcess.State, driverFuelEntryProcess.Country,
+                                     driverFuelEntryProcess.FuelAmount, driverFuelEntryProcess.Mdtid);
+
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                          driverFuelEntryProcess.EmployeeId, out fault);
@@ -163,6 +174,59 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (driverFuelEntryProcess.Odometer < powerMaster.PowerOdometer)
                         {
                             driverFuelEntryProcess.Odometer = (int)powerMaster.PowerOdometer;
+                        }
+                    }
+                    ////////////////////////////////////////////////////////
+                    //If the MDTId is not provided by the mobile app, build it using the MDT Prefix (if it exists) plus the employee id.
+                    if (driverFuelEntryProcess.Mdtid == null)
+                    {
+                        // Lookup Preference: DEFMDTPrefix
+                        string prefMDTPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                      Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
+                        if (fault != null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        driverFuelEntryProcess.Mdtid = prefMDTPrefix + driverFuelEntryProcess.EmployeeId;
+                    }
+                    ////////////////////////////////////////////////
+                    //First validate country
+                    var codeTableCountry = new CodeTable();
+                    if (null != driverFuelEntryProcess.Country)
+                    {
+                        codeTableCountry = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                              CodeTableNameConstants.Countries, driverFuelEntryProcess.Country, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        if (null == codeTableCountry)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverFuelEntryProcess:Invalid Country: "
+                                            + driverFuelEntryProcess.Country));
+                            break;
+                        }
+                    }
+                    ////////////////////////////////////////////////
+                    //Now validate state and country combination
+                    var codeTableStateCountry = new CodeTable();
+                    if (null != driverFuelEntryProcess.State &&
+                        null != driverFuelEntryProcess.Country)
+                    {
+                        codeTableStateCountry = Common.GetCodeTableEntryForStateCountry(dataService, settings, userCulture, userRoleIds,
+                                              CodeTableNameConstants.States, driverFuelEntryProcess.State, driverFuelEntryProcess.Country, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        if (null == codeTableStateCountry)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverFuelEntryProcess:Invalid State/Country: "
+                                            + driverFuelEntryProcess.State + "/" + driverFuelEntryProcess.Country));
+                            break;
                         }
                     }
 
