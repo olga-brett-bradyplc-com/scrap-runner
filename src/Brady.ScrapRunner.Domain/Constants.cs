@@ -112,6 +112,7 @@
         public static readonly string ReceiptComments = "RECEIPTCOMMENTS";
         public static readonly string RegularRuns = "REGULARRUNS";
         public static readonly string SecurityAccess = "SECURITYACCESS";
+        public static readonly string States = "STATES";
         public static readonly string StatesCanada = "STATESCAN";
         public static readonly string StatesMexico = "STATESMEX";
         public static readonly string StatesUSA = "STATESUSA";
@@ -147,6 +148,14 @@
         public static readonly string Loaded = "L";
         public static readonly string Preload = "P";
         public static readonly string Unknown = "U";
+    }
+    /// <summary>
+    /// Container Method of Entry internal codes. Used in the TripSegmentContainer table.
+    /// </summary>
+    public static class ContainerMethodOfEntry
+    {
+        public static readonly string Scanned = "S";
+        public static readonly string Manual = "M";
     }
 
     /// <summary>
@@ -696,6 +705,12 @@
         /// Otherwise a driver can log in to a power unit whose region matches the driver's region. 
         /// </summary>
         public static readonly string DEFAllowAnyPowerUnit = "DEFAllowAnyPowerUnit";
+
+        /// <summary>
+        /// MDT Prefix for OnDemand Customers only
+        /// A 1-2 character identifier to uniquely identify the customer for IPCom
+        /// </summary>
+        public static readonly string DEFMDTPrefix = "DEFMDTPrefix";
     }
     /// <summary>
     /// Driver Preference internal codes. From the Preferences table.
@@ -797,6 +812,8 @@
         public static readonly string Driver = "D";
         /// <summary>Manual: M</summary>
         public static readonly string Manual = "M";
+        ///<summary>Scanned</summary>
+        public static readonly string Scanned = "S";
     }
     /// <summary>
     /// The trip segment action type codes.

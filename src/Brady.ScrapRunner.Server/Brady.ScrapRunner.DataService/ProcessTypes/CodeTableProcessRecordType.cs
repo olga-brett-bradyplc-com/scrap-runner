@@ -119,6 +119,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //CodeTableProcess has been called
+                    log.DebugFormat("SRTEST:CodeTableProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:CodeTableProcess Driver:{0}",
+                                     codetablesProcess.EmployeeId);
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                          codetablesProcess.EmployeeId, out fault);
@@ -154,9 +160,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Lookup code tables.  
-                    var codetables = new List<CodeTable>();
+                    var codeTableList = new List<CodeTable>();
                     //This query does not include container level
-                    codetables = Common.GetCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
+                    codeTableList = Common.GetCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
                                     employeeMaster.RegionId, prefDefCountry, prefUseContainerLevel,out fault);
                     if (fault != null)
                     {
@@ -166,14 +172,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     // Don't forget to actually backfill the CodeTableProcess object contained within 
                     // the ChangeSetResult that exits this method and is returned to the caller.
-                    codetablesProcess.CodeTables = codetables;
+                    codetablesProcess.CodeTables = codeTableList;
 
                     //Now using log4net.ILog implementation to test results of query.
-                    log.DebugFormat("SRTEST:CodeTableProcess Region:{0} Terminal:{1} Driver:{2}",
-                                    employeeMaster.RegionId, employeeMaster.TerminalId, codetablesProcess.EmployeeId);
-                    foreach (var codetable in codetables)
+                    foreach (var codetable in codeTableList)
                     {
-                        log.DebugFormat("SRTEST:CodeName:{0} CodeValue:{1} CodeDisp1:{2} CodeDisp2:{3} CodeDisp3:{4} CodeDisp4:{5} CodeDisp5:{6} CodeDisp6:{7}",
+                        log.DebugFormat("SRTEST:CodeTableProcess:CodeName:{0} CodeValue:{1} CodeDisp1:{2} CodeDisp2:{3} CodeDisp3:{4} CodeDisp4:{5} CodeDisp5:{6} CodeDisp6:{7}",
                                        codetable.CodeName,codetable.CodeValue,codetable.CodeDisp1,codetable.CodeDisp2,codetable.CodeDisp3,
                                        codetable.CodeDisp4,codetable.CodeDisp5,codetable.CodeDisp6);
                     }
