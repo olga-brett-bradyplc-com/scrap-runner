@@ -812,6 +812,8 @@
         public static readonly string Driver = "D";
         /// <summary>Manual: M</summary>
         public static readonly string Manual = "M";
+        ///<summary>Scanned</summary>
+        public static readonly string Scanned = "S";
     }
     /// <summary>
     /// The trip segment action type codes.

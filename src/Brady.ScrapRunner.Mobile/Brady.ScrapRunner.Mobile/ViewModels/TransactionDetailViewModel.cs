@@ -27,12 +27,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         // Initialize parameters passed from transaction summary screen
-        public void Init(string tripNumber, string tripSegmentNumber, short tripSegmentSeqNo)
+        public void Init(string tripNumber, string tripSegmentNumber, short tripSegmentSeqNo, string methodOfEntry)
         {
             TripNumber = tripNumber;
             TripSegNumber = tripSegmentNumber;
             TripSegContainerSeqNumber = tripSegmentSeqNo;
+            MethodOfEntry = methodOfEntry;
             SubTitle = AppResources.Trip + $" {TripNumber}";
+        }
+        private string _methodOfEntry;
+        public string MethodOfEntry
+        {
+            get { return _methodOfEntry; }
+            set { SetProperty(ref _methodOfEntry, value); }
         }
 
         public override async void Start()
@@ -73,7 +80,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     _tripService.ProcessTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerSeqNumber,
                         TripSegContainerNumber, true);
                 Close(this);
-                ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
+                ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
             }
         }
 
@@ -98,7 +105,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     _tripService.ProcessTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerSeqNumber,
                         TripSegContainerNumber, false);
                 Close(this);
-                ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
+                ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
             }
         }
 

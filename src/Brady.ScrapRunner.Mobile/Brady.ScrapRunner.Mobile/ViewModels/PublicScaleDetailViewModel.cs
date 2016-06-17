@@ -46,13 +46,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             => _noProcessCommandAsync ?? (_noProcessCommandAsync = new MvxAsyncCommand(ExecuteNoProcessCommandDialog));
 
         public void Init(string tripNumber, string tripSegNumber, short tripSegContainerSeqNumber,
-            string tripSegContainerNumber)
+            string tripSegContainerNumber, string methodOfEntry)
         {
             TripNumber = tripNumber;
             TripSegNumber = tripSegNumber;
             TripSegContainerSeqNumber = tripSegContainerSeqNumber;
             TripSegContainerNumber = tripSegContainerNumber;
+            MethodOfEntry = methodOfEntry;
             SubTitle = $"Trip {TripNumber}";
+        }
+        private string _methodOfEntry;
+
+        public string MethodOfEntry
+        {
+            get { return _methodOfEntry; }
+            set { SetProperty(ref _methodOfEntry, value); }
         }
 
         public override async void Start()
@@ -251,6 +259,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         EmployeeId = currentUser.EmployeeId,
                         PowerId = currentUser.PowerId,
                         ActionType = ContainerActionTypeConstants.Exception,
+                        MethodOfEntry = MethodOfEntry,
                         ActionDateTime = DateTime.Now,
                         TripNumber = TripNumber,
                         TripSegNumber = TripSegNumber,
@@ -278,14 +287,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     await _tripService.MarkExceptionTripAsync(TripNumber);
                     await _tripService.MarkExceptionTripSegmentAsync(TripNumber, TripSegNumber);
+                    await
+                        _tripService.MarkExceptionTripSegmentContainerAsync(TripNumber, TripSegNumber,
+                            TripSegContainerNumber, reasonItem.CodeDisp1);
                 }
                 CantProcessLabel = AppResources.CanProcess;
-                //TODO: how to disable all buttons Gross, 2nd gross, tare, material grading
             }
             else
             {
                 CantProcessLabel = AppResources.CantProcess;
-                //TODO: 2nd gross, tare, material grading should be disabled (except Gross)
             }
         }
 

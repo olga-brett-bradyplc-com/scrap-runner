@@ -66,5 +66,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<YardModel> FindYardInfo(string terminalId);
 
+        Task<int> MarkExceptionTripSegmentContainerAsync(string tripNumber, string tripSegNo, string tripSegContainerNo, string reviewReason);
     }
 }
