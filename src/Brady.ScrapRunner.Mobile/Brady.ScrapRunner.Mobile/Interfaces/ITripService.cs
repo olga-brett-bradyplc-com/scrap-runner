@@ -81,5 +81,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<int> UpdateTripSegmentAsync(TripSegmentModel tripSegment);
 
         Task<int> CreateTripSegmentContainerAsync(TripSegmentContainerModel tripSegmentContainer);
+
+        Task<int> MarkExceptionTripSegmentContainerAsync(string tripNumber, string tripSegNo, string tripSegContainerNo, string reviewReason);
     }
 }

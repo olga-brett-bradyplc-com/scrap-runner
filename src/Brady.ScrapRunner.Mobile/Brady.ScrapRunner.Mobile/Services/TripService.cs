@@ -431,6 +431,7 @@
             return await _tripSegmentContainerRepository.UpdateAsync(container);
         }
 
+
         /// <summary>
         /// Complete a given trip
         /// </summary>
@@ -524,6 +525,18 @@
         public async Task<int> CreateTripSegmentContainerAsync(TripSegmentContainerModel tripSegmentContainer)
         {
             return await _tripSegmentContainerRepository.InsertAsync(tripSegmentContainer);
+        }
+
+        public async Task<int> MarkExceptionTripSegmentContainerAsync(string tripNumber, string tripSegNumber, string tripSegContainerNumber,
+            string reviewReason)
+        {
+            var tripSegmentContainer =
+                await _tripSegmentContainerRepository.FindAsync(
+                    ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
+            tripSegmentContainer.TripSegContainerReviewFlag = TripSegStatusConstants.Exception;
+            tripSegmentContainer.TripSegContainerReviewReason = reviewReason;
+
+            return await _tripSegmentContainerRepository.UpdateAsync(tripSegmentContainer);
         }
     }
 }
