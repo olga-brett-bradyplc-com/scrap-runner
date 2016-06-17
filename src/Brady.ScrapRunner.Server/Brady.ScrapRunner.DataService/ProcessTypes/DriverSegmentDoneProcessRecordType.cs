@@ -123,6 +123,85 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //Validate the ActionType
+                    var actions = new List<string> {TripSegmentActionTypeConstants.Done,
+                                                    TripSegmentActionTypeConstants.Canceled,
+                                                    TripSegmentActionTypeConstants.Pending};
+                    if (!actions.Contains(driverSegmentDoneProcess.ActionType))
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid ActionType: "
+                                        + driverSegmentDoneProcess.ActionType));
+                        break;
+                    }
+                    ////////////////////////////////////////////////
+                    //DriverSegmentDoneProcess has been called
+                    log.DebugFormat("SRTEST:DriverSegmentDoneProcess Called by {0}", key);
+                    if (driverSegmentDoneProcess.ActionType == TripSegmentActionTypeConstants.Done)
+                    {
+                        log.DebugFormat("SRTEST:DriverSegmentDoneProcess:DONE Driver:{0} DT:{1} Trip:{2}-{3} PowerId:{4} Lat:{5} Lon:{6} Host:{7} DrvGen:{8} DrvMod:{9} MDT:{10}",
+                                     driverSegmentDoneProcess.EmployeeId, driverSegmentDoneProcess.ActionDateTime,
+                                     driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber,
+                                     driverSegmentDoneProcess.PowerId, driverSegmentDoneProcess.Latitude,
+                                     driverSegmentDoneProcess.Longitude, driverSegmentDoneProcess.DestCustHostCode,
+                                     driverSegmentDoneProcess.DriverGenerated, driverSegmentDoneProcess.DriverModified,
+                                     driverSegmentDoneProcess.Mdtid);
+                    }
+                    if (driverSegmentDoneProcess.ActionType == TripSegmentActionTypeConstants.Canceled)
+                    {
+                        log.DebugFormat("SRTEST:DriverSegmentDoneProcess:CANCELED Driver:{0} DT:{1} Trip:{2}-{3} PowerId:{4} Lat:{5} Lon:{6} Host:{7} DrvGen:{8} DrvMod:{9} MDT:{10}",
+                                     driverSegmentDoneProcess.EmployeeId, driverSegmentDoneProcess.ActionDateTime,
+                                     driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber,
+                                     driverSegmentDoneProcess.PowerId, driverSegmentDoneProcess.Latitude,
+                                     driverSegmentDoneProcess.Longitude, driverSegmentDoneProcess.DestCustHostCode,
+                                     driverSegmentDoneProcess.DriverGenerated, driverSegmentDoneProcess.DriverModified,
+                                     driverSegmentDoneProcess.Mdtid);
+                    }
+                    if (driverSegmentDoneProcess.ActionType == TripSegmentActionTypeConstants.Pending)
+                    {
+                        log.DebugFormat("SRTEST:DriverSegmentDoneProcess:PENDING Driver:{0} DT:{1} Trip:{2}-{3} PowerId:{4} Lat:{5} Lon:{6} Host:{7} DrvGen:{8} DrvMod:{9} MDT:{10}",
+                                     driverSegmentDoneProcess.EmployeeId, driverSegmentDoneProcess.ActionDateTime,
+                                     driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber,
+                                     driverSegmentDoneProcess.PowerId, driverSegmentDoneProcess.Latitude,
+                                     driverSegmentDoneProcess.Longitude, driverSegmentDoneProcess.DestCustHostCode,
+                                     driverSegmentDoneProcess.DriverGenerated, driverSegmentDoneProcess.DriverModified,
+                                     driverSegmentDoneProcess.Mdtid);
+                        if (driverSegmentDoneProcess.DestCustHostCode == null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DestCustHostCode is required. "
+                                    + driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
+                            break;
+                        }
+                        if (driverSegmentDoneProcess.TripSegType == null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("TripSegType is required. "
+                                    + driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
+                            break;
+                        }
+                        if (driverSegmentDoneProcess.TripSegType != BasicTripTypeConstants.ReturnYard &&
+                            driverSegmentDoneProcess.TripSegType != BasicTripTypeConstants.ReturnYardNC)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("TripSegType must be RT or RN. "
+                                    + driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
+                            break;
+                        }
+                        if (driverSegmentDoneProcess.DriverGenerated == null)
+                        {
+                            driverSegmentDoneProcess.DriverGenerated = Constants.No;
+                        }
+                        if (driverSegmentDoneProcess.DriverModified == null)
+                        {
+                            driverSegmentDoneProcess.DriverModified = Constants.No;
+                        }
+                        if (driverSegmentDoneProcess.DriverGenerated == Constants.No &&
+                            driverSegmentDoneProcess.DriverModified == Constants.No)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverGenerated or DriverModified must be Y. "
+                                    + driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
+                            break;
+                        }
+                    }
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                          driverSegmentDoneProcess.EmployeeId, out fault);
@@ -198,14 +277,66 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-
                     ////////////////////////////////////////////////
                     // Get a list of all containers for the trip from the TripSegmentContainer table
                     var tripContainerList = Common.GetTripContainersForTrip(dataService, settings, userCulture, userRoleIds,
-                                            driverSegmentDoneProcess.TripNumber, out fault);
+                                        driverSegmentDoneProcess.TripNumber, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+
+                    ////////////////////////////////////////////////
+                    //Now call the SegmentPending method to process adds and modifies
+                    if (driverSegmentDoneProcess.ActionType == TripSegmentActionTypeConstants.Pending)
+                    {
+                        if (driverSegmentDoneProcess.DriverGenerated == Constants.Yes)
+                        {
+                            if (!SegmentAdd(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
+                                               driverSegmentDoneProcess, employeeMaster, powerMaster,
+                                               currentTrip, tripSegList, tripContainerList))
+                            {
+                                break;
+                            }
+                        }
+                        else if (driverSegmentDoneProcess.DriverModified == Constants.Yes)
+                        {
+                            if (!SegmentModify(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
+                                               driverSegmentDoneProcess, employeeMaster, powerMaster,
+                                               currentTrip, tripSegList, tripContainerList))
+                            {
+                                break;
+                            }
+                        }
+
+
+                    }
+                    ////////////////////////////////////////////////
+                    // Get the current TripSegment record
+                    var currentTripSegment = (from item in tripSegList
+                                              where item.TripSegNumber == driverSegmentDoneProcess.TripSegNumber
+                                              select item).FirstOrDefault();
+                    if (null == currentTripSegment)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid TripSegment: " +
+                            driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
+                        break;
+                    }
+
+                    ////////////////////////////////////////////////
+                    // Get the Customer record for the destination cust host code
+                    var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                                     currentTripSegment.TripSegDestCustHostCode, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    if (null == destCustomerMaster)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid CustHostCode: "
+                                        + currentTripSegment.TripSegDestCustHostCode));
                         break;
                     }
 
@@ -234,33 +365,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
-                    ////////////////////////////////////////////////
-                    // Get the current TripSegment record
-                    var currentTripSegment = (from item in tripSegList
-                                             where item.TripSegNumber == driverSegmentDoneProcess.TripSegNumber
-                                             select item).FirstOrDefault();
-                    if (null == currentTripSegment)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid TripSegment: " +
-                            driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
-                        break;
-                    }
-
-                    ////////////////////////////////////////////////
-                    // Get the Customer record for the destination cust host code
-                    var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
-                                     currentTripSegment.TripSegDestCustHostCode, out fault);
-                    if (null != fault)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        break;
-                    }
-                    if (null == destCustomerMaster)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid CustHostCode: "
-                                        + currentTripSegment.TripSegDestCustHostCode));
                         break;
                     }
 
@@ -1158,31 +1262,360 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             return true;
         }
-        public bool SegmentPending(IDataService dataService, ProcessChangeSetSettings settings,
+        public bool SegmentAdd(IDataService dataService, ProcessChangeSetSettings settings,
            ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
            DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
-           CustomerMaster destCustomerMaster, Trip currentTrip, List<TripSegment> tripSegList, TripSegment currentTripSegment,
-           List<TripSegmentContainer> tripContainerList, List<TripReferenceNumber> tripReferenceNumberList,
-           List<TripSegmentMileage> tripMileageList, List<DriverDelay> tripDelayList)
+           Trip currentTrip, List<TripSegment> tripSegList, List<TripSegmentContainer> tripContainerList)
         {
+            DataServiceFault fault = null;
+            ////////////////////////////////////////////////
+            // Get the Customer record for the destination cust host code
+            var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                             driverSegmentDoneProcess.DestCustHostCode, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (null == destCustomerMaster)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid CustHostCode: "
+                                + driverSegmentDoneProcess.DestCustHostCode));
+                return false;
+            }
 
-            //If driver modified set driver generated flag
-            //Then modify trip segment destination info
-            //If there is a next segment, modify origin info
-            //Add EventLog to show Driver Modified Segment
+            /////////////////////////////////////////
+            //Add the new trip segment.
 
-            //If driver added, set driver generated flag
-            //Add trip segment.
-            //Add EventLog to show Driver Added Segment
+            /////////////////////////////////////////
+            //Get the current trip segment which should be the last segment in the list
+            var currentTripSegment = (from item in tripSegList                                   
+                                      select item).LastOrDefault();
+            if (null == currentTripSegment)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid TripSegment: " +
+                    driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
+                return false;
+            }
 
-            //Update TripSegment with Primary Container Info and new std drive time
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Set the values for the new Segment
+            var newTripSegment = new TripSegment();
 
-            //Update Trip Table
+            newTripSegment.TripNumber = currentTripSegment.TripNumber;
+            //Use the new segment number from the mobile app
+            newTripSegment.TripSegNumber = driverSegmentDoneProcess.TripSegNumber;
 
-            //Adjust Origins
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Set the new segment status to pending
+            newTripSegment.TripSegStatus = TripSegStatusConstants.Pending;
+            //Lookup the TripSegStatus Description in the CodeTable TRIPSEGSTATUS 
+            var codeTableTripSegStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                    CodeTableNameConstants.TripSegStatus, TripSegStatusConstants.Pending, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            newTripSegment.TripSegStatusDesc = codeTableTripSegStatus?.CodeDisp1;
+
+            //////////////////////////////////////////////////////////////////////////////////////
+            //Use the new segment type from the mobile app
+            newTripSegment.TripSegType = driverSegmentDoneProcess.TripSegType;
+            //Lookup the Basic Trip Type Description in the TripTypeBasic table 
+            var tripTypeBasic = Common.GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
+                                driverSegmentDoneProcess.TripSegType, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            newTripSegment.TripSegTypeDesc = tripTypeBasic?.TripTypeDesc;
+
+            newTripSegment.TripSegDriverId = driverSegmentDoneProcess.EmployeeId;
+            newTripSegment.TripSegDriverName = Common.GetEmployeeName(employeeMaster);
+            newTripSegment.TripSegPowerId = driverSegmentDoneProcess.PowerId;
+
+            //Set the origin customer information from the destination of the current segment
+            newTripSegment.TripSegOrigCustType = currentTripSegment.TripSegOrigCustType;
+            newTripSegment.TripSegOrigCustTypeDesc = currentTripSegment.TripSegOrigCustTypeDesc;
+            newTripSegment.TripSegOrigCustHostCode = currentTripSegment.TripSegOrigCustHostCode;
+            newTripSegment.TripSegOrigCustCode4_4 = currentTripSegment.TripSegOrigCustCode4_4;
+            newTripSegment.TripSegOrigCustName = currentTripSegment.TripSegOrigCustName;
+            newTripSegment.TripSegOrigCustAddress1 = currentTripSegment.TripSegOrigCustAddress1;
+            newTripSegment.TripSegOrigCustAddress2 = currentTripSegment.TripSegOrigCustAddress2;
+            newTripSegment.TripSegOrigCustCity = currentTripSegment.TripSegOrigCustCity;
+            newTripSegment.TripSegOrigCustState = currentTripSegment.TripSegOrigCustState;
+            newTripSegment.TripSegOrigCustZip = currentTripSegment.TripSegOrigCustZip;
+            newTripSegment.TripSegOrigCustCountry = currentTripSegment.TripSegOrigCustCountry;
+            newTripSegment.TripSegOrigCustPhone1 = currentTripSegment.TripSegOrigCustPhone1;
+            newTripSegment.TripSegOrigCustTimeFactor = currentTripSegment.TripSegOrigCustTimeFactor;
+
+            //Set the destination customer information from the destination host code supplied by the mobile app
+            newTripSegment.TripSegDestCustType = destCustomerMaster.CustType;
+            //Look up the description in the CodeTable CUSTOMERTYPE
+            var codeTableDestCustomerType = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                        CodeTableNameConstants.CustomerType, destCustomerMaster.CustType, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            newTripSegment.TripSegDestCustTypeDesc = codeTableDestCustomerType?.CodeDisp1;
+
+            newTripSegment.TripSegDestCustHostCode = destCustomerMaster.CustHostCode;
+            newTripSegment.TripSegDestCustCode4_4 = destCustomerMaster.CustCode4_4;
+            newTripSegment.TripSegDestCustName = destCustomerMaster.CustName;
+            newTripSegment.TripSegDestCustAddress1 = destCustomerMaster.CustAddress1;
+            newTripSegment.TripSegDestCustAddress2 = destCustomerMaster.CustAddress2;
+            newTripSegment.TripSegDestCustCity = destCustomerMaster.CustCity;
+            newTripSegment.TripSegDestCustState = destCustomerMaster.CustState;
+            newTripSegment.TripSegDestCustZip = destCustomerMaster.CustZip;
+            newTripSegment.TripSegDestCustCountry = destCustomerMaster.CustCountry;
+            newTripSegment.TripSegDestCustPhone1 = destCustomerMaster.CustPhone1;
+            newTripSegment.TripSegDestCustTimeFactor = destCustomerMaster.CustTimeFactor;
+
+            //ToDo:Calculate the standard drive time and standard stop time and standard miles.
+            newTripSegment.TripSegStandardDriveMinutes = 0;
+            newTripSegment.TripSegStandardStopMinutes = 0;
+            newTripSegment.TripSegStandardMiles = 0;
+
+            //Set driver generated flag to Y
+            newTripSegment.TripSegDriverGenerated = driverSegmentDoneProcess.DriverGenerated;
+
+            ////////////////////////////////////////////////
+            //Get a list of all containers for the segment. 
+            var tripSegContainerList = (from item in tripContainerList
+                                        where item.TripSegNumber == driverSegmentDoneProcess.TripSegNumber
+                                        select item).ToList();
+
+            ////////////////////////////////////////////////
+            //Update TripSegment Primary Container Information from first TripSegmentContainer information. 
+            if (tripSegContainerList.Count() > 0)
+            {
+                var firstTripSegmentContainer = tripSegContainerList.First();
+
+                if (null != firstTripSegmentContainer)
+                {
+                    //Only if there is a container number
+                    if (null != firstTripSegmentContainer.TripSegContainerNumber)
+                    {
+                        newTripSegment.TripSegPrimaryContainerNumber = firstTripSegmentContainer.TripSegContainerNumber;
+                        newTripSegment.TripSegPrimaryContainerType = firstTripSegmentContainer.TripSegContainerType;
+                        newTripSegment.TripSegPrimaryContainerSize = firstTripSegmentContainer.TripSegContainerSize;
+                        newTripSegment.TripSegPrimaryContainerCommodityCode = firstTripSegmentContainer.TripSegContainerCommodityCode;
+                        newTripSegment.TripSegPrimaryContainerCommodityDesc = firstTripSegmentContainer.TripSegContainerCommodityDesc;
+                        newTripSegment.TripSegPrimaryContainerLocation = firstTripSegmentContainer.TripSegContainerLocation;
+                    }
+                }
+            }
+
+            ////////////////////////////////////////////////
+            //Do the TripSegment table update
+            changeSetResult = Common.UpdateTripSegment(dataService, settings, newTripSegment);
+            log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Segment Done.",
+                            newTripSegment.TripNumber, newTripSegment.TripSegNumber);
+            if (Common.LogChangeSetFailure(changeSetResult, newTripSegment, log))
+            {
+                var s = string.Format("Segment Done:Could not update TripSegment for Trip:{0}-{1}.",
+                    newTripSegment.TripNumber, newTripSegment.TripSegNumber);
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                return false;
+            }
+
+            //ToDo:Update Trip Table
+
+            ////////////////////////////////////////////////
+            //Add entry to Event Log – Driver Added Segment. 
+            StringBuilder sbComment = new StringBuilder();
+            sbComment.Append(EventCommentConstants.ReceivedDriverAddedSeg);
+            sbComment.Append(" HH:");
+            sbComment.Append(driverSegmentDoneProcess.ActionDateTime);
+            sbComment.Append(" Trip:");
+            sbComment.Append(driverSegmentDoneProcess.TripNumber);
+            sbComment.Append("-");
+            sbComment.Append(driverSegmentDoneProcess.TripSegNumber);
+            sbComment.Append(" Drv:");
+            sbComment.Append(driverSegmentDoneProcess.EmployeeId);
+            sbComment.Append(" Pwr:");
+            sbComment.Append(driverSegmentDoneProcess.PowerId);
+            sbComment.Append(" SegType:");
+            sbComment.Append(driverSegmentDoneProcess.TripSegType);
+            sbComment.Append(" Dest:");
+            sbComment.Append(driverSegmentDoneProcess.DestCustHostCode);
+            string comment = sbComment.ToString().Trim();
+
+            var eventLog = new EventLog()
+            {
+                EventDateTime = driverSegmentDoneProcess.ActionDateTime,
+                EventSeqNo = 0,
+                EventTerminalId = employeeMaster.TerminalId,
+                EventRegionId = employeeMaster.RegionId,
+                //These are not populated in the current system.
+                // EventEmployeeId = driverStatus.EmployeeId,
+                // EventEmployeeName = Common.GetEmployeeName(employeeMaster),
+                EventTripNumber = driverSegmentDoneProcess.TripNumber,
+                EventProgram = EventProgramConstants.Services,
+                //These are not populated in the current system.
+                //EventScreen = null,
+                //EventAction = null,
+                EventComment = comment,
+            };
+
+            ChangeSetResult<int> eventChangeSetResult;
+            eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
+            log.Debug("SRTEST:Saving EventLog Record - Segment Done");
+            log.DebugFormat("SRTEST:Saving EventLog Record for Trip:{0}-{1} - Segment Done.",
+                            currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
+            //Check for EventLog failure.
+            if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
+            {
+                var s = string.Format("Segment Done:Could not update EventLog for Trip:{0}-{1}.",
+                        currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                return false;
+            }
+
+            //ToDo:Adjust Origins
 
             return true;
         }
+
+        public bool SegmentModify(IDataService dataService, ProcessChangeSetSettings settings,
+           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+           DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
+           Trip currentTrip, List<TripSegment> tripSegList, List<TripSegmentContainer> tripContainerList)
+        {
+            DataServiceFault fault = null;
+            ////////////////////////////////////////////////
+            // Get the Customer record for the destination cust host code
+            var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                             driverSegmentDoneProcess.DestCustHostCode, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (null == destCustomerMaster)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid CustHostCode: "
+                                + driverSegmentDoneProcess.DestCustHostCode));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            // Get the current TripSegment record
+            var currentTripSegment = (from item in tripSegList
+                                        where item.TripSegNumber == driverSegmentDoneProcess.TripSegNumber
+                                        select item).FirstOrDefault();
+            if (null == currentTripSegment)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid TripSegment: " +
+                    driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            //Set the destination customer information from the destination host code supplied by the mobile app
+            currentTripSegment.TripSegDestCustType = destCustomerMaster.CustType;
+            //Look up the description in the CodeTable CUSTOMERTYPE
+            var codeTableDestCustomerType = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                                        CodeTableNameConstants.CustomerType, destCustomerMaster.CustType, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            currentTripSegment.TripSegDestCustTypeDesc = codeTableDestCustomerType?.CodeDisp1;
+
+            currentTripSegment.TripSegDestCustHostCode = destCustomerMaster.CustHostCode;
+            currentTripSegment.TripSegDestCustCode4_4 = destCustomerMaster.CustCode4_4;
+            currentTripSegment.TripSegDestCustName = destCustomerMaster.CustName;
+            currentTripSegment.TripSegDestCustAddress1 = destCustomerMaster.CustAddress1;
+            currentTripSegment.TripSegDestCustAddress2 = destCustomerMaster.CustAddress2;
+            currentTripSegment.TripSegDestCustCity = destCustomerMaster.CustCity;
+            currentTripSegment.TripSegDestCustState = destCustomerMaster.CustState;
+            currentTripSegment.TripSegDestCustZip = destCustomerMaster.CustZip;
+            currentTripSegment.TripSegDestCustCountry = destCustomerMaster.CustCountry;
+            currentTripSegment.TripSegDestCustPhone1 = destCustomerMaster.CustPhone1;
+            currentTripSegment.TripSegDestCustTimeFactor = destCustomerMaster.CustTimeFactor;
+
+            ////////////////////////////////////////////////
+            //ToDo:Calculate the standard drive time and standard stop time and standard miles.
+            currentTripSegment.TripSegStandardDriveMinutes = 0;
+            currentTripSegment.TripSegStandardStopMinutes = 0;
+            currentTripSegment.TripSegStandardMiles = 0;
+
+            //Set driver modified flag to Y
+            currentTripSegment.TripSegDriverModified = driverSegmentDoneProcess.DriverModified;
+
+            //Do the TripSegment table update
+            changeSetResult = Common.UpdateTripSegment(dataService, settings, currentTripSegment);
+            log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Segment Done.",
+                            currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
+            if (Common.LogChangeSetFailure(changeSetResult, currentTripSegment, log))
+            {
+                var s = string.Format("Segment Done:Could not update TripSegment for Trip:{0}-{1}.",
+                    currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                return false;
+            }
+
+            //ToDo:If there is a next segment, modify origin info
+
+            //ToDo:Update Trip Table
+
+            ////////////////////////////////////////////////
+            //Add entry to Event Log – Driver Modified Segment. 
+            StringBuilder sbComment = new StringBuilder();
+            sbComment.Append(EventCommentConstants.ReceivedDriverModifiedSeg);
+            sbComment.Append(" HH:");
+            sbComment.Append(driverSegmentDoneProcess.ActionDateTime);
+            sbComment.Append(" Trip:");
+            sbComment.Append(driverSegmentDoneProcess.TripNumber);
+            sbComment.Append("-");
+            sbComment.Append(driverSegmentDoneProcess.TripSegNumber);
+            sbComment.Append(" Drv:");
+            sbComment.Append(driverSegmentDoneProcess.EmployeeId);
+            sbComment.Append(" Pwr:");
+            sbComment.Append(driverSegmentDoneProcess.PowerId);
+            sbComment.Append(" SegType:");
+            sbComment.Append(driverSegmentDoneProcess.TripSegType);
+            sbComment.Append(" Dest:");
+            sbComment.Append(driverSegmentDoneProcess.DestCustHostCode);
+            string comment = sbComment.ToString().Trim();
+
+            var eventLog = new EventLog()
+            {
+                EventDateTime = driverSegmentDoneProcess.ActionDateTime,
+                EventSeqNo = 0,
+                EventTerminalId = employeeMaster.TerminalId,
+                EventRegionId = employeeMaster.RegionId,
+                //These are not populated in the current system.
+                // EventEmployeeId = driverStatus.EmployeeId,
+                // EventEmployeeName = Common.GetEmployeeName(employeeMaster),
+                EventTripNumber = driverSegmentDoneProcess.TripNumber,
+                EventProgram = EventProgramConstants.Services,
+                //These are not populated in the current system.
+                //EventScreen = null,
+                //EventAction = null,
+                EventComment = comment,
+            };
+
+            ChangeSetResult<int> eventChangeSetResult;
+            eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
+            log.Debug("SRTEST:Saving EventLog Record - Segment Done");
+            log.DebugFormat("SRTEST:Saving EventLog Record for Trip:{0}-{1} - Segment Done.",
+                            currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
+            //Check for EventLog failure.
+            if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
+            {
+                var s = string.Format("Segment Done:Could not update EventLog for Trip:{0}-{1}.",
+                        currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                return false;
+            }
+
+            //ToDo:Adjust Origins
+
+            return true;
+        }//end of public bool SegmentModify
 
         /// <summary>
         /// Marks an entire trip done.

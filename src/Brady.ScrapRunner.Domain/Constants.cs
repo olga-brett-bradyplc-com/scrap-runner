@@ -316,6 +316,8 @@
         public static readonly string ReceivedDriverCancelSeg = "RECEIVED DRIVER CANCEL SEG";
         /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
         public static readonly string ReceivedDriverAddedSeg = "RECEIVED DRIVER ADDED SEG";
+        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER MODIFIED SEG</summary>
+        public static readonly string ReceivedDriverModifiedSeg = "RECEIVED DRIVER MODIFIED SEG";
         /// <summary>ReceivedDriverContainerAction: RECEIVED DRIVER CONTAINER ACTION</summary>
         public static readonly string ReceivedDriverContainerAction = "RECEIVED DRIVER CONTAINER ACTION";
         /// <summary>ReceivedDriverNewContainer: RECEIVED DRIVER NEW CONTAINER</summary>
@@ -822,6 +824,7 @@
     {
         public static readonly string Done = "D";
         public static readonly string Canceled = "X";
+        public static readonly string Pending = "P";
     }
 
     /// <summary>
