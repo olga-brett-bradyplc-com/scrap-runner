@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:textColor="#000000"
-        local:MvxBind="Text Format('{0} {1}', 'OPEN:', DateTime(TripCustOpenTime))"
+        local:MvxBind="Text Format('{0} {1}', 'OPEN:', TripCustOpenTime24Hr)"
         tools:text="OPEN: 0900" />
     <TextView
         android:id="@+id/cust_close_time"
@@ -34,7 +34,7 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/activity_margin_half"
         android:textColor="#000000"
-        local:MvxBind="Text Format('{0} {1}', 'CLOSE:', DateTime(TripCustCloseTime))"
+        local:MvxBind="Text Format('{0} {1}', 'CLOSE:', TripCustCloseTime24Hr)"
         tools:text="CLOSE: 1500" />
     <TextView
         android:id="@+id/cust_name"
