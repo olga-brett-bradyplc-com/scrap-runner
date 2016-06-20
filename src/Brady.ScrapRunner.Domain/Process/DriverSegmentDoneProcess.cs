@@ -39,6 +39,9 @@ namespace Brady.ScrapRunner.Domain.Process
         /// the terminal or added a return to yard segment to a terminal.
          public virtual string DestCustHostCode { get; set; }
 
+        /// Trip type of RT or RN populated when driver is adding a RT segment
+        public virtual string TripSegType { get; set; }
+
         /// Flag indicating the driver added this segment (RT)
         public virtual string DriverGenerated { get; set; }
 

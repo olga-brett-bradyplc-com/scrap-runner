@@ -26,6 +26,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             IntegerProperty(x => x.Latitude);
             IntegerProperty(x => x.Longitude);
             StringProperty(x => x.DestCustHostCode);
+            StringProperty(x => x.TripSegType);
             StringProperty(x => x.DriverGenerated);
             StringProperty(x => x.DriverModified);
             StringProperty(x => x.Mdtid);
@@ -40,6 +41,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.Latitude)
             .Property(x => x.Longitude)
             .Property(x => x.DestCustHostCode)
+            .Property(x => x.TripSegType)
             .Property(x => x.DriverGenerated)
             .Property(x => x.DriverModified)
             .Property(x => x.Mdtid)
