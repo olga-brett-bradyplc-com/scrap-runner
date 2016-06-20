@@ -4291,6 +4291,54 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return response;
         }
+        /// TRIPPOINTS Table  queries
+        /// <summary>
+        ///  Get a trip points record for a orig host code and dest host code.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="origHostCode"></param>
+        /// <param name="destHostCode"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty Trip record if tripNumber is null or no record is found</returns>
+        public static TripPoints GetTripPoints(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string origHostCode,string destHostCode, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripPoints = new TripPoints();
+            if (null != origHostCode && null != destHostCode)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripPoints>()
+                    .Filter(y => y.Property(x => x.TripPointsHostCode1).EqualTo(origHostCode)
+                    .And().Property(x => x.TripPointsHostCode2).EqualTo(destHostCode))
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripPoints;
+                }
+                if (null == queryResult)
+                {
+                    query = new Query
+                    {
+                        CurrentQuery = new QueryBuilder<TripPoints>()
+                        .Filter(y => y.Property(x => x.TripPointsHostCode1).EqualTo(destHostCode)
+                        .And().Property(x => x.TripPointsHostCode2).EqualTo(origHostCode))
+                        .GetQuery()
+                    };
+                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+
+                }
+                tripPoints = queryResult.Records.Cast<TripPoints>().FirstOrDefault();
+            }
+            return tripPoints;
+        }
 
         /// TRIPREFERENCE Table queries
         /// <summary>

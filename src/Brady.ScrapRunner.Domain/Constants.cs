@@ -56,6 +56,7 @@
         public static readonly string Exception = "E";
         public static readonly string Load = "L";
         public static readonly string Dropped = "S";
+        public static readonly string Added = "A";
     }
     /// <summary>
     /// The Delay Action Type internal codes.  Used in the processing delay & back on duty information.
