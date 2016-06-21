@@ -28,25 +28,13 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             _navigationView.SetNavigationItemSelectedListener(this);
 
             _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(false);
-            _navigationView.Menu.FindItem(Resource.Id.nav_unabletoprocess).SetVisible(false);
 
             return view;
         }
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
-            if (menuItem != _previousMenuItem)
-            {
-                _previousMenuItem?.SetChecked(false);
-            }
-
-            menuItem.SetCheckable(true);
-            menuItem.SetChecked(true);
-
-            _previousMenuItem = menuItem;
-
             Navigate(menuItem.ItemId);
-
             return true;
         }
 

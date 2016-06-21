@@ -61,7 +61,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var customerCommodities = await _customerService.FindCustomerCommodites();
             CustomerCommodityList = new ObservableCollection<CustomerCommodityModel>(customerCommodities);
 
-            MenuFilter = MenuFilterEnum.OnTransaction;
+            MenuFilter = MenuFilterEnum.OnTrip;
 
             base.Start();
         }

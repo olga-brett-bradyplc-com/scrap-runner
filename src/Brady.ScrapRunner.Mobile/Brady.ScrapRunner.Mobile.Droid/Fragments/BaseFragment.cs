@@ -102,16 +102,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(false);
                     _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(true);
                     break;
-                case MenuFilterEnum.OnTransaction:
-                    _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_unabletoprocess).SetVisible(true);
-                    break;
                 default: // MenuFilterEnum.NotOnTrip
                     _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(true);
                     _navigationView.Menu.FindItem(Resource.Id.nav_adddelay).SetVisible(true);
                     _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_unabletoprocess).SetVisible(false);
                     break;
             }
         }
