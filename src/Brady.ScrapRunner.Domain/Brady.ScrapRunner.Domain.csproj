@@ -57,6 +57,7 @@
     <Compile Include="Metadata\DriverDelayProcessMetadata.cs" />
     <Compile Include="Metadata\DriverEfficiencyMetadata.cs" />
     <Compile Include="Metadata\DriverEnrouteProcessMetadata.cs" />
+    <Compile Include="Metadata\DriverImageProcessMetadata.cs" />
     <Compile Include="Metadata\DriverMessageProcessMetadata.cs" />
     <Compile Include="Metadata\DriverNewContainerProcessMetadata.cs" />
     <Compile Include="Metadata\DriverOdomUpdateProcessMetadata.cs" />
@@ -178,6 +179,7 @@
     <Compile Include="Process\DriverContainerActionProcess.cs" />
     <Compile Include="Process\DriverDelayProcess.cs" />
     <Compile Include="Process\DriverEnrouteProcess.cs" />
+    <Compile Include="Process\DriverImageProcess.cs" />
     <Compile Include="Process\DriverLoginProcess.cs" />
     <Compile Include="Process\DriverMessageProcess.cs" />
     <Compile Include="Process\DriverNewContainerProcess.cs" />

@@ -192,6 +192,7 @@
     <Compile Include="Concrete\SRDataService.cs" />
     <Compile Include="Concrete\SRRepository.cs" />
     <Compile Include="Mappings\DriverDelayProcessMap.cs" />
+    <Compile Include="Mappings\DriverImageProcessMap.cs" />
     <Compile Include="Mappings\DriverMessageProcessMap.cs" />
     <Compile Include="Mappings\DriverNewContainerProcessMap.cs" />
     <Compile Include="Mappings\DriverOdomUpdateProcessMap.cs" />
@@ -199,6 +200,7 @@
     <Compile Include="Mappings\DriverTripAckProcessMap.cs" />
     <Compile Include="Mappings\DriverFuelEntryProcessMap.cs" />
     <Compile Include="ProcessTypes\DriverDelayProcessRecordType.cs" />
+    <Compile Include="ProcessTypes\DriverImageProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverMessageProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverNewContainerProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverOdomUpdateProcessRecordType.cs" />
@@ -369,6 +371,8 @@
     <Compile Include="Validators\DriverEfficiencyValidator.cs" />
     <Compile Include="Validators\DriverEnrouteProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverEnrouteProcessValidator.cs" />
+    <Compile Include="Validators\DriverImageProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverImageProcessValidator.cs" />
     <Compile Include="Validators\DriverMessageProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverMessageProcessValidator.cs" />
     <Compile Include="Validators\DriverNewContainerProcessDeletionValidator.cs" />

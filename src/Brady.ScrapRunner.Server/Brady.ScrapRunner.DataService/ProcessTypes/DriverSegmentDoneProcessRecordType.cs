@@ -1425,35 +1425,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 return false;
             }
 
-            //Update Trip Table
-            currentTrip.TripPrimaryContainerNumber = newTripSegment.TripSegPrimaryContainerNumber;
-            currentTrip.TripPrimaryContainerType = newTripSegment.TripSegPrimaryContainerType;
-            currentTrip.TripPrimaryContainerSize = newTripSegment.TripSegPrimaryContainerSize;
-            currentTrip.TripPrimaryCommodityCode = newTripSegment.TripSegPrimaryContainerCommodityCode;
-            currentTrip.TripPrimaryCommodityDesc = newTripSegment.TripSegPrimaryContainerCommodityDesc;
-            currentTrip.TripPrimaryContainerLocation = newTripSegment.TripSegPrimaryContainerLocation;
-            currentTrip.TripStartedDateTime = newTripSegment.TripSegStartDateTime;
-            if (newTripSegment.TripSegContainerQty > 1)
-            {
-                currentTrip.TripMultContainerFlag = Constants.Yes;
-            }
-            else
-            {
-                currentTrip.TripMultContainerFlag = Constants.No;
-            }
-            currentTrip.TripInProgressFlag = Constants.Yes;
-
-            //Do the update
-            changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
-            log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Segment Add.",
-                            currentTrip.TripNumber);
-            if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
-            {
-                var s = string.Format("Segment Add::Could not update Trip for Trip:{0}.",
-                    currentTrip.TripNumber);
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                return false;
-            }
+            ////////////////////////////////////////////////
+            //It seems unecessary to update trip info with primary container info, since this segment is never the first segment.
 
             ////////////////////////////////////////////////
             //Add entry to Event Log – Driver Added Segment. 
@@ -1528,7 +1501,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             if (null == destCustomerMaster)
             {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Modifiy:Invalid CustHostCode: "
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Modify:Invalid CustHostCode: "
                                 + driverSegmentDoneProcess.DestCustHostCode));
                 return false;
             }
@@ -1540,7 +1513,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         select item).FirstOrDefault();
             if (null == currentTripSegment)
             {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Modifiy:Invalid TripSegment: " +
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Modify:Invalid TripSegment: " +
                     driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
                 return false;
             }
@@ -1580,11 +1553,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             //Do the TripSegment table update
             changeSetResult = Common.UpdateTripSegment(dataService, settings, currentTripSegment);
-            log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Segment Modifiy.",
+            log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Segment Modify.",
                             currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
             if (Common.LogChangeSetFailure(changeSetResult, currentTripSegment, log))
             {
-                var s = string.Format("Segment Modifiy:Could not update TripSegment for Trip:{0}-{1}.",
+                var s = string.Format("Segment Modify:Could not update TripSegment for Trip:{0}-{1}.",
                     currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                 return false;
@@ -1618,45 +1591,19 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                 //Do the TripSegment table update
                 changeSetResult = Common.UpdateTripSegment(dataService, settings, nextTripSegment);
-                log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Segment Modifiy.",
+                log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Segment Modify.",
                                 nextTripSegment.TripNumber, nextTripSegment.TripSegNumber);
                 if (Common.LogChangeSetFailure(changeSetResult, nextTripSegment, log))
                 {
-                    var s = string.Format("Segment Modifiy:Could not update TripSegment for Trip:{0}-{1}.",
+                    var s = string.Format("Segment Modify:Could not update TripSegment for Trip:{0}-{1}.",
                         nextTripSegment.TripNumber, nextTripSegment.TripSegNumber);
                     changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                     return false;
                 }
             }
-            //Update Trip Table
-            currentTrip.TripPrimaryContainerNumber = currentTripSegment.TripSegPrimaryContainerNumber;
-            currentTrip.TripPrimaryContainerType = currentTripSegment.TripSegPrimaryContainerType;
-            currentTrip.TripPrimaryContainerSize = currentTripSegment.TripSegPrimaryContainerSize;
-            currentTrip.TripPrimaryCommodityCode = currentTripSegment.TripSegPrimaryContainerCommodityCode;
-            currentTrip.TripPrimaryCommodityDesc = currentTripSegment.TripSegPrimaryContainerCommodityDesc;
-            currentTrip.TripPrimaryContainerLocation = currentTripSegment.TripSegPrimaryContainerLocation;
-            currentTrip.TripStartedDateTime = currentTripSegment.TripSegStartDateTime;
-            if (currentTripSegment.TripSegContainerQty > 1)
-            {
-                currentTrip.TripMultContainerFlag = Constants.Yes;
-            }
-            else
-            {
-                currentTrip.TripMultContainerFlag = Constants.No;
-            }
-            currentTrip.TripInProgressFlag = Constants.Yes;
 
-            //Do the update
-            changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
-            log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Segment Modify.",
-                            currentTrip.TripNumber);
-            if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
-            {
-                var s = string.Format("Segment Add::Could not update Trip for Trip:{0}.",
-                    currentTrip.TripNumber);
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                return false;
-            }
+            ////////////////////////////////////////////////
+            //It seems unecessary to update trip info with primary container info, since container info has not changed.
 
             ////////////////////////////////////////////////
             //Add entry to Event Log – Driver Modified Segment. 
@@ -1695,13 +1642,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             ChangeSetResult<int> eventChangeSetResult;
             eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
-            log.Debug("SRTEST:Saving EventLog Record - Segment Modifiy");
-            log.DebugFormat("SRTEST:Saving EventLog Record for Trip:{0}-{1} - Segment Modifiy.",
+            log.Debug("SRTEST:Saving EventLog Record - Segment Modify");
+            log.DebugFormat("SRTEST:Saving EventLog Record for Trip:{0}-{1} - Segment Modify.",
                             currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
             //Check for EventLog failure.
             if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
             {
-                var s = string.Format("Segment Modifiy:Could not update EventLog for Trip:{0}-{1}.",
+                var s = string.Format("Segment Modify:Could not update EventLog for Trip:{0}-{1}.",
                         currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                 return false;
