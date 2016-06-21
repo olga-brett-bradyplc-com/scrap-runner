@@ -52,6 +52,7 @@
     <Compile Include="Interfaces\ILocationService.cs" />
     <Compile Include="Interfaces\IMessagesService.cs" />
     <Compile Include="Interfaces\INetworkAvailabilityService.cs" />
+    <Compile Include="Interfaces\IPollingService.cs" />
     <Compile Include="Interfaces\IPreferenceService.cs" />
     <Compile Include="Interfaces\IQueueScheduler.cs" />
     <Compile Include="Interfaces\IQueueService.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Services\LocationPathService.cs" />
     <Compile Include="Services\LocationService.cs" />
     <Compile Include="Services\MessagesService.cs" />
+    <Compile Include="Services\PollingService.cs" />
     <Compile Include="Services\QueuedDataServiceClient.cs" />
     <Compile Include="Services\PreferenceService.cs" />
     <Compile Include="Services\DbService.cs" />
