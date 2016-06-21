@@ -109,6 +109,27 @@ namespace Brady.ScrapRunner.DataService.Util
             return onPowerId;
         }
         /// <summary>
+        /// Returns the string containing the partial path to store a trip's picture or signature
+        /// Directory will be created in a form of 0\0\0\1\2\3\4\5\6\7 '
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns></returns>
+        public static string CreateDirectoryStringForImage(string tripNumber)
+        {
+            //Pad with leading 0's to form a 10-character string
+            string paddedTripNumber = tripNumber.PadLeft(10, '0');
+            string path = @"\";     
+
+            int iLen = paddedTripNumber.Length - 1;
+            for (int i = 0; i < iLen; i++)
+            {
+                path += paddedTripNumber[i];
+                path += @"\";
+            }
+            return path;
+        }
+
+        /// <summary>
         /// Determines if the segment is loaded.
         /// If any container on the truck is loaded, segment is loaded
         /// Otherwise if the segment is a drop full, scale, or unload, the segment is loaded
@@ -1852,7 +1873,23 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-        
+        /// <summary>
+        /// Update a TripSegmentImage record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="tripSegmentImage"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdateTripSegmentImage(IDataService dataService, ProcessChangeSetSettings settings,
+            TripSegmentImage tripSegmentImage)
+        {
+            var recordType = (TripSegmentImageRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegmentImage");
+            var changeSet = (ChangeSet<string, TripSegmentImage>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(tripSegmentImage.Id, tripSegmentImage);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+
         /// <summary>
         /// Update a TripSegmentContainer record.
         /// </summary>
@@ -4824,6 +4861,43 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentContainer;
         }
+        /// TRIPSEGMENTIMAGE Table  queries
+        /// <summary>
+        ///  Gets the last trip segment image record for a given trip and segment.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static TripSegmentImage GetTripSegmentImageLast(IDataService dataService, ProcessChangeSetSettings settings,
+                      string userCulture, IEnumerable<long> userRoleIds, string tripNumber, string tripSegNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripSegmentImage = new TripSegmentImage();
+            if (null != tripNumber && null != tripSegNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripSegmentImage>()
+                    .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripNumber)
+                    .And().Property(x => x.TripSegNumber).EqualTo(tripSegNumber))
+                    .OrderBy(x => x.TripSegImageSeqId, Direction.Descending)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripSegmentImage;
+                }
+                tripSegmentImage = queryResult.Records.Cast<TripSegmentImage>().FirstOrDefault();
+            }
+            return tripSegmentImage;
+        }
+
         /// TRIPSEGMENTMILEAGE Table  queries
         /// <summary>
         ///  Gets the trip segment mileage records for a given trip.
