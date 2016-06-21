@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using BWF.Membership.Adaptor.Interfaces;
 using BWF.Membership.Adaptor.Models;
 using System.Threading.Tasks;
-using System.Linq;
-using System.Runtime.CompilerServices;
+using log4net;
 
 namespace Brady.ScrapRunner.Host.Membership
 {
@@ -16,13 +16,36 @@ namespace Brady.ScrapRunner.Host.Membership
     /// </summary>
     public class ScrapRunMembershipProvider : IMembershipAdaptor
     {
-        private IDictionary<string, IList<string>> userRoles = new Dictionary<string, IList<string>>();
-        private IDictionary<string, ExternalUser> users = new Dictionary<string, ExternalUser>();
-        private IDictionary<string, string> roles = new Dictionary<string, string>();
 
-        private const string adminRole = "Administrator";
-        private const string dispatcherRole = "Dispatcher";
-        private const string driverRole = "Driver";
+        private static readonly ILog Log = LogManager.GetLogger(typeof (ScrapRunMembershipProvider));
+
+        // TODO: Remove or disable hardcoded admin prior to customer deployment
+        private bool enableHardcodedAdmin = true;
+
+        // TODO:  Flesh out roles and user assignments.
+        // For now only drivers use the service, so currently we assign them the administrator role 
+        // for set-up simplicity.  Note we could use the exploroer as an alternative password reset 
+        // mechanism.
+        //
+        //   private const string RoleDispatcher = "Dispatcher";
+        //   private const string RoleDriver = "Driver";
+        private const string RoleAdministrator = "Administrator";
+        private List<string> allRoles = new List<string>();
+        private List<string> userRoles = new List<string>();
+
+        /// <summary>
+        /// The non-argument constructor
+        /// </summary>
+        public ScrapRunMembershipProvider()
+        {
+            allRoles.Add(RoleAdministrator);
+            // allRoles.Add(RoleDriver);
+            // allRoles.Add(RoleDispatcher);
+
+            userRoles.Add(RoleAdministrator);
+            // userRoles.Add(RoleDriver);
+            // userRoles.Add(RoleDispatcher);
+        }
 
         /// <summary>
         /// Allow selection of adaptor by framework 
@@ -47,117 +70,80 @@ namespace Brady.ScrapRunner.Host.Membership
         /// <summary>
         /// Indicate to the BWF if this optional functionality is implemented.
         /// </summary>
-        public bool SupportsChangePassword => false;
+        public bool SupportsChangePassword => true;
 
         /// <summary>
         /// Indicate to the BWF if this optional functionality is implemented.
         /// </summary>
-        public bool SupportsPasswordReset => false;
+        public bool SupportsPasswordReset => true;
 
         /// <summary>
         /// Indicate to the BWF if this optional functionality is implemented.
         /// </summary>
         public bool SupportsUnlockUser => false;
 
-        public bool RequiresExternalAuthenticationUrl
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        /// <summary>
+        /// Indicate to the BWF if this optional functionality is implemented.
+        /// </summary>
+        public bool RequiresExternalAuthenticationUrl => false;
 
-        public bool RequiresExternalSignOutUrl
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public ScrapRunMembershipProvider()
-        {
-            userRoles.Add("admin", new List<string> { adminRole });
-            userRoles.Add("steve", new List<string> { dispatcherRole });
-            userRoles.Add("smaniak", new List<string> { driverRole });
-            users.Add("admin", new ExternalUser { Username = "admin", EmailAddress = "steve.maniak@bradyplc.com", IsApproved = true });
-            users.Add("steve", new ExternalUser { Username = "steve", EmailAddress = "steve.maniak@bradyplc.com", IsApproved = true });
-            users.Add("smaniak", new ExternalUser { Username = "smaniak", EmailAddress = "steve.maniak@bradyplc.com", IsApproved = true });
-            roles.Add(adminRole, adminRole);
-            roles.Add(driverRole, driverRole);
-            roles.Add(dispatcherRole, dispatcherRole);
-        }
+        /// <summary>
+        /// Indicate to the BWF if this optional functionality is implemented.
+        /// </summary>
+        public bool RequiresExternalSignOutUrl => false;
 
         /// <summary>
         /// Return existing users 
         /// </summary>
-        //public IEnumerable<ExternalUser> Users
-        //{
-        //    get
-        //    {
-        //        var externalUsers = new List<ExternalUser>
-        //        {
-        //            new ExternalUser()
-        //            {
-        //                Username = "admin",
-        //                EmailAddress = "steve.maniak@bradyplc.com",
-        //                IsApproved = true
-        //            },
-        //            new ExternalUser()
-        //            {
-        //                Username = "steve",
-        //                EmailAddress = "steve.maniak@bradyplc.com",
-        //                IsApproved = true
-        //            },
-        //            new ExternalUser()
-        //            {
-        //                Username = "smaniak",
-        //                EmailAddress = "steve.maniak@bradyplc.com",
-        //                IsApproved = true
-        //            },
-        //            new ExternalUser()
-        //            {
-        //                Username = "sparky",
-        //                EmailAddress = "steve.maniak@bradyplc.com",
-        //                IsApproved = true
-        //            }
-        //        };
+        public Task<IEnumerable<ExternalUser>> GetUsersAsync()
+        {
+            Log.Debug("Enter GetUsersAsync()");
+            var externalUsers = new List<ExternalUser>();
 
-        //        var connectionString = ConfigurationManager.ConnectionStrings["ScrapRunner"].ConnectionString;
-        //        var queryString = "SELECT EmployeeId AS UserName, " + 
-        //                          "       '' AS EmailAddress, " +
-        //                          "       CAST(CASE WHEN InactiveDate IS NULL THEN 1 ELSE 0 END AS bit) as IsApproved " +
-        //                          "  FROM dbo.EmployeeMaster ";
+            if (enableHardcodedAdmin)
+            {
+                externalUsers.Add(
+                    new ExternalUser()
+                    {
+                        Username = "admin",
+                        EmailAddress = "",
+                        IsApproved = true
+                    });
+            }
 
-        //        using (SqlConnection con = new SqlConnection(connectionString))
-        //        {
-        //            con.Open();
-        //            using (var command = new SqlCommand(queryString, con))
-        //            {
-        //                using (var reader = command.ExecuteReader())
-        //                {
-        //                    while (reader.Read())
-        //                    {
-        //                        externalUsers.Add(new ExternalUser() { Username = reader.GetString(0), EmailAddress = reader.GetString(1), IsApproved = reader.GetBoolean(2) });
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        return externalUsers;
-        //    }
-        //}
+            var connectionString = ConfigurationManager.ConnectionStrings["ScrapRunner"].ConnectionString;
+            var queryString = "SELECT em.EmployeeId AS UserName, " +
+                              "       '' AS EmailAddress, " +
+                              "       CAST(CASE WHEN em.InactiveDate IS NULL THEN 1 ELSE 0 END AS bit) as IsApproved " +
+                              "  FROM dbo.EmployeeMaster AS em " +
+                              "  JOIN dbo.DriverMaster AS dm " +
+                              "    ON em.EmployeeId = dm.EmployeeId " +
+                              " ORDER BY em.EmployeeId ";
 
-        /// <summary>
-        /// Return all recognized roles.
-        /// </summary>
-        //public IEnumerable<string> Roles
-        //{
-        //    get
-        //    {
-        //        Perhaps something like: SELECT DISTINCT SecurityLevel from dbo.EmployeeMaster
-        //        return new[] { "Administrator", "Dispatcher", "Driver" };
-        //    }
-        //}
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+                    var command = new SqlCommand(queryString, con);
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        externalUsers.Add(new ExternalUser()
+                        {
+                            Username = reader.GetString(0),
+                            EmailAddress = reader.GetString(1),
+                            IsApproved = reader.GetBoolean(2)
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error("Exception in GetUsersAsync", e);
+            }
+            return Task.FromResult((IEnumerable<ExternalUser>) externalUsers);
+        }
 
         /// <summary>
         /// Is the user locked?
@@ -166,7 +152,7 @@ namespace Brady.ScrapRunner.Host.Membership
         /// <returns>true of user is locked, false otherwise</returns>
         public Task<bool> IsUserLockedAsync(string username)
         {
-            // Details TBD.  If even supported, perhaps SELECT EmployeeStatus FROM dbo.EmployeeMaster WHERE EmployeeId = '{0}'
+            // Locking not supported
             return Task.FromResult(false);
         }
 
@@ -177,11 +163,8 @@ namespace Brady.ScrapRunner.Host.Membership
         /// <returns>A list of zero to many roles</returns>
         public Task<IEnumerable<string>> GetRolesForUserAsync(string username)
         {
-            // Details TBD.  Probably simple like: SELECT SecurityLevel from dbo.EmployeeMaster WHERE EmployeeId = '{0}'
-            return Task.FromResult(
-                userRoles.ContainsKey(username)
-                    ? userRoles[username]
-                    : Enumerable.Empty<string>());
+            // TODO: UserRole details TBD.
+            return Task.FromResult((IEnumerable<string>) userRoles);
         }
 
         /// <summary>
@@ -195,29 +178,34 @@ namespace Brady.ScrapRunner.Host.Membership
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public Task<IEnumerable<ExternalUser>> GetUsersAsync()
-        {
-            return Task.FromResult(users.Select(x => x.Value));
-        }
-
-
-        /// <summary>
         /// Authenticate the user.
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
+        /// <param name="credentials">a UsernameAndPassword tuple</param>
         /// <returns>true if password is valid and user is not restricted/locked</returns>
-        public async Task<string> AuthenticateUserAsync(object credentials)
+        public Task<string> AuthenticateUserAsync(object credentials)
         {
-            // Details TBD.  Perhaps something like hash and compare: 
-            // SELECT Password from dbo.EmployeeMaster WHERE EmployeeId = '{0}'
-            //bool authenticated = null != username && null != password && "mem_2014".Equals(password);
-            //return authenticated;
+            Log.Debug("Enter AuthenticateUserAsync(object credentials)");
+            bool isAuthenticated = false;
             var usernameAndPassword = credentials as UsernameAndPassword;
-            return (await GetUsersAsync()).Any(x => x.Username.Equals(usernameAndPassword.Username, StringComparison.OrdinalIgnoreCase)) ? usernameAndPassword.Username : null;
+            if (null != usernameAndPassword)
+            {
+
+                if (enableHardcodedAdmin && "admin".Equals(usernameAndPassword.Username))
+                {
+                    isAuthenticated = "mem_2014".Equals(usernameAndPassword.Password);
+                }
+                else
+                {
+                    var hashIncoming = PasswordHasher.GetBase64PasswordHash(usernameAndPassword.Username,
+                        usernameAndPassword.Password);
+                    var oldUsernameAndPassword = SelectPersistedUserAndPasswordHash(usernameAndPassword.Username);
+                    if (!string.IsNullOrEmpty(oldUsernameAndPassword?.Password))
+                    {
+                        isAuthenticated = hashIncoming.Equals(oldUsernameAndPassword.Password);
+                    }
+                }
+            }
+            return Task.FromResult(isAuthenticated ? usernameAndPassword.Username : null);
         }
 
         /// <summary>
@@ -229,11 +217,86 @@ namespace Brady.ScrapRunner.Host.Membership
         /// <returns>true if successful</returns>
         public Task<bool> ChangePasswordAsync(string username, string oldPassword, string newPassword)
         {
-            // Details TBD.  Perhaps somethign like hash old and compare: 
-            // SELECT Password from dbo.EmployeeMaster WHERE EmployeeId = '{0}'
-            // Then hash new and insert: 
-            // UPDATE dbo.EmployeeMaster SET Password = '{0}' from  WHERE EmployeeId = '{1}'
-            throw new NotImplementedException();
+            Log.Debug("Enter ChangePasswordAsync(username, oldPassword, newPassword)");
+            bool wasSuccessful = false;
+
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new ArgumentException("Must not be null or empty", nameof(username));
+            }
+            if (string.IsNullOrEmpty(oldPassword))
+            {
+                throw new ArgumentException("Must not be null or empty", nameof(oldPassword));
+            }
+            if (string.IsNullOrEmpty(newPassword))
+            {
+                throw new ArgumentException("Must not be null or empty", nameof(newPassword));
+            }
+            if (oldPassword.Equals(newPassword))
+            {
+                throw new ArgumentException("New password must differ from old password", nameof(newPassword));
+            }
+
+            if (enableHardcodedAdmin && "admin".Equals(username))
+            {
+                //Option:  throw new NotImplementedException();
+                // for now: wasSuccessful = false;
+            }
+            else
+            {
+                var oldHash = PasswordHasher.GetBase64PasswordHash(username, oldPassword);
+                var newHash = PasswordHasher.GetBase64PasswordHash(username, newPassword);
+                var oldUsernameAndPassword = SelectPersistedUserAndPasswordHash(username);
+                if (!string.IsNullOrEmpty(oldUsernameAndPassword?.Password))
+                {
+                    if (oldHash.Equals(oldUsernameAndPassword.Password))
+                    {
+                        var connectionString = ConfigurationManager.ConnectionStrings["ScrapRunner"].ConnectionString;
+                        string sql = "UPDATE dbo.EmployeeMaster " +
+                                     "   SET PasswordEncrypted = @PasswordEncrypted " +
+                                     " WHERE EmployeeId = @EmployeeId ";
+
+                        using (SqlConnection con = new SqlConnection(connectionString))
+                        {
+                            con.Open();
+                            var command = con.CreateCommand();
+                            var transaction = con.BeginTransaction();
+
+                            try
+                            {
+                                // Must assign both transaction object and connection
+                                // to Command object for a pending local transaction
+                                command.Connection = con;
+                                command.Transaction = transaction;
+                                command.CommandText = sql;
+                                command.Parameters.Add("@PasswordEncrypted", SqlDbType.VarChar);
+                                command.Parameters.Add("@EmployeeId", SqlDbType.VarChar);
+                                command.Parameters["@PasswordEncrypted"].Value = newHash;
+                                command.Parameters["@EmployeeId"].Value = username;
+                                var numrows = command.ExecuteNonQuery();
+
+                                if (numrows == 1)
+                                {
+                                    wasSuccessful = true;
+                                }
+
+                                if (numrows > 1)
+                                {
+                                    throw new Exception("numrows greater than 1 when updating password!");
+                                }
+
+                                transaction.Commit();
+                            }
+                            catch (Exception e)
+                            {
+                                transaction.Rollback();
+                                Log.Error("Exception in SelectPersistedUserAndPasswordHash", e);
+                            }
+                        }
+                    }
+                }
+            }
+            return Task.FromResult(wasSuccessful);
         }
 
         /// <summary>
@@ -244,20 +307,67 @@ namespace Brady.ScrapRunner.Host.Membership
         /// <returns></returns>
         public Task<bool> ResetPasswordAsync(string username, string newPassword)
         {
-            // Details TBD:  Perhaps simply hash new and insert: 
-            // UPDATE dbo.EmployeeMaster SET Password = '{0}' from  WHERE EmployeeId = '{1}'
-            throw new NotImplementedException();
-        }
+            Log.Debug("Enter ResetPasswordAsync(username, newPassword)");
+            bool wasSuccessful = false;
 
-        /// <summary>
-        /// Unlock a user
-        /// </summary>
-        /// <param name="username"></param>
-        /// <returns>true if user is currently or now unlocked</returns>
-        public Task<bool> UnlockUser(string username)
-        {
-            // Details TBD:  Any support?
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new ArgumentException("Must not be null or empty", nameof(username));
+            }
+            if (string.IsNullOrEmpty(newPassword))
+            {
+                throw new ArgumentException("Must not be null or empty", nameof(newPassword));
+            }
+
+            if (enableHardcodedAdmin && "admin".Equals(username))
+            {
+                //Option:  throw new NotImplementedException();
+                // for now: wasSuccessful = false;
+            }
+            else
+            {
+                var newHash = PasswordHasher.GetBase64PasswordHash(username, newPassword);
+                var connectionString = ConfigurationManager.ConnectionStrings["ScrapRunner"].ConnectionString;
+                string sql = "UPDATE dbo.EmployeeMaster " +
+                             "   SET PasswordEncrypted = @PasswordEncrypted " +
+                             " WHERE EmployeeId = @EmployeeId ";
+
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+                    var command = con.CreateCommand();
+                    var transaction = con.BeginTransaction();
+
+                    try
+                    {
+                        // Must assign both transaction object and connection
+                        // to Command object for a pending local transaction
+                        command.Connection = con;
+                        command.Transaction = transaction;
+                        command.CommandText = sql;
+                        command.Parameters.Add("@PasswordEncrypted", SqlDbType.VarChar);
+                        command.Parameters.Add("@EmployeeId", SqlDbType.VarChar);
+                        command.Parameters["@PasswordEncrypted"].Value = newHash;
+                        command.Parameters["@EmployeeId"].Value = username;
+                        var numrows = command.ExecuteNonQuery();
+                        if (numrows == 1)
+                        {
+                            wasSuccessful = true;
+                        }
+                        if (numrows > 1)
+                        {
+                            throw new Exception("numrows greater than 1 when resetting password!");
+                        }
+                        transaction.Commit();
+                    }
+                    catch (Exception e)
+                    {
+                        transaction.Rollback();
+                        Log.Error("Exception in SelectPersistedUserAndPasswordHash", e);
+                    }
+                }
+            }
+            return Task.FromResult(wasSuccessful);
         }
 
         public Task<bool> CreateUserAsync(ExternalUser user, string password)
@@ -295,35 +405,12 @@ namespace Brady.ScrapRunner.Host.Membership
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Hash a user's password.
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
-        /// <returns>Base64 representaion of the user's salted and hashed password.</returns>
-        private string hashPassword(string username, string password)
-        {
-            // This is a sample SHA512 example.  We may need to retrofit whatever hashing or encodidng the
-            // legacy SR code is using.
-            if (null == username)
-            {
-                username = "";
-            }
-            if (null == password)
-            {
-                password = "";
-            }
-            var salt = username.ToLower();
-            byte[] saltedcleartext = System.Text.Encoding.UTF8.GetBytes(password + "{" + salt + "}");
-            byte[] hash = System.Security.Cryptography.SHA512.Create().ComputeHash(saltedcleartext);
-            return Convert.ToBase64String(hash);
-        }
-
         public Task<IEnumerable<string>> GetRolesAsync()
         {
-            throw new NotImplementedException();
+            // TODO: AllRole details TBD.
+            return Task.FromResult((IEnumerable<string>)allRoles);
         }
-
+        
         public Task<bool> UnlockUserAsync(string username)
         {
             throw new NotImplementedException();
@@ -347,6 +434,46 @@ namespace Brady.ScrapRunner.Host.Membership
         public string GetRedirectUrlForAuthenticatedQuery(dynamic query)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Fetch an existing username and password hash from the database.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns>null if username not found</returns>
+        private UsernameAndPassword SelectPersistedUserAndPasswordHash(string username)
+        {
+            Log.Debug("Enter SelectPersistedUserAndPasswordHash(username)");
+            UsernameAndPassword usernameAndPassword = null;
+            var connectionString = ConfigurationManager.ConnectionStrings["ScrapRunner"].ConnectionString;
+            var queryString = "SELECT em.EmployeeId, em.PasswordEncrypted " +
+                              "  FROM dbo.EmployeeMaster AS em " +
+                              " WHERE em.EmployeeId = @EmployeeId ";
+            if (!string.IsNullOrEmpty(username))
+            {
+                try
+                {
+                    using (SqlConnection con = new SqlConnection(connectionString))
+                    {
+                        con.Open();
+                        var command = new SqlCommand(queryString, con);
+                        command.Parameters.Add("@EmployeeId", SqlDbType.VarChar);
+                        command.Parameters["@EmployeeId"].Value = username;
+                        var reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            // There is at most one result, possibly null
+                            usernameAndPassword = new UsernameAndPassword(reader.GetString(0), reader.GetString(1));
+                            break;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Exception in SelectPersistedUserAndPasswordHash", e);
+                }
+            }
+            return usernameAndPassword;
         }
     }
 }
