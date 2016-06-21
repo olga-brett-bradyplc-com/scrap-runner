@@ -13,12 +13,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IConnectionService _connection;
         private readonly IQueueScheduler _queueScheduler;
         private readonly ICodeTableService _codeTableService;
+        private readonly ILocationService _locationService;
 
-        public MenuViewModel(IConnectionService connection, IQueueScheduler queueScheduler, ICodeTableService codeTableService)
+        public MenuViewModel(IConnectionService connection, IQueueScheduler queueScheduler, ICodeTableService codeTableService, ILocationService locationService)
         {
             _connection = connection;
             _queueScheduler = queueScheduler;
             _codeTableService = codeTableService;
+            _locationService = locationService;
         }
 
         private IMvxAsyncCommand _logoutCommand;
@@ -32,6 +34,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (logoutDialog)
             {
                 _queueScheduler.Unschedule();
+                _locationService.Stop();
                 _connection.DeleteConnection();
                 ShowViewModel<SignInViewModel>();
             }
@@ -46,6 +49,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             AppResources.ForcedLogoffMessage, AppResources.ForcedLogoff, AppResources.OK);
 
             _queueScheduler.Unschedule();
+            _locationService.Stop();
             _connection.DeleteConnection();
             ShowViewModel<SignInViewModel>();
         }
@@ -96,6 +100,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
+
         private IMvxCommand _takePictureCommand;
         public IMvxCommand TakePictureCommand
             => _takePictureCommand ?? (_takePictureCommand = new MvxCommand(ExecuteTakePictureCommand));
@@ -103,6 +108,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private void ExecuteTakePictureCommand()
         {
             ShowViewModel<PhotosViewModel>();
+        }
+
+        private IMvxCommand _loadDropContainersCommand;
+        public IMvxCommand LoadDropContainersCommand
+            => _loadDropContainersCommand ?? (_loadDropContainersCommand = new MvxCommand(ExecuteLoadDropContainersCommand));
+
+        private void ExecuteLoadDropContainersCommand()
+        {
+            ShowViewModel<LoadDropContainerViewModel>();
         }
     }
 }

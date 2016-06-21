@@ -56,6 +56,7 @@
         public static readonly string Exception = "E";
         public static readonly string Load = "L";
         public static readonly string Dropped = "S";
+        public static readonly string Added = "A";
     }
     /// <summary>
     /// The Delay Action Type internal codes.  Used in the processing delay & back on duty information.
@@ -112,6 +113,7 @@
         public static readonly string ReceiptComments = "RECEIPTCOMMENTS";
         public static readonly string RegularRuns = "REGULARRUNS";
         public static readonly string SecurityAccess = "SECURITYACCESS";
+        public static readonly string States = "STATES";
         public static readonly string StatesCanada = "STATESCAN";
         public static readonly string StatesMexico = "STATESMEX";
         public static readonly string StatesUSA = "STATESUSA";
@@ -129,7 +131,15 @@
         public static readonly string System = "S";
         public static readonly string User = "U";
     }
-
+    /// <summary>
+    /// Container Change internal codes
+    /// </summary>
+    public static class ContainerChangeConstants
+    {
+        public static readonly string Add = "A";
+        public static readonly string Delete = "D";
+        public static readonly string Modify = "C";
+    }
     /// <summary>
     /// The Container Contents internal codes.  Used in the ContainerMaster table.
     /// </summary>
@@ -139,6 +149,14 @@
         public static readonly string Loaded = "L";
         public static readonly string Preload = "P";
         public static readonly string Unknown = "U";
+    }
+    /// <summary>
+    /// Container Method of Entry internal codes. Used in the TripSegmentContainer table.
+    /// </summary>
+    public static class ContainerMethodOfEntry
+    {
+        public static readonly string Scanned = "S";
+        public static readonly string Manual = "M";
     }
 
     /// <summary>
@@ -299,6 +317,8 @@
         public static readonly string ReceivedDriverCancelSeg = "RECEIVED DRIVER CANCEL SEG";
         /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER ADDED SEG</summary>
         public static readonly string ReceivedDriverAddedSeg = "RECEIVED DRIVER ADDED SEG";
+        /// <summary>ReceivedDriverAddedSeg: RECEIVED DRIVER MODIFIED SEG</summary>
+        public static readonly string ReceivedDriverModifiedSeg = "RECEIVED DRIVER MODIFIED SEG";
         /// <summary>ReceivedDriverContainerAction: RECEIVED DRIVER CONTAINER ACTION</summary>
         public static readonly string ReceivedDriverContainerAction = "RECEIVED DRIVER CONTAINER ACTION";
         /// <summary>ReceivedDriverNewContainer: RECEIVED DRIVER NEW CONTAINER</summary>
@@ -688,6 +708,12 @@
         /// Otherwise a driver can log in to a power unit whose region matches the driver's region. 
         /// </summary>
         public static readonly string DEFAllowAnyPowerUnit = "DEFAllowAnyPowerUnit";
+
+        /// <summary>
+        /// MDT Prefix for OnDemand Customers only
+        /// A 1-2 character identifier to uniquely identify the customer for IPCom
+        /// </summary>
+        public static readonly string DEFMDTPrefix = "DEFMDTPrefix";
     }
     /// <summary>
     /// Driver Preference internal codes. From the Preferences table.
@@ -762,6 +788,15 @@
         public static readonly string GateCheck = "GT";
     }
     /// <summary>
+    /// Terminal Change internal codes
+    /// </summary>
+    public static class TerminalChangeConstants
+    {
+        public static readonly string Add = "A";
+        public static readonly string Delete = "D";
+        public static readonly string Modify = "M";
+    }
+    /// <summary>
     /// The Trip Assign Status internal codes.  Used in the Trip table.
     /// </summary>
     public static class TripAssignStatusConstants
@@ -780,6 +815,17 @@
         public static readonly string Driver = "D";
         /// <summary>Manual: M</summary>
         public static readonly string Manual = "M";
+        ///<summary>Scanned</summary>
+        public static readonly string Scanned = "S";
+    }
+    /// <summary>
+    /// The trip segment action type codes.
+    /// </summary>
+    public static class TripSegmentActionTypeConstants
+    {
+        public static readonly string Done = "D";
+        public static readonly string Canceled = "X";
+        public static readonly string Pending = "P";
     }
 
     /// <summary>

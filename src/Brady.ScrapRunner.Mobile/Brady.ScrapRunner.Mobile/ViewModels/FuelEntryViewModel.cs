@@ -149,6 +149,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     ActionDateTime = DateTime.Now,
                     PowerId = currentUser.PowerId,
                     State = SelectedState.CodeValue,
+                    Country = SelectedState.CodeDisp2,
                     TripNumber = currentUser.TripNumber,
                     TripSegNumber = currentUser.TripSegNumber,
                     FuelAmount = FuelAmount ?? default(float)

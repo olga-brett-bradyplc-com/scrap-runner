@@ -168,17 +168,16 @@
         /// </summary>
         /// <param name="tripNumber"></param>
         /// <returns>bool</returns>
-        public async Task<bool> IsTripLegAcctTypeScale(string tripNumber)
+        public async Task<bool> IsTripLegTypePublicScale(string tripNumber)
         {
             var segment = await _tripSegmentRepository.AsQueryable()
                 .Where(ts =>
                     ts.TripNumber == tripNumber
-                    &&
-                    (ts.TripSegType == CustomerTypeConstants.Scale))
+                    && (ts.TripSegStatus == TripSegStatusConstants.Pending ||
+                     ts.TripSegStatus == TripSegStatusConstants.Missed))
                 .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
 
-            return segment.TripSegType.Equals(BasicTripTypeConstants.Scale) ||
-                   segment.TripSegType.Equals(BasicTripTypeConstants.ReturnYard);
+            return segment?.TripSegType == BasicTripTypeConstants.Scale;
         }
 
         /// <summary>
@@ -271,7 +270,7 @@
                 Mvx.TaggedError(Constants.ScrapRunner, $"Couldn't find next containers for trip {tripNumber}.");
                 return Enumerable.Empty<TripSegmentContainerModel>().ToList();
             }
-            return containers.TakeWhile(tscm => tscm.TripSegContainerComplete != Constants.Yes).ToList();
+            return containers.ToList();
         }
 
         /// <summary>
@@ -301,11 +300,11 @@
         /// <param name="tripSegNo"></param>
         /// <param name="tripSegContainerSeqNumber"></param>
         /// <param name="tripSegContainerNumer"></param>
+        /// <param name="segmentComplete"></param>
         /// <returns></returns>
         public async Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo,
             short tripSegContainerSeqNumber, string tripSegContainerNumer)
         {
-            // @TODO : Not complete
             var container = await _tripSegmentContainerRepository.AsQueryable()
                 .Where(
                     tscm =>
@@ -317,6 +316,33 @@
 
             container.TripSegContainerActionDateTime = DateTime.Now;
             container.TripSegContainerComplete = Constants.Yes;
+
+            return await _tripSegmentContainerRepository.UpdateAsync(container);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNo"></param>
+        /// <param name="tripSegContainerSeqNumber"></param>
+        /// <param name="tripSegContainerNumer"></param>
+        /// <param name="tripSegmentComplete"></param>
+        /// <returns></returns>
+        public async Task<int> ProcessTripSegmentContainerAsync(string tripNumber, string tripSegNo,
+            short tripSegContainerSeqNumber, string tripSegContainerNumer, bool tripSegmentComplete)
+        {
+            var container = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(
+                    tscm =>
+                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
+                        tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).FirstOrDefaultAsync();
+
+            if (string.IsNullOrEmpty(container.TripSegContainerNumber))
+                container.TripSegContainerNumber = tripSegContainerNumer;
+
+            container.TripSegContainerActionDateTime = DateTime.Now;
+            container.TripSegContainerComplete = (tripSegmentComplete) ? Constants.Yes : Constants.No;
 
             return await _tripSegmentContainerRepository.UpdateAsync(container);
         }
@@ -374,6 +400,7 @@
             return await _tripSegmentContainerRepository.UpdateAsync(container);
         }
 
+
         /// <summary>
         /// Complete a given trip
         /// </summary>
@@ -384,6 +411,19 @@
             // @TODO : Implement remote process once it's completed
             var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
             trip.TripStatus = TripStatusConstants.Done;
+            return await _tripRepository.UpdateAsync(trip);
+        }
+
+        /// <summary>
+        /// Mark a given trip as an exception
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns></returns>
+        public async Task<int> MarkExceptionTripAsync(string tripNumber)
+        {
+            // @TODO : Implement remote process once it's completed
+            var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
+            trip.TripStatus = TripStatusConstants.Exception;
             return await _tripRepository.UpdateAsync(trip);
         }
 
@@ -399,6 +439,21 @@
                 await _tripSegmentRepository.FindAsync(
                     ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
             tripSegment.TripSegStatus = TripSegStatusConstants.Done;
+            return await _tripSegmentRepository.UpdateAsync(tripSegment);
+        }
+
+        /// <summary>
+        /// Mark a given leg of a trip as exception; 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNumber"></param>
+        /// <returns></returns>
+        public async Task<int> MarkExceptionTripSegmentAsync(string tripNumber, string tripSegNumber)
+        {
+            var tripSegment =
+                await _tripSegmentRepository.FindAsync(
+                    ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
+            tripSegment.TripSegStatus = TripSegStatusConstants.Exception;
             return await _tripSegmentRepository.UpdateAsync(tripSegment);
         }
 
@@ -425,6 +480,17 @@
             var yardInfo = _yardInfoRepository.AsQueryable()
                 .Where(y => y.TerminalId == terminalId).FirstOrDefaultAsync();
             return yardInfo;
+        }
+        public async Task<int> MarkExceptionTripSegmentContainerAsync(string tripNumber, string tripSegNumber, string tripSegContainerNumber,
+            string reviewReason)
+        {
+            var tripSegmentContainer =
+                await _tripSegmentContainerRepository.FindAsync(
+                    ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
+            tripSegmentContainer.TripSegContainerReviewFlag = TripSegStatusConstants.Exception;
+            tripSegmentContainer.TripSegContainerReviewReason = reviewReason;
+
+            return await _tripSegmentContainerRepository.UpdateAsync(tripSegmentContainer);
         }
     }
 }

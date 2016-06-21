@@ -122,6 +122,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
+                    //DriverTripAckProcess has been called
+                    log.DebugFormat("SRTEST:DriverTripAckProcess Called by {0}", key);
+                    log.DebugFormat("SRTEST:DriverTripAckProcess Driver:{0} Trip:{1} DT:{2} MDT:{3}",
+                                     driverTripAckProcess.EmployeeId, driverTripAckProcess.TripNumber,
+                                     driverTripAckProcess.ActionDateTime, driverTripAckProcess.Mdtid);
+
+                    ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                                   driverTripAckProcess.EmployeeId, out fault);
@@ -157,7 +164,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Check if trip is complete
                     if (Common.IsTripComplete(currentTrip))
                     {
-                        log.DebugFormat("SRTEST:TripNumber:{0} is Complete. TripAck processing ends.",
+                        log.DebugFormat("SRTEST:DriverTripAckProcess:TripNumber:{0} is Complete. TripAck processing ends.",
                                         driverTripAckProcess.TripNumber);
                         break;
                     }
@@ -177,11 +184,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     //Do the update
                     changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
-                    log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Trip Ack.",
+                    log.DebugFormat("SRTEST:DriverTripAckProcess:Saving Trip Record for Trip:{0} - Trip Ack.",
                                     currentTrip.TripNumber);
                     if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
                     {
-                        var s = string.Format("Could not update Trip for Trip:{0}.",
+                        var s = string.Format("DriverTripAckProcess:Could not update Trip for Trip:{0}.",
                             currentTrip.TripNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
@@ -217,11 +224,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ChangeSetResult<int> eventChangeSetResult;
                     eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
-                    log.Debug("SRTEST:Saving EventLog Record - Trip Ack");
+                    log.Debug("SRTEST:DriverTripAckProcess:Saving EventLog Record - Trip Ack");
                     //Check for EventLog failure.
                     if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
                     {
-                        var s = string.Format("Could not update EventLog for Driver {0} {1}.",
+                        var s = string.Format("DriverTripAckProcess:Could not update EventLog for Driver {0} {1}.",
                                 driverTripAckProcess.EmployeeId, EventCommentConstants.ReceivedDriverAck);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;
@@ -242,12 +249,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedDeletions.Any())
             {
                 transaction.Rollback();
-                log.Debug("SRTEST:Transaction Rollback - TripAck");
+                log.Debug("SRTEST:DriverTripAckProcess:Transaction Rollback - TripAck");
             }
             else
             {
                 transaction.Commit();
-                log.Debug("SRTEST:Transaction Committed - TripAck");
+                log.Debug("SRTEST:DriverTripAckProcess:Transaction Committed - TripAck");
                 // We need to notify that data has changed for any types we have updated
                 // We always need to notify for the current type
                 dataService.NotifyOfExternalChangesToData();

@@ -274,8 +274,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 containerSeqNo = containerHistoryMax.ContainerSeqNumber + callCountThisTxn;
             }
             //For testing
-            log.Debug("SRTEST:Add ContainerHistory");
-            log.DebugFormat("SRTEST:ContainerNumber:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add ContainerHistory:ContainerNumber:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
                              containerMaster.ContainerNumber,
                              containerMaster.ContainerCurrentTripNumber,
                              containerMaster.ContainerCurrentTripSegNumber,
@@ -533,8 +532,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
 
             //For testing
-            log.Debug("SRTEST:Add DriverDelay");
-            log.DebugFormat("SRTEST:DriverId:{0} TripNumber:{1}-{2} StartDate:{3} DelayCode:{4} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add DriverDelay:DriverId:{0} TripNumber:{1}-{2} StartDate:{3} DelayCode:{4} Seq#:{5}",
                              driverDelay.DriverId,
                              driverDelay.TripNumber,
                              driverDelay.TripSegNumber,
@@ -746,8 +744,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 driverSeqNo = driverHistoryMax.DriverSeqNumber + callCountThisTxn;
             }
             //For testing
-            log.Debug("SRTEST:Add DriverHistory");
-            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add DriverHistory:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
                              driverStatus.EmployeeId,
                              driverStatus.TripNumber,
                              driverStatus.TripSegNumber,
@@ -921,8 +918,7 @@ namespace Brady.ScrapRunner.DataService.Util
             List<long> userRoleIds = userRoleIdsEnumerable.ToList();
 
             //For testing
-            log.Debug("SRTEST:Add Message");
-            log.DebugFormat("SRTEST:Sender:{0}-{1} Receiver:{2}-{3} Msg:{4}",
+            log.DebugFormat("SRTEST:Add Message:Sender:{0}-{1} Receiver:{2}-{3} Msg:{4}",
                              message.SenderId,
                              message.SenderName,
                              message.ReceiverId,
@@ -980,8 +976,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
               
             //For testing
-            log.Debug("SRTEST:Add PowerFuel");
-            log.DebugFormat("SRTEST:PowerId:{0} TripNumber:{1}-{2} Date:{3} State:{4} Amt:{5} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add PowerFuel:PowerId:{0} TripNumber:{1}-{2} Date:{3} State:{4} Amt:{5} Seq#:{5}",
                              powerFuel.PowerId,
                              powerFuel.TripNumber,
                              powerFuel.TripSegNumber,
@@ -1041,8 +1036,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 powerSeqNo = powerHistoryMax.PowerSeqNumber + callCountThisTxn;
             }
             //For testing
-            log.Debug("SRTEST:Add PowerHistory");
-            log.DebugFormat("SRTEST:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add PowerHistory:Driver:{0} TripNumber:{1} Seg:{2} Status:{3} DateTime:{4} Seq#:{5}",
                              powerMaster.PowerDriverId,
                              powerMaster.PowerCurrentTripNumber,
                              powerMaster.PowerCurrentTripSegNumber,
@@ -1615,8 +1609,7 @@ namespace Brady.ScrapRunner.DataService.Util
             tripSegmentMileage.TripSegMileageDriverName = tripSegment.TripSegDriverName;
             
             //For testing
-            log.Debug("SRTEST:Add TripSegmentMileage");
-            log.DebugFormat("SRTEST:TripNumber:{0} Seg:{1} Start:{2} End:{3} State:{4} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add TripSegmentMileage:TripNumber:{0} Seg:{1} Start:{2} End:{3} State:{4} Seq#:{5}",
                              tripSegmentMileage.TripNumber,
                              tripSegmentMileage.TripSegNumber,
                              tripSegmentMileage.TripSegMileageOdometerStart,
@@ -1977,7 +1970,22 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-
+        /// <summary>
+        /// Delete a TripSegment record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="tripSegment"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> DeleteTripSegment(IDataService dataService, ProcessChangeSetSettings settings,
+            TripSegment tripSegment)
+        {
+            var recordType = (TripSegmentRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegment");
+            var changeSet = (ChangeSet<string, TripSegment>)recordType.GetNewChangeSet();
+            changeSet.AddDelete(tripSegment.Id);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
         /// <summary>
         /// Delete a TripSegmentContainer record.
         /// </summary>
@@ -2290,7 +2298,46 @@ namespace Brady.ScrapRunner.DataService.Util
             codeTableEntry = queryResult.Records.Cast<CodeTable>().FirstOrDefault();
             return codeTableEntry;
         }
- 
+        /// CODETABLE Table queries
+        /// <summary>
+        /// Get a single codetable record for a given state and country code
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="codeName"></param>
+        /// <param name="state"></param>
+        /// <param name="country"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static CodeTable GetCodeTableEntryForStateCountry(IDataService dataService, ProcessChangeSetSettings settings,
+            string userCulture, IEnumerable<long> userRoleIds, string codeName, string state, string country, out DataServiceFault fault)
+        {
+            fault = null;
+            var codeTableEntry = new CodeTable();
+            if (null != state && null != country)
+            {
+                codeName += country;
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<CodeTable>()
+                        .Filter(y => y.Property(x => x.CodeName).EqualTo(codeName)
+                        .And(x => x.CodeValue).EqualTo(state)
+                        .And(x => x.CodeDisp2).EqualTo(country))
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return codeTableEntry;
+                }
+                codeTableEntry = queryResult.Records.Cast<CodeTable>().FirstOrDefault();
+            }
+            return codeTableEntry;
+        }
+
+
         /// COMMODITYMASTER Table queries
         /// <summary>
         /// Get a list of all commodities with the universal flag set to Y.
@@ -2338,8 +2385,8 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="dateTime"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if dateTime is null or no entries are found</returns>
-        public static List<ContainerChange> GetContainerChanges(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, out DataServiceFault fault)
+        public static List<ContainerChange> GetContainerChangesAll(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, DateTime? dateTime, out DataServiceFault fault)
         {
             fault = null;
             var containers = new List<ContainerChange>();
@@ -2375,8 +2422,8 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="regionId"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if dateTime or regionId is null or no entries are found</returns>
-        public static List<ContainerChange> GetContainerChangesByRegion(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, string regionId, out DataServiceFault fault)
+        public static List<ContainerChange> GetContainerChangesForRegion(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, DateTime? dateTime, string regionId, out DataServiceFault fault)
         {
             fault = null;
             var containers = new List<ContainerChange>();
@@ -2617,6 +2664,72 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         /// CONTAINERMASTER Table queries
         /// <summary>
+        ///  Get a list of all container master records for a given region.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if dateTime is null or no entries are found</returns>
+        public static List<ContainerMaster> GetContainerMasterForRegion(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string regionId, out DataServiceFault fault)
+        {
+            fault = null;
+            var containers = new List<ContainerMaster>();
+            if (null != regionId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<ContainerMaster>()
+                        .Filter(y => y.Property(x => x.ContainerRegionId).EqualTo(regionId))
+                        .OrderBy(x => x.ContainerNumber)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return containers;
+                }
+                containers = queryResult.Records.Cast<ContainerMaster>().ToList();
+            }
+            return containers;
+        }
+        /// CONTAINERMASTER Table queries
+        /// <summary>
+        ///  Get a list of all container master records for a given region.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if dateTime is null or no entries are found</returns>
+        public static List<ContainerMaster> GetContainerMasterAll(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, out DataServiceFault fault)
+        {
+            fault = null;
+            var containers = new List<ContainerMaster>();
+            Query query = new Query
+            {
+                CurrentQuery = new QueryBuilder<ContainerMaster>()
+                    .OrderBy(x => x.ContainerNumber)
+                    .GetQuery()
+            };
+            var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+            if (null != fault)
+            {
+                return containers;
+            }
+            containers = queryResult.Records.Cast<ContainerMaster>().ToList();
+            return containers;
+        }
+
+        /// CONTAINERMASTER Table queries
+        /// <summary>
         ///  Get a list of container master that are on a given power unit..
         /// </summary>
         /// <param name="dataService"></param>
@@ -2827,6 +2940,43 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return customer;
         }
+        /// <summary>
+        /// Get customer record from the customer master for a given terminal
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="terminalId"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static CustomerMaster GetCustomerForTerminal(IDataService dataService, ProcessChangeSetSettings settings,
+        string userCulture, IEnumerable<long> userRoleIds, string terminalId, out DataServiceFault fault)
+        {
+            fault = null;
+
+            fault = null;
+            var customer = new CustomerMaster();
+            if (null != terminalId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<CustomerMaster>()
+                          .Filter(t => t.Property(p => p.ServingTerminalId).EqualTo(terminalId)
+                          .And().Property(p => p.CustType).EqualTo(CustomerTypeConstants.Yard))
+                          .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token,
+                    out fault);
+                if (null != fault)
+                {
+                    return customer;
+                }
+                customer = (CustomerMaster)queryResult.Records.Cast<CustomerMaster>().FirstOrDefault();
+            }
+            return customer;
+        }
+
         /// DRIVERDELAY Table queries
         /// <summary>
         ///  Get an employee record from the EmployeeMaster
@@ -3759,8 +3909,8 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="regionId"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if dateTime or regionId is null or no entries are found</returns>
-        public static List<TerminalChange> GetTerminalChangesByRegion(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, string regionId, out DataServiceFault fault)
+        public static List<TerminalChange> GetTerminalChangesForRegion(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, DateTime? dateTime, string regionId, out DataServiceFault fault)
         {
             fault = null;
             var terminals = new List<TerminalChange>();
@@ -3797,8 +3947,8 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="areaId"></param>
         /// <param name="fault"></param>
         /// <returns>An empty list if dateTime or areaId is null or no entries are found</returns>
-        public static List<TerminalChange> GetTerminalChangesByArea(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, DateTime dateTime, string areaId, out DataServiceFault fault)
+        public static List<TerminalChange> GetTerminalChangesForArea(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, DateTime? dateTime, string areaId, out DataServiceFault fault)
         {
             fault = null;
             var terminalsInArea = new List<string>();
@@ -3824,6 +3974,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return terminals;
         }
+
         /// TERMINALMASTER Table queries
         /// <summary>
         ///  Get a a terminal master record for a given terminal.
@@ -3858,6 +4009,77 @@ namespace Brady.ScrapRunner.DataService.Util
                 terminal = (TerminalMaster)queryResult.Records.Cast<TerminalMaster>().FirstOrDefault();
             }
             return terminal;
+        }
+        /// TERMINALMASTER Table queries
+        /// <summary>
+        /// Gets a list of terminals by area
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="areaId"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static List<TerminalMaster> GetTerminalMastersForArea(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string areaId, out DataServiceFault fault)
+        {
+            fault = null;
+            var terminalsInArea = new List<string>();
+            var terminals = new List<TerminalMaster>();
+            if (null != areaId)
+            {
+                terminalsInArea = Common.GetTerminalsByArea
+                    (dataService, settings, userCulture, userRoleIds, areaId, out fault);
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TerminalMaster>()
+                    .Filter(y => y.Property(x => x.TerminalId).In(terminalsInArea.ToArray()))
+                    .OrderBy(x => x.TerminalId)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return terminals;
+                }
+                terminals = queryResult.Records.Cast<TerminalMaster>().ToList();
+            }
+            return terminals;
+        }
+        /// TERMINALMASTER Table queries
+        /// <summary>
+        /// Gets a list of terminals by region
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static List<TerminalMaster> GetTerminalMastersForRegion(IDataService dataService, ProcessChangeSetSettings settings,
+            string userCulture, IEnumerable<long> userRoleIds, string regionId, out DataServiceFault fault)
+        {
+            fault = null;
+            var terminals = new List<TerminalMaster>();
+            if (null != regionId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TerminalMaster>()
+                    .Filter(y => y.Property(x => x.Region).EqualTo(regionId))
+                    .OrderBy(x => x.TerminalId)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return terminals;
+                }
+                terminals = queryResult.Records.Cast<TerminalMaster>().ToList();
+            }
+            return terminals;
         }
         /// TRIP Table  queries
         /// <summary>
@@ -4068,6 +4290,54 @@ namespace Brady.ScrapRunner.DataService.Util
                     response = true;
             }
             return response;
+        }
+        /// TRIPPOINTS Table  queries
+        /// <summary>
+        ///  Get a trip points record for a orig host code and dest host code.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="origHostCode"></param>
+        /// <param name="destHostCode"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty Trip record if tripNumber is null or no record is found</returns>
+        public static TripPoints GetTripPoints(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string origHostCode,string destHostCode, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripPoints = new TripPoints();
+            if (null != origHostCode && null != destHostCode)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripPoints>()
+                    .Filter(y => y.Property(x => x.TripPointsHostCode1).EqualTo(origHostCode)
+                    .And().Property(x => x.TripPointsHostCode2).EqualTo(destHostCode))
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripPoints;
+                }
+                if (null == queryResult)
+                {
+                    query = new Query
+                    {
+                        CurrentQuery = new QueryBuilder<TripPoints>()
+                        .Filter(y => y.Property(x => x.TripPointsHostCode1).EqualTo(destHostCode)
+                        .And().Property(x => x.TripPointsHostCode2).EqualTo(origHostCode))
+                        .GetQuery()
+                    };
+                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+
+                }
+                tripPoints = queryResult.Records.Cast<TripPoints>().FirstOrDefault();
+            }
+            return tripPoints;
         }
 
         /// TRIPREFERENCE Table queries

@@ -6,26 +6,23 @@
     android:layout_height="match_parent">
     <include
         layout="@layout/toolbar" />
-    <TextView
+    <Chronometer
+        android:id="@+id/chronometer"
+        android:format="%s"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_gravity="center"
-        android:gravity="center"
-        android:text="{Timer}" />
+        android:textSize="30sp"
+        android:gravity="center" />
     <LinearLayout
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:background="#fff"
         android:layout_alignParentBottom="true">
         <Button
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:layout_margin="10dp"
             android:text="Back On Duty"
-            android:textColor="#fff"
-            style="?android:attr/borderlessButtonStyle"
-            android:gravity="center"
+            style="@style/ScrapRunnerTheme.StandardButtonStyle"
             local:MvxBind="Click BackOnDutyCommand"
+            local:MvxLang="Text BackOnDuty"
             android:background="@color/delayed" />
     </LinearLayout>
 </RelativeLayout>
