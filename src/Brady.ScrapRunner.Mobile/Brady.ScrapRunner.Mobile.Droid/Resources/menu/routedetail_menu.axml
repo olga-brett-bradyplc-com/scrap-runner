@@ -4,7 +4,6 @@
   xmlns:app="http://schemas.android.com/apk/res-auto">
   <item
     android:id="@+id/edit_rtn_nav"
-    android:icon="@drawable/ic_add_white_36dp"
-    android:title="Edit RTN TO YARD Segment"
+    android:title="Edit RTY Segment"
     app:showAsAction="never" />
 </menu>

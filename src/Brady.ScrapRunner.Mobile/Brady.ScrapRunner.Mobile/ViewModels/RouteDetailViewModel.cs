@@ -302,11 +302,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             AppResources.Error, AppResources.OK);
                     }
 
-                    if (_tripService.IsTripLegTransactionAsync(Containers.First().Key))
+                    if (_tripService.IsTripLegTransaction(Containers.First().Key))
                         NextActionLabel = AppResources.Transactions;
-                    else if (_tripService.IsTripLegScaleAsync(Containers.First().Key))
+                    else if (_tripService.IsTripLegScale(Containers.First().Key))
                         NextActionLabel = AppResources.YardScaleLabel;
-                    else if (_tripService.IsTripLegNoScreenAsync(Containers.First().Key))
+                    else if (_tripService.IsTripLegNoScreen(Containers.First().Key))
                         NextActionLabel = AppResources.FinishTripLabel;
                 }
             }
@@ -314,12 +314,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteNextStageCommandAsync()
         {
-            if (_tripService.IsTripLegTransactionAsync(Containers.First().Key))
+            if (_tripService.IsTripLegTransaction(Containers.First().Key))
             {
                 Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
-            else if (_tripService.IsTripLegScaleAsync(Containers.First().Key))
+            else if (_tripService.IsTripLegScale(Containers.First().Key))
             {
                 Close(this);
 
@@ -328,7 +328,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 else
                     ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
             }
-            else if (_tripService.IsTripLegNoScreenAsync(Containers.First().Key))
+            else if (_tripService.IsTripLegNoScreen(Containers.First().Key))
             {
                 var message = string.Format(AppResources.PerformActionLabel, "\n\n");
                 var confirm =
