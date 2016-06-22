@@ -38,6 +38,10 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverFuelEntryProcess"
         },
         {
+          "text": "DriverImageProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverImageProcess"
+        },
+        {
           "text": "DriverLoginProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLoginProcess"
         },

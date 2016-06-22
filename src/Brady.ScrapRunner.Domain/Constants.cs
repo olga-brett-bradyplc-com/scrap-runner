@@ -56,6 +56,7 @@
         public static readonly string Exception = "E";
         public static readonly string Load = "L";
         public static readonly string Dropped = "S";
+        public static readonly string Added = "A";
     }
     /// <summary>
     /// The Delay Action Type internal codes.  Used in the processing delay & back on duty information.
@@ -322,6 +323,10 @@
         public static readonly string ReceivedDriverContainerAction = "RECEIVED DRIVER CONTAINER ACTION";
         /// <summary>ReceivedDriverNewContainer: RECEIVED DRIVER NEW CONTAINER</summary>
         public static readonly string ReceivedDriverNewContainer = "RECEIVED DRIVER NEW CONTAINER";
+        /// <summary>ReceivedDriverSignature: RECEIVED DRIVER SIGNATURE</summary>
+        public static readonly string ReceivedDriverSignature = "RECEIVED DRIVER SIGNATURE";
+        /// <summary>ReceivedDriverPicture: RECEIVED DRIVER PICTURE</summary>
+        public static readonly string ReceivedDriverPicture = "RECEIVED DRIVER PICTURE";
     }
     public static class HistoryActionConstants
     {
@@ -341,7 +346,33 @@
         /// <summary>BroadcastToAllDrvrs: B</summary>
         public static readonly string BroadcastToAllDrvrs = "B";
 
-    } 
+    }
+    /// <summary>
+    /// Image Extension internal codes
+    /// </summary>
+    public static class ImageExtConstants
+    {
+        /// <summary>Picture: jpg</summary>
+        public static readonly string Picture = "jpg";
+        /// <summary>Signature: png</summary>
+        public static readonly string Signature = "png";
+    }
+
+
+    /// <summary>
+    /// Image Type internal codes.
+    /// </summary>
+    public static class ImageTypeConstants
+    {
+        /// <summary>Picture: P</summary>
+        public static readonly string Picture = "P";
+        /// <summary>Signature: P</summary>
+        public static readonly string Signature = "S";
+        /// <summary>Signature/Picture:S/P </summary>
+        public static readonly string Both = "S/P";
+    }
+
+
     /// <summary>
     /// Driver Preference internal codes. From the Preferences table.
     /// </summary>
@@ -709,10 +740,18 @@
         public static readonly string DEFAllowAnyPowerUnit = "DEFAllowAnyPowerUnit";
 
         /// <summary>
+        /// DEFMDTPrefix:
         /// MDT Prefix for OnDemand Customers only
         /// A 1-2 character identifier to uniquely identify the customer for IPCom
         /// </summary>
         public static readonly string DEFMDTPrefix = "DEFMDTPrefix";
+
+        /// <summary>
+        /// DEFSignatureCapturePath:
+        /// Image Path to store pictures and signatures
+        /// </summary>
+        public static readonly string DEFSignatureCapturePath = "DEFSignatureCapturePath";
+        
     }
     /// <summary>
     /// Driver Preference internal codes. From the Preferences table.
