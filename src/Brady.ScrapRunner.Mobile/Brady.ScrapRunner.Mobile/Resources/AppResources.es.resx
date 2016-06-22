@@ -462,8 +462,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
   </data>
   <data name="PerformActionLabel" xml:space="preserve">
-    <value>Performing this action will complete this trip. {0} Are you sure you want to do this?</value>
-    <comment>TransactionConfirmationViewModel</comment>
+    <value>Performing this action will complete this trip. {0} Are you sure you want to do this? ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; TransactionConfirmationViewModel</comment>
   </data>
   <data name="NewSegmentCreated" xml:space="preserve">
     <value>New Segment Successfully Created ( Spanish )</value>
@@ -472,5 +472,17 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
   <data name="SegmentUpdated" xml:space="preserve">
     <value>Trip Segment Successfully Updated! ( Spanish )</value>
     <comment>NEEDS TRANSLATION; ModifyReturnToYardFragment</comment>
+  </data>
+  <data name="ContainerComplete" xml:space="preserve">
+    <value>Container Complete ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
+  </data>
+  <data name="MarkContainerComplete" xml:space="preserve">
+    <value>Mark this container as complete? ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
+  </data>
+  <data name="SelectException" xml:space="preserve">
+    <value>Select Exception Code ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
   </data>
 </root>

@@ -242,6 +242,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Container Complete.
+        /// </summary>
+        public static string ContainerComplete {
+            get {
+                return ResourceManager.GetString("ContainerComplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Container ID.
         /// </summary>
         public static string ContainerId {
@@ -501,6 +510,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string LogOutMessage {
             get {
                 return ResourceManager.GetString("LogOutMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mark this container as complete?.
+        /// </summary>
+        public static string MarkContainerComplete {
+            get {
+                return ResourceManager.GetString("MarkContainerComplete", resourceCulture);
             }
         }
         
@@ -771,6 +789,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string SegmentUpdated {
             get {
                 return ResourceManager.GetString("SegmentUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Exception Code.
+        /// </summary>
+        public static string SelectException {
+            get {
+                return ResourceManager.GetString("SelectException", resourceCulture);
             }
         }
         

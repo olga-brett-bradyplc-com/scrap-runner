@@ -73,7 +73,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionCompleteCommand()
         {
-            var confirm = await UserDialogs.Instance.ConfirmAsync("Mark this container as complete?", "Segment Complete");
+            var confirm = await UserDialogs.Instance.ConfirmAsync(AppResources.MarkContainerComplete, AppResources.ContainerComplete);
             if (confirm)
             {
                 await
@@ -96,9 +96,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async Task ExecuteTransactionUnableToProcessCommand()
         {
             var exceptions = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ExceptionCodes);
-            var exceptionDialogAsync = await UserDialogs.Instance.ActionSheetAsync("Select Exception Code", "", "Cancel",
+            var exceptionDialogAsync = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, "", AppResources.Cancel,
                         exceptions.Select(ct => ct.CodeDisp1).ToArray());
-            if (exceptionDialogAsync != "Cancel")
+            if (exceptionDialogAsync != AppResources.Cancel)
             {
                 var exceptionObj = exceptions.FirstOrDefault(ct => ct.CodeDisp1 == exceptionDialogAsync);
                 await

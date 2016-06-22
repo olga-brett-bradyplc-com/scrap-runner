@@ -21,11 +21,11 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<ChangeResultWithItem<TripInfoProcess>> FindTripsRemoteAsync(TripInfoProcess tripInfoProcess);
 
-        bool IsTripLegTransactionAsync(TripSegmentModel tripSegment);
+        bool IsTripLegTransaction(TripSegmentModel tripSegment);
 
-        bool IsTripLegScaleAsync(TripSegmentModel tripSegmentContainer);
+        bool IsTripLegScale(TripSegmentModel tripSegmentContainer);
 
-        bool IsTripLegNoScreenAsync(TripSegmentModel tripSegmentContainer);
+        bool IsTripLegNoScreen(TripSegmentModel tripSegmentContainer);
 
         bool IsTripLegTypePublicScale(TripSegmentModel tripSegmentContainer);
 

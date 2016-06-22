@@ -100,7 +100,7 @@
         /// </summary>
         /// <param name="tripSegment"></param>
         /// <returns>bool</returns>
-        public bool IsTripLegTransactionAsync(TripSegmentModel tripSegment)
+        public bool IsTripLegTransaction(TripSegmentModel tripSegment)
         {
             return tripSegment.TripSegType == BasicTripTypeConstants.DropEmpty ||
                    tripSegment.TripSegType == BasicTripTypeConstants.DropFull ||
@@ -121,7 +121,7 @@
         /// </summary>
         /// <param name="tripSegment"></param>
         /// <returns>bool</returns>
-        public bool IsTripLegScaleAsync(TripSegmentModel tripSegment)
+        public bool IsTripLegScale(TripSegmentModel tripSegment)
         {
             return tripSegment.TripSegType == BasicTripTypeConstants.Scale ||
                    tripSegment.TripSegType == BasicTripTypeConstants.ReturnYard;
@@ -134,7 +134,7 @@
         /// </summary>
         /// <param name="tripSegment"></param>
         /// <returns></returns>
-        public bool IsTripLegNoScreenAsync(TripSegmentModel tripSegment)
+        public bool IsTripLegNoScreen(TripSegmentModel tripSegment)
         {
             return tripSegment.TripSegType == BasicTripTypeConstants.YardWork ||
                    tripSegment.TripSegType == BasicTripTypeConstants.ReturnYardNC;

@@ -507,4 +507,16 @@ You will now be sent back to the login.</value>
     <value>Trip Segment Successfully Updated!</value>
     <comment>ModifyReturnToYardFragment</comment>
   </data>
+  <data name="ContainerComplete" xml:space="preserve">
+    <value>Container Complete</value>
+    <comment>TransactionDetailViewModel</comment>
+  </data>
+  <data name="MarkContainerComplete" xml:space="preserve">
+    <value>Mark this container as complete?</value>
+    <comment>TransactionDetailViewModel</comment>
+  </data>
+  <data name="SelectException" xml:space="preserve">
+    <value>Select Exception Code</value>
+    <comment>TransactionDetailViewModel</comment>
+  </data>
 </root>
