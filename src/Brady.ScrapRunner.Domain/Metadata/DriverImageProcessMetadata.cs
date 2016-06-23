@@ -23,7 +23,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             TimeProperty(x => x.ActionDateTime);
             StringProperty(x => x.PrintedName);
             StringProperty(x => x.ImageType);
-            ImageProperty(x => x.Image);
+            ImageProperty(x => x.ImageByteArray);
 
             ViewDefaults()
             .Property(x => x.EmployeeId)
@@ -32,7 +32,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.ActionDateTime)
             .Property(x => x.PrintedName)
             .Property(x => x.ImageType)
-            .Property(x => x.Image)
+            .Property(x => x.ImageByteArray)
 
             .OrderBy(x => x.EmployeeId);
         }
