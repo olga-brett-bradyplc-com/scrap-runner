@@ -19,6 +19,10 @@ using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.Util;
 using Brady.ScrapRunner.Domain.Enums;
+using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
+
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -129,6 +133,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                      driverImageProcess.TripSegNumber, driverImageProcess.ActionDateTime,
                                      driverImageProcess.PrintedName, driverImageProcess.ImageType);
 
+
                     ////////////////////////////////////////////////
                     // Validate driver id / Get the EmployeeMaster record
                     var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
@@ -208,29 +213,82 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     //////////////////////////////////////////////
-                    //Create the full path to the file, using the trip number
-                    string partialPath = Common.CreateDirectoryStringForImage(driverImageProcess.TripNumber);
-                    string fileExtension;
-                    if (driverImageProcess.ImageType == ImageTypeConstants.Signature)
+                    string fullImagePath = "";
+                    //Processing for pictures
+                    if (driverImageProcess.ImageType == ImageTypeConstants.Picture)
                     {
-                        fileExtension = ImageExtConstants.Signature;
+                        //Create the full path to the file, using the trip number
+                        string imagePath = prefImageCapturePath + Common.CreateDirectoryStringForImage(driverImageProcess.TripNumber);
+                        string seqId = imageSeqId.ToString("D3");
+                        //Assemble full path with file name
+                        fullImagePath = imagePath +
+                                        driverImageProcess.TripNumber + "-" +
+                                        driverImageProcess.TripSegNumber + "-" +
+                                        seqId + "." +
+                                        ImageExtConstants.Picture;
+                      
+                        try
+                        {
+                            //////////////////////////////////////////////
+                            //Convert the byte array to an image and save to the server
+                            //Reads sample picture from a file into a byte array for testing
+                            //Comment out when finished testing
+                            //driverImageProcess.ImageByteArray = File.ReadAllBytes(@"C:\Scrap\Samples\013322-03-000.jpg");
+
+                            //Converts the byte array to an image 
+                            MemoryStream ms = new MemoryStream(driverImageProcess.ImageByteArray);
+                            Image pictureImage = Image.FromStream(ms);
+                            //Create the directory if it does not already exist
+                            System.IO.FileInfo file = new System.IO.FileInfo(imagePath);
+                            file.Directory.Create(); 
+                            //Save the image to a file of type jpeg
+                            pictureImage.Save(fullImagePath, ImageFormat.Jpeg);
+                        }
+                        catch (Exception e)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Operation failed for "
+                                               + imagePath + ": " + e.Message));
+                            break;
+                        }
+
                     }
                     else
                     {
-                        fileExtension = ImageExtConstants.Picture;                   
+                        //Create the full path to the file, using the trip number
+                        string imagePath = prefImageCapturePath + Common.CreateDirectoryStringForImage(driverImageProcess.TripNumber);
+                        string seqId = imageSeqId.ToString("D3");
+                        //Assemble full path with file name
+                        fullImagePath = imagePath +
+                                        driverImageProcess.TripNumber + "-" +
+                                        driverImageProcess.TripSegNumber + "-" +
+                                        seqId + "." +
+                                        ImageExtConstants.Signature;
+
+                        try
+                        {
+                            //////////////////////////////////////////////
+                            //Convert the byte array to an image and save to the server
+                            //Reads sample picture from a file into a byte array for testing
+                            //Comment out when finished testing
+                            //driverImageProcess.ImageByteArray = File.ReadAllBytes(@"C:\Scrap\Samples\000010-02-000.png");
+
+                            //Converts the byte array to an image 
+                            MemoryStream ms = new MemoryStream(driverImageProcess.ImageByteArray);
+                            Image signatureImage = Image.FromStream(ms);
+                            //Create the directory if it does not already exist
+                            System.IO.FileInfo file = new System.IO.FileInfo(imagePath);
+                            file.Directory.Create();
+                            //Save the image to a file of type png
+                            signatureImage.Save(fullImagePath, ImageFormat.Png);
+                        }
+                        catch (Exception e)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Operation failed for "
+                                               + imagePath + ": " + e.Message));
+                            break;
+                        }
+
                     }
-                    string seqId = imageSeqId.ToString("D3");
-                    //Assemble
-                    string fullImagePath = prefImageCapturePath + 
-                                           partialPath + 
-                                           driverImageProcess.TripNumber + "-" + 
-                                           driverImageProcess.TripSegNumber + "-" + 
-                                           seqId + "." + 
-                                           fileExtension;
-
-                    //////////////////////////////////////////////
-                    //ToDo: Convert the byte array to an image and save to the server
-
                     //////////////////////////////////////////////
                     //Insert a record into the TripSegmentImage table
                     var tripSegmentImage = new TripSegmentImage();
