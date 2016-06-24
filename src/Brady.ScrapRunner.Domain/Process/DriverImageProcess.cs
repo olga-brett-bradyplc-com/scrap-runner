@@ -30,7 +30,7 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string ImageType { get; set; }
 
         ///The Image. Required.
-        public virtual byte[] Image { get; set; }
+        public virtual byte[] ImageByteArray { get; set; }
 
         public virtual String Id
         {
