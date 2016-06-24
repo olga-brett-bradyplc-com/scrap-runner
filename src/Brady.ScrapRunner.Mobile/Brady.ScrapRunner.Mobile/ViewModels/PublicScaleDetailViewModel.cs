@@ -53,10 +53,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripSegContainerSeqNumber = tripSegContainerSeqNumber;
             TripSegContainerNumber = tripSegContainerNumber;
             MethodOfEntry = methodOfEntry;
-            SubTitle = $"Trip {TripNumber}";
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
         }
-        private string _methodOfEntry;
 
+        private string _methodOfEntry;
         public string MethodOfEntry
         {
             get { return _methodOfEntry; }
@@ -87,7 +87,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         // Listview bindings
         private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
-
         public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
         {
             get { return _containers; }
@@ -95,7 +94,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         private string _cantProcessLabel;
-
         public string CantProcessLabel
         {
             get { return _cantProcessLabel; }
@@ -105,9 +103,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 NoProcessCommandAsync.RaiseCanExecuteChanged();
             }
         }
-
-
-        // Field bindings
+        
         private string _tripNumber;
         public string TripNumber
         {
@@ -163,7 +159,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         private string _selectedReason;
-
         public string SelectedReason
         {
             get { return _selectedReason; }
@@ -187,7 +182,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 var currentUser = await _driverService.GetCurrentDriverStatusAsync();
 
-                var containerProcess = await _tripService.ProcessPublicScaleAsync(new DriverContainerActionProcess
+                var containerProcess = await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
                 {
                     EmployeeId = currentUser.EmployeeId,
                     PowerId = currentUser.PowerId,
@@ -202,7 +197,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     TareActionDateTime = TareTime
                 });
 
-                var doneProcess = await _tripService.ProcessContainerDoneAsync(new DriverSegmentDoneProcess
+                var doneProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
                 {
                     EmployeeId = currentUser.EmployeeId,
                     TripNumber = TripNumber,
@@ -254,42 +249,49 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (reasonItem != null)
                 {
-                    var containerProcess = await _tripService.ProcessPublicScaleAsync(new DriverContainerActionProcess
-                    {
-                        EmployeeId = currentUser.EmployeeId,
-                        PowerId = currentUser.PowerId,
-                        ActionType = ContainerActionTypeConstants.Exception,
-                        MethodOfEntry = MethodOfEntry,
-                        ActionDateTime = DateTime.Now,
-                        TripNumber = TripNumber,
-                        TripSegNumber = TripSegNumber,
-                        ContainerNumber = TripSegContainerNumber,
-                        ActionDesc = reasonItem.CodeDisp1
-                    });
-
-                    if (!containerProcess.WasSuccessful)
-                        await UserDialogs.Instance.AlertAsync(containerProcess.Failure.Summary,
-                            AppResources.Error, AppResources.OK);
-
-                    var doneProcess = await _tripService.ProcessContainerDoneAsync(new DriverSegmentDoneProcess
-                    {
-                        EmployeeId = currentUser.EmployeeId,
-                        TripNumber = TripNumber,
-                        TripSegNumber = TripSegNumber,
-                        ActionDateTime = DateTime.Now,
-                        PowerId = currentUser.PowerId,
-                        DriverModified = Constants.Yes
-                    });
-
-                    if (!doneProcess.WasSuccessful)
-                        await UserDialogs.Instance.AlertAsync(doneProcess.Failure.Summary,
-                            AppResources.Error, AppResources.OK);
-
                     await _tripService.MarkExceptionTripAsync(TripNumber);
-                    await _tripService.MarkExceptionTripSegmentAsync(TripNumber, TripSegNumber);
-                    await
-                        _tripService.MarkExceptionTripSegmentContainerAsync(TripNumber, TripSegNumber,
-                            TripSegContainerNumber, reasonItem.CodeDisp1);
+
+                    foreach (var segment in Containers)
+                    {
+                        var doneProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                        {
+                            EmployeeId = currentUser.EmployeeId,
+                            TripNumber = TripNumber,
+                            TripSegNumber = TripSegNumber,
+                            ActionDateTime = DateTime.Now,
+                            PowerId = currentUser.PowerId,
+                            DriverModified = Constants.Yes
+                        });
+
+                        if (!doneProcess.WasSuccessful)
+                            await UserDialogs.Instance.AlertAsync(doneProcess.Failure.Summary,
+                                AppResources.Error, AppResources.OK);
+
+                        await _tripService.MarkExceptionTripSegmentAsync(segment.Key);
+
+                        foreach (var container in segment)
+                        {
+                            var containerProcess = await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                            {
+                                EmployeeId = currentUser.EmployeeId,
+                                PowerId = currentUser.PowerId,
+                                ActionType = ContainerActionTypeConstants.Exception,
+                                MethodOfEntry = MethodOfEntry,
+                                ActionDateTime = DateTime.Now,
+                                TripNumber = TripNumber,
+                                TripSegNumber = container.TripSegNumber,
+                                ContainerNumber = container.TripSegContainerNumber,
+                                ActionDesc = reasonItem.CodeDisp1
+                            });
+
+                            if (!containerProcess.WasSuccessful)
+                                await UserDialogs.Instance.AlertAsync(containerProcess.Failure.Summary,
+                                    AppResources.Error, AppResources.OK);
+
+                            await
+                                _tripService.MarkExceptionTripSegmentContainerAsync(container, reasonItem.CodeDisp1);
+                        }
+                    }
                 }
                 CantProcessLabel = AppResources.CanProcess;
             }
@@ -310,7 +312,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (!tripSegmentContainers.Any())
             {
                 await _tripService.CompleteTripAsync(TripNumber);
-                await _tripService.CompleteTripSegmentAsync(TripNumber, TripSegNumber);
+                foreach(var segment in Containers)
+                    await _tripService.CompleteTripSegmentAsync(segment.Key);
+
                 Close(this);
                 ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
             }

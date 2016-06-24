@@ -1,7 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
@@ -13,10 +16,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class TransactionConfirmationViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
+        private readonly IDriverService _driverService;
 
-        public TransactionConfirmationViewModel(ITripService tripService)
+        public TransactionConfirmationViewModel(ITripService tripService, IDriverService driverService)
         {
             _tripService = tripService;
+            _driverService = driverService;
             Title = AppResources.SignatureReceipt;
         }
 
@@ -103,10 +108,53 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task FinishTripLeg()
         {
-            using (var completeTripSegment = UserDialogs.Instance.Loading("Completing Trip Segment", maskType: MaskType.Clear))
+            var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
+            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Clear))
             {
-                foreach (var grouping in Containers)
-                    await _tripService.CompleteTripSegmentAsync(TripNumber, grouping.Key.TripSegNumber);
+                foreach (var segment in Containers)
+                {
+                    var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                    {
+                        EmployeeId = currentDriver.EmployeeId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = segment.Key.TripSegNumber,
+                        ActionType = TripSegmentActionTypeConstants.Done,
+                        ActionDateTime = DateTime.Now,
+                        PowerId = currentDriver.PowerId
+                    });
+
+                    if (tripSegmentProcess.WasSuccessful)
+                    {
+                        await _tripService.CompleteTripSegmentAsync(segment.Key);
+                        foreach (var container in segment)
+                        {
+                            var containerAction =
+                                await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                                {
+                                    EmployeeId = currentDriver.EmployeeId,
+                                    PowerId = currentDriver.PowerId,
+                                    ActionType = ContainerActionTypeConstants.Done,
+                                    ActionDateTime = DateTime.Now,
+                                    MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                                    TripNumber = TripNumber,
+                                    TripSegNumber = container.TripSegNumber,
+                                    ContainerNumber = container.TripSegContainerNumber,
+                                    ContainerLevel = container.TripSegContainerLevel
+                                });
+
+                            if (containerAction.WasSuccessful) continue;
+
+                            UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
+                        return;
+                    }
+                }
             }
 
             var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);

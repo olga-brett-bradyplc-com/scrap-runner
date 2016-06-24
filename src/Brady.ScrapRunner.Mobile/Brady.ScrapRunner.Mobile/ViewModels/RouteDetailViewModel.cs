@@ -221,26 +221,28 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
                 {
-                    var setDriverEnroute = await _driverService.SetDriverEnrouteRemoteAsync(new DriverEnrouteProcess
+                    foreach (var segment in Containers)
                     {
-                        EmployeeId = currentDriver.EmployeeId,
-                        PowerId = currentDriver.PowerId,
-                        TripNumber = TripNumber,
-                        TripSegNumber = "01",
-                        ActionDateTime = DateTime.Now,
-                        Odometer = currentDriver.Odometer ?? default(int),
-                    });
+                        var setDriverEnroute = await _driverService.SetDriverEnrouteRemoteAsync(new DriverEnrouteProcess
+                        {
+                            EmployeeId = currentDriver.EmployeeId,
+                            PowerId = currentDriver.PowerId,
+                            TripNumber = TripNumber,
+                            TripSegNumber = segment.Key.TripSegNumber,
+                            ActionDateTime = DateTime.Now,
+                            Odometer = currentDriver.Odometer ?? default(int),
+                        });
 
-                    if (setDriverEnroute.WasSuccessful)
-                    {
-                        CurrentStatus = DriverStatusConstants.Enroute;
-                        MenuFilter = MenuFilterEnum.OnTrip;
+                        if (!setDriverEnroute.WasSuccessful)
+                        {
+                            await UserDialogs.Instance.AlertAsync(setDriverEnroute.Failure.Summary,
+                                AppResources.Error, AppResources.OK);
+                            return;
+                        }
                     }
-                    else
-                    {
-                        await UserDialogs.Instance.AlertAsync(setDriverEnroute.Failure.Summary,
-                            AppResources.Error, AppResources.OK);
-                    }
+
+                    CurrentStatus = DriverStatusConstants.Enroute;
+                    MenuFilter = MenuFilterEnum.OnTrip;
                 }
             }
         }
@@ -338,8 +340,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (confirm)
                 {
-                    foreach (var groupings in Containers)
-                        await _tripService.CompleteTripSegmentAsync(TripNumber, groupings.Key.TripSegNumber);
+                    foreach (var segment in Containers)
+                        await _tripService.CompleteTripSegmentAsync(segment.Key);
 
                     await _tripService.CompleteTripAsync(TripNumber);
 

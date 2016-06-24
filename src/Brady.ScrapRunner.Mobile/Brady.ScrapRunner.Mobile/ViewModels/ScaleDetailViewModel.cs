@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 
@@ -15,10 +17,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class ScaleDetailViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
+        private readonly IDriverService _driverService;
+        private readonly ICodeTableService _codeTableService;
 
-        public ScaleDetailViewModel(ITripService tripService)
+        public ScaleDetailViewModel(ITripService tripService, IDriverService driverService, ICodeTableService codeTableService)
         {
             _tripService = tripService;
+            _driverService = driverService;
+            _codeTableService = codeTableService;
+
             Title = AppResources.YardScaleDetail;
 
             GrossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand);
@@ -130,61 +137,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // Command impl
         private async Task ExecuteContainerSetDownCommandAsync()
         {
-            var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
-            var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
-
-            var completeMessage = (nextTripSegment.TakeWhile( ts => ts.TripSegNumber != TripSegNumber).Any() ||
-                                   tripSegmentContainers.TakeWhile(
-                                       tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete) && tscm.TripSegContainerNumber != TripSegContainerNumber).Any())
-                ? AppResources.SetDownContainerMessage
-                : AppResources.SetDownContainerMessage + "\n\n" + AppResources.CompleteTrip;
-
-            // @TODO : Determine if this is last leg of trip, and then give warning that this action will complete said trip
-            var result = await UserDialogs.Instance.ConfirmAsync(completeMessage, AppResources.SetDown);
-            if (result)
-            {
-                // @TODO : This won't work with bulk processing
-                await
-                    _tripService.UpdateTripSegmentContainerWeightTimesAsync(TripNumber, TripSegNumber,
-                        TripSegContainerNumber, GrossTime, SecondGrossTime, TareTime);
-                // @TODO : Implement once we have our location service working
-                //await
-                //    _tripService.UpdateTripSegmentContainerLongLatAsync(TripNumber, TripSegNumber,
-                //        TripSegContainerNumber, Latitude, Longitude);
-                await _tripService.ProcessTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerSeqNumber, TripSegContainerNumber, true);
-                await ExecuteNextStage();
-            }
+            await ProcessContainers(true, AppResources.SetDownContainerMessage);
         }
 
         private async Task ExecuteContainerLeftOnTruckCommandAsync()
         {
-            var result = await UserDialogs.Instance.ConfirmAsync(AppResources.LeftOnTruckContainerMessage, AppResources.LeftOnTruck);
-            if (result)
-            {
-                Close(this);
-            }
-        }
-
-        private async Task ExecuteNextStage()
-        {
-            // Are there any more containers that need to be weighed?
-            // Check to see if any containers/segments exists
-            // If not, mark the trip as complete and return to route summary
-            // Otherwise, we'd go to the next point in the trip
-            var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
-
-            if (!tripSegmentContainers.TakeWhile(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)).Any())
-            {
-                await _tripService.CompleteTripAsync(TripNumber);
-                await _tripService.CompleteTripSegmentAsync(TripNumber, TripSegNumber);
-                Close(this);
-                ShowViewModel<RouteSummaryViewModel>();
-            }
-            else
-            {
-                Close(this);
-                ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
-            }
+            await ProcessContainers(false, AppResources.LeftOnTruckContainerMessage);
         }
 
         private void ExecuteGrossWeightSetCommand()
@@ -205,6 +163,95 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private bool IsGrossWeightSet()
         {
             return GrossTime != null;
+        }
+
+        private async Task ProcessContainers(bool setDownInYard, string confirmationMessage)
+        {
+            var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
+            var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
+            var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
+
+            var completeMessage = (nextTripSegment.TakeWhile(ts => ts.TripSegNumber != TripSegNumber).Any() ||
+                                   tripSegmentContainers.TakeWhile(
+                                       tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete) && tscm.TripSegContainerNumber != TripSegContainerNumber).Any())
+                ? confirmationMessage
+                : confirmationMessage + "\n\n" + AppResources.CompleteTrip;
+
+            var result = await UserDialogs.Instance.ConfirmAsync(completeMessage, AppResources.ConfirmLabel);
+
+            // If user confirms action
+            if (result)
+            {
+                // Show review exception dialog if gross time isn't set
+                var reasonDialogAsync = (!GrossTime.HasValue)
+                    ? await
+                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, AppResources.Cancel, "",
+                            reasons.Select(ct => ct.CodeDisp1).ToArray())
+                    : "";
+
+                var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
+
+                // Go through each container, updating both the local and remote db
+                foreach (var container in Containers.SelectMany(grouping => grouping))
+                {
+                    await _tripService.UpdateTripSegmentContainerWeightTimesAsync(container, GrossTime, SecondGrossTime, TareTime);
+                    await _tripService.CompleteTripSegmentContainerAsync(container);
+                    // @TODO : Implement once we have our location service working
+                    //await _tripService.UpdateTripSegmentContainerLongLatAsync(TripSegmentContainerModel container , Latitude, Longitude);
+
+                    var containerAction =
+                        await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                        {
+                            EmployeeId = currentDriver.EmployeeId,
+                            PowerId = currentDriver.PowerId,
+                            ActionType = (string.IsNullOrEmpty(reason?.CodeDisp1)) ? ContainerActionTypeConstants.Done : ContainerActionTypeConstants.Review,
+                            ActionDateTime = DateTime.Now,
+                            TripNumber = TripNumber,
+                            TripSegNumber = container.TripSegNumber,
+                            ContainerNumber = container.TripSegContainerNumber,
+                            Gross1ActionDateTime = GrossTime,
+                            TareActionDateTime = TareTime,
+                            Gross2ActionDateTime = SecondGrossTime,
+                            SetInYardFlag = setDownInYard ? Constants.Yes : Constants.No,
+                            MethodOfEntry = ContainerMethodOfEntry.Manual,
+                            ActionCode = reason?.CodeValue,
+                            ActionDesc = reason?.CodeDisp1
+                        });
+
+                    if (containerAction.WasSuccessful) continue;
+
+                    UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                    return;
+                }
+
+                await ExecuteNextStage();
+            }
+        }
+
+        private async Task ExecuteNextStage()
+        {
+            // Are there any more containers that need to be weighed?
+            // Check to see if any containers/segments exists
+            // If not, mark the trip as complete and return to route summary
+            // Otherwise, we'd go to the next point in the trip
+            var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
+
+            if (!tripSegmentContainers.TakeWhile(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)).Any())
+            {
+                await _tripService.CompleteTripAsync(TripNumber);
+
+                foreach (var segment in Containers)
+                    await _tripService.CompleteTripSegmentAsync(segment.Key);
+
+                Close(this);
+                ShowViewModel<RouteSummaryViewModel>();
+            }
+            else
+            {
+                Close(this);
+                ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
+            }
         }
     }
 }

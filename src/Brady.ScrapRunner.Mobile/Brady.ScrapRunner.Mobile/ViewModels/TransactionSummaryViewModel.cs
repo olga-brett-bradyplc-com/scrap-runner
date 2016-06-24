@@ -158,10 +158,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
                 CurrentTransaction.TripSegContainerNumber = scannedNumber;
 
-            await
-                _tripService.ProcessTripSegmentContainerAsync(CurrentTransaction.TripNumber,
-                    CurrentTransaction.TripSegNumber, CurrentTransaction.TripSegContainerSeqNumber,
-                    CurrentTransaction.TripSegContainerNumber, true);
+            //await
+            //    _tripService.ProcessTripSegmentContainerAsync(CurrentTransaction.TripNumber,
+            //        CurrentTransaction.TripSegNumber, CurrentTransaction.TripSegContainerSeqNumber,
+            //        CurrentTransaction.TripSegContainerNumber, true);
 
             // Update local copy of container list
             var container = await _tripService.FindTripSegmentContainer(CurrentTransaction.TripNumber,

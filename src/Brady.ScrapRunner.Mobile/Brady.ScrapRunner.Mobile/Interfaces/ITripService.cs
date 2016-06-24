@@ -19,21 +19,19 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task UpdateTripSegmentContainers(IEnumerable<TripSegmentContainer> tripSegmentContainers);
 
-        Task<ChangeResultWithItem<TripInfoProcess>> FindTripsRemoteAsync(TripInfoProcess tripInfoProcess);
+        Task<int> CreateTripAsync(TripModel trip);
 
-        bool IsTripLegTransaction(TripSegmentModel tripSegment);
+        Task<int> CreateTripSegmentAsync(TripSegmentModel tripSegment);
 
-        bool IsTripLegScale(TripSegmentModel tripSegmentContainer);
+        Task<int> CreateTripSegmentContainerAsync(TripSegmentContainerModel tripSegmentContainer);
 
-        bool IsTripLegNoScreen(TripSegmentModel tripSegmentContainer);
+        Task<int> UpdateTripAsync(TripModel trip);
 
-        bool IsTripLegTypePublicScale(TripSegmentModel tripSegmentContainer);
+        Task<int> UpdateTripSegmentAsync(TripSegmentModel tripSegment);
 
-        bool IsContainerDropped(TripSegmentModel tripSegment);
+        Task<int> UpdateTripSegmentContainerAsync(TripSegmentContainerModel container);
+        
 
-        bool IsContainerLoaded(TripSegmentModel tripSegment);
-
-        Task<bool> IsTripSequenceEnforcedAsync();
 
         Task<TripModel> FindTripAsync(string tripNumber);
 
@@ -55,33 +53,47 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<TripSegmentContainerModel> FindTripSegmentContainer(string tripNumber, string tripSegNo,
             int? tripSegContainerSeqNumber);
 
-        Task<int> UpdateTripSegmentContainerWeightTimesAsync(string tripNumber, string tripSegNo,
-            string tripSegContainerNumber, DateTime? gsWt, DateTime? gs2Wt, DateTime? trWt);
 
-        Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo,
-            string tripSegContainerNumber, int? latitude, int? longitude);
 
-        Task<int> ProcessTripSegmentContainerAsync(string tripNumber, string tripSegNo, short tripSegContainerSeqNumber, string tripSegContainerNumber, bool tripSegmentComplete);
+        bool IsTripLegTransaction(TripSegmentModel tripSegment);
 
+        bool IsTripLegScale(TripSegmentModel tripSegmentContainer);
+
+        bool IsTripLegNoScreen(TripSegmentModel tripSegmentContainer);
+
+        bool IsTripLegTypePublicScale(TripSegmentModel tripSegmentContainer);
+
+        bool IsContainerDropped(TripSegmentModel tripSegment);
+
+        bool IsContainerLoaded(TripSegmentModel tripSegment);
+
+        Task<bool> IsTripSequenceEnforcedAsync();
+
+        Task<int> UpdateTripSegmentContainerWeightTimesAsync(TripSegmentContainerModel container, DateTime? gsWt, DateTime? gs2Wt, DateTime? trWt);
+
+        Task<int> UpdateTripSegmentContainerLongLatAsync(TripSegmentContainerModel container, int? latitude, int? longitude);
+        
         Task<int> CompleteTripAsync(string tripNumber);
 
-        Task<int> CompleteTripSegmentAsync(string tripNumber, string tripSegNo);
+        Task<int> CompleteTripSegmentAsync(TripSegmentModel tripSegment);
 
-        Task<int> MarkExceptionTripAsync(string tripNumber);
-
-        Task<int> MarkExceptionTripSegmentAsync(string tripNumber, string tripSegNo);
-
-        Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessPublicScaleAsync(DriverContainerActionProcess driverContActionProcess);
-        Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessContainerDoneAsync(DriverSegmentDoneProcess driverContActionProcess);
+        Task<int> CompleteTripSegmentContainerAsync(TripSegmentContainerModel container);
 
         Task<YardModel> FindYardInfo(string terminalId);
 
-        Task<int> CreateTripSegmentAsync(TripSegmentModel tripSegment);
+        Task<int> MarkExceptionTripAsync(string tripNumber);
 
-        Task<int> UpdateTripSegmentAsync(TripSegmentModel tripSegment);
+        Task<int> MarkExceptionTripSegmentAsync(TripSegmentModel tripSegment);
 
-        Task<int> CreateTripSegmentContainerAsync(TripSegmentContainerModel tripSegmentContainer);
+        Task<int> MarkExceptionTripSegmentContainerAsync(TripSegmentContainerModel container, string reviewReason);
 
-        Task<int> MarkExceptionTripSegmentContainerAsync(string tripNumber, string tripSegNo, string tripSegContainerNo, string reviewReason);
+
+
+        Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessTripSegmentDoneAsync(DriverSegmentDoneProcess driverContActionProcess);
+
+        Task<ChangeResultWithItem<TripInfoProcess>> ProcessTripInfoAsync(TripInfoProcess tripInfoProcess);
+
+        Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessContainerActionAsync(
+            DriverContainerActionProcess driverContainerAction);
     }
 }

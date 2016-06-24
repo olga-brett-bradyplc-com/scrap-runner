@@ -12,13 +12,22 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 {
     public interface IContainerService
     {
-        Task<ChangeResultWithItem<ContainerChangeProcess>> FindContainerChangesRemoteAsync(
-            ContainerChangeProcess containerChangeProcess);
         Task UpdateContainerMaster(List<ContainerMaster> containerMaster);
+
         Task UpdateContainerChange(List<ContainerChange> containerChange);
+
         Task<IEnumerable<ContainerMasterModel>> FindPowerIdContainersAsync(string powerId);
+
         Task<ContainerMasterModel> FindContainerAsync(string containerNumber);
+
         Task<int> UpdateNbContainerAsync(string containerNumber);
+
         Task<int> RemoveContainerFromPowerId(string powerId, string containerNumber);
+
+        Task<ChangeResultWithItem<ContainerChangeProcess>> ProcessContainerChangeAsync(
+            ContainerChangeProcess containerChangeProcess);
+
+        Task<ChangeResultWithItem<DriverNewContainerProcess>> ProcessNewContainerAsync(
+            DriverNewContainerProcess newContainer);
     }
 }

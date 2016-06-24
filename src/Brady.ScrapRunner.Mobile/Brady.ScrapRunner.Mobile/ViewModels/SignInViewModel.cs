@@ -166,19 +166,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 // Delete/Create necesscary SQLite tables
                 await _dbService.RefreshAll();
-
-                /* 
-                    Check username/password against BWF, and create session if valid
-
-                    *Note : As of 6/22/16, you'll need to make sure that the scraprunner
-                            membership adapter is being used in BWF, that the 'enableHardcodedAdmin' 
-                            in the membership adapter is set to false, and that you've 
-                            applied the nececssary updates to the EmployeeMaster table.
-                            Talk to myself ( Jay ) or Steve if you need help with that.
-                */
                 IClientSettings clientSettings = new DemoClientSettings();
                 _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
-                    UserName, Password, "ScrapRunner");
+                    clientSettings.UserName, clientSettings.Password, "ScrapRunner");
 
                 _queueScheduler.Unschedule();
                 _locationService.Stop();
@@ -258,7 +248,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 // Retrieve container info from remote server and populate local DB
                 var containerChanges =
-                    await _containerService.FindContainerChangesRemoteAsync(new ContainerChangeProcess
+                    await _containerService.ProcessContainerChangeAsync(new ContainerChangeProcess
                     {
                         EmployeeId = UserName
                     });
@@ -311,7 +301,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 loginData.Title = AppResources.LoadingTripInformation;
 
-                var tripProcess = await _tripService.FindTripsRemoteAsync(new TripInfoProcess
+                var tripProcess = await _tripService.ProcessTripInfoAsync(new TripInfoProcess
                 {
                     EmployeeId = UserName
                 });

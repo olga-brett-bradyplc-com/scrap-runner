@@ -93,7 +93,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             using (var loginData = UserDialogs.Instance.Loading(AppResources.SavingData, maskType: MaskType.Black))
             {
-                var message = await _driverService.SendMessageRemoteAsync(new DriverMessageProcess
+                var message = await _driverService.ProcessDriverMessageAsync(new DriverMessageProcess
                 {
                     EmployeeId = LocalUserId,
                     ActionDateTime = DateTime.Now,

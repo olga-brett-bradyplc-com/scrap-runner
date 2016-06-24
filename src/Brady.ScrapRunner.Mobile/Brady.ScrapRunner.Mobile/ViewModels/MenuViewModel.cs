@@ -96,7 +96,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (delayAlertAsync != "Cancel")
             {
                 var delayReasonObj = delays.FirstOrDefault(ct => ct.CodeDisp1 == delayAlertAsync);
-                ShowViewModel<DelayViewModel>(new {delayReason = delayReasonObj.CodeValue});
+                ShowViewModel<DelayViewModel>(new {delayCode = delayReasonObj.CodeValue, delayReason = delayReasonObj.CodeValue});
             }
         }
 

@@ -25,16 +25,6 @@ namespace Brady.ScrapRunner.Mobile.Services
             _containerChangeRepository = containerChangeRepository;
         }
 
-        public async Task<ChangeResultWithItem<ContainerChangeProcess>> FindContainerChangesRemoteAsync(
-            ContainerChangeProcess containerChangeProcess)
-        {
-            var containers =
-                await
-                    _connection.GetConnection(ConnectionType.Online)
-                        .UpdateAsync(containerChangeProcess, requeryUpdated: false);
-            return containers;
-        }
-
         public Task UpdateContainerMaster(List<ContainerMaster> containerMaster)
         {
             var mapped = AutoMapper.Mapper.Map<List<ContainerMaster>, List<ContainerMasterModel>>(containerMaster);
@@ -72,6 +62,23 @@ namespace Brady.ScrapRunner.Mobile.Services
             var container = await FindContainerAsync(containerNumber);
             container.ContainerPowerId = null;
             return await _containerMasterRepository.UpdateAsync(container);
+        }
+
+        public async Task<ChangeResultWithItem<ContainerChangeProcess>> ProcessContainerChangeAsync(
+            ContainerChangeProcess containerChangeProcess)
+        {
+            var containers =
+                await
+                    _connection.GetConnection(ConnectionType.Online)
+                        .UpdateAsync(containerChangeProcess, requeryUpdated: false);
+            return containers;
+        }
+
+        public async Task<ChangeResultWithItem<DriverNewContainerProcess>> ProcessNewContainerAsync(
+            DriverNewContainerProcess newContainer)
+        {
+            var container = await _connection.GetConnection().UpdateAsync(newContainer, requeryUpdated: false);
+            return container;
         }
     }
 }
