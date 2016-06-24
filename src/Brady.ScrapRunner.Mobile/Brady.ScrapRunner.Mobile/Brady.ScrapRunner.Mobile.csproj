@@ -40,6 +40,7 @@
     <Compile Include="Converters\DateTimeValueConverter.cs" />
     <Compile Include="CustomLanguageBindingParser.cs" />
     <Compile Include="Enums\MenuFilterEnum.cs" />
+    <Compile Include="Enums\TerminalChangeEnum.cs" />
     <Compile Include="Helpers\ChangeSetExtensions.cs" />
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Interfaces\ICodeTableService.cs" />
@@ -59,10 +60,12 @@
     <Compile Include="Interfaces\IConnectionService.cs" />
     <Compile Include="Interfaces\IClientSettings.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
+    <Compile Include="Interfaces\ITerminalService.cs" />
     <Compile Include="Interfaces\ITripService.cs" />
     <Compile Include="Messages\LocationModelMessage.cs" />
     <Compile Include="MobileConstants.cs" />
     <Compile Include="Models\CodeTableModel.cs" />
+    <Compile Include="Models\ContainerChangeModel.cs" />
     <Compile Include="Models\CustomerCommodityModel.cs" />
     <Compile Include="Models\CustomerLocationModel.cs" />
     <Compile Include="Models\DriverStatusModel.cs" />
@@ -76,6 +79,7 @@
     <Compile Include="Models\QueueItemModel.cs" />
     <Compile Include="Models\SqliteRepository.cs" />
     <Compile Include="Models\Route.cs" />
+    <Compile Include="Models\TerminalChangeModel.cs" />
     <Compile Include="Models\YardModel.cs" />
     <Compile Include="Models\TransactionDetail.cs" />
     <Compile Include="Models\TripModel.cs" />
@@ -104,6 +108,7 @@
     <Compile Include="Services\PreferenceService.cs" />
     <Compile Include="Services\DbService.cs" />
     <Compile Include="Services\QueueService.cs" />
+    <Compile Include="Services\TerminalService.cs" />
     <Compile Include="Services\TripService.cs" />
     <Compile Include="StringResourceConverter.cs" />
     <Compile Include="Validators\OdometerRangeValidator.cs" />
@@ -114,6 +119,7 @@
     <Compile Include="ViewModels\FuelEntryViewModel.cs" />
     <Compile Include="ViewModels\LoadDropContainerViewModel.cs" />
     <Compile Include="ViewModels\MessagesViewModel.cs" />
+    <Compile Include="ViewModels\ModifyReturnToYardViewModel.cs" />
     <Compile Include="ViewModels\NewMessageViewModel.cs" />
     <Compile Include="ViewModels\NbScanViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

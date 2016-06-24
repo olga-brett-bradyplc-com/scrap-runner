@@ -56,6 +56,10 @@ namespace Brady.ScrapRunner.Mobile
                 SqliteRepository<QueueItemModel>>();
             Mvx.RegisterType<IRepository<YardModel>,
                 SqliteRepository<YardModel>>();
+            Mvx.RegisterType<IRepository<TerminalChangeModel>, 
+                SqliteRepository<TerminalChangeModel>>();
+            Mvx.RegisterType<IRepository<ContainerChangeModel>,
+                SqliteRepository<ContainerChangeModel>>();
 
 
             Mapper.Initialize(cfg =>

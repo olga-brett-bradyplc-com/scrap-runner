@@ -27,7 +27,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             TripNumber = tripNumber;
             MethodOfEntry = methodOfEntry;
-            SubTitle = AppResources.Trip + $" {TripNumber}";
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
         }
         private string _methodOfEntry;
 

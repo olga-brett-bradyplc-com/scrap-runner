@@ -767,7 +767,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     var statuses = new List<string> {ContainerStatusConstants.CustomerSite,
                                                      ContainerStatusConstants.Contractor,
                                                      ContainerStatusConstants.SpecialProject};
-                    if (statuses.Contains(containerLastTrip.ContainerStatus))
+                    if (statuses.Contains(containerLastTrip?.ContainerStatus))
                     {
                         containerMaster.LocationWarningFlag = Constants.Yes;
                     }

@@ -101,23 +101,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 case MenuFilterEnum.OnTrip:
                     _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(false);
                     _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_changereturnyard).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_addreturnyard).SetVisible(true);
-                    break;
-                case MenuFilterEnum.OnTransaction:
-                    _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_unabletoprocess).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_changereturnyard).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_addreturnyard).SetVisible(false);
                     break;
                 default: // MenuFilterEnum.NotOnTrip
                     _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(true);
                     _navigationView.Menu.FindItem(Resource.Id.nav_adddelay).SetVisible(true);
                     _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_changereturnyard).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_addreturnyard).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_unabletoprocess).SetVisible(false);
                     break;
             }
         }

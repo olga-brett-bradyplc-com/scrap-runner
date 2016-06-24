@@ -26,6 +26,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
         private readonly IContainerService _containerService;
         private readonly ICodeTableService _codeTableService;
+        private readonly ITerminalService _terminalService;
         private readonly IConnectionService _connection;
         private readonly IMessagesService _messagesService;
         private readonly IQueueScheduler _queueScheduler;
@@ -41,6 +42,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IDriverService driverService,
             IContainerService containerService,
             ICodeTableService codeTableService,
+            ITerminalService terminalService,
             IMessagesService messagesService,
             IConnectionService connection, 
             IQueueScheduler queueScheduler, 
@@ -54,6 +56,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _driverService = driverService;
             _containerService = containerService;
             _codeTableService = codeTableService;
+            _terminalService = terminalService;
             _messagesService = messagesService;
 
             _connection = connection;
@@ -163,8 +166,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 // Delete/Create necesscary SQLite tables
                 await _dbService.RefreshAll();
-
-                // Check username/password against BWF, and create session if valid
                 IClientSettings clientSettings = new DemoClientSettings();
                 _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
@@ -172,6 +173,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _queueScheduler.Unschedule();
                 _locationService.Stop();
                 _locationOdometerService.Stop();
+
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
                 // have a need for a login service, leaving this as it is.
                 var loginProcess = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(
@@ -181,7 +183,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         PowerId = TruckId,
                         Odometer = Odometer,
                         LocaleCode = 1033,
-                        OverrideFlag = "N",
+                        OverrideFlag = Constants.No,
                         Mdtid = "Phone",
                         LoginDateTime = DateTime.Now
                     }, requeryUpdated: false);
@@ -215,11 +217,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 loginData.Title = AppResources.LoadingPreferences;
 
-                var preferenceObj = new PreferencesProcess
-                {
-                    EmployeeId = UserName
-                };
-
+                // Retrieve preferences from remote server and populate local DB
+                var preferenceObj = new PreferencesProcess { EmployeeId = UserName };
                 var preferenceProcess = await _preferenceService.FindPreferencesRemoteAsync(new PreferencesProcess { EmployeeId = UserName });
 
                 if (preferenceProcess.WasSuccessful)
@@ -233,6 +232,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
+                // Retrieve code table info from remote server and populate local DB
                 var codesTable = await _codeTableService.FindCodesRemoteAsync(new CodeTableProcess { EmployeeId = UserName });
 
                 if (codesTable.WasSuccessful)
@@ -242,6 +242,45 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 else
                 {
                     await UserDialogs.Instance.AlertAsync(codesTable.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
+
+                // Retrieve container info from remote server and populate local DB
+                var containerChanges =
+                    await _containerService.ProcessContainerChangeAsync(new ContainerChangeProcess
+                    {
+                        EmployeeId = UserName
+                    });
+
+                if (containerChanges.WasSuccessful)
+                {
+                    if (containerChanges.Item?.Containers?.Count > 0)
+                        await _containerService.UpdateContainerChange(containerChanges.Item.Containers);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(containerChanges.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
+
+                // Retrieve terminal change info and populate local DB
+                var terminalChanges =
+                    await _terminalService.FindTerminalChangesRemoteAsync(new TerminalChangeProcess
+                    {
+                        EmployeeId = UserName,
+                        TerminalId = loginProcess.Item.TermId
+                    });
+
+                if (terminalChanges.WasSuccessful)
+                {
+                    if (terminalChanges.Item?.Terminals?.Count > 0)
+                        await _terminalService.UpdateTerminalChange(terminalChanges.Item.Terminals);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(terminalChanges.Failure.Summary,
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
@@ -262,7 +301,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 loginData.Title = AppResources.LoadingTripInformation;
 
-                var tripProcess = await _tripService.FindTripsRemoteAsync(new TripInfoProcess
+                var tripProcess = await _tripService.ProcessTripInfoAsync(new TripInfoProcess
                 {
                     EmployeeId = UserName
                 });

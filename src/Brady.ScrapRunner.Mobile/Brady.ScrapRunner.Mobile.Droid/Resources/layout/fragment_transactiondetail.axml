@@ -20,7 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:hint="Segment Container Number"
-                local:MvxBind="Text ContainerId"
+                local:MvxBind="Text TripSegContainerNumber"
                 android:background="@color/material_gray_100" />
         </android.support.design.widget.TextInputLayout>
         <TextView
@@ -69,7 +69,7 @@
                 style="@style/ScrapRunnerTheme.SpinnerBase"
                 local:MvxItemTemplate="@layout/item_codetable"
                 local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
-                local:MvxBind="ItemsSource LevelList" />
+                local:MvxBind="ItemsSource LevelList;SelectedItem Level" />
         </LinearLayout>
         <android.support.design.widget.TextInputLayout
             android:id="@+id/notes_input_field"
