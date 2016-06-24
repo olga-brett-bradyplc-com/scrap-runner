@@ -38,6 +38,10 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverFuelEntryProcess"
         },
         {
+          "text": "DriverGPSLocationProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverGPSLocationProcess"
+        },
+        {
           "text": "DriverImageProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverImageProcess"
         },
@@ -202,6 +206,10 @@
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
             }
           ]
+        },
+        {
+          "text": "GPSLocation",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/GPSLocation"
         },
         {
           "text": "History",

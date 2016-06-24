@@ -1671,6 +1671,24 @@ namespace Brady.ScrapRunner.DataService.Util
             return changeSetResult;
         }
 
+        ///TABLE INSERTS
+        /// <summary>
+        /// Add/Update an GPSLocation record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="gpsLocation"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<int> UpdateGPSLocation(IDataService dataService, ProcessChangeSetSettings settings,
+                                              GPSLocation gpsLocation)
+        {
+            var recordType = (GPSLocationRecordType)dataService.RecordTypes.Single(x => x.TypeName == "GPSLocation");
+            var changeSet = (ChangeSet<int, GPSLocation>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(gpsLocation.Id, gpsLocation);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+
         //////////////////////////////////////////////////////////////////////////
         ///TABLE UPDATES
         /// <summary>

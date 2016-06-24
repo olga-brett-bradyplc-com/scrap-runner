@@ -45,6 +45,37 @@
         /// Useage: For delays without a trip number, use # + driverid
         /// </summary>
         public static readonly string DriverPrefix = "#";
+
+        /// <summary>
+        /// Router Send Folder
+        /// Useage: For sending files to router
+        /// </summary>
+        public static readonly string Send = "Send";
+
+        /// <summary>
+        /// Router Read Folder
+        /// Useage: For reading files from router
+        /// </summary>
+        public static readonly string Read = "Read";
+
+        /// <summary>
+        /// Router ToName TRACKER
+        /// Useage: For sending files to TRACKER through router
+        /// </summary>
+        public static readonly string Tracker = "TRACKER";
+
+        /// <summary>
+        /// File Name for packets being sent to TRACKER
+        /// Useage: For sending files to TRACKER through router
+        /// </summary>
+        public static readonly string GPSFileName = "GPSScrapPkt";
+
+        /// <summary>
+        /// File Extension for packets being sent to TRACKER
+        /// Useage: For sending files to TRACKER through router
+        /// </summary>
+        public static readonly string GPSFileExt = ".x";
+
     }
     /// <summary>
     /// The Container Action Type internal codes.  Used in the processing container information.
@@ -751,6 +782,12 @@
         /// Image Path to store pictures and signatures
         /// </summary>
         public static readonly string DEFSignatureCapturePath = "DEFSignatureCapturePath";
+
+        /// <summary>
+        /// DEFRouterPath:
+        /// Router Path 
+        /// </summary>
+        public static readonly string DEFRouterPath = "DEFRouterPath";
         
     }
     /// <summary>
