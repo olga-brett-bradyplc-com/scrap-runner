@@ -16,11 +16,14 @@ namespace Brady.ScrapRunner.Mobile.Services
     {
         private readonly IConnectionService _connection;
         private readonly IRepository<DriverStatusModel> _driverStatusRepository;
+        private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository; 
 
-        public DriverService(IRepository<DriverStatusModel> driverStatusRepository, 
+        public DriverService(IRepository<DriverStatusModel> driverStatusRepository,
+            IRepository<EmployeeMasterModel> employeeMasterRepository,
             IConnectionService connection)
         {
             _driverStatusRepository = driverStatusRepository;
+            _employeeMasterRepository = employeeMasterRepository;
             _connection = connection;
         }
 
@@ -33,6 +36,33 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var mapped = AutoMapper.Mapper.Map<DriverStatus, DriverStatusModel>(driverStatus);
             return _driverStatusRepository.InsertAsync(mapped);
+        }
+
+        /// <summary>
+        /// Update the local EmployeeMaster SQLite table with current user information
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        public Task UpdateDriverEmployeeRecord(EmployeeMaster employee)
+        {
+            var mapped = AutoMapper.Mapper.Map<EmployeeMaster, EmployeeMasterModel>(employee);
+            return _employeeMasterRepository.InsertAsync(mapped);
+        }
+
+        /// <summary>
+        /// Find the remote EmployeeMaster record for the current user
+        /// </summary>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
+        public async Task<EmployeeMaster> FindEmployeeMasterForDriverRemoteAsync(string employeeId)
+        {
+            var driver =
+                await
+                    _connection.GetConnection(ConnectionType.Online)
+                        .QueryAsync(
+                            new QueryBuilder<EmployeeMaster>().Filter(
+                                e => e.Property(f => f.EmployeeId).EqualTo(employeeId)));
+            return driver.Records.FirstOrDefault();
         }
 
         /// <summary>

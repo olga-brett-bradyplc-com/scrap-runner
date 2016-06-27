@@ -13,6 +13,10 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
     {
         Task UpdateDriverStatus(DriverStatus driverStatus);
 
+        Task UpdateDriverEmployeeRecord(EmployeeMaster employee);
+
+        Task<EmployeeMaster> FindEmployeeMasterForDriverRemoteAsync(string employeeId);
+
         Task<ChangeResultWithItem<DriverEnrouteProcess>> SetDriverEnrouteRemoteAsync(DriverEnrouteProcess driverEnrouteProcess);
 
         Task<ChangeResultWithItem<DriverArriveProcess>> SetDriverArrivedRemoteAsync(DriverArriveProcess driverArriveProcess);

@@ -11,14 +11,22 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
     public interface IMessagesService
     {
-        Task<ChangeResultWithItem<DriverMessageProcess>> FindMsgsRemoteAsync(DriverMessageProcess driverMessageProcess);
+        Task UpdateMessages(IEnumerable<Messages> messages);
+
+        Task<int> CreateMessageAsync(MessagesModel message);
+
+        Task<int> UpdateMessageAsync(MessagesModel message);
 
         Task<MessagesModel> FindMessageAsync(int? msgId);
 
-        Task<List<MessagesModel>> FindMsgsFromAsync(string senderId);
+        Task<List<MessagesModel>> FindMessagesAsync(string senderId);
 
-        Task<List<MessagesModel>> SortedDrvrMsgsAsync();
+        Task<List<EmployeeMasterModel>> FindApprovedUsersForMessagingAsync();
 
-        Task UpdateMessages(IEnumerable<Messages> messages);
+        Task<EmployeeMasterModel> FindEmployeeAsync(string employeeId);
+
+        Task UpdateApprovedUsersForMessaging(IEnumerable<EmployeeMaster> users);
+        
+        Task<ChangeResultWithItem<DriverMessageProcess>> ProcessDriverMessagesAsync(DriverMessageProcess driverMessageProcess);
     }
 }
