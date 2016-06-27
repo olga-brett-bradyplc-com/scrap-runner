@@ -807,9 +807,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                     }
                     ////////////////////////////////////////////////
-                    //TODO: Send GPS Customer Host Code packet to tracker. 
-
-                    ////////////////////////////////////////////////
+                    //Send GPS Customer Host Code packet to tracker.(NOT USED) 
                     //Send GPS Location Status packet to tracker. (NOT USED)
 
                     ////////////////////////////////////////////////

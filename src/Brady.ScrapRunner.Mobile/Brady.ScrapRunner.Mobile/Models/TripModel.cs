@@ -77,5 +77,12 @@
 
         [Ignore]
         public string CityStateZipFormatted => $"{TripCustCity}, {TripCustState} {TripCustZip}";
+
+        [Ignore]
+        public string TripCustOpenTime24Hr
+            => TripCustOpenTime.HasValue ? TripCustOpenTime.Value.ToLocalTime().ToString("HH:mm") : "";
+
+        [Ignore]
+        public string TripCustCloseTime24Hr => TripCustCloseTime.HasValue ? TripCustCloseTime.Value.ToLocalTime().ToString("HH:mm") : "";
     }
 }

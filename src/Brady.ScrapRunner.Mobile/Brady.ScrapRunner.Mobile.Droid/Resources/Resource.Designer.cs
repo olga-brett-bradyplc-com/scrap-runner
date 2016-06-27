@@ -4182,6 +4182,9 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600f1
 			public const int add_new_container_loaddrop = 2131099889;
 			
+			// aapt resource value: 0x7f060101
+			public const int add_rtn_nav = 2131099905;
+			
 			// aapt resource value: 0x7f06004c
 			public const int alertTitle = 2131099724;
 			
@@ -4353,6 +4356,9 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06005f
 			public const int edit_query = 2131099743;
 			
+			// aapt resource value: 0x7f060100
+			public const int edit_rtn_nav = 2131099904;
+			
 			// aapt resource value: 0x7f0600a6
 			public const int employeeIdInputField = 2131099814;
 			
@@ -4485,53 +4491,44 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600ae
 			public const int name_input_field = 2131099822;
 			
-			// aapt resource value: 0x7f060100
-			public const int nav_aboutscraprunner = 2131099904;
+			// aapt resource value: 0x7f0600fd
+			public const int nav_aboutscraprunner = 2131099901;
 			
 			// aapt resource value: 0x7f0600f5
 			public const int nav_adddelay = 2131099893;
 			
-			// aapt resource value: 0x7f0600fa
-			public const int nav_addreturnyard = 2131099898;
-			
 			// aapt resource value: 0x7f0600f4
 			public const int nav_changepowerunit = 2131099892;
 			
-			// aapt resource value: 0x7f0600f9
-			public const int nav_changereturnyard = 2131099897;
-			
-			// aapt resource value: 0x7f0600fd
-			public const int nav_composemessage = 2131099901;
+			// aapt resource value: 0x7f0600fa
+			public const int nav_composemessage = 2131099898;
 			
 			// aapt resource value: 0x7f0600f6
 			public const int nav_fuelentry = 2131099894;
 			
-			// aapt resource value: 0x7f0600fe
-			public const int nav_helpcenter = 2131099902;
+			// aapt resource value: 0x7f0600fb
+			public const int nav_helpcenter = 2131099899;
 			
 			// aapt resource value: 0x7f0600f7
 			public const int nav_loadcontainer = 2131099895;
 			
-			// aapt resource value: 0x7f060102
-			public const int nav_logout = 2131099906;
+			// aapt resource value: 0x7f0600ff
+			public const int nav_logout = 2131099903;
 			
-			// aapt resource value: 0x7f0600fc
-			public const int nav_messages = 2131099900;
+			// aapt resource value: 0x7f0600f9
+			public const int nav_messages = 2131099897;
 			
-			// aapt resource value: 0x7f060101
-			public const int nav_reportproblem = 2131099905;
+			// aapt resource value: 0x7f0600fe
+			public const int nav_reportproblem = 2131099902;
 			
 			// aapt resource value: 0x7f0600f3
 			public const int nav_routesummary = 2131099891;
 			
-			// aapt resource value: 0x7f0600ff
-			public const int nav_setup = 2131099903;
+			// aapt resource value: 0x7f0600fc
+			public const int nav_setup = 2131099900;
 			
 			// aapt resource value: 0x7f0600f8
 			public const int nav_takepicture = 2131099896;
-			
-			// aapt resource value: 0x7f0600fb
-			public const int nav_unabletoprocess = 2131099899;
 			
 			// aapt resource value: 0x7f06006f
 			public const int navigation_frame = 2131099759;
@@ -5180,6 +5177,12 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			
 			// aapt resource value: 0x7f0c0002
 			public const int navigation_drawer = 2131492866;
+			
+			// aapt resource value: 0x7f0c0003
+			public const int routedetail_menu = 2131492867;
+			
+			// aapt resource value: 0x7f0c0004
+			public const int transactionsummary_menu = 2131492868;
 			
 			static Menu()
 			{

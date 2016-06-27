@@ -355,7 +355,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         tripSegmentMileage.TripSegMileageOdometerEnd = driverStateLineProcess.Odometer;
 
                         //Do the update
-                        //ToDo: This throws the Exception getting single or default.
                         changeSetResult = Common.UpdateTripSegmentMileage(dataService, settings, tripSegmentMileage);
                         log.DebugFormat("SRTEST:Saving TripSegmentMileage Record for Trip:{0}-{1} State:{2} - StateLine.",
                                         driverStateLineProcess.TripNumber, driverStateLineProcess.TripSegNumber, driverStateLineProcess.State);

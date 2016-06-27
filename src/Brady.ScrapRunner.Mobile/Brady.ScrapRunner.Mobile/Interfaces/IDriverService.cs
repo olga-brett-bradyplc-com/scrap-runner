@@ -17,9 +17,11 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<ChangeResultWithItem<DriverArriveProcess>> SetDriverArrivedRemoteAsync(DriverArriveProcess driverArriveProcess);
 
-        Task<ChangeResultWithItem<DriverFuelEntryProcess>> SetFuelEntryRemoteAsync(DriverFuelEntryProcess driverFuelEntryProcess);
+        Task<ChangeResultWithItem<DriverDelayProcess>> ProcessDriverDelayAsync(DriverDelayProcess driverDelayProcess);
 
-        Task<ChangeResultWithItem<DriverMessageProcess>> SendMessageRemoteAsync(DriverMessageProcess driverMessageEntryProcess);
+        Task<ChangeResultWithItem<DriverFuelEntryProcess>> ProcessDriverFuelEntryAsync(DriverFuelEntryProcess driverFuelEntryProcess);
+
+        Task<ChangeResultWithItem<DriverMessageProcess>> ProcessDriverMessageAsync(DriverMessageProcess driverMessageEntryProcess);
 
         Task<DriverStatusModel> GetCurrentDriverStatusAsync();
     }

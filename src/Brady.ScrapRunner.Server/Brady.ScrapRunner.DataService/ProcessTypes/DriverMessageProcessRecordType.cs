@@ -144,9 +144,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         + driverMessageProcess.EmployeeId));
                         break;
                     }
-                    //ToDo: How do we know if this is a request from the driver for messages,
-                    //or an actual message from a driver?
-                    //Perhaps if there is only the EmployeeId and nothing else, then we send.
+
+                    //If there is only the EmployeeId and nothing else, then we send.
                     if (driverMessageProcess.SenderId == null)
                     {
                         //Sending message(s)

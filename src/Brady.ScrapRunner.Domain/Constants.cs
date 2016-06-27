@@ -45,6 +45,37 @@
         /// Useage: For delays without a trip number, use # + driverid
         /// </summary>
         public static readonly string DriverPrefix = "#";
+
+        /// <summary>
+        /// Router Send Folder
+        /// Useage: For sending files to router
+        /// </summary>
+        public static readonly string Send = "Send";
+
+        /// <summary>
+        /// Router Read Folder
+        /// Useage: For reading files from router
+        /// </summary>
+        public static readonly string Read = "Read";
+
+        /// <summary>
+        /// Router ToName TRACKER
+        /// Useage: For sending files to TRACKER through router
+        /// </summary>
+        public static readonly string Tracker = "TRACKER";
+
+        /// <summary>
+        /// File Name for packets being sent to TRACKER
+        /// Useage: For sending files to TRACKER through router
+        /// </summary>
+        public static readonly string GPSFileName = "GPSScrapPkt";
+
+        /// <summary>
+        /// File Extension for packets being sent to TRACKER
+        /// Useage: For sending files to TRACKER through router
+        /// </summary>
+        public static readonly string GPSFileExt = ".x";
+
     }
     /// <summary>
     /// The Container Action Type internal codes.  Used in the processing container information.
@@ -323,6 +354,10 @@
         public static readonly string ReceivedDriverContainerAction = "RECEIVED DRIVER CONTAINER ACTION";
         /// <summary>ReceivedDriverNewContainer: RECEIVED DRIVER NEW CONTAINER</summary>
         public static readonly string ReceivedDriverNewContainer = "RECEIVED DRIVER NEW CONTAINER";
+        /// <summary>ReceivedDriverSignature: RECEIVED DRIVER SIGNATURE</summary>
+        public static readonly string ReceivedDriverSignature = "RECEIVED DRIVER SIGNATURE";
+        /// <summary>ReceivedDriverPicture: RECEIVED DRIVER PICTURE</summary>
+        public static readonly string ReceivedDriverPicture = "RECEIVED DRIVER PICTURE";
     }
     public static class HistoryActionConstants
     {
@@ -342,7 +377,33 @@
         /// <summary>BroadcastToAllDrvrs: B</summary>
         public static readonly string BroadcastToAllDrvrs = "B";
 
-    } 
+    }
+    /// <summary>
+    /// Image Extension internal codes
+    /// </summary>
+    public static class ImageExtConstants
+    {
+        /// <summary>Picture: jpg</summary>
+        public static readonly string Picture = "jpg";
+        /// <summary>Signature: png</summary>
+        public static readonly string Signature = "png";
+    }
+
+
+    /// <summary>
+    /// Image Type internal codes.
+    /// </summary>
+    public static class ImageTypeConstants
+    {
+        /// <summary>Picture: P</summary>
+        public static readonly string Picture = "P";
+        /// <summary>Signature: P</summary>
+        public static readonly string Signature = "S";
+        /// <summary>Signature/Picture:S/P </summary>
+        public static readonly string Both = "S/P";
+    }
+
+
     /// <summary>
     /// Driver Preference internal codes. From the Preferences table.
     /// </summary>
@@ -710,10 +771,24 @@
         public static readonly string DEFAllowAnyPowerUnit = "DEFAllowAnyPowerUnit";
 
         /// <summary>
+        /// DEFMDTPrefix:
         /// MDT Prefix for OnDemand Customers only
         /// A 1-2 character identifier to uniquely identify the customer for IPCom
         /// </summary>
         public static readonly string DEFMDTPrefix = "DEFMDTPrefix";
+
+        /// <summary>
+        /// DEFSignatureCapturePath:
+        /// Image Path to store pictures and signatures
+        /// </summary>
+        public static readonly string DEFSignatureCapturePath = "DEFSignatureCapturePath";
+
+        /// <summary>
+        /// DEFRouterPath:
+        /// Router Path 
+        /// </summary>
+        public static readonly string DEFRouterPath = "DEFRouterPath";
+        
     }
     /// <summary>
     /// Driver Preference internal codes. From the Preferences table.

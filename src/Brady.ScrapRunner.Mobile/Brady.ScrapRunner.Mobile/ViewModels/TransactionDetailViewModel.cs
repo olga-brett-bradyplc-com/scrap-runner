@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
@@ -33,24 +34,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripSegNumber = tripSegmentNumber;
             TripSegContainerSeqNumber = tripSegmentSeqNo;
             MethodOfEntry = methodOfEntry;
-            SubTitle = AppResources.Trip + $" {TripNumber}";
-        }
-        private string _methodOfEntry;
-        public string MethodOfEntry
-        {
-            get { return _methodOfEntry; }
-            set { SetProperty(ref _methodOfEntry, value); }
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
         }
 
         public override async void Start()
         {
-            var container =
+            Segment = await _tripService.FindTripSegmentInfoAsync(TripNumber, TripSegNumber);
+            Container =
                 await _tripService.FindTripSegmentContainer(TripNumber, TripSegNumber, TripSegContainerSeqNumber);
 
-            ContainerId = container?.TripSegContainerNumber ?? "";
-            Location = container?.TripSegContainerLocation ?? "";
-            Commodity = container?.TripSegContainerCommodityDesc ?? "";
-            Notes = container?.TripSegContainerComment ?? "";
+            TripSegContainerNumber = Container?.TripSegContainerNumber ?? "";
+            Location = Container?.TripSegContainerLocation ?? "";
+            Commodity = Container?.TripSegContainerCommodityDesc ?? "";
+            Notes = Container?.TripSegContainerComment ?? "";
 
             var containerLevels = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerLevel);
             LevelList = new ObservableCollection<CodeTableModel>(containerLevels);
@@ -61,7 +57,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var customerCommodities = await _customerService.FindCustomerCommodites();
             CustomerCommodityList = new ObservableCollection<CustomerCommodityModel>(customerCommodities);
 
-            MenuFilter = MenuFilterEnum.OnTransaction;
+            MenuFilter = MenuFilterEnum.OnTrip;
 
             base.Start();
         }
@@ -73,12 +69,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionCompleteCommand()
         {
-            var confirm = await UserDialogs.Instance.ConfirmAsync("Mark this container as complete?", "Segment Complete");
+            var confirm = await UserDialogs.Instance.ConfirmAsync(AppResources.MarkContainerComplete, AppResources.ContainerComplete);
             if (confirm)
             {
-                await
-                    _tripService.ProcessTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerSeqNumber,
-                        TripSegContainerNumber, true);
+                if (!string.IsNullOrEmpty(TripSegContainerNumber))
+                    Container.TripSegContainerNumber = TripSegContainerNumber;
+
+                Container.TripSegContainerLevel = short.Parse(Level.CodeValue);
+
+                await _tripService.CompleteTripSegmentContainerAsync(Container);
+                
                 Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
             }
@@ -86,7 +86,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private bool CanExecuteTransactionCompleteCommand()
         {
-            return !string.IsNullOrEmpty(ContainerId);
+            return !string.IsNullOrEmpty(TripSegContainerNumber);
         }
 
         private IMvxAsyncCommand _transactionUnableToProcessCommand;
@@ -96,20 +96,31 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async Task ExecuteTransactionUnableToProcessCommand()
         {
             var exceptions = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ExceptionCodes);
-            var exceptionDialogAsync = await UserDialogs.Instance.ActionSheetAsync("Select Exception Code", "", "Cancel",
+            var exceptionDialogAsync = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, "", AppResources.Cancel,
                         exceptions.Select(ct => ct.CodeDisp1).ToArray());
-            if (exceptionDialogAsync != "Cancel")
+            if (exceptionDialogAsync != AppResources.Cancel)
             {
                 var exceptionObj = exceptions.FirstOrDefault(ct => ct.CodeDisp1 == exceptionDialogAsync);
-                await
-                    _tripService.ProcessTripSegmentContainerAsync(TripNumber, TripSegNumber, TripSegContainerSeqNumber,
-                        TripSegContainerNumber, false);
+
+                if (!string.IsNullOrEmpty(TripSegContainerNumber))
+                    Container.TripSegContainerNumber = TripSegContainerNumber;
+
+                await _tripService.MarkExceptionTripAsync(TripNumber);
+                await _tripService.MarkExceptionTripSegmentAsync(Segment);
+                await _tripService.MarkExceptionTripSegmentContainerAsync(Container, exceptionObj.CodeValue);
+
                 Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
             }
         }
 
-        // Field bindings
+        private string _methodOfEntry;
+        public string MethodOfEntry
+        {
+            get { return _methodOfEntry; }
+            set { SetProperty(ref _methodOfEntry, value); }
+        }
+
         private string _tripNumber;
         public string TripNumber
         {
@@ -135,18 +146,18 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public string TripSegContainerNumber
         {
             get { return _tripSegContainerNumber; }
-            set { SetProperty(ref _tripSegContainerNumber, value); }
+            set
+            {
+                SetProperty(ref _tripSegContainerNumber, value);
+                TransactionCompleteCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private string _containerId;
         public string ContainerId
         {
             get { return _containerId; }
-            set
-            {
-                SetProperty(ref _containerId, value);
-                TransactionCompleteCommand.RaiseCanExecuteChanged();
-            }
+            set { SetProperty(ref _containerId, value); }
         }
 
         private string _location;
@@ -163,8 +174,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _commodity, value); }
         }
 
-        private int? _level;
-        public int? Level
+        private CodeTableModel _level;
+        public CodeTableModel Level
         {
             get { return _level; }
             set{ SetProperty(ref _level, value); }
@@ -205,5 +216,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _customerCommodityList, value); }
         }
 
+        private TripSegmentContainerModel Container { get; set; }
+
+        private TripSegmentModel Segment { get; set; }
     }
 }

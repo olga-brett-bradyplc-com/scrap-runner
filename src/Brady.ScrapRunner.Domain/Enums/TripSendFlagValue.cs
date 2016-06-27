@@ -5,6 +5,33 @@ using Newtonsoft.Json;
 namespace Brady.ScrapRunner.Domain.Enums
 {
     [JsonConverter(typeof(RichEnumConverter))]
+
+    public enum GPSSendFlagValue
+    {
+        /// <summary>
+        /// 0 - Not Ready to be sent to tracker.
+        /// </summary>
+        [RichEnum("Not Ready", "NotReady")]
+        NotReady = 0,
+
+        /// <summary>
+        /// 1 - Ready to be sent to tracker.
+        /// </summary>
+        [RichEnum("Ready", "Ready")]
+        Ready = 1,
+
+        /// <summary>
+        /// 2 - Sent to driver.
+        /// </summary> 
+        [RichEnum("Sent To Tracker", "SentToTracker")]
+        SentToTracker = 2,
+
+        /// <summary>
+        /// 2 - Sent to driver.
+        /// </summary> 
+        [RichEnum("Sent To Tracker", "SentToTracker")]
+        SendFailed = 3,
+    }
     //Trip Send Auto Receipt Flag Values
     public enum TripSendAutoReceiptValue
     {

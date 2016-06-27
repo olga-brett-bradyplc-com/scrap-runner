@@ -69,13 +69,19 @@ namespace Brady.ScrapRunner.Mobile.Services
             return driver.FirstOrDefault();
         }
 
-        public async Task<ChangeResultWithItem<DriverFuelEntryProcess>> SetFuelEntryRemoteAsync(DriverFuelEntryProcess driverFuelEntryProcess)
+        public async Task<ChangeResultWithItem<DriverDelayProcess>> ProcessDriverDelayAsync(DriverDelayProcess driverDelayProcess)
+        {
+            var driverDelay = await _connection.GetConnection().UpdateAsync(driverDelayProcess, requeryUpdated: false);
+            return driverDelay;
+        }
+
+        public async Task<ChangeResultWithItem<DriverFuelEntryProcess>> ProcessDriverFuelEntryAsync(DriverFuelEntryProcess driverFuelEntryProcess)
         {
             var fuelEntry = await _connection.GetConnection().UpdateAsync(driverFuelEntryProcess, requeryUpdated: false);
             return fuelEntry;
         }
 
-        public async Task<ChangeResultWithItem<DriverMessageProcess>> SendMessageRemoteAsync(DriverMessageProcess driverMessageEntryProcess)
+        public async Task<ChangeResultWithItem<DriverMessageProcess>> ProcessDriverMessageAsync(DriverMessageProcess driverMessageEntryProcess)
         {
             var message = await _connection.GetConnection().UpdateAsync(driverMessageEntryProcess, requeryUpdated: false);
             return message;
