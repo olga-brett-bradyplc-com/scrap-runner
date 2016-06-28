@@ -519,4 +519,16 @@ You will now be sent back to the login.</value>
     <value>Select Exception Code</value>
     <comment>TransactionDetailViewModel</comment>
   </data>
+  <data name="SelectDelay" xml:space="preserve">
+    <value>Select Delay Reason</value>
+    <comment>MenuViewModel</comment>
+  </data>
+  <data name="SelectUser" xml:space="preserve">
+    <value>Select User To Message</value>
+    <comment>MenuViewModel</comment>
+  </data>
+  <data name="NoUsers" xml:space="preserve">
+    <value>No users found to message</value>
+    <comment>MenuViewModel</comment>
+  </data>
 </root>

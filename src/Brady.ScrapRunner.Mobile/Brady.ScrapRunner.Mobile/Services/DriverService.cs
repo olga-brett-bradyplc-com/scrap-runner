@@ -16,11 +16,14 @@ namespace Brady.ScrapRunner.Mobile.Services
     {
         private readonly IConnectionService _connection;
         private readonly IRepository<DriverStatusModel> _driverStatusRepository;
+        private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository; 
 
-        public DriverService(IRepository<DriverStatusModel> driverStatusRepository, 
+        public DriverService(IRepository<DriverStatusModel> driverStatusRepository,
+            IRepository<EmployeeMasterModel> employeeMasterRepository,
             IConnectionService connection)
         {
             _driverStatusRepository = driverStatusRepository;
+            _employeeMasterRepository = employeeMasterRepository;
             _connection = connection;
         }
 
@@ -36,31 +39,45 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// 
+        /// Update the local EmployeeMaster SQLite table with current user information
         /// </summary>
-        /// <param name="driverEnrouteProcess"></param>
+        /// <param name="employee"></param>
         /// <returns></returns>
-        public async Task<ChangeResultWithItem<DriverEnrouteProcess>> SetDriverEnrouteRemoteAsync(DriverEnrouteProcess driverEnrouteProcess)
+        public Task UpdateDriverEmployeeRecord(EmployeeMaster employee)
         {
-            var enrouteProcess = await _connection.GetConnection().UpdateAsync(driverEnrouteProcess, requeryUpdated: false);
-            return enrouteProcess;
+            var mapped = AutoMapper.Mapper.Map<EmployeeMaster, EmployeeMasterModel>(employee);
+            return _employeeMasterRepository.InsertAsync(mapped);
+        }
+
+        /// <summary>
+        /// Find the remote EmployeeMaster record for the current user
+        /// </summary>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
+        public async Task<EmployeeMaster> FindEmployeeMasterForDriverRemoteAsync(string employeeId)
+        {
+            var driver =
+                await
+                    _connection.GetConnection(ConnectionType.Online)
+                        .QueryAsync(
+                            new QueryBuilder<EmployeeMaster>().Filter(
+                                e => e.Property(f => f.EmployeeId).EqualTo(employeeId)));
+            return driver.Records.FirstOrDefault();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="driverArriveProcess"></param>
+        /// <param name="driver"></param>
         /// <returns></returns>
-        public async Task<ChangeResultWithItem<DriverArriveProcess>> SetDriverArrivedRemoteAsync(DriverArriveProcess driverArriveProcess)
+        public async Task<int> UpdateDriver(DriverStatusModel driver)
         {
-            var arriveProcess = await _connection.GetConnection().UpdateAsync(driverArriveProcess, requeryUpdated: false);
-            return arriveProcess;
+            return await _driverStatusRepository.UpdateAsync(driver);
         }
 
         /// <summary>
         /// Return current driver status
-        /// Right now, making an assumption that there will only ever be one record in the local
-        ///     DriverStatus SQLite table
+        /// Right now, making an assumption that there will only ever be one record in the local DriverStatus SQLite table
         /// </summary>
         /// <returns></returns>
         public async Task<DriverStatusModel> GetCurrentDriverStatusAsync()
@@ -69,18 +86,55 @@ namespace Brady.ScrapRunner.Mobile.Services
             return driver.FirstOrDefault();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverArriveProcess"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverArriveProcess>> ProcessDriverArrivedAsync(DriverArriveProcess driverArriveProcess)
+        {
+            var arriveProcess = await _connection.GetConnection().UpdateAsync(driverArriveProcess, requeryUpdated: false);
+            return arriveProcess;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverEnrouteProcess"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverEnrouteProcess>> ProcessDriverEnrouteAsync(DriverEnrouteProcess driverEnrouteProcess)
+        {
+            var enrouteProcess = await _connection.GetConnection().UpdateAsync(driverEnrouteProcess, requeryUpdated: false);
+            return enrouteProcess;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverDelayProcess"></param>
+        /// <returns></returns>
         public async Task<ChangeResultWithItem<DriverDelayProcess>> ProcessDriverDelayAsync(DriverDelayProcess driverDelayProcess)
         {
             var driverDelay = await _connection.GetConnection().UpdateAsync(driverDelayProcess, requeryUpdated: false);
             return driverDelay;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverFuelEntryProcess"></param>
+        /// <returns></returns>
         public async Task<ChangeResultWithItem<DriverFuelEntryProcess>> ProcessDriverFuelEntryAsync(DriverFuelEntryProcess driverFuelEntryProcess)
         {
             var fuelEntry = await _connection.GetConnection().UpdateAsync(driverFuelEntryProcess, requeryUpdated: false);
             return fuelEntry;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverMessageEntryProcess"></param>
+        /// <returns></returns>
         public async Task<ChangeResultWithItem<DriverMessageProcess>> ProcessDriverMessageAsync(DriverMessageProcess driverMessageEntryProcess)
         {
             var message = await _connection.GetConnection().UpdateAsync(driverMessageEntryProcess, requeryUpdated: false);

@@ -191,7 +191,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (loginProcess.WasSuccessful)
                 {
                     await _containerService.UpdateContainerMaster(loginProcess.Item.ContainersOnPowerId);
-
+                    await _messagesService.UpdateApprovedUsersForMessaging(loginProcess.Item.UsersForMessaging);
                     await _driverService.UpdateDriverStatus(new DriverStatus
                     {
                         EmployeeId = loginProcess.Item.EmployeeId,
@@ -207,6 +207,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         LoginProcessedDateTime = loginProcess.Item.LoginDateTime,
                         DriverLCID = loginProcess.Item.LocaleCode
                     });
+
+                    // Get the EmployeeMaster record for the current driver and update local DB
+                    var driverEmployeeRecord =
+                        await _driverService.FindEmployeeMasterForDriverRemoteAsync(loginProcess.Item.EmployeeId);
+                    await _driverService.UpdateDriverEmployeeRecord(driverEmployeeRecord);
                 }
                 else
                 {
@@ -285,7 +290,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
-                var messagesTable = await _messagesService.FindMsgsRemoteAsync(new DriverMessageProcess { EmployeeId = UserName });
+                var messagesTable = await _messagesService.ProcessDriverMessagesAsync(new DriverMessageProcess { EmployeeId = UserName });
 
                 if (messagesTable.WasSuccessful)
                 {

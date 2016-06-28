@@ -13,14 +13,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IConnectionService _connection;
         private readonly IQueueScheduler _queueScheduler;
         private readonly ICodeTableService _codeTableService;
+        private readonly IMessagesService _messagesService;
         private readonly ILocationService _locationService;
 
-        public MenuViewModel(IConnectionService connection, IQueueScheduler queueScheduler, ICodeTableService codeTableService, ILocationService locationService)
+        public MenuViewModel(IConnectionService connection, IQueueScheduler queueScheduler, ICodeTableService codeTableService, ILocationService locationService, IMessagesService messageService)
         {
             _connection = connection;
             _queueScheduler = queueScheduler;
             _codeTableService = codeTableService;
             _locationService = locationService;
+            _messagesService = messageService;
         }
 
         private IMvxAsyncCommand _logoutCommand;
@@ -71,13 +73,31 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ShowViewModel<MessagesViewModel>();
         }
 
-        private IMvxCommand _newMessageCommand;
-        public IMvxCommand NewMessageCommand
-            => _newMessageCommand ?? (_newMessageCommand = new MvxCommand(ExecuteNewMessageCommand));
+        private IMvxAsyncCommand _newMessageCommand;
+        public IMvxAsyncCommand NewMessageCommand
+            => _newMessageCommand ?? (_newMessageCommand = new MvxAsyncCommand(ExecuteNewMessageCommandAsync));
 
-        private void ExecuteNewMessageCommand()
+        private async Task ExecuteNewMessageCommandAsync()
         {
-            ShowViewModel<NewMessageViewModel>();
+            var approvedUsers = await _messagesService.FindApprovedUsersForMessagingAsync();
+            if (approvedUsers.Count > 0)
+            {
+                var approvedListAsync =
+                    await
+                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectUser, "", AppResources.Cancel,
+                            approvedUsers.Select(u => u.FullName).ToArray());
+
+                if (approvedListAsync != AppResources.Cancel)
+                {
+                    var user = approvedUsers.FirstOrDefault(u => u.FullName == approvedListAsync);
+                    ShowViewModel<NewMessageViewModel>(
+                        new {remoteUserId = user.EmployeeId, remoteUserFullName = user.FullName});
+                }
+            }
+            else
+            {
+                await UserDialogs.Instance.AlertAsync(AppResources.NoUsers, AppResources.Error);
+            }
         }
 
         private IMvxAsyncCommand _delayCommandAsync;
@@ -89,11 +109,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var delays = await _codeTableService.FindCodeTableList(CodeTableNameConstants.DelayCodes);
             var delayAlertAsync =
                 await
-                    UserDialogs.Instance.ActionSheetAsync("Select Delay Reason", "", "Cancel",
+                    UserDialogs.Instance.ActionSheetAsync(AppResources.SelectDelay, "", AppResources.Cancel,
                         delays.Select(ct => ct.CodeDisp1).ToArray());
 
             // Hitting "Cancel" on an ActionSheet dialog returns a string of "Cancel" ...
-            if (delayAlertAsync != "Cancel")
+            if (delayAlertAsync != AppResources.Cancel)
             {
                 var delayReasonObj = delays.FirstOrDefault(ct => ct.CodeDisp1 == delayAlertAsync);
                 ShowViewModel<DelayViewModel>(new {delayCode = delayReasonObj.CodeValue, delayReason = delayReasonObj.CodeValue});

@@ -13,8 +13,7 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_margin_half"
         tools:text="HEWITT"
-        local:MvxBind="Text SenderName"
-        local:MvxLang="TextSource SenderName"
+        local:MvxBind="Text RemoteUserName"
         android:textColor="#000000"
         android:textSize="20dp"
         android:textStyle="bold" />
@@ -39,6 +38,5 @@
         android:singleLine="true"
         android:textColor="#000000"
         tools:text="THIS IS A TEST TO TEST THE TESTING TESTS OF TEXT TESTS"
-        local:MvxBind="Text MsgText"
-        local:MvxLang="TextSource MsgText" />
+        local:MvxBind="Text MsgText"/>
 </RelativeLayout>

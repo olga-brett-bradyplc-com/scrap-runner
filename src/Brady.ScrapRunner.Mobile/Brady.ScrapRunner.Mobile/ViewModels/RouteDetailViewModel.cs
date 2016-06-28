@@ -44,6 +44,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public override async void Start()
         {
             var trip = await _tripService.FindTripAsync(TripNumber);
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
             if (trip != null)
             {
@@ -175,6 +176,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _allowRtnEdit, value); }
         }
 
+        private DriverStatusModel _currentDriver;
+        public DriverStatusModel CurrentDriver
+        {
+            get { return _currentDriver; }
+            set { SetProperty(ref _currentDriver, value); }
+        }
+
         private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers; 
         public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
         {
@@ -216,30 +224,28 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmEnrouteTitle);
             if (confirm)
             {
-
-                var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
-
                 using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
                 {
-                    foreach (var segment in Containers)
+                    var setDriverEnroute = await _driverService.ProcessDriverEnrouteAsync(new DriverEnrouteProcess
                     {
-                        var setDriverEnroute = await _driverService.SetDriverEnrouteRemoteAsync(new DriverEnrouteProcess
-                        {
-                            EmployeeId = currentDriver.EmployeeId,
-                            PowerId = currentDriver.PowerId,
-                            TripNumber = TripNumber,
-                            TripSegNumber = segment.Key.TripSegNumber,
-                            ActionDateTime = DateTime.Now,
-                            Odometer = currentDriver.Odometer ?? default(int),
-                        });
+                        EmployeeId = CurrentDriver.EmployeeId,
+                        PowerId = CurrentDriver.PowerId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = Containers.FirstOrDefault().Key.TripSegNumber,
+                        ActionDateTime = DateTime.Now,
+                        Odometer = CurrentDriver.Odometer ?? default(int),
+                    });
 
-                        if (!setDriverEnroute.WasSuccessful)
-                        {
-                            await UserDialogs.Instance.AlertAsync(setDriverEnroute.Failure.Summary,
-                                AppResources.Error, AppResources.OK);
-                            return;
-                        }
+                    if (!setDriverEnroute.WasSuccessful)
+                    {
+                        await UserDialogs.Instance.AlertAsync(setDriverEnroute.Failure.Summary,
+                            AppResources.Error, AppResources.OK);
+                        return;
                     }
+
+                    CurrentDriver.TripNumber = TripNumber;
+                    CurrentDriver.TripSegNumber = Containers.FirstOrDefault().Key.TripSegNumber;
+                    await _driverService.UpdateDriver(CurrentDriver);
 
                     CurrentStatus = DriverStatusConstants.Enroute;
                     MenuFilter = MenuFilterEnum.OnTrip;
@@ -258,18 +264,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmArrivalTitle);
             if (confirm)
             {
-                var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
-
                 using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
                 {
-                    var setDriverArrived = await _driverService.SetDriverArrivedRemoteAsync(new DriverArriveProcess
+                    var setDriverArrived = await _driverService.ProcessDriverArrivedAsync(new DriverArriveProcess
                     {
-                        EmployeeId = currentDriver.EmployeeId,
-                        PowerId = currentDriver.PowerId,
+                        EmployeeId = CurrentDriver.EmployeeId,
+                        PowerId = CurrentDriver.PowerId,
                         TripNumber = TripNumber,
-                        TripSegNumber = "01", //TODO: why it's hardcoded? we need to pass segment number into route detail
+                        TripSegNumber = Containers.FirstOrDefault().Key.TripSegNumber,
                         ActionDateTime = DateTime.Now,
-                        Odometer = currentDriver.Odometer ?? default(int),
+                        Odometer = CurrentDriver.Odometer ?? default(int),
                     });
 
                     if (setDriverArrived.WasSuccessful)

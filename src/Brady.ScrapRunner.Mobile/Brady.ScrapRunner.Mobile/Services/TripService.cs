@@ -549,6 +549,18 @@
             return actionProcess;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverImage"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverImageProcess>> ProcessDriverImageAsync(
+            DriverImageProcess driverImage)
+        {
+            var imageProcess = await _connection.GetConnection().UpdateAsync(driverImage, requeryUpdated: false);
+            return imageProcess;
+        }
+
         #endregion
     }
 }
