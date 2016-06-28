@@ -33,6 +33,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
             var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
@@ -69,6 +70,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
+        private DriverStatusModel _currentDriver;
+        public DriverStatusModel CurrentDriver
+        {
+            get { return _currentDriver; }
+            set { SetProperty(ref _currentDriver, value); }
+        }
+
         // Listview bindings
         private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
         public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
@@ -79,16 +87,34 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         // Command bindings
         private IMvxAsyncCommand _confirmTransactionsCommand;
-        public IMvxAsyncCommand ConfirmTransactionsCommand => _confirmTransactionsCommand ?? (_confirmTransactionsCommand = new MvxAsyncCommand(ExecuteConfirmTransactionsCommandAsync, CanExecuteConfirmTransactionsCommandAsync));
+        public IMvxAsyncCommand ConfirmTransactionsCommand => _confirmTransactionsCommand ?? (_confirmTransactionsCommand = new MvxAsyncCommand<byte[]>(ExecuteConfirmTransactionsCommandAsync, CanExecuteConfirmTransactionsCommandAsync));
 
         // Command Impl
-        private async Task ExecuteConfirmTransactionsCommandAsync()
+        private async Task ExecuteConfirmTransactionsCommandAsync(byte[] image)
         {
             // Check to see if this is the last leg of the trip, and if so, warn them.
             // We can't use FindNextTripSegment like we normally do because we haven't
             // marked the segment as complete yet.
             var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
+            var firstSegment = Containers.FirstOrDefault().Key.TripSegNumber;
             var lastSegment = tripSegments.Last();
+
+            var imageProcess = await _tripService.ProcessDriverImageAsync(new DriverImageProcess
+            {
+                EmployeeId = CurrentDriver.EmployeeId,
+                TripNumber = TripNumber,
+                TripSegNumber = firstSegment,
+                ActionDateTime = DateTime.Now,
+                PrintedName = PrintedName,
+                ImageType = ImageTypeConstants.Signature,
+                ImageByteArray = image
+            });
+
+            if (!imageProcess.WasSuccessful)
+            {
+                UserDialogs.Instance.Alert(imageProcess.Failure.Summary, AppResources.Error);
+                return;
+            }
 
             if (Containers.Any(ts => ts.Key.TripSegNumber == lastSegment.TripSegNumber))
             {
@@ -108,7 +134,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task FinishTripLeg()
         {
-            var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
             using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Clear))
             {
@@ -116,12 +141,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 {
                     var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
                     {
-                        EmployeeId = currentDriver.EmployeeId,
+                        EmployeeId = CurrentDriver.EmployeeId,
                         TripNumber = TripNumber,
                         TripSegNumber = segment.Key.TripSegNumber,
                         ActionType = TripSegmentActionTypeConstants.Done,
                         ActionDateTime = DateTime.Now,
-                        PowerId = currentDriver.PowerId
+                        PowerId = CurrentDriver.PowerId
                     });
 
                     if (tripSegmentProcess.WasSuccessful)
@@ -132,8 +157,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             var containerAction =
                                 await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
                                 {
-                                    EmployeeId = currentDriver.EmployeeId,
-                                    PowerId = currentDriver.PowerId,
+                                    EmployeeId = CurrentDriver.EmployeeId,
+                                    PowerId = CurrentDriver.PowerId,
                                     ActionType = ContainerActionTypeConstants.Done,
                                     ActionDateTime = DateTime.Now,
                                     MethodOfEntry = TripMethodOfCompletionConstants.Manual,
@@ -171,9 +196,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        private bool CanExecuteConfirmTransactionsCommandAsync()
+        private bool CanExecuteConfirmTransactionsCommandAsync(byte[] image)
         {
-            return !string.IsNullOrEmpty(PrintedName);
+            if (string.IsNullOrEmpty(PrintedName) || image == null)
+            {
+                UserDialogs.Instance.Alert("You must sign and print your name", AppResources.Error);
+                return false;
+            }
+
+            return true;
         }
 
     }
