@@ -74,6 +74,9 @@
       <HintPath>..\..\..\packages\Acr.UserDialogs.5.0.1\lib\MonoAndroid10\AndHUD.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="BWF.DataServices.Domain">
+      <HintPath>..\..\..\packages\bwf.dataservices.domain.2016.2.43-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.Domain.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Android" />
     <Reference Include="Mono.Android.Export" />
     <Reference Include="mscorlib" />
@@ -273,6 +276,7 @@
     <Compile Include="LinkerPleaseInclude.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\DroidPollingNotificationService.cs" />
     <Compile Include="Services\NetworkAvailabilityServiceAndroid.cs" />
     <Compile Include="Services\QueueIntentBroadcastReceiver.cs" />
     <Compile Include="Services\QueueIntentService.cs" />
@@ -490,6 +494,10 @@
     <AndroidResource Include="Resources\drawable\drawericon2.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Brady.ScrapRunner.Domain\Brady.ScrapRunner.Domain.csproj">
+      <Project>{1EA17373-9A27-4090-A3BF-F8E290C97561}</Project>
+      <Name>Brady.ScrapRunner.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Brady.ScrapRunner.Mobile\Brady.ScrapRunner.Mobile.csproj">
       <Project>{c18d5575-9337-4b35-b59a-12c17b366f4b}</Project>
       <Name>Brady.ScrapRunner.Mobile</Name>
@@ -1179,7 +1187,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\build\Xamarin.Android.Support.Vector.Drawable.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Xamarin.Android.Support.Vector.Drawable.23.3.0\build\Xamarin.Android.Support.Vector.Drawable.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
   </Target>
+  <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
      Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

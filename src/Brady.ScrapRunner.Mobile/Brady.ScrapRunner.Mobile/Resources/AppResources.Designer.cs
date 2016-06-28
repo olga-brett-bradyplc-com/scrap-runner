@@ -937,6 +937,69 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Trip(s) Canceled.
+        /// </summary>
+        public static string TripsCanceled {
+            get {
+                return ResourceManager.GetString("TripsCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trip(s) Marked Done.
+        /// </summary>
+        public static string TripsMarkedDone {
+            get {
+                return ResourceManager.GetString("TripsMarkedDone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Modified Trip(s).
+        /// </summary>
+        public static string TripsModified {
+            get {
+                return ResourceManager.GetString("TripsModified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Trip(s).
+        /// </summary>
+        public static string TripsNew {
+            get {
+                return ResourceManager.GetString("TripsNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trip(s) Resequenced.
+        /// </summary>
+        public static string TripsResequenced {
+            get {
+                return ResourceManager.GetString("TripsResequenced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dispatch has changed the order of your trips..
+        /// </summary>
+        public static string TripsResequencedBody {
+            get {
+                return ResourceManager.GetString("TripsResequencedBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trip(s) Unassigned.
+        /// </summary>
+        public static string TripsUnassigned {
+            get {
+                return ResourceManager.GetString("TripsUnassigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Truck ID.
         /// </summary>
         public static string TruckId {
