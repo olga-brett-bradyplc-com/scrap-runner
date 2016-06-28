@@ -561,6 +561,18 @@
             return imageProcess;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverAck"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverTripAckProcess>> ProcessDriverTripAck(
+            DriverTripAckProcess driverAck)
+        {
+            var tripAckProcess = await _connection.GetConnection().UpdateAsync(driverAck, requeryUpdated: false);
+            return tripAckProcess;
+        }
+
         #endregion
     }
 }
