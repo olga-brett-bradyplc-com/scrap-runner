@@ -98,5 +98,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<ChangeResultWithItem<DriverImageProcess>> ProcessDriverImageAsync(
             DriverImageProcess driverImage);
+
+        Task<ChangeResultWithItem<DriverTripAckProcess>> ProcessDriverTripAck(
+            DriverTripAckProcess driverAck);
     }
 }

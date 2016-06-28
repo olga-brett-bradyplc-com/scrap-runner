@@ -314,9 +314,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (tripProcess.WasSuccessful)
                 {
                     // @TODO : Should we throw an error/alert dialog to the end user if any of these fail?
-
-                    if( tripProcess.Item?.Trips?.Count > 0 )
+                    if (tripProcess.Item?.Trips?.Count > 0)
+                    {
                         await _tripService.UpdateTrips(tripProcess.Item.Trips);
+
+                        // Acknowledge each trip
+                        foreach (var trip in tripProcess.Item.Trips)
+                        {
+                            var tripAck = await _tripService.ProcessDriverTripAck(new DriverTripAckProcess
+                            {
+                                EmployeeId = UserName,
+                                TripNumber = trip.TripNumber,
+                                ActionDateTime = DateTime.Now,
+                                Mdtid = UserName
+                            });
+
+                            if (!tripAck.WasSuccessful)
+                                UserDialogs.Instance.Alert(tripAck.Failure.Summary, AppResources.Error);
+                        }
+                    }
 
                     if(tripProcess.Item?.TripSegments?.Count > 0)
                         await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);
