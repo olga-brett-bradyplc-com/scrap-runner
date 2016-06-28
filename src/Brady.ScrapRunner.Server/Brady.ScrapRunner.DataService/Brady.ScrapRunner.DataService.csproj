@@ -193,6 +193,7 @@
     <Compile Include="Concrete\SRDataService.cs" />
     <Compile Include="Concrete\SRRepository.cs" />
     <Compile Include="Mappings\DriverDelayProcessMap.cs" />
+    <Compile Include="Mappings\DriverGPSLocationProcessMap.cs" />
     <Compile Include="Mappings\DriverImageProcessMap.cs" />
     <Compile Include="Mappings\DriverMessageProcessMap.cs" />
     <Compile Include="Mappings\DriverNewContainerProcessMap.cs" />
@@ -200,7 +201,9 @@
     <Compile Include="Mappings\DriverStateLineProcessMap.cs" />
     <Compile Include="Mappings\DriverTripAckProcessMap.cs" />
     <Compile Include="Mappings\DriverFuelEntryProcessMap.cs" />
+    <Compile Include="Mappings\GPSLocationMap.cs" />
     <Compile Include="ProcessTypes\DriverDelayProcessRecordType.cs" />
+    <Compile Include="ProcessTypes\DriverGPSLocationProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverImageProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverMessageProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverNewContainerProcessRecordType.cs" />
@@ -283,6 +286,7 @@
     <Compile Include="ProcessTypes\PreferencesProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverLoginProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverTripAckProcessRecordType.cs" />
+    <Compile Include="RecordTypes\GPSLocationRecordType.cs" />
     <Compile Include="RecordTypes\MessagesRecordType.cs" />
     <Compile Include="ProcessTypes\TerminalChangeProcessRecordType.cs" />
     <Compile Include="ProcessTypes\TripInfoProcessRecordType.cs" />
@@ -372,6 +376,8 @@
     <Compile Include="Validators\DriverEfficiencyValidator.cs" />
     <Compile Include="Validators\DriverEnrouteProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverEnrouteProcessValidator.cs" />
+    <Compile Include="Validators\DriverGPSLocationProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverGPSLocationProcessValidator.cs" />
     <Compile Include="Validators\DriverImageProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverImageProcessValidator.cs" />
     <Compile Include="Validators\DriverMessageProcessDeletionValidator.cs" />
@@ -388,6 +394,8 @@
     <Compile Include="Validators\DriverTripAckProcessValidator.cs" />
     <Compile Include="Validators\DriverFuelEntryProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverFuelEntryProcessValidator.cs" />
+    <Compile Include="Validators\GPSLocationDeletionValidator.cs" />
+    <Compile Include="Validators\GPSLocationValidator.cs" />
     <Compile Include="Validators\PreferencesProcessValidator.cs" />
     <Compile Include="Validators\PreferencesProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverLoginProcessDeletionValidator.cs" />

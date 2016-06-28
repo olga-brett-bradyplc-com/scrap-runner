@@ -19,6 +19,7 @@ using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.Util;
 using Brady.ScrapRunner.DataService.RecordTypes;
+using System.IO;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -652,10 +653,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
 
                         ////////////////////////////////////////////////
-                        // TODO:Send GPS Company Info to tracker
-                        // TODO:Send GV Driver START Packet to tracker
-                        // TODO:Send GV Driver CODE Packet to tracker
-                        // TODO:Send GV Driver NAME Packet to tracker
+                        // Send start-up information to tracker
+                        if(!SendToTracker(dataService, settings, changeSetResult,msgKey,userRoleIds,userCulture,
+                                          driverLoginProcess, employeeMaster))
+                        {
+                            break;
+                        }
 
                         ////////////////////////////////////////////////
                         // Add entry to Event Log - Login Received.
@@ -1022,6 +1025,125 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 log.ErrorFormat("Fault occured: {0} during login request: {1}", fault.Message, driverLoginProcess);
             }
             return faultDetected;
+        }
+
+        private bool SendToTracker(IDataService dataService, ProcessChangeSetSettings settings,
+                   ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture, 
+                   DriverLoginProcess driverLoginProcess, EmployeeMaster employeeMaster)
+        {
+            DataServiceFault fault;
+
+            ////////////////////////////////////////////////////////
+            // Lookup Preference: DEFRouterPath
+            string prefRouterPath = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                          Constants.SystemTerminalId, PrefSystemConstants.DEFRouterPath, out fault);
+            if (fault != null)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            ////////////////////////////////////////////////////////
+            // Lookup Preference: DEFMDTPrefix
+            string prefMDTPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                          Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
+            if (fault != null)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+
+            //Router path must be specified in system preference or we cannot send the packet.
+            if (prefRouterPath != null)
+            {
+                //Build the mdtId
+                string mdtId = driverLoginProcess.EmployeeId;
+                if (prefMDTPrefix != null && prefMDTPrefix != "")
+                {
+                    mdtId = prefMDTPrefix + mdtId;
+                }
+
+                // Build the complete path.
+                if (0 != prefRouterPath[prefRouterPath.Length - 1].CompareTo('\\'))
+                {
+                    prefRouterPath += @"\";
+                }
+                string fullRouterPathFileName = prefRouterPath + Constants.Send + @"\" + Constants.GPSFileName;
+
+                try
+                {
+                    // Write the lines to a new file or append to an existing file (true does this).
+                    using (StreamWriter outputFile = new StreamWriter(fullRouterPathFileName + Constants.GPSFileExt, true))
+                    {
+                        // Send GPS Company Info to tracker
+                        //*T TO TRACKER FR MdtId
+                        //*DC:2,GA
+                        //*DI:2,1
+                        //*DC:7,TerminalId
+                        //*DC:11,RegionId
+                        //*END
+                        outputFile.WriteLine($"*T TO {Constants.Tracker} FR {mdtId}");
+                        outputFile.WriteLine($"*DC:2,GA");
+                        outputFile.WriteLine($"*DI:2,1");
+                        outputFile.WriteLine($"*DC:7,{driverLoginProcess.TermId}");
+                        outputFile.WriteLine($"*DC:11,{driverLoginProcess.RegionId}");
+                        outputFile.WriteLine($"*END");
+
+                        // Send GV Driver START Packet to tracker
+                        //*T TO TRACKER FR MdtId
+                        //*DS:3,GV 
+                        //*DC:5,START
+                        //*END
+                        outputFile.WriteLine($"*T TO {Constants.Tracker} FR {mdtId}");
+                        outputFile.WriteLine($"*DS:3,GV");
+                        outputFile.WriteLine($"*DC:5,START");
+                        outputFile.WriteLine($"*END");
+
+                        // Send GV Driver CODE Packet to tracker
+                        //*T TO TRACKER FR MdtId
+                        //*DS:3,GV 
+                        //*DS:5,CODE 
+                        //*DC:10,TerminalId
+                        //*END
+                        outputFile.WriteLine($"*T TO {Constants.Tracker} FR {mdtId}");
+                        outputFile.WriteLine($"*DS:3,GV");
+                        outputFile.WriteLine($"*DS:5,CODE");
+                        outputFile.WriteLine($"*DC:10,{driverLoginProcess.TermId}");
+                        outputFile.WriteLine($"*END");
+
+                        // Send GV Driver NAME Packet to tracker
+                        //*T TO TRACKER FR MdtId
+                        //*DS:3,GV 
+                        //*DS:5,NAME 
+                        //*DC:41,LastName,FirstName
+                        //*END
+                        string driverName = Common.GetEmployeeName(employeeMaster);
+                        outputFile.WriteLine($"*T TO {Constants.Tracker} FR {mdtId}");
+                        outputFile.WriteLine($"*DS:3,GV");
+                        outputFile.WriteLine($"*DS:5,NAME");
+                        outputFile.WriteLine($"*DC:41,{driverName}");
+                        outputFile.WriteLine($"*END");
+
+                    }
+                    //If the file GPSScrapPkt does not exist, the rename the GPSScrapPkt.x to GPSScrapPkt (no extension)
+                    if (!File.Exists(fullRouterPathFileName))
+                    {
+                        if (File.Exists(fullRouterPathFileName + Constants.GPSFileExt))
+                        {
+                            File.Move(fullRouterPathFileName + Constants.GPSFileExt, fullRouterPathFileName);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    log.DebugFormat("SRTEST:DriverGPSLocationProcess Write failed: {0}.", e.Message);
+                }
+
+            }//if (prefRouterPath != null)
+            else
+            {
+                log.DebugFormat("SRTEST:DriverGPSLocationProcess Router Path no set up.");
+            }
+            return true;
         }
 
     }
