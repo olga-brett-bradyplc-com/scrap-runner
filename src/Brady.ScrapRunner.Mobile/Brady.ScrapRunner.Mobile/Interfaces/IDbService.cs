@@ -9,5 +9,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
     public interface IDbService
     {
         Task RefreshAll();
+        Task RefreshTable<T>() where T : class;
     }
 }
