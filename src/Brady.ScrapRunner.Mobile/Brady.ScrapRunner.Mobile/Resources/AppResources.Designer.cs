@@ -874,6 +874,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must sign and print your name.
+        /// </summary>
+        public static string SignAndPrint {
+            get {
+                return ResourceManager.GetString("SignAndPrint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Signature.
         /// </summary>
         public static string Signature {

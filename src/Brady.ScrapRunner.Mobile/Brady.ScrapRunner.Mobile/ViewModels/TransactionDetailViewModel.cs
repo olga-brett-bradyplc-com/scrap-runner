@@ -105,6 +105,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (!string.IsNullOrEmpty(TripSegContainerNumber))
                     Container.TripSegContainerNumber = TripSegContainerNumber;
 
+                Container.TripSegContainerLevel = short.Parse(Level.CodeValue);
+                await _tripService.UpdateTripSegmentContainerAsync(Container);
+
                 await _tripService.MarkExceptionTripAsync(TripNumber);
                 await _tripService.MarkExceptionTripSegmentAsync(Segment);
                 await _tripService.MarkExceptionTripSegmentContainerAsync(Container, exceptionObj.CodeValue);

@@ -275,6 +275,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //Converts the byte array to an image 
                             MemoryStream ms = new MemoryStream(driverImageProcess.ImageByteArray);
                             Image signatureImage = Image.FromStream(ms);
+                            string temp = "haii";
+                            var gofuckyourself = temp;
                             //Create the directory if it does not already exist
                             System.IO.FileInfo file = new System.IO.FileInfo(imagePath);
                             file.Directory.Create();

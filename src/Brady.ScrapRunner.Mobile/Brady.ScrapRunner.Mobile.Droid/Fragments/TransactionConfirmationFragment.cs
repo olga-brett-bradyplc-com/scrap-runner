@@ -10,6 +10,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Brady.ScrapRunner.Mobile.ViewModels;
+using Java.IO;
 using Java.Nio;
 using MvvmCross.Binding.Droid.Views;
 using MvvmCross.Droid.Shared.Attributes;
@@ -23,6 +24,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     public class TransactionConfirmationFragment : BaseFragment<TransactionConfirmationViewModel>
     {
         private IDisposable _containersToken;
+        private byte[] _image;
 
         protected override int FragmentId => Resource.Layout.fragment_transactionconfirmation;
         protected override bool NavMenuEnabled => true;
@@ -48,16 +50,14 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 if (signaturePad.Points.Length > 0)
                 {
                     var bitmap = signaturePad.GetImage();
-                    byte[] bytes;
 
                     using (var ms = new MemoryStream())
                     {
                         bitmap.Compress(Bitmap.CompressFormat.Png, 80, ms);
-                        bytes = ms.ToArray();
+                        _image = ms.ToArray();
                     }
 
-                    ViewModel.ConfirmTransactionsCommand.ExecuteAsync(bytes);
-                    Array.Clear(bytes, 0, bytes.Length);
+                    ViewModel.ConfirmTransactionsCommand.ExecuteAsync(_image);
                 }
                 else
                 {
@@ -70,9 +70,13 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             base.OnDestroyView();
 
-            if (_containersToken == null) return;
-            _containersToken.Dispose();
-            _containersToken = null;
+            if (_containersToken != null)
+            {
+                _containersToken.Dispose();
+                _containersToken = null;
+            }
+            
+            _image = null;
         }
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
