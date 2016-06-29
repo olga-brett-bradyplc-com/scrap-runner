@@ -159,6 +159,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         List<EmployeeMaster> usersForMessagingList = new List<EmployeeMaster>();
 
                         ////////////////////////////////////////////////
+                        //DriverEnrouteProcess has been called
+                        log.DebugFormat("SRTEST:DriverLoginProcess Called by {0}", key);
+                        log.DebugFormat("SRTEST:DriverLoginProcess Driver:{0} DT:{1} PowerId:{2} Odom:{3} MDT:{4}",
+                                         driverLoginProcess.EmployeeId, driverLoginProcess.LoginDateTime,
+                                         driverLoginProcess.PowerId, driverLoginProcess.Odometer,
+                                         driverLoginProcess.Mdtid);
+                        ////////////////////////////////////////////////
                         // Validate driver id / Get the EmployeeMaster
                         // UserId must be a valid EmployeeId in the EmployeeMaster and SecurityLevel must be DR for driver.
                         var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
@@ -176,13 +183,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         driverLoginProcess.TermId = employeeMaster.TerminalId;
                         driverLoginProcess.RegionId = employeeMaster.RegionId;
                         driverLoginProcess.AreaId = employeeMaster.AreaId;
-
-                        //For testing
-                        log.Debug("SRTEST:GetEmployeeDriver");
-                        log.DebugFormat("SRTEST:Driver:{0} Terminal:{1} SecurityLevel:{2}",
-                                         employeeMaster.EmployeeId,
-                                         employeeMaster.TerminalId,
-                                         employeeMaster.SecurityLevel);
 
                         ////////////////////////////////////////////////
                         // Preferences:  Lookup the system preference "DEFAllowAnyPowerUnit".  
@@ -220,16 +220,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid Power ID " + driverLoginProcess.PowerId));
                             break;
                         }
-                        //For testing
-                        log.Debug("SRTEST:GetPowerUnit or GetPowerUnitForRegion");
-                        log.DebugFormat("SRTEST:PowerId:{0} Driver:{1} Odom:{2} PowerStatus:{3} AllowAnyPowerUnit:{4} Region:{5}",
-                                         powerMaster.PowerId,
-                                         powerMaster.PowerDriverId,
-                                         powerMaster.PowerOdometer,
-                                         powerMaster.PowerStatus,
-                                         prefAllowAnyPowerUnit,
-                                         powerMaster.PowerRegionId);
-
                         ////////////////////////////////////////////////
                         // Check power unit status: Scheduled for the shop? PS_SHOP = "S"
                         if (PowerStatusConstants.Shop == powerMaster.PowerStatus)
@@ -267,13 +257,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             }
                             if (null != prefOdomWarnRange)
                             {
-                                //For testing
-                                log.Debug("SRTEST:Check Odometer");
-                                log.DebugFormat("SRTEST:OdomRange:{0} PowerId:{1} Odom:{2} OdomFromDriver:{3}",
-                                                 prefOdomWarnRange,
-                                                 powerMaster.PowerId,
-                                                 powerMaster.PowerOdometer,
-                                                 driverLoginProcess.Odometer);
 
                                 var deltaMiles = int.Parse(prefOdomWarnRange);
                                 if (driverLoginProcess.Odometer < powerMaster.PowerOdometer.Value - deltaMiles ||
@@ -286,6 +269,16 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 }
                             }
                         }
+                        ////////////////////////////////////////////////
+                        // Preferences:  Lookup the system preference "DEFMDTPrefix".  
+                        string prefMDTPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                       Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
+                        if (null != fault)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        driverLoginProcess.Mdtid = prefMDTPrefix + driverLoginProcess.EmployeeId;
 
                         ////////////////////////////////////////////////
                         //Get the driver status record for the driver. If one does not exist (which is common), add one.
@@ -306,13 +299,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             };
                         }
                         //Now there is a driverStatus
-                        //For testing
-                        log.Debug("SRTEST:GetDriverStatus");
-                        log.DebugFormat("SRTEST:DriverId:{0} DriverStatus:{1} TripNumber:{2} Seg:{3}",
-                                                            driverStatus.EmployeeId,
-                                                            driverStatus.Status,
-                                                            driverStatus.TripNumber,
-                                                            driverStatus.TripSegNumber);
 
                         ////////////////////////////////////////////////
                         // Validate Duplicate login?  Assuming we don't need this at this time.
@@ -363,25 +349,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 //No need to do this after all, since we will be removing the driverstatus.
                                 //driverLoginProcess.DriverStatus = DriverStatusSRConstants.Available;
 
-                                //For testing
-                                log.Debug("SRTEST:GetNextIncompleteTripSegment");
-                                log.DebugFormat("SRTEST:TripNumber:{0} NextSegment:{1}",
-                                                 nextTripSegment.TripNumber,
-                                                 nextTripSegment.TripSegNumber);
-                            }
+                          }
                             //For all other statuses just use the current seg number in the driver status table.
                             else
                             {
                                 driverLoginProcess.TripSegNumber = driverStatus.TripSegNumber;
                             }
-
-                            //For testing
-                            log.Debug("SRTEST:Driver Status");
-                            log.DebugFormat("SRTEST:TripNumber:{0} Segment:{1} DriverStatus:{2} PrevDriverStatus:{3}",
-                                             driverStatus.TripNumber,
-                                             driverStatus.TripSegNumber,
-                                             driverStatus.Status,
-                                             driverStatus.PrevDriverStatus);
 
                             //Remove the driver status except for enroutes,arrives, and state line crossings
                             //Other statuses that the driver might have been in (delay, back on duty, fuel, done) don't matter anymore.
@@ -396,7 +369,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //The enroute is stored in the previous driver status, while disconnect is now the driver status.
                             //The enroute is the one we want to use.
                             //If there is a previous driver status, use it. Otherwise use driver status.
-                            driverStatus.Status = driverStatus.PrevDriverStatus ?? driverStatus.Status;
+                            driverLoginProcess.DriverStatus = driverStatus.PrevDriverStatus ?? driverStatus.Status;
 
                             ////////////////////////////////////////////////
                             //Update Trip Record: Set the "trip in progress" flag in the trip table
@@ -419,12 +392,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                                         break;
                                     }
-                                    //For testing
-                                    log.Debug("SRTEST:GetTrip to check TripInProgressFlag");
-                                    log.DebugFormat("SRTEST:TripNumber:{0} TripInProgressFlag:{1} DriverStatus:{2}",
-                                                                        trip.TripNumber,
-                                                                        trip.TripInProgressFlag,
-                                                                        driverStatus.Status);
+
                                     //Set to N only if it is not N already
                                     if (trip.TripInProgressFlag != Constants.No)
                                     {
@@ -497,7 +465,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         if (null == destCustomerMaster)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverEnrouteProcess:Invalid CustHostCode: "
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("DriverLoginProcess:Invalid CustHostCode: "
                                             + currentTripSegment.TripSegDestCustHostCode));
                             break;
                         }
@@ -773,18 +741,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
                         //For testing
-                        log.Debug("SRTEST:GetDispatcherList");
-                        foreach (var user in usersForMessaging)
-                        {
-                            log.DebugFormat("SRTEST:LastName:{0} FirstName:{1} SecurityLevel:{2} AllowMessaging:{3} Region:{4} Terminal:{5} Area:{6}",
-                                             user.LastName,
-                                             user.FirstName,
-                                             user.SecurityLevel,
-                                             user.AllowMessaging,
-                                             user.RegionId,
-                                             user.TerminalId,
-                                             user.AreaId);
-                        }
+                        log.DebugFormat("SRTEST:GetDispatcherList: Sending:{0} Dispatchers", usersForMessaging.Count);
 
                         ////////////////////////////////////////////////
                         // Populate and send the Login message back to the mobile device.

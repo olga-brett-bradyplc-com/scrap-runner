@@ -186,6 +186,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
                     }
+                    if (driverImageProcess.ImageByteArray[0] == 0)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("No Values in Array "));
+                        break;
+                    }
                     //////////////////////////////////////////////
                     //Get the path from the system preference DEFSignatureCapturePath to store the image
                     string prefImageCapturePath = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
