@@ -163,10 +163,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    log.DebugFormat("SRTEST:PreferenceProcess:EmployeeId:{0} TerminalId:{1} SecurityLevel:{2}",                                    employeeMaster.EmployeeId,
-                                    employeeMaster.EmployeeId,
-                                    employeeMaster.TerminalId,
-                                    employeeMaster.SecurityLevel);
 
                     ////////////////////////////////////////////////
                     // Lookup TerminalMaster for two "additional" preferences 
@@ -177,10 +173,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                         break;
                     }
-                    log.DebugFormat("SRTEST:PreferenceProcess:TerminalId:{0} TimeZoneFactor:{1} DaylightSavings:{2}",
-                                    terminalMaster.TerminalId,
-                                    terminalMaster.TimeZoneFactor,
-                                    terminalMaster.DaylightSavings);
 
                     ////////////////////////////////////////////////
                     // Filter for the 30some properties of interst.
