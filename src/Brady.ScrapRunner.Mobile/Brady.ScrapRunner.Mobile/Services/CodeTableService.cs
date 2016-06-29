@@ -51,6 +51,11 @@ namespace Brady.ScrapRunner.Mobile.Services
             return sortedStates;
         }
 
+        /// <summary>
+        /// Find a list of CodeTableModel objects based on CodeName column
+        /// </summary>
+        /// <param name="codeName"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<CodeTableModel>> FindCodeTableList(string codeName)
         {
             var sortedCodes = await _codeTableRepository.AsQueryable()
@@ -58,6 +63,18 @@ namespace Brady.ScrapRunner.Mobile.Services
                 .OrderBy(t => t.CodeValue)
                 .ToListAsync();
             return sortedCodes;
+        }
+
+        /// <summary>
+        /// Find a specific CodeTableModel object based on CodeName and CodeValue
+        /// </summary>
+        /// <param name="codeName"></param>
+        /// <param name="codeValue"></param>
+        /// <returns></returns>
+        public async Task<CodeTableModel> FindCodeTableObject(string codeName, string codeValue)
+        {
+            var ct = await _codeTableRepository.FindAsync(v => v.CodeName == codeName && v.CodeValue == codeValue);
+            return ct;
         }
 
         /// <summary>

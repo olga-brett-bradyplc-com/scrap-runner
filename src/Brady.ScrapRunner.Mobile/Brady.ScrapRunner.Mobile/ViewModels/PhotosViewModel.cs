@@ -133,7 +133,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     if (!imageProcess.WasSuccessful)
                     {
-                        Array.Clear(bytes, 0, bytes.Length);
                         UserDialogs.Instance.Alert(imageProcess.Failure.Summary, AppResources.Error);
                         return;
                     }

@@ -14,7 +14,7 @@ using MvvmCross.Platform.WeakSubscription;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame)]
+    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame, true)]
     [Register("brady.scraprunner.mobile.droid.fragments.ScaleDetailFragment")]
     public class ScaleDetailFragment : BaseFragment<ScaleDetailViewModel>
     {
@@ -76,13 +76,13 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         private void OnTareTimeChanged(object sender, PropertyChangedEventArgs args)
         {
             var button = View.FindViewById<Button>(Resource.Id.tareButton);
-            button.Text = "Tare : " + ViewModel.GrossTime;
+            button.Text = "Tare : " + ViewModel.TareTime;
         }
 
         private void OnSecondGrossTimeChanged(object sender, PropertyChangedEventArgs args)
         {
             var button = View.FindViewById<Button>(Resource.Id.secondGrossButton);
-            button.Text = "Second Gross : " + ViewModel.GrossTime;
+            button.Text = "Second Gross : " + ViewModel.SecondGrossTime;
         }
     }
 }

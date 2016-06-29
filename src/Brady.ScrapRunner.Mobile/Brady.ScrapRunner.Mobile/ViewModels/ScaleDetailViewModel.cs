@@ -28,10 +28,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             Title = AppResources.YardScaleDetail;
 
-            GrossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand);
-            SecondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet);
-            TareWeightSetCommand = new MvxCommand(ExecuteTareWeightSetCommand, IsGrossWeightSet);
-
             ContainerSetDownCommand = new MvxAsyncCommand(ExecuteContainerSetDownCommandAsync);
             ContainerLeftOnTruckCommand = new MvxAsyncCommand(ExecuteContainerLeftOnTruckCommandAsync);
         }
@@ -47,6 +43,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
             var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
@@ -127,37 +124,49 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _tareTime, value); }
         }
 
+        private DriverStatusModel CurrentDriver { get; set; }
+
         // Command bindings
         public IMvxAsyncCommand ContainerSetDownCommand { get; private set; }
         public IMvxAsyncCommand ContainerLeftOnTruckCommand { get; private set; }
-        public MvxCommand GrossWeightSetCommand { get; private set; }
-        public MvxCommand TareWeightSetCommand { get; private set; }
-        public MvxCommand SecondGrossWeightSetCommand { get; private set; }
 
-        // Command impl
-        private async Task ExecuteContainerSetDownCommandAsync()
-        {
-            await ProcessContainers(true, AppResources.SetDownContainerMessage);
-        }
-
-        private async Task ExecuteContainerLeftOnTruckCommandAsync()
-        {
-            await ProcessContainers(false, AppResources.LeftOnTruckContainerMessage);
-        }
-
+        private IMvxCommand _grossWeightSetCommand;
+        public IMvxCommand GrossWeightSetCommand
+            => _grossWeightSetCommand ?? (_grossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand));
+        
         private void ExecuteGrossWeightSetCommand()
         {
             GrossTime = DateTime.Now;
         }
 
+        private IMvxCommand _tareWeightSetCommand;
+        public IMvxCommand TareWeightSetCommand
+            => _tareWeightSetCommand ?? (_tareWeightSetCommand = new MvxCommand(ExecuteTareWeightSetCommand));
+        
+        private void ExecuteTareWeightSetCommand()
+        {
+            TareTime = DateTime.Now;
+        }
+        
+        private async Task ExecuteContainerSetDownCommandAsync()
+        {
+            await ProcessContainers(true, AppResources.SetDownContainerMessage);
+        }
+
+        private IMvxCommand _secondGrossWeightSetCommand;
+        public IMvxCommand SecondGrossWeightSetCommand
+            =>
+                _secondGrossWeightSetCommand ??
+                (_secondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand));
+        
         private void ExecuteSecondGrossWeightSetCommand()
         {
             SecondGrossTime = DateTime.Now;
         }
 
-        private void ExecuteTareWeightSetCommand()
+        private async Task ExecuteContainerLeftOnTruckCommandAsync()
         {
-            TareTime = DateTime.Now;
+            await ProcessContainers(false, AppResources.LeftOnTruckContainerMessage);
         }
 
         private bool IsGrossWeightSet()
@@ -168,7 +177,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async Task ProcessContainers(bool setDownInYard, string confirmationMessage)
         {
             var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
-            var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
             var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
 
@@ -203,8 +211,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     var containerAction =
                         await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
                         {
-                            EmployeeId = currentDriver.EmployeeId,
-                            PowerId = currentDriver.PowerId,
+                            EmployeeId = CurrentDriver.EmployeeId,
+                            PowerId = CurrentDriver.PowerId,
                             ActionType = (string.IsNullOrEmpty(reason?.CodeDisp1)) ? ContainerActionTypeConstants.Done : ContainerActionTypeConstants.Review,
                             ActionDateTime = DateTime.Now,
                             TripNumber = TripNumber,
@@ -242,7 +250,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 await _tripService.CompleteTripAsync(TripNumber);
 
                 foreach (var segment in Containers)
-                    await _tripService.CompleteTripSegmentAsync(segment.Key);
+                {
+                    var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                    {
+                        EmployeeId = CurrentDriver.EmployeeId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = segment.Key.TripSegNumber,
+                        ActionDateTime = DateTime.Now,
+                        PowerId = CurrentDriver.PowerId,
+                        ActionType = TripSegStatusConstants.Done
+                    });
+
+                    if (tripSegmentProcess.WasSuccessful)
+                        await _tripService.CompleteTripSegmentAsync(segment.Key);
+                    else
+                        UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
+                }
 
                 Close(this);
                 ShowViewModel<RouteSummaryViewModel>();

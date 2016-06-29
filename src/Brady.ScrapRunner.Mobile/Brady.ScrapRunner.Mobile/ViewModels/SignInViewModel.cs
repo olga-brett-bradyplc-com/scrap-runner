@@ -9,11 +9,13 @@ using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Plugins.Sqlite;
 using Brady.ScrapRunner.Mobile.Resources;
 using Brady.ScrapRunner.Mobile.Services;
 using Brady.ScrapRunner.Mobile.Validators;
+using Plugin.Settings.Abstractions;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -251,15 +253,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
+                // If there's no last updated for container settings, manually refresh the containers
+                if (PhoneSettings.ContainerSettings == null)
+                    await _dbService.RefreshTable<ContainerChangeModel>();
+
                 // Retrieve container info from remote server and populate local DB
                 var containerChanges =
                     await _containerService.ProcessContainerChangeAsync(new ContainerChangeProcess
                     {
-                        EmployeeId = UserName
+                        EmployeeId = UserName,
+                        LastContainerMasterUpdate = PhoneSettings.ContainerSettings.HasValue ? PhoneSettings.ContainerSettings.Value.ToLocalTime() : (DateTime?) null
                     });
 
                 if (containerChanges.WasSuccessful)
                 {
+                    PhoneSettings.ContainerSettings = DateTime.Now;
                     if (containerChanges.Item?.Containers?.Count > 0)
                         await _containerService.UpdateContainerChange(containerChanges.Item.Containers);
                 }

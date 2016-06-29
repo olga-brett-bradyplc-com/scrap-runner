@@ -234,7 +234,8 @@
                     ts.TripNumber == tripNumber
                     &&
                     (ts.TripSegStatus == TripSegStatusConstants.Pending ||
-                     ts.TripSegStatus == TripSegStatusConstants.Missed))
+                     ts.TripSegStatus == TripSegStatusConstants.Missed ||
+                     ts.TripSegStatus == TripSegStatusConstants.Exception))
                 .OrderBy(ts => ts.TripSegNumber)
                 .ToListAsync();
             if (!segments.Any())
@@ -419,6 +420,7 @@
         /// <returns></returns>
         public async Task<int> CompleteTripSegmentContainerAsync(TripSegmentContainerModel container)
         {
+            container.TripSegContainerReviewFlag = Constants.No;
             container.TripSegContainerActionDateTime = DateTime.Now;
             container.TripSegContainerComplete = Constants.Yes;
             return await _tripSegmentContainerRepository.UpdateAsync(container);
