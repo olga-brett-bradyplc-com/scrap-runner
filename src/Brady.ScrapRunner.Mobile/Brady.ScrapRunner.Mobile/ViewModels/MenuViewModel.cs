@@ -84,7 +84,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 var approvedListAsync =
                     await
-                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectUser, "", AppResources.Cancel,
+                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectUser, "", AppResources.Cancel, null,
                             approvedUsers.Select(u => u.FullName).ToArray());
 
                 if (approvedListAsync != AppResources.Cancel)
@@ -109,7 +109,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var delays = await _codeTableService.FindCodeTableList(CodeTableNameConstants.DelayCodes);
             var delayAlertAsync =
                 await
-                    UserDialogs.Instance.ActionSheetAsync(AppResources.SelectDelay, "", AppResources.Cancel,
+                    UserDialogs.Instance.ActionSheetAsync(AppResources.SelectDelay, "", AppResources.Cancel, null,
                         delays.Select(ct => ct.CodeDisp1).ToArray());
 
             // Hitting "Cancel" on an ActionSheet dialog returns a string of "Cancel" ...

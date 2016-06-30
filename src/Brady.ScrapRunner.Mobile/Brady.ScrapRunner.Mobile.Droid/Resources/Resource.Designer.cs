@@ -84,6 +84,27 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			global::MvvmCross.Binding.Droid.Resource.Styleable.MvxListView = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxListView;
 			global::MvvmCross.Binding.Droid.Resource.Styleable.MvxListView_MvxDropDownItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxListView_MvxDropDownItemTemplate;
 			global::MvvmCross.Binding.Droid.Resource.Styleable.MvxListView_MvxItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxListView_MvxItemTemplate;
+			global::MvvmCross.Droid.FullFragging.Resource.Attribute.MvxBind = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxBind;
+			global::MvvmCross.Droid.FullFragging.Resource.Attribute.MvxDropDownItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxDropDownItemTemplate;
+			global::MvvmCross.Droid.FullFragging.Resource.Attribute.MvxGroupItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxGroupItemTemplate;
+			global::MvvmCross.Droid.FullFragging.Resource.Attribute.MvxItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxItemTemplate;
+			global::MvvmCross.Droid.FullFragging.Resource.Attribute.MvxLang = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxLang;
+			global::MvvmCross.Droid.FullFragging.Resource.Attribute.MvxSource = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxSource;
+			global::MvvmCross.Droid.FullFragging.Resource.Attribute.MvxTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxTemplate;
+			global::MvvmCross.Droid.FullFragging.Resource.Id.MvvmCrossTagId = global::Brady.ScrapRunner.Mobile.Droid.Resource.Id.MvvmCrossTagId;
+			global::MvvmCross.Droid.FullFragging.Resource.Id.MvxBindingTagUnique = global::Brady.ScrapRunner.Mobile.Droid.Resource.Id.MvxBindingTagUnique;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxBinding = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxBinding;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxBinding_MvxBind = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxBinding_MvxBind;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxBinding_MvxLang = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxBinding_MvxLang;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxControl = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxControl;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxControl_MvxTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxControl_MvxTemplate;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxExpandableListView = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxExpandableListView;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxExpandableListView_MvxGroupItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxExpandableListView_MvxGroupItemTemplate;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxImageView = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxImageView;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxImageView_MvxSource = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxImageView_MvxSource;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxListView = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxListView;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxListView_MvxDropDownItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxListView_MvxDropDownItemTemplate;
+			global::MvvmCross.Droid.FullFragging.Resource.Styleable.MvxListView_MvxItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxListView_MvxItemTemplate;
 			global::MvvmCross.Droid.Support.Design.Resource.Animation.abc_fade_in = global::Brady.ScrapRunner.Mobile.Droid.Resource.Animation.abc_fade_in;
 			global::MvvmCross.Droid.Support.Design.Resource.Animation.abc_fade_out = global::Brady.ScrapRunner.Mobile.Droid.Resource.Animation.abc_fade_out;
 			global::MvvmCross.Droid.Support.Design.Resource.Animation.abc_grow_fade_in_from_bottom = global::Brady.ScrapRunner.Mobile.Droid.Resource.Animation.abc_grow_fade_in_from_bottom;
@@ -1669,10 +1690,10 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.MvxDropDownItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxDropDownItemTemplate;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.MvxGroupItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxGroupItemTemplate;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.MvxItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxItemTemplate;
-			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.MvxItemTemplateSelector = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxItemTemplateSelector;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.MvxLang = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxLang;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.MvxSource = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxSource;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.MvxTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxTemplate;
+			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.MvxTemplateSelector = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.MvxTemplateSelector;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.layoutManager = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.layoutManager;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.reverseLayout = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.reverseLayout;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Attribute.spanCount = global::Brady.ScrapRunner.Mobile.Droid.Resource.Attribute.spanCount;
@@ -1696,7 +1717,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Styleable.MvxListView_MvxDropDownItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxListView_MvxDropDownItemTemplate;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Styleable.MvxListView_MvxItemTemplate = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxListView_MvxItemTemplate;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Styleable.MvxRecyclerView = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxRecyclerView;
-			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Styleable.MvxRecyclerView_MvxItemTemplateSelector = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxRecyclerView_MvxItemTemplateSelector;
+			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Styleable.MvxRecyclerView_MvxTemplateSelector = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.MvxRecyclerView_MvxTemplateSelector;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Styleable.RecyclerView = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.RecyclerView;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Styleable.RecyclerView_android_orientation = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.RecyclerView_android_orientation;
 			global::MvvmCross.Droid.Support.V7.RecyclerView.Resource.Styleable.RecyclerView_layoutManager = global::Brady.ScrapRunner.Mobile.Droid.Resource.Styleable.RecyclerView_layoutManager;
@@ -1792,9 +1813,6 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f010129
 			public const int MvxItemTemplate = 2130772265;
 			
-			// aapt resource value: 0x7f010125
-			public const int MvxItemTemplateSelector = 2130772261;
-			
 			// aapt resource value: 0x7f010127
 			public const int MvxLang = 2130772263;
 			
@@ -1803,6 +1821,9 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			
 			// aapt resource value: 0x7f010128
 			public const int MvxTemplate = 2130772264;
+			
+			// aapt resource value: 0x7f010125
+			public const int MvxTemplateSelector = 2130772261;
 			
 			// aapt resource value: 0x7f01004a
 			public const int actionBarDivider = 2130772042;
@@ -3900,136 +3921,127 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			public const int ic_keyboard_arrow_right_black_24dp = 2130837616;
 			
 			// aapt resource value: 0x7f020071
-			public const int ic_language_black_18dp = 2130837617;
+			public const int ic_language_black_24dp = 2130837617;
 			
 			// aapt resource value: 0x7f020072
-			public const int ic_language_black_24dp = 2130837618;
+			public const int ic_local_gas_station_black_36dp = 2130837618;
 			
 			// aapt resource value: 0x7f020073
-			public const int ic_language_black_36dp = 2130837619;
+			public const int ic_local_shipping_white_18dp = 2130837619;
 			
 			// aapt resource value: 0x7f020074
-			public const int ic_local_gas_station_black_36dp = 2130837620;
+			public const int ic_local_shipping_white_24dp = 2130837620;
 			
 			// aapt resource value: 0x7f020075
-			public const int ic_local_shipping_white_18dp = 2130837621;
+			public const int ic_local_shipping_white_36dp = 2130837621;
 			
 			// aapt resource value: 0x7f020076
-			public const int ic_local_shipping_white_24dp = 2130837622;
+			public const int ic_loupe_white_36dp = 2130837622;
 			
 			// aapt resource value: 0x7f020077
-			public const int ic_local_shipping_white_36dp = 2130837623;
+			public const int ic_phonelink_erase_black_36dp = 2130837623;
 			
 			// aapt resource value: 0x7f020078
-			public const int ic_loupe_white_36dp = 2130837624;
+			public const int ic_phonelink_setup_black_36dp = 2130837624;
 			
 			// aapt resource value: 0x7f020079
-			public const int ic_phonelink_erase_black_36dp = 2130837625;
+			public const int ic_place_white_36dp = 2130837625;
 			
 			// aapt resource value: 0x7f02007a
-			public const int ic_phonelink_setup_black_36dp = 2130837626;
+			public const int ic_queue_black_36dp = 2130837626;
 			
 			// aapt resource value: 0x7f02007b
-			public const int ic_place_white_36dp = 2130837627;
+			public const int ic_redo_black_36dp = 2130837627;
 			
 			// aapt resource value: 0x7f02007c
-			public const int ic_queue_black_36dp = 2130837628;
+			public const int ic_report_problem_black_36dp = 2130837628;
 			
 			// aapt resource value: 0x7f02007d
-			public const int ic_redo_black_36dp = 2130837629;
+			public const int ic_settings_input_antenna_black_24dp = 2130837629;
 			
 			// aapt resource value: 0x7f02007e
-			public const int ic_report_problem_black_36dp = 2130837630;
+			public const int ic_settings_white_36dp = 2130837630;
 			
 			// aapt resource value: 0x7f02007f
-			public const int ic_settings_input_antenna_black_24dp = 2130837631;
+			public const int ic_settings_white_48dp = 2130837631;
 			
 			// aapt resource value: 0x7f020080
-			public const int ic_settings_input_antenna_black_36dp = 2130837632;
+			public const int ic_successstatus = 2130837632;
 			
 			// aapt resource value: 0x7f020081
-			public const int ic_settings_white_36dp = 2130837633;
+			public const int ic_swap_vert_black_36dp = 2130837633;
 			
 			// aapt resource value: 0x7f020082
-			public const int ic_settings_white_48dp = 2130837634;
+			public const int ic_view_quilt_black_36dp = 2130837634;
 			
 			// aapt resource value: 0x7f020083
-			public const int ic_successstatus = 2130837635;
+			public const int icon = 2130837635;
 			
 			// aapt resource value: 0x7f020084
-			public const int ic_swap_vert_black_36dp = 2130837636;
+			public const int loadingxamarin = 2130837636;
 			
 			// aapt resource value: 0x7f020085
-			public const int ic_view_quilt_black_36dp = 2130837637;
+			public const int loginsplash800x1280 = 2130837637;
 			
 			// aapt resource value: 0x7f020086
-			public const int icon = 2130837638;
+			public const int loginsplash800x1280_4 = 2130837638;
 			
 			// aapt resource value: 0x7f020087
-			public const int loadingxamarin = 2130837639;
+			public const int logo = 2130837639;
 			
 			// aapt resource value: 0x7f020088
-			public const int loginsplash800x1280 = 2130837640;
+			public const int logo_2 = 2130837640;
 			
 			// aapt resource value: 0x7f020089
-			public const int loginsplash800x1280_4 = 2130837641;
-			
-			// aapt resource value: 0x7f02008a
-			public const int logo = 2130837642;
-			
-			// aapt resource value: 0x7f02008b
-			public const int logo_2 = 2130837643;
-			
-			// aapt resource value: 0x7f02008c
-			public const int navigation_header_background = 2130837644;
-			
-			// aapt resource value: 0x7f02009c
-			public const int notification_template_icon_bg = 2130837660;
-			
-			// aapt resource value: 0x7f02008d
-			public const int rectangle_border = 2130837645;
-			
-			// aapt resource value: 0x7f02008e
-			public const int round_button_arrive = 2130837646;
-			
-			// aapt resource value: 0x7f02008f
-			public const int round_button_directions = 2130837647;
-			
-			// aapt resource value: 0x7f020090
-			public const int round_button_enroute = 2130837648;
-			
-			// aapt resource value: 0x7f020091
-			public const int rounded_edittext_bottom = 2130837649;
-			
-			// aapt resource value: 0x7f020092
-			public const int rounded_edittext_bottom_focused = 2130837650;
-			
-			// aapt resource value: 0x7f020093
-			public const int rounded_edittext_bottom_states = 2130837651;
-			
-			// aapt resource value: 0x7f020094
-			public const int rounded_edittext_top = 2130837652;
-			
-			// aapt resource value: 0x7f020095
-			public const int rounded_edittext_top_focused = 2130837653;
-			
-			// aapt resource value: 0x7f020096
-			public const int rounded_edittext_top_states = 2130837654;
-			
-			// aapt resource value: 0x7f020097
-			public const int roundedbg = 2130837655;
-			
-			// aapt resource value: 0x7f020098
-			public const int roundedbgdark = 2130837656;
+			public const int navigation_header_background = 2130837641;
 			
 			// aapt resource value: 0x7f020099
-			public const int spinner_bg = 2130837657;
+			public const int notification_template_icon_bg = 2130837657;
 			
-			// aapt resource value: 0x7f02009a
-			public const int splash = 2130837658;
+			// aapt resource value: 0x7f02008a
+			public const int rectangle_border = 2130837642;
 			
-			// aapt resource value: 0x7f02009b
-			public const int user_icon_header_navigation = 2130837659;
+			// aapt resource value: 0x7f02008b
+			public const int round_button_arrive = 2130837643;
+			
+			// aapt resource value: 0x7f02008c
+			public const int round_button_directions = 2130837644;
+			
+			// aapt resource value: 0x7f02008d
+			public const int round_button_enroute = 2130837645;
+			
+			// aapt resource value: 0x7f02008e
+			public const int rounded_edittext_bottom = 2130837646;
+			
+			// aapt resource value: 0x7f02008f
+			public const int rounded_edittext_bottom_focused = 2130837647;
+			
+			// aapt resource value: 0x7f020090
+			public const int rounded_edittext_bottom_states = 2130837648;
+			
+			// aapt resource value: 0x7f020091
+			public const int rounded_edittext_top = 2130837649;
+			
+			// aapt resource value: 0x7f020092
+			public const int rounded_edittext_top_focused = 2130837650;
+			
+			// aapt resource value: 0x7f020093
+			public const int rounded_edittext_top_states = 2130837651;
+			
+			// aapt resource value: 0x7f020094
+			public const int roundedbg = 2130837652;
+			
+			// aapt resource value: 0x7f020095
+			public const int roundedbgdark = 2130837653;
+			
+			// aapt resource value: 0x7f020096
+			public const int spinner_bg = 2130837654;
+			
+			// aapt resource value: 0x7f020097
+			public const int splash = 2130837655;
+			
+			// aapt resource value: 0x7f020098
+			public const int user_icon_header_navigation = 2130837656;
 			
 			static Drawable()
 			{
@@ -7670,7 +7682,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
 					2130772261};
 			
 			// aapt resource value: 0
-			public const int MvxRecyclerView_MvxItemTemplateSelector = 0;
+			public const int MvxRecyclerView_MvxTemplateSelector = 0;
 			
 			public static int[] NavigationView = new int[] {
 					16842964,

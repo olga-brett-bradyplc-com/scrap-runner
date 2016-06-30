@@ -71,7 +71,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var languages = SupportedCultureTags.Select(sc => new CultureInfo(sc));
             var languageDialogAsync =
                 await
-                    UserDialogs.Instance.ActionSheetAsync(AppResources.SelectLanguage, "", AppResources.Cancel,
+                    UserDialogs.Instance.ActionSheetAsync(AppResources.SelectLanguage, "", AppResources.Cancel, null,
                         languages.Select(c => c.DisplayName).ToArray());
 
             if (languageDialogAsync != AppResources.Cancel)

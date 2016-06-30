@@ -240,7 +240,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 var alertAsync =
                     await
-                        UserDialogs.Instance.ActionSheetAsync("Select Reason Code", "", "Cancel",
+                        UserDialogs.Instance.ActionSheetAsync("Select Reason Code", "", "Cancel", null,
                             ReviewReasonsList.Select(cm => cm.CodeDisp1).ToArray());
 
                 var currentUser = await _driverService.GetCurrentDriverStatusAsync();
