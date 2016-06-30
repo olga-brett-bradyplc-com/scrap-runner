@@ -28,6 +28,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             LanguageSettingLabel = AppResources.LanguageLabel;
             LanguageSettingSubLabel = CultureInfo.CurrentCulture.DisplayName;
 
+            // @TODO : Put in a mechanism to either disable/hide server settings when logged in, or make them re-log in after changing
             ServerSettingLabel = AppResources.ServerLabel;
             ServerSettingSubLabel = PhoneSettings.ServerSettings;
         }
