@@ -64,8 +64,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (Containers.Any())
                 CurrentTransaction = Containers.FirstOrDefault().FirstOrDefault();
 
-            // Is the user allowed to add a rt/rn segment?
-            // rt/rn must not exist as last segment
+            // Is the user allowed to add a rt/rn segment? RT/RN must not exist as last segment
             var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
             var doesRtnSegExistAtEnd = tripSegments.All(sg => sg.TripSegType != BasicTripTypeConstants.ReturnYard && sg.TripSegType != BasicTripTypeConstants.ReturnYardNC);
             // User preference DEFAllowAddRT must be set to 'Y'
@@ -158,11 +157,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
                 CurrentTransaction.TripSegContainerNumber = scannedNumber;
 
-            //await
-            //    _tripService.ProcessTripSegmentContainerAsync(CurrentTransaction.TripNumber,
-            //        CurrentTransaction.TripSegNumber, CurrentTransaction.TripSegContainerSeqNumber,
-            //        CurrentTransaction.TripSegContainerNumber, true);
-
             // Update local copy of container list
             var container = await _tripService.FindTripSegmentContainer(CurrentTransaction.TripNumber,
                 CurrentTransaction.TripSegNumber, CurrentTransaction.TripSegContainerSeqNumber);
@@ -202,7 +196,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private bool CanExecuteConfirmationSelectedCommand()
         {
-            return Containers.All(container => !container.All(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)));
+            return Containers.All(container => !container.All(tscm => string.IsNullOrEmpty(tscm.TripSegContainerReviewFlag)));
         }
 
         private void UpdateLocalContainers(TripSegmentContainerModel tripContainer)

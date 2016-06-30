@@ -234,7 +234,8 @@
                     ts.TripNumber == tripNumber
                     &&
                     (ts.TripSegStatus == TripSegStatusConstants.Pending ||
-                     ts.TripSegStatus == TripSegStatusConstants.Missed))
+                     ts.TripSegStatus == TripSegStatusConstants.Missed ||
+                     ts.TripSegStatus == TripSegStatusConstants.Exception))
                 .OrderBy(ts => ts.TripSegNumber)
                 .ToListAsync();
             if (!segments.Any())
@@ -419,6 +420,7 @@
         /// <returns></returns>
         public async Task<int> CompleteTripSegmentContainerAsync(TripSegmentContainerModel container)
         {
+            container.TripSegContainerReviewFlag = Constants.No;
             container.TripSegContainerActionDateTime = DateTime.Now;
             container.TripSegContainerComplete = Constants.Yes;
             return await _tripSegmentContainerRepository.UpdateAsync(container);
@@ -547,6 +549,30 @@
             var actionProcess =
                 await _connection.GetConnection().UpdateAsync(driverContainerAction, requeryUpdated: false);
             return actionProcess;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverImage"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverImageProcess>> ProcessDriverImageAsync(
+            DriverImageProcess driverImage)
+        {
+            var imageProcess = await _connection.GetConnection().UpdateAsync(driverImage, requeryUpdated: false);
+            return imageProcess;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverAck"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverTripAckProcess>> ProcessDriverTripAck(
+            DriverTripAckProcess driverAck)
+        {
+            var tripAckProcess = await _connection.GetConnection().UpdateAsync(driverAck, requeryUpdated: false);
+            return tripAckProcess;
         }
 
         #endregion

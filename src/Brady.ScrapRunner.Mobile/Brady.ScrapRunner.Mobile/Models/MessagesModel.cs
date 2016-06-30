@@ -50,6 +50,17 @@ namespace Brady.ScrapRunner.Mobile.Models
         [MaxLength(1)]
         public string DeleteFlag { get; set; }
 
+        // Helper fields that help us determine if the SenderId or RecieverId is the current driver id
+        // This is used for display purposes mostly
+        // As of now, LocalUser needs to be manually set for each message object in order for this properties to function correctly.
+        [Ignore]
+        public string LocalUser { get; set; }
+
+        [Ignore]
+        public string RemoteUserId => LocalUser == SenderId ? ReceiverId : SenderId;
+
+        [Ignore]
+        public string RemoteUserName => LocalUser == SenderId ? ReceiverName : SenderName;
     }
 }
 

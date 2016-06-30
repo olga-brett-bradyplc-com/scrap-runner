@@ -74,6 +74,7 @@
       <HintPath>..\..\..\packages\Acr.UserDialogs.5.0.1\lib\MonoAndroid10\AndHUD.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Java.Interop" />
     <Reference Include="BWF.DataServices.Domain">
       <HintPath>..\..\..\packages\bwf.dataservices.domain.2016.2.43-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.Domain.dll</HintPath>
     </Reference>
@@ -186,6 +187,14 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Newtonsoft.Json.8.0.2\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Plugin.Settings, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Xam.Plugins.Settings.2.1.0\lib\MonoAndroid10\Plugin.Settings.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Plugin.Settings.Abstractions, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Xam.Plugins.Settings.2.1.0\lib\MonoAndroid10\Plugin.Settings.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SignaturePad.Android">
@@ -464,6 +473,9 @@
       <SubType>AndroidResource</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\menu\transactionsummary_menu.axml">
+      <SubType>AndroidResource</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\menu\messages_menu.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>
   </ItemGroup>

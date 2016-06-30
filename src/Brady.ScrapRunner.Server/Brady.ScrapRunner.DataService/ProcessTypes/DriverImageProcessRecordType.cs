@@ -186,6 +186,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
                     }
+                    if (driverImageProcess.ImageByteArray[0] == 0)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("No Values in Array "));
+                        break;
+                    }
                     //////////////////////////////////////////////
                     //Get the path from the system preference DEFSignatureCapturePath to store the image
                     string prefImageCapturePath = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
@@ -275,6 +280,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //Converts the byte array to an image 
                             MemoryStream ms = new MemoryStream(driverImageProcess.ImageByteArray);
                             Image signatureImage = Image.FromStream(ms);
+                            string temp = "haii";
+                            var gofuckyourself = temp;
                             //Create the directory if it does not already exist
                             System.IO.FileInfo file = new System.IO.FileInfo(imagePath);
                             file.Directory.Create();

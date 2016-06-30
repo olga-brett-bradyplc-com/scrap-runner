@@ -117,12 +117,12 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                 var flatItem = (FlatItem)item;
                 var tscm = (TripSegmentContainerModel) flatItem.Item;
 
-                switch (tscm.TripSegContainerComplete)
+                switch (tscm.TripSegContainerReviewFlag)
                 {
-                    case "Y":
+                    case "N":
                         icon.SetImageResource(Resource.Drawable.check_circle_green_tint_icon);
                         break;
-                    case "N":
+                    case "E":
                         icon.SetImageResource(Resource.Drawable.cancelled_red_tint_icon);
                         break;
                     default:

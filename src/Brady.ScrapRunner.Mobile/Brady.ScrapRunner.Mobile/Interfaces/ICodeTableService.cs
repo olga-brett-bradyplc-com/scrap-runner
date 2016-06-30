@@ -17,6 +17,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<IEnumerable<CodeTableModel>> FindCodeTableList(string codeName);
 
+        Task<CodeTableModel> FindCodeTableObject(string codeName, string codeValue);
+
         Task UpdateCodeTable(IEnumerable<CodeTable> codeTable);
 
     }

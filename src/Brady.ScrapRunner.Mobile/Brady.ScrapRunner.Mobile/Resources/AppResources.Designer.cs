@@ -577,6 +577,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No users found to message.
+        /// </summary>
+        public static string NoUsers {
+            get {
+                return ResourceManager.GetString("NoUsers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A numeric value is required.
         /// </summary>
         public static string NumericRequired {
@@ -793,11 +802,29 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Delay Reason.
+        /// </summary>
+        public static string SelectDelay {
+            get {
+                return ResourceManager.GetString("SelectDelay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select Exception Code.
         /// </summary>
         public static string SelectException {
             get {
                 return ResourceManager.GetString("SelectException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select User To Message.
+        /// </summary>
+        public static string SelectUser {
+            get {
+                return ResourceManager.GetString("SelectUser", resourceCulture);
             }
         }
         
@@ -843,6 +870,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must sign and print your name.
+        /// </summary>
+        public static string SignAndPrint {
+            get {
+                return ResourceManager.GetString("SignAndPrint", resourceCulture);
             }
         }
         

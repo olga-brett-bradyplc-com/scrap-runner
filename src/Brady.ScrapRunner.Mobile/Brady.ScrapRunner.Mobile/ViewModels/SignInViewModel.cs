@@ -9,11 +9,13 @@ using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Plugins.Sqlite;
 using Brady.ScrapRunner.Mobile.Resources;
 using Brady.ScrapRunner.Mobile.Services;
 using Brady.ScrapRunner.Mobile.Validators;
+using Plugin.Settings.Abstractions;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -191,7 +193,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (loginProcess.WasSuccessful)
                 {
                     await _containerService.UpdateContainerMaster(loginProcess.Item.ContainersOnPowerId);
-
+                    await _messagesService.UpdateApprovedUsersForMessaging(loginProcess.Item.UsersForMessaging);
                     await _driverService.UpdateDriverStatus(new DriverStatus
                     {
                         EmployeeId = loginProcess.Item.EmployeeId,
@@ -207,6 +209,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         LoginProcessedDateTime = loginProcess.Item.LoginDateTime,
                         DriverLCID = loginProcess.Item.LocaleCode
                     });
+
+                    // Get the EmployeeMaster record for the current driver and update local DB
+                    var driverEmployeeRecord =
+                        await _driverService.FindEmployeeMasterForDriverRemoteAsync(loginProcess.Item.EmployeeId);
+                    await _driverService.UpdateDriverEmployeeRecord(driverEmployeeRecord);
                 }
                 else
                 {
@@ -246,15 +253,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
+                // If there's no last updated for container settings, manually refresh the containers
+                if (PhoneSettings.ContainerSettings == null)
+                    await _dbService.RefreshTable<ContainerChangeModel>();
+
                 // Retrieve container info from remote server and populate local DB
                 var containerChanges =
                     await _containerService.ProcessContainerChangeAsync(new ContainerChangeProcess
                     {
-                        EmployeeId = UserName
+                        EmployeeId = UserName,
+                        LastContainerMasterUpdate = PhoneSettings.ContainerSettings.HasValue ? PhoneSettings.ContainerSettings.Value.ToLocalTime() : (DateTime?) null
                     });
 
                 if (containerChanges.WasSuccessful)
                 {
+                    PhoneSettings.ContainerSettings = DateTime.Now;
                     if (containerChanges.Item?.Containers?.Count > 0)
                         await _containerService.UpdateContainerChange(containerChanges.Item.Containers);
                 }
@@ -285,7 +298,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
-                var messagesTable = await _messagesService.FindMsgsRemoteAsync(new DriverMessageProcess { EmployeeId = UserName });
+                var messagesTable = await _messagesService.ProcessDriverMessagesAsync(new DriverMessageProcess { EmployeeId = UserName });
 
                 if (messagesTable.WasSuccessful)
                 {
@@ -309,9 +322,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (tripProcess.WasSuccessful)
                 {
                     // @TODO : Should we throw an error/alert dialog to the end user if any of these fail?
-
-                    if( tripProcess.Item?.Trips?.Count > 0 )
+                    if (tripProcess.Item?.Trips?.Count > 0)
+                    {
                         await _tripService.UpdateTrips(tripProcess.Item.Trips);
+
+                        // Acknowledge each trip
+                        foreach (var trip in tripProcess.Item.Trips)
+                        {
+                            var tripAck = await _tripService.ProcessDriverTripAck(new DriverTripAckProcess
+                            {
+                                EmployeeId = UserName,
+                                TripNumber = trip.TripNumber,
+                                ActionDateTime = DateTime.Now,
+                                Mdtid = UserName
+                            });
+
+                            if (!tripAck.WasSuccessful)
+                                UserDialogs.Instance.Alert(tripAck.Failure.Summary, AppResources.Error);
+                        }
+                    }
 
                     if(tripProcess.Item?.TripSegments?.Count > 0)
                         await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);

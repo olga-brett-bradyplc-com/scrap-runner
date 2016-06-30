@@ -24,9 +24,9 @@
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
         <Button
+            android:id="@+id/confirm_transactions_button"
             style="@style/ScrapRunnerTheme.StandardButtonStyle"
             android:background="@color/arrive"
-            local:MvxBind="Click ConfirmTransactionsCommand"
             local:MvxLang="Text FinishLabel" />
     </LinearLayout>
     <LinearLayout

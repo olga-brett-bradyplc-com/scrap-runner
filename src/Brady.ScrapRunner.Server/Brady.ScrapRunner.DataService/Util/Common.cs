@@ -3543,6 +3543,12 @@ namespace Brady.ScrapRunner.DataService.Util
                     return messages;
                 }
                 messages = queryResult.Records.Cast<Messages>().ToList();
+
+                foreach(var message in messages)
+                {
+                    message.SenderId = message.SenderId.Trim();
+                    message.ReceiverId = message.ReceiverId.Trim();
+                }
             }
             return messages;
         }

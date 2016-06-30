@@ -485,4 +485,20 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Select Exception Code ( Spanish )</value>
     <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
   </data>
+  <data name="SelectDelay" xml:space="preserve">
+    <value>Select Delay Reason ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
+  </data>
+  <data name="SelectUser" xml:space="preserve">
+    <value>Select User To Message ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
+  </data>
+  <data name="NoUsers" xml:space="preserve">
+    <value>No users found to message ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
+  </data>
+  <data name="SignAndPrint" xml:space="preserve">
+    <value>You must sign and print your name ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; TransactionConfirmationViewModel</comment>
+  </data>
 </root>
