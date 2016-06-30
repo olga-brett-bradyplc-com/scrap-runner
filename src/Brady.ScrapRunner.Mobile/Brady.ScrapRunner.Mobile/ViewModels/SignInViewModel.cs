@@ -174,7 +174,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 // Delete/Create necesscary SQLite tables
                 await _dbService.RefreshAll();
                 IClientSettings clientSettings = new DemoClientSettings();
-                _connection.CreateConnection(PhoneSettings.ServerSettings, UserName, Password, "ScrapRunner");
+                _connection.CreateConnection("https://" + PhoneSettings.ServerSettings, UserName, Password, "ScrapRunner");
 
                 _queueScheduler.Unschedule();
                 _locationService.Stop();

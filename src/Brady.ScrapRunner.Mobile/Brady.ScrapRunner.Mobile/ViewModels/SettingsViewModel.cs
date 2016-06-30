@@ -91,7 +91,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var prompt = await UserDialogs.Instance.PromptAsync(AppResources.ServerInput, AppResources.ServerLabel, AppResources.Save, AppResources.Cancel, PhoneSettings.ServerSettings, InputType.Url);
             if (!string.IsNullOrEmpty(prompt.Text))
             {
-                PhoneSettings.ServerSettings = prompt.Text;
+                PhoneSettings.ServerSettings = prompt.Text.Replace("https://", "");
                 ServerSettingSubLabel = PhoneSettings.ServerSettings;
             }
         }
