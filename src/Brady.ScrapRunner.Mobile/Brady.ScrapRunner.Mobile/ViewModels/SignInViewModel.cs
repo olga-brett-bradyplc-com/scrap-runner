@@ -34,8 +34,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IQueueScheduler _queueScheduler;
         private readonly ILocationService _locationService;
         private readonly ILocationOdometerService _locationOdometerService;
-
-
+        
         public SignInViewModel(
             IDbService dbService,
             IPreferenceService preferenceService,
@@ -117,6 +116,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         protected async Task ExecuteSignInCommandAsync()
         {
+            if (string.IsNullOrEmpty(PhoneSettings.ServerSettings))
+            {
+                UserDialogs.Instance.ErrorToast(AppResources.NoServerEndpoint, AppResources.NoServerSummary);
+                return;
+            }
+
             var userNameResults = Validate<UsernameValidator, string>(UserName);
             if (!userNameResults.IsValid)
             {
@@ -169,8 +174,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 // Delete/Create necesscary SQLite tables
                 await _dbService.RefreshAll();
                 IClientSettings clientSettings = new DemoClientSettings();
-                _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
-                    clientSettings.UserName, clientSettings.Password, "ScrapRunner");
+                _connection.CreateConnection(PhoneSettings.ServerSettings, UserName, Password, "ScrapRunner");
 
                 _queueScheduler.Unschedule();
                 _locationService.Stop();

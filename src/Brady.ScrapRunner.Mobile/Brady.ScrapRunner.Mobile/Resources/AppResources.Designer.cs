@@ -424,6 +424,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Language.
+        /// </summary>
+        public static string LanguageLabel {
+            get {
+                return ResourceManager.GetString("LanguageLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Left On Truck.
         /// </summary>
         public static string LeftOnTruck {
@@ -564,6 +573,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string No {
             get {
                 return ResourceManager.GetString("No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Server Endpoint Set.
+        /// </summary>
+        public static string NoServerEndpoint {
+            get {
+                return ResourceManager.GetString("NoServerEndpoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please go to the settings menu and set a server endpoint.
+        /// </summary>
+        public static string NoServerSummary {
+            get {
+                return ResourceManager.GetString("NoServerSummary", resourceCulture);
             }
         }
         
@@ -820,6 +847,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Language.
+        /// </summary>
+        public static string SelectLanguage {
+            get {
+                return ResourceManager.GetString("SelectLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select User To Message.
         /// </summary>
         public static string SelectUser {
@@ -843,6 +879,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Send {
             get {
                 return ResourceManager.GetString("Send", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the server endpoint address.
+        /// </summary>
+        public static string ServerInput {
+            get {
+                return ResourceManager.GetString("ServerInput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server Endpoint.
+        /// </summary>
+        public static string ServerLabel {
+            get {
+                return ResourceManager.GetString("ServerLabel", resourceCulture);
             }
         }
         

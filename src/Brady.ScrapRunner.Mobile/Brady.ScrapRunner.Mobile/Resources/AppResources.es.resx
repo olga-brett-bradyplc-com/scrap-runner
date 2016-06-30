@@ -501,4 +501,28 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>You must sign and print your name ( Spanish )</value>
     <comment>NEEDS TRANSLATION; TransactionConfirmationViewModel</comment>
   </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>Language( Spanish )</value>
+    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+  </data>
+  <data name="NoServerEndpoint" xml:space="preserve">
+    <value>No Server Endpoint Set ( Spanish )</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
+  <data name="NoServerSummary" xml:space="preserve">
+    <value>Please go to the settings menu and set a server endpoint ( Spanish )</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Select Language ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+  </data>
+  <data name="ServerInput" xml:space="preserve">
+    <value>Enter the server endpoint address( Spanish )</value>
+    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+  </data>
+  <data name="ServerLabel" xml:space="preserve">
+    <value>Server Endpoint( Spanish )</value>
+    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+  </data>
 </root>

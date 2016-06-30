@@ -535,4 +535,26 @@ You will now be sent back to the login.</value>
     <value>You must sign and print your name</value>
     <comment>TransactionConfirmationViewModel</comment>
   </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>Language</value>
+    <comment>SettingsViewModel</comment>
+  </data>
+  <data name="NoServerEndpoint" xml:space="preserve">
+    <value>No Server Endpoint Set</value>
+  </data>
+  <data name="NoServerSummary" xml:space="preserve">
+    <value>Please go to the settings menu and set a server endpoint</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Select Language</value>
+    <comment>SettingsViewModel</comment>
+  </data>
+  <data name="ServerInput" xml:space="preserve">
+    <value>Enter the server endpoint address</value>
+    <comment>SettingsViewModel</comment>
+  </data>
+  <data name="ServerLabel" xml:space="preserve">
+    <value>Server Endpoint</value>
+    <comment>SettingsViewModel</comment>
+  </data>
 </root>

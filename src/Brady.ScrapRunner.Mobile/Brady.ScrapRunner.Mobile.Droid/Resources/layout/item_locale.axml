@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="40dp"
+    android:background="#fff">
   <TextView
-      android:id="@+id/locale_name"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:paddingLeft="20dp"
+    android:textSize="15sp"
+    android:gravity="center_vertical"
+    android:layout_alignParentLeft="true"
+    local:MvxBind="Text DisplayName"
+    local:MvxLang="TextSource DisplayName"/>
+
+  <ImageView
+      android:id="@+id/selected_language_image"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginLeft="@dimen/activity_horizontal_margin"
-      android:layout_marginTop="@dimen/activity_margin_half"
-      local:MvxBind="Text DisplayName"
-      local:MvxLang="TextSource DisplayName"
-      />
+      android:paddingRight="20dp"
+      android:layout_marginTop="7dp"
+      android:layout_alignParentRight="true"/>
 </RelativeLayout>
