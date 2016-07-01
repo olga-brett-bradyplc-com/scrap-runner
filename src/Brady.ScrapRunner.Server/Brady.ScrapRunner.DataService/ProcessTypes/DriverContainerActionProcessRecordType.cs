@@ -200,6 +200,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         if (driverContainerActionProcess.ActionType != ContainerActionTypeConstants.Added)
                         {
+                            if (driverContainerActionProcess.ContainerContents == null)
+                            {
+                                //changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Container Contents is required for ActionType:"
+                                //                                  + driverContainerActionProcess.ActionType));
+                                //break;
+
+                            }
                             if (driverContainerActionProcess.MethodOfEntry == null)
                             {
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("MethodOfEntry is required for ActionType:"
@@ -515,7 +522,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         }//end of public bool ContainerLoadDrop
 
         /// <summary>
-        /// Processing for Container Done actions:D=Done,E=Exception, R=Review
+        /// Processing for Container Done actions:D=Done, R=Review
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
@@ -580,6 +587,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     driverContainerActionProcess.TripNumber + "-" + driverContainerActionProcess.TripSegNumber));
                 return false;
             }
+            ////////////////////////////////////////////////
+            //Check if trip segment is complete
+            if (Common.IsTripSegmentComplete(currentTripSegment))
+            {
+                log.DebugFormat("SRTEST:TripSegNumber:{0}-{1} is Complete. Container done processing ends.",
+                                driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber);
+                return false;
+            }
+
             if (currentTripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
                currentTripSegment.TripSegType == BasicTripTypeConstants.Load)
             { 
@@ -959,6 +975,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             return true;
         }//end of public bool ContainerDone
+
         /// <summary>
         /// Container Exception processing
         /// </summary>
@@ -999,6 +1016,37 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
                 log.DebugFormat("SRTEST:TripNumber:{0} is Complete. Container exception processing ends.",
                                 driverContainerActionProcess.TripNumber);
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            //Get a list of all segments for the trip
+            var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
+                              driverContainerActionProcess.TripNumber, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            // Get the current TripSegment record
+            var currentTripSegment = (from item in tripSegList
+                                      where item.TripSegNumber == driverContainerActionProcess.TripSegNumber
+                                      select item).FirstOrDefault();
+            if (null == currentTripSegment)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripSegment: " +
+                    driverContainerActionProcess.TripNumber + "-" + driverContainerActionProcess.TripSegNumber));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            //Check if trip segment is complete
+            if (Common.IsTripSegmentComplete(currentTripSegment))
+            {
+                log.DebugFormat("SRTEST:TripSegNumber:{0}-{1} is Complete. Container done processing ends.",
+                                driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber);
                 return false;
             }
 

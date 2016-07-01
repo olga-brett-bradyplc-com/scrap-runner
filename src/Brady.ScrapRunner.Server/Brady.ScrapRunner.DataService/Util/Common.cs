@@ -23,6 +23,12 @@ namespace Brady.ScrapRunner.DataService.Util
     /// </summary>
     public class Common
     {
+        public static int CalculateStandardDriveMin(int miles)
+        {
+            int minutes = 0;
+
+            return minutes;
+        }
 
         /// <summary>
         /// Return driver's cumulative time in minutes.
@@ -4348,6 +4354,26 @@ namespace Brady.ScrapRunner.DataService.Util
                             TripStatusConstants.Review,
                             TripStatusConstants.Exception};
                 if (statuses.Contains(tripRecord.TripStatus))
+                    response = true;
+            }
+            return response;
+        }
+        /// <summary>
+        /// Checks if the trip segment has already been completed.
+        /// </summary>
+        /// <param name="tripSegmentRecord"></param>
+        /// <returns></returns>
+        public static bool IsTripSegmentComplete(TripSegment tripSegmentRecord)
+        {
+            bool response = false;
+            if (null != tripSegmentRecord)
+            {
+                var statuses = new List<string> {
+                            TripSegStatusConstants.Done,
+                            TripSegStatusConstants.ErrorQueue,
+                            TripSegStatusConstants.Review,
+                            TripSegStatusConstants.Exception};
+                if (statuses.Contains(tripSegmentRecord.TripSegStatus))
                     response = true;
             }
             return response;
