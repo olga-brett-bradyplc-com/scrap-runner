@@ -29,6 +29,8 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual List<TripSegmentContainer> TripSegmentContainers { get; set; }
 
         public virtual List<TripReferenceNumber> TripReferenceNumbers { get; set; }
+        
+        public virtual List<CustomerMaster> CustomerMasters { get; set; }
 
         public virtual List<CustomerDirections> CustomerDirections { get; set; }
 
