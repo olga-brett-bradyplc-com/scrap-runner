@@ -519,32 +519,20 @@ You will now be sent back to the login.</value>
     <value>Select Exception Code</value>
     <comment>TransactionDetailViewModel</comment>
   </data>
-  <data name="TripsCanceled" xml:space="preserve">
-    <value>Trip(s) Canceled</value>
-    <comment>DroidPollingNotificationService</comment>
+  <data name="SelectDelay" xml:space="preserve">
+    <value>Select Delay Reason</value>
+    <comment>MenuViewModel</comment>
   </data>
-  <data name="TripsMarkedDone" xml:space="preserve">
-    <value>Trip(s) Marked Done</value>
-    <comment>DroidPollingNotificationService</comment>
+  <data name="SelectUser" xml:space="preserve">
+    <value>Select User To Message</value>
+    <comment>MenuViewModel</comment>
   </data>
-  <data name="TripsModified" xml:space="preserve">
-    <value>Modified Trip(s)</value>
-    <comment>DroidPollingNotificationService</comment>
+  <data name="NoUsers" xml:space="preserve">
+    <value>No users found to message</value>
+    <comment>MenuViewModel</comment>
   </data>
-  <data name="TripsNew" xml:space="preserve">
-    <value>New Trip(s)</value>
-    <comment>DroidPollingNotificationService</comment>
-  </data>
-  <data name="TripsResequenced" xml:space="preserve">
-    <value>Trip(s) Resequenced</value>
-    <comment>DroidPollingNotificationService</comment>
-  </data>
-  <data name="TripsResequencedBody" xml:space="preserve">
-    <value>Dispatch has changed the order of your trips.</value>
-    <comment>DroidPollingNotificationService</comment>
-  </data>
-  <data name="TripsUnassigned" xml:space="preserve">
-    <value>Trip(s) Unassigned</value>
-    <comment>DroidPollingNotificationService</comment>
+  <data name="SignAndPrint" xml:space="preserve">
+    <value>You must sign and print your name</value>
+    <comment>TransactionConfirmationViewModel</comment>
   </data>
 </root>
