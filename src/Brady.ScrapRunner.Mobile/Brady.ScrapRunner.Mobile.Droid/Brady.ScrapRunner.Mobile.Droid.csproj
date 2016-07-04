@@ -285,7 +285,7 @@
     <Compile Include="LinkerPleaseInclude.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\DroidPollingNotificationService.cs" />
+    <Compile Include="Services\AndroidNotificationService.cs" />
     <Compile Include="Services\NetworkAvailabilityServiceAndroid.cs" />
     <Compile Include="Services\QueueIntentBroadcastReceiver.cs" />
     <Compile Include="Services\QueueIntentService.cs" />
