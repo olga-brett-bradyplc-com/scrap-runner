@@ -501,4 +501,84 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>You must sign and print your name ( Spanish )</value>
     <comment>NEEDS TRANSLATION; TransactionConfirmationViewModel</comment>
   </data>
+  <data name="NotificationMessageTitle" xml:space="preserve">
+    <value>Message from {0}</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationNewTripText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been dispatched.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationNewTripTitle" xml:space="preserve">
+    <value>New Trip</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripCanceledText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been canceled by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripCanceledTitle" xml:space="preserve">
+    <value>Trip Canceled</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripFutureText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been moved to a future date.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripFutureTitle" xml:space="preserve">
+    <value>Future Trip</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripMarkedDoneText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been marked done by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripMarkedDoneTitle" xml:space="preserve">
+    <value>Trip Marked Done</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationMessageText" xml:space="preserve">
+    <value>{0}</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripModifiedText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been modified by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripModifiedTitle" xml:space="preserve">
+    <value>Trip Modified</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripOnHoldText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been placed on hold by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripOnHoldTitle" xml:space="preserve">
+    <value>Trip Placed On Hold</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripReassignedText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been reassigned to a different driver by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripReassignedTitle" xml:space="preserve">
+    <value>Trip Reassigned</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripResequenceText" xml:space="preserve">
+    <value>Dispatch has changed the trip order.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripResequenceTitle" xml:space="preserve">
+    <value>Trips Resequenced</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripUnassignedText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been unassigned by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripUnassignedTitle" xml:space="preserve">
+    <value>Trip Unassigned</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
 </root>

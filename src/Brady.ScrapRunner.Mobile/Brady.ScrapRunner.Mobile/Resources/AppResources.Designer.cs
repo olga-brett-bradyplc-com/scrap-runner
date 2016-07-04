@@ -577,6 +577,186 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}.
+        /// </summary>
+        public static string NotificationMessageText {
+            get {
+                return ResourceManager.GetString("NotificationMessageText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message from {0}.
+        /// </summary>
+        public static string NotificationMessageTitle {
+            get {
+                return ResourceManager.GetString("NotificationMessageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been dispatched..
+        /// </summary>
+        public static string NotificationNewTripText {
+            get {
+                return ResourceManager.GetString("NotificationNewTripText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Trip.
+        /// </summary>
+        public static string NotificationNewTripTitle {
+            get {
+                return ResourceManager.GetString("NotificationNewTripTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been canceled by dispatch..
+        /// </summary>
+        public static string NotificationTripCanceledText {
+            get {
+                return ResourceManager.GetString("NotificationTripCanceledText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trip Canceled.
+        /// </summary>
+        public static string NotificationTripCanceledTitle {
+            get {
+                return ResourceManager.GetString("NotificationTripCanceledTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been moved to a future date..
+        /// </summary>
+        public static string NotificationTripFutureText {
+            get {
+                return ResourceManager.GetString("NotificationTripFutureText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Future Trip.
+        /// </summary>
+        public static string NotificationTripFutureTitle {
+            get {
+                return ResourceManager.GetString("NotificationTripFutureTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been marked done by dispatch..
+        /// </summary>
+        public static string NotificationTripMarkedDoneText {
+            get {
+                return ResourceManager.GetString("NotificationTripMarkedDoneText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trip Marked Done.
+        /// </summary>
+        public static string NotificationTripMarkedDoneTitle {
+            get {
+                return ResourceManager.GetString("NotificationTripMarkedDoneTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been modified by dispatch..
+        /// </summary>
+        public static string NotificationTripModifiedText {
+            get {
+                return ResourceManager.GetString("NotificationTripModifiedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trip Modified.
+        /// </summary>
+        public static string NotificationTripModifiedTitle {
+            get {
+                return ResourceManager.GetString("NotificationTripModifiedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been placed on hold by dispatch..
+        /// </summary>
+        public static string NotificationTripOnHoldText {
+            get {
+                return ResourceManager.GetString("NotificationTripOnHoldText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trip Placed On Hold.
+        /// </summary>
+        public static string NotificationTripOnHoldTitle {
+            get {
+                return ResourceManager.GetString("NotificationTripOnHoldTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been reassigned to a different driver by dispatch..
+        /// </summary>
+        public static string NotificationTripReassignedText {
+            get {
+                return ResourceManager.GetString("NotificationTripReassignedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trip Reassigned.
+        /// </summary>
+        public static string NotificationTripReassignedTitle {
+            get {
+                return ResourceManager.GetString("NotificationTripReassignedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dispatch has changed the trip order..
+        /// </summary>
+        public static string NotificationTripResequenceText {
+            get {
+                return ResourceManager.GetString("NotificationTripResequenceText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trips Resequenced.
+        /// </summary>
+        public static string NotificationTripResequenceTitle {
+            get {
+                return ResourceManager.GetString("NotificationTripResequenceTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been unassigned by dispatch..
+        /// </summary>
+        public static string NotificationTripUnassignedText {
+            get {
+                return ResourceManager.GetString("NotificationTripUnassignedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trip Unassigned.
+        /// </summary>
+        public static string NotificationTripUnassignedTitle {
+            get {
+                return ResourceManager.GetString("NotificationTripUnassignedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No users found to message.
         /// </summary>
         public static string NoUsers {
@@ -969,69 +1149,6 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Trip {
             get {
                 return ResourceManager.GetString("Trip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Trip(s) Canceled.
-        /// </summary>
-        public static string TripsCanceled {
-            get {
-                return ResourceManager.GetString("TripsCanceled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Trip(s) Marked Done.
-        /// </summary>
-        public static string TripsMarkedDone {
-            get {
-                return ResourceManager.GetString("TripsMarkedDone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Modified Trip(s).
-        /// </summary>
-        public static string TripsModified {
-            get {
-                return ResourceManager.GetString("TripsModified", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to New Trip(s).
-        /// </summary>
-        public static string TripsNew {
-            get {
-                return ResourceManager.GetString("TripsNew", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Trip(s) Resequenced.
-        /// </summary>
-        public static string TripsResequenced {
-            get {
-                return ResourceManager.GetString("TripsResequenced", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dispatch has changed the order of your trips..
-        /// </summary>
-        public static string TripsResequencedBody {
-            get {
-                return ResourceManager.GetString("TripsResequencedBody", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Trip(s) Unassigned.
-        /// </summary>
-        public static string TripsUnassigned {
-            get {
-                return ResourceManager.GetString("TripsUnassigned", resourceCulture);
             }
         }
         

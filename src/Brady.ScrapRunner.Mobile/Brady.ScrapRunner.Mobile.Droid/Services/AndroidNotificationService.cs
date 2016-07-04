@@ -7,6 +7,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
     using Android.Support.V4.App;
     using Domain.Models;
     using Interfaces;
+    using Resources;
 
     public class AndroidNotificationService : INotificationService
     {
@@ -33,43 +34,43 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
             switch (context)
             {
                 case TripNotificationContext.New:
-                    title = "New Trip";
-                    text = $"{trip.TripTypeDesc} trip {trip.TripCustName} ({trip.TripNumber}) has been dispatched.";
+                    title = AppResources.NotificationNewTripTitle;
+                    text = string.Format(AppResources.NotificationNewTripText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
                     notificationId = NewTripNotificationId;
                     break;
                 case TripNotificationContext.Modified:
-                    title = "Trip Modified";
-                    text = $"{trip.TripTypeDesc} trip {trip.TripCustName} ({trip.TripNumber}) has been modified by dispatch.";
+                    title = AppResources.NotificationTripModifiedTitle;
+                    text = string.Format(AppResources.NotificationTripModifiedText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
                     notificationId = ModifiedTripNotificationId;
                     break;
                 case TripNotificationContext.Canceled:
-                    title = "Trip Canceled";
-                    text = $"{trip.TripTypeDesc} trip {trip.TripCustName} ({trip.TripNumber}) has been canceled by dispatch.";
+                    title = AppResources.NotificationTripCanceledTitle;
+                    text = string.Format(AppResources.NotificationTripCanceledText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
                     notificationId = CanceledTripNotificationId;
                     break;
                 case TripNotificationContext.OnHold:
-                    title = "Trip Placed On Hold";
-                    text = $"{trip.TripTypeDesc} trip {trip.TripCustName} ({trip.TripNumber}) has been placed on hold by dispatch.";
+                    title = AppResources.NotificationTripOnHoldTitle;
+                    text = string.Format(AppResources.NotificationTripOnHoldText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
                     notificationId = OnHoldTripNotificationId;
                     break;
                 case TripNotificationContext.Future:
-                    title = "Future Trip";
-                    text = $"{trip.TripTypeDesc} trip {trip.TripCustName} ({trip.TripNumber}) has been changed to a future date.";
+                    title = AppResources.NotificationTripFutureTitle;
+                    text = string.Format(AppResources.NotificationTripFutureText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
                     notificationId = FutureTripNotificationId;
                     break;
                 case TripNotificationContext.Reassigned:
-                    title = "Trip Reassigned";
-                    text = $"{trip.TripTypeDesc} trip {trip.TripCustName} ({trip.TripNumber}) has been reassigned to a different driver.";
+                    title = AppResources.NotificationTripReassignedTitle;
+                    text = string.Format(AppResources.NotificationTripReassignedText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
                     notificationId = ReassignedTripNotificationId;
                     break;
                 case TripNotificationContext.Unassigned:
-                    title = "Trip Unassigned";
-                    text = $"{trip.TripTypeDesc} trip {trip.TripCustName} ({trip.TripNumber}) has been unassigned.";
+                    title = AppResources.NotificationTripUnassignedTitle;
+                    text = string.Format(AppResources.NotificationTripUnassignedText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
                     notificationId = UnassignedTripNotificationId;
                     break;
                 case TripNotificationContext.MarkedDone:
-                    title = "Trip Marked Done";
-                    text = $"{trip.TripTypeDesc} trip {trip.TripCustName} ({trip.TripNumber}) has been marked done by dispatch.";
+                    title = AppResources.NotificationTripMarkedDoneTitle;
+                    text = string.Format(AppResources.NotificationTripMarkedDoneText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
                     notificationId = MarkedDoneTripNotificationId;
                     break;
                 default:
@@ -84,9 +85,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
 
         public void TripsResequenced()
         {
-            var title = "Trips Resequenced";
-            var text = "Trips have been resequenced.";
-            var builder = BuildNotification(title, text)
+            var builder = BuildNotification(AppResources.NotificationTripResequenceTitle, 
+                    AppResources.NotificationTripResequenceText)
                 .SetGroup(TripResequenceNotificationGroup)
                 .SetSmallIcon(Resource.Drawable.ic_swap_vert_black_36dp);
             var notification = builder.Build();
@@ -95,9 +95,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
 
         public void Message(Messages message)
         {
-            var title = $"Message from {message.SenderName}";
-            var text = message.MsgText;
-            var builder = BuildNotification(title, text)
+            var builder = BuildNotification(string.Format(AppResources.NotificationMessageTitle, message.SenderName),
+                    string.Format(AppResources.NotificationMessageText, message.MsgText))
                 .SetGroup(MessageNotificationGroup)
                 .SetSmallIcon(Resource.Drawable.ic_email_black_36dp);
             var notification = builder.Build();
