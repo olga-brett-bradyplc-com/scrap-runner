@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using AutoMapper;
     using BWF.DataServices.Domain.Models;
     using BWF.DataServices.PortableClients;
     using Domain;
@@ -10,6 +11,7 @@
     using Domain.Models;
     using Interfaces;
     using Messages;
+    using Models;
     using MvvmCross.Plugins.Messenger;
     using Plugin.Settings.Abstractions;
 
@@ -19,18 +21,21 @@
         private readonly INotificationService _notificationService;
         private readonly ISettings _settings;
         private readonly IMvxMessenger _mvxMessenger;
+        private readonly IMessagesService _messagesService;
         private const string TerminalMasterSettingsKey = "TerminalMasterDateTime";
         private const string ContainerMasterSettingsKey = "ContainerMasterDateTime";
 
         public PollingService(IConnectionService connectionService, 
             INotificationService notificationService, 
             ISettings settings, 
-            IMvxMessenger mvxMessenger)
+            IMvxMessenger mvxMessenger, 
+            IMessagesService messagesService)
         {
             _connectionService = connectionService;
             _notificationService = notificationService;
             _settings = settings;
             _mvxMessenger = mvxMessenger;
+            _messagesService = messagesService;
         }
 
         public async Task PollForChangesAsync(string driverId, string terminalId, string regionId, string areaId)
@@ -377,7 +382,8 @@
             var messages = await GetMessagesAsync(driverId);
             foreach (var message in messages.Records)
             {
-                // @TODO: Update local database.
+                var mappedMessage = Mapper.Map<Messages, MessagesModel>(message);
+                await _messagesService.CreateMessageAsync(mappedMessage);
                 _mvxMessenger.Publish(new NewMessagesMessage(this)
                 {
                     Message = message
