@@ -150,7 +150,10 @@
                 // @TODO: Update local database.
                 // @TODO: Send MvxMessage.
             }
-            _notificationService.TripsResequenced();
+            if (doneTrips.Records.Any())
+            {
+                _notificationService.TripsResequenced();
+            }
         }
 
         private Task<QueryResult<ContainerChange>> GetContainerChangesAsync(string terminalId, string regionId, DateTime modifiedAfter)
