@@ -22,6 +22,8 @@
         private readonly ISettings _settings;
         private readonly IMvxMessenger _mvxMessenger;
         private readonly IMessagesService _messagesService;
+        private readonly ITerminalService _terminalService;
+        private readonly IContainerService _containerService;
         private const string TerminalMasterSettingsKey = "TerminalMasterDateTime";
         private const string ContainerMasterSettingsKey = "ContainerMasterDateTime";
 
@@ -29,13 +31,17 @@
             INotificationService notificationService, 
             ISettings settings, 
             IMvxMessenger mvxMessenger, 
-            IMessagesService messagesService)
+            IMessagesService messagesService, 
+            ITerminalService terminalService, 
+            IContainerService containerService)
         {
             _connectionService = connectionService;
             _notificationService = notificationService;
             _settings = settings;
             _mvxMessenger = mvxMessenger;
             _messagesService = messagesService;
+            _terminalService = terminalService;
+            _containerService = containerService;
         }
 
         public async Task PollForChangesAsync(string driverId, string terminalId, string regionId, string areaId)
@@ -247,12 +253,12 @@
             }
             foreach (var container in containerChanges.Records)
             {
-                // @TODO: Update local database.
                 _mvxMessenger.Publish(new ContainerChangeMessage(this)
                 {
                     Change = container
                 });
             }
+            await _containerService.UpdateContainerChange(containerChanges.Records);
             var maxActionDate = containerChanges.Records.Max(c => c.ActionDate);
             if (maxActionDate.HasValue)
             {
@@ -333,12 +339,12 @@
             }
             foreach (var terminalChange in terminalChanges.Records)
             {
-                // @TODO: Update local database.
                 _mvxMessenger.Publish(new TerminalChangeMessage(this)
                 {
                     Change = terminalChange
                 });
             }
+            await _terminalService.UpdateTerminalChange(terminalChanges.Records);
             var maxChgDateTime = terminalChanges.Records.Max(terminalChange => terminalChange.ChgDateTime);
             if (maxChgDateTime.HasValue)
             {
