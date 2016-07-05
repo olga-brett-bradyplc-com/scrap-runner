@@ -65,7 +65,13 @@
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
     <Compile Include="Interfaces\ITerminalService.cs" />
     <Compile Include="Interfaces\ITripService.cs" />
+    <Compile Include="Messages\ContainerChangeMessage.cs" />
+    <Compile Include="Messages\ForceLogoffMessage.cs" />
     <Compile Include="Messages\LocationModelMessage.cs" />
+    <Compile Include="Messages\NewMessagesMessage.cs" />
+    <Compile Include="Messages\TerminalChangeMessage.cs" />
+    <Compile Include="Messages\TripNotificationMessage.cs" />
+    <Compile Include="Messages\TripResequencedMessage.cs" />
     <Compile Include="MobileConstants.cs" />
     <Compile Include="Models\CodeTableModel.cs" />
     <Compile Include="Models\ContainerChangeModel.cs" />

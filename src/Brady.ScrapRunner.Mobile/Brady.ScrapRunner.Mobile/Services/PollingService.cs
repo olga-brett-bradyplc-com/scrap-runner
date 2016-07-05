@@ -9,6 +9,8 @@
     using Domain.Enums;
     using Domain.Models;
     using Interfaces;
+    using Messages;
+    using MvvmCross.Plugins.Messenger;
     using Plugin.Settings.Abstractions;
 
     public class PollingService : IPollingService
@@ -16,16 +18,19 @@
         private readonly IConnectionService _connectionService;
         private readonly INotificationService _notificationService;
         private readonly ISettings _settings;
+        private readonly IMvxMessenger _mvxMessenger;
         private const string TerminalMasterSettingsKey = "TerminalMasterDateTime";
         private const string ContainerMasterSettingsKey = "ContainerMasterDateTime";
 
         public PollingService(IConnectionService connectionService, 
             INotificationService notificationService, 
-            ISettings settings)
+            ISettings settings, 
+            IMvxMessenger mvxMessenger)
         {
             _connectionService = connectionService;
             _notificationService = notificationService;
             _settings = settings;
+            _mvxMessenger = mvxMessenger;
         }
 
         public async Task PollForChangesAsync(string driverId, string terminalId, string regionId, string areaId)
@@ -60,7 +65,13 @@
             foreach (var trip in tripsAfterLogin.Records)
             {
                 // @TODO: Update local database.
-                // @TODO: Send MvxMessage.
+                var newTrip = false;
+                // @TODO: Determine if trip is a modification or new.
+                _mvxMessenger.Publish(new TripNotificationMessage(this)
+                {
+                    Context = newTrip ? TripNotificationContext.New : TripNotificationContext.Modified,
+                    Trip = trip
+                });
                 _notificationService.Trip(trip, TripNotificationContext.New);
             }
         }
@@ -83,7 +94,11 @@
             foreach (var trip in canceledTrips.Records)
             {
                 // @TODO: Update local database.
-                // @TODO: Send MvxMessage.
+                _mvxMessenger.Publish(new TripNotificationMessage(this)
+                {
+                    Context = TripNotificationContext.Canceled,
+                    Trip = trip
+                });
                 _notificationService.Trip(trip, TripNotificationContext.Canceled);
             }
         }
@@ -105,7 +120,11 @@
             foreach (var trip in unassignedTrips.Records)
             {
                 // @TODO: Update local database.
-                // @TODO: Send MvxMessage.
+                _mvxMessenger.Publish(new TripNotificationMessage(this)
+                {
+                    Context = TripNotificationContext.Unassigned,
+                    Trip = trip
+                });
                 _notificationService.Trip(trip, TripNotificationContext.Unassigned);
             }
         }
@@ -126,7 +145,11 @@
             foreach (var trip in doneTrips.Records)
             {
                 // @TODO: Update local database.
-                // @TODO: Send MvxMessage.
+                _mvxMessenger.Publish(new TripNotificationMessage(this)
+                {
+                    Context = TripNotificationContext.MarkedDone,
+                    Trip = trip
+                });
                 _notificationService.Trip(trip, TripNotificationContext.MarkedDone);
             }
         }
@@ -148,7 +171,7 @@
             foreach (var trip in doneTrips.Records)
             {
                 // @TODO: Update local database.
-                // @TODO: Send MvxMessage.
+                _mvxMessenger.Publish(new TripResequencedMessage(this));
             }
             if (doneTrips.Records.Any())
             {
@@ -189,7 +212,10 @@
             foreach (var container in containerChanges.Records)
             {
                 // @TODO: Update local database.
-                // @TODO: Send MvxMessage.
+                _mvxMessenger.Publish(new ContainerChangeMessage(this)
+                {
+                    Change = container
+                });
             }
             var maxActionDate = containerChanges.Records.Max(c => c.ActionDate);
             if (maxActionDate.HasValue)
@@ -231,13 +257,16 @@
         private async Task PollForTerminalChangesAsync(string areaId, string regionId)
         {
             var modifiedAfter = _settings.GetValueOrDefault(TerminalMasterSettingsKey, default(DateTime));
-            // @TODO: Figure out how to get "DEFSendOnlyYardsForArea" preference from here?
+            // @TODO: Figure out how to get "DEFSendOnlyYardsForArea" preference from here? (It's not in the preference table)
             var defSendOnlyYardsForArea = "Y";
             var terminalChanges = await GetTerminalChangesAsync(areaId, regionId, modifiedAfter, defSendOnlyYardsForArea);
             foreach (var terminalChange in terminalChanges.Records)
             {
                 // @TODO: Update local database.
-                // @TODO: Send MvxMessage.
+                _mvxMessenger.Publish(new TerminalChangeMessage(this)
+                {
+                    Change = terminalChange
+                });
             }
             var maxChgDateTime = terminalChanges.Records.Max(terminalChange => terminalChange.ChgDateTime);
             if (maxChgDateTime.HasValue)
@@ -259,7 +288,11 @@
         private async Task PollForceLogoffAsync(string driverId)
         {
             var forceLogoff = await GetForceLogoffMessageAsync(driverId);
-            // @TODO: Show ACR.UserDialog here.
+            if (forceLogoff.Records.Any())
+            {
+                _mvxMessenger.Publish(new ForceLogoffMessage(this));
+                // @TODO: Show ACR.UserDialog here.
+            }
         }
 
         private Task<QueryResult<Messages>> GetMessagesAsync(string driverId)
@@ -279,7 +312,10 @@
             foreach (var message in messages.Records)
             {
                 // @TODO: Update local database.
-                // @TODO: Send MvxMessage.
+                _mvxMessenger.Publish(new NewMessagesMessage(this)
+                {
+                    Message = message
+                });
                 _notificationService.Message(message);
             }
         }
