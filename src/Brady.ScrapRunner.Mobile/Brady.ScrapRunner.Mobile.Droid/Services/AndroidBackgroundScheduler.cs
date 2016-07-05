@@ -5,7 +5,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
     using Interfaces;
     using Java.Util;
 
-    public class QueueSchedulerAndroid : IQueueScheduler
+    public class AndroidBackgroundScheduler : IBackgroundScheduler
     {
         protected const int AlarmRequestCode = 1024;
 
@@ -34,7 +34,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
 
         private static Intent NewIntent()
         {
-            return new Intent(Application.Context, typeof(QueueIntentBroadcastReceiver));
+            return new Intent(Application.Context, typeof(BackgroundIntentBroadcastReceiver));
         }
     }
 }

@@ -57,7 +57,7 @@
     <Compile Include="Interfaces\INotificationService.cs" />
     <Compile Include="Interfaces\IPollingService.cs" />
     <Compile Include="Interfaces\IPreferenceService.cs" />
-    <Compile Include="Interfaces\IQueueScheduler.cs" />
+    <Compile Include="Interfaces\IBackgroundScheduler.cs" />
     <Compile Include="Interfaces\IQueueService.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\IConnectionService.cs" />

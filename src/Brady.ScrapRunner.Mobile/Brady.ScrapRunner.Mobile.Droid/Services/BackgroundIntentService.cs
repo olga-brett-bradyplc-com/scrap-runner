@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
     using MvvmCross.Platform.Exceptions;
 
     [Service]
-    public class QueueIntentService : IntentService
+    public class BackgroundIntentService : IntentService
     {
         private bool _inProgress;
         private INetworkAvailabilityService _networkAvailabilityService;
@@ -39,14 +39,14 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
         {
             if (_inProgress)
             {
-                Mvx.Warning("QueueIntentService.OnHandleIntent: Operation is still in progress.");
+                Mvx.Warning("BackgroundIntentService.OnHandleIntent: Operation is still in progress.");
                 return;
             }
             if (_networkAvailabilityService == null)
             {
                 // If MvxException was caught in OnCreate() then MvvmCross IoC won't work. 
                 // Just exit and try again next time.
-                Mvx.Warning("QueueIntentService.OnHandleIntent: Failed to resolve INetworkAvailabilityService");
+                Mvx.Warning("BackgroundIntentService.OnHandleIntent: Failed to resolve INetworkAvailabilityService");
                 return;
             }
             try

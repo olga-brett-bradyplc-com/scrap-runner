@@ -85,8 +85,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
             ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 #endif
             Mvx.RegisterType<IMvxLanguageBindingParser, CustomLanguageBindingParser>();
-            Mvx.LazyConstructAndRegisterSingleton<INetworkAvailabilityService>(() => new NetworkAvailabilityServiceAndroid());
-            Mvx.LazyConstructAndRegisterSingleton<IQueueScheduler>(() => new QueueSchedulerAndroid());
+            Mvx.LazyConstructAndRegisterSingleton<INetworkAvailabilityService>(() => new AndroidNetworkAvailabilityService());
+            Mvx.LazyConstructAndRegisterSingleton<IBackgroundScheduler>(() => new AndroidBackgroundScheduler());
             Mvx.LazyConstructAndRegisterSingleton<INotificationService>(() => new AndroidNotificationService());
         }
     }
