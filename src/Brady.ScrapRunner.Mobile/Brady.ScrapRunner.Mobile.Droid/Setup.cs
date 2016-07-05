@@ -19,6 +19,7 @@ using MvvmCross.Droid.Support.V7.AppCompat;
 namespace Brady.ScrapRunner.Mobile.Droid
 {
     using Interfaces;
+    using Plugin.Settings.Abstractions;
     using Services;
 
     public class Setup : MvxAndroidSetup
@@ -84,10 +85,15 @@ namespace Brady.ScrapRunner.Mobile.Droid
             // Ignore SSL certificate errors while debugging.
             ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 #endif
+            // This plugin doesn't use MvvmCross Plugin Bootstrapper.
+            Mvx.RegisterType<ISettings, Plugin.Settings.SettingsImplementation>();
+
             Mvx.RegisterType<IMvxLanguageBindingParser, CustomLanguageBindingParser>();
             Mvx.LazyConstructAndRegisterSingleton<INetworkAvailabilityService>(() => new AndroidNetworkAvailabilityService());
             Mvx.LazyConstructAndRegisterSingleton<IBackgroundScheduler>(() => new AndroidBackgroundScheduler());
             Mvx.LazyConstructAndRegisterSingleton<INotificationService>(() => new AndroidNotificationService());
+
+            
         }
     }
 }
