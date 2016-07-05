@@ -174,13 +174,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     // the ChangeSetResult that exits this method and is returned to the caller.
                     codetablesProcess.CodeTables = codeTableList;
 
-                    //Now using log4net.ILog implementation to test results of query.
-                    foreach (var codetable in codeTableList)
-                    {
-                        log.DebugFormat("SRTEST:CodeTableProcess:CodeName:{0} CodeValue:{1} CodeDisp1:{2} CodeDisp2:{3} CodeDisp3:{4} CodeDisp4:{5} CodeDisp5:{6} CodeDisp6:{7}",
-                                       codetable.CodeName,codetable.CodeValue,codetable.CodeDisp1,codetable.CodeDisp2,codetable.CodeDisp3,
-                                       codetable.CodeDisp4,codetable.CodeDisp5,codetable.CodeDisp6);
-                    }
                 }
             }
 

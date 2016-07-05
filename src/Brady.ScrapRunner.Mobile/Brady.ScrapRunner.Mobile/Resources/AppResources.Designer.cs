@@ -188,6 +188,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you back on duty?.
+        /// </summary>
+        public static string ConfirmBackOnDuty {
+            get {
+                return ResourceManager.GetString("ConfirmBackOnDuty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are about to go en route to:{0}{2}{1}{3}{1}{4}{0}Are you sure you want to start this trip?.
         /// </summary>
         public static string ConfirmEnRouteMessage {
@@ -202,6 +211,42 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string ConfirmEnrouteTitle {
             get {
                 return ResourceManager.GetString("ConfirmEnrouteTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm.
+        /// </summary>
+        public static string ConfirmLabel {
+            get {
+                return ResourceManager.GetString("ConfirmLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are about to add the following terminal as a Return To Yard segment :{0}{2}{1}{3}{1}{4}{0}Are you sure you want to add this?.
+        /// </summary>
+        public static string ConfirmReturnToYardAdd {
+            get {
+                return ResourceManager.GetString("ConfirmReturnToYardAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are about to change the Return To Yard Segment from :{0}{2}{1}{3}{1}{4}{0}To:{0}{5}{1}{6}{1}{7}{0}Are you sure you want to change this?.
+        /// </summary>
+        public static string ConfirmReturnToYardEdit {
+            get {
+                return ResourceManager.GetString("ConfirmReturnToYardEdit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Container Complete.
+        /// </summary>
+        public static string ContainerComplete {
+            get {
+                return ResourceManager.GetString("ContainerComplete", resourceCulture);
             }
         }
         
@@ -238,6 +283,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string CustomerLocation {
             get {
                 return ResourceManager.GetString("CustomerLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delay.
+        /// </summary>
+        public static string Delay {
+            get {
+                return ResourceManager.GetString("Delay", resourceCulture);
             }
         }
         
@@ -460,6 +514,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mark this container as complete?.
+        /// </summary>
+        public static string MarkContainerComplete {
+            get {
+                return ResourceManager.GetString("MarkContainerComplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Message.
         /// </summary>
         public static string Message {
@@ -474,6 +537,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Messages {
             get {
                 return ResourceManager.GetString("Messages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Segment Successfully Created.
+        /// </summary>
+        public static string NewSegmentCreated {
+            get {
+                return ResourceManager.GetString("NewSegmentCreated", resourceCulture);
             }
         }
         
@@ -501,6 +573,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Notes {
             get {
                 return ResourceManager.GetString("Notes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No users found to message.
+        /// </summary>
+        public static string NoUsers {
+            get {
+                return ResourceManager.GetString("NoUsers", resourceCulture);
             }
         }
         
@@ -595,6 +676,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Performing this action will complete this trip. {0} Are you sure you want to do this?.
+        /// </summary>
+        public static string PerformActionLabel {
+            get {
+                return ResourceManager.GetString("PerformActionLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Photos.
         /// </summary>
         public static string Photos {
@@ -649,6 +739,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Return To Yard.
+        /// </summary>
+        public static string ReturnToYardAdd {
+            get {
+                return ResourceManager.GetString("ReturnToYardAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit Return To Yard.
+        /// </summary>
+        public static string ReturnToYardEdit {
+            get {
+                return ResourceManager.GetString("ReturnToYardEdit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Route Summary.
         /// </summary>
         public static string RouteSummary {
@@ -685,6 +793,51 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Trip Segment Successfully Updated!.
+        /// </summary>
+        public static string SegmentUpdated {
+            get {
+                return ResourceManager.GetString("SegmentUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Delay Reason.
+        /// </summary>
+        public static string SelectDelay {
+            get {
+                return ResourceManager.GetString("SelectDelay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Exception Code.
+        /// </summary>
+        public static string SelectException {
+            get {
+                return ResourceManager.GetString("SelectException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select User To Message.
+        /// </summary>
+        public static string SelectUser {
+            get {
+                return ResourceManager.GetString("SelectUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select A Yard.
+        /// </summary>
+        public static string SelectYard {
+            get {
+                return ResourceManager.GetString("SelectYard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Send.
         /// </summary>
         public static string Send {
@@ -717,6 +870,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must sign and print your name.
+        /// </summary>
+        public static string SignAndPrint {
+            get {
+                return ResourceManager.GetString("SignAndPrint", resourceCulture);
             }
         }
         

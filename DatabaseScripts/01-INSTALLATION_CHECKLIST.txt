@@ -1,0 +1,56 @@
+
+This document last updated:  2016-07-01
+	DatabaseScripts\01-INSTALLATION_CHECKLIST.txt
+
+For Development
+***************
+	1) Follow the instructions and unzip a sample database in:
+		DatabaseScripts\ScrapTestDatabase\*
+
+	2) Note the last revision date on the databse, you may need to update schma, see 
+		"Staring with an existing database" below to catch up as necessary		
+
+	3) You may need to update metadata within the database, see
+		"Maintenance, migration, etc." below
+ 
+	4) The following files are only of value to the Android/Xamarin development at this time and can be disregarded:
+		DatabaseScripts\RevisedSQLliteSchema.txt
+		DatabaseScripts\SQLliteDbOriginal.zip
+
+Staring with an existing database:
+*********************************
+
+	1) Set up the ASP membership tables:
+		Details:  http://camvm-tcs-1:81/repository/download/BradyGroupDevelopment_BwfDocumentationBlessed/.lastSuccessful/htmloutput/prerequisites.html
+		In short: For SQLServer run the 
+			C:\Windows\Microsoft.Net\Framework\v4.0.30319\aspnet_regsql.exe 
+		GUI application.  Your path/version number may be slightly different but this should not matter.
+
+	2) Set up memership tables:
+		DatabaseScripts\BWFUpdates\membership_0_to_2015.3.sql
+		DatabaseScripts\BWFUpdates\Membership20160602.sql
+
+	3) Set Up explorer tables:
+		DatabaseScripts\BWFUpdates\explorer_0_to_2015.3.sql
+		DatabaseScripts\BWFUpdates\Explorer2015302.sql
+		DatabaseScripts\BWFUpdates\Explorer2016101.sql
+		DatabaseScripts\BWFUpdates\Explorer2016102.sql
+		DatabaseScripts\BWFUpdates\Explorer2016103.sql
+		DatabaseScripts\BWFUpdates\Explorer2016104.sql
+
+	4) Check for scrap runner schema modificaitons:
+		DatabaseScripts\ScrapRunUpdates\20160209EventErrorLog.sql
+		DatabaseScripts\ScrapRunUpdates\20160216ModifyTriggers.sql
+		DatabaseScripts\ScrapRunUpdates\20160505 new field EmployeeMaster.sql
+		DatabaseScripts\ScrapRunUpdates\20160520 Add Country.sql
+		DatabaseScripts\ScrapRunUpdates\20160603 read_committed_snapshot.sql
+		DatabaseScripts\ScrapRunUpdates\PasswordEncrypted EmployeeMaster.sql
+		DatabaseScripts\ScrapRunUpdates\20160610 CreateGPSLocation Table.sql
+
+Maintenance, migration, etc. 
+****************************
+
+	1) If necessary to reset URLS in the DB if addresses, ports, etc. ever change after initial startup, 
+	   you may want to edit as necessary and excute a local copy of 
+		DatabaseScripts\ScrapRunUpdates\UpdateURLs.sql
+	   

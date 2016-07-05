@@ -142,7 +142,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 var currentUser = await _driverService.GetCurrentDriverStatusAsync();
 
-                var fuelEntry = await _driverService.SetFuelEntryRemoteAsync(new DriverFuelEntryProcess
+                var fuelEntry = await _driverService.ProcessDriverFuelEntryAsync(new DriverFuelEntryProcess
                 {
                     EmployeeId = currentUser.EmployeeId,
                     Odometer = OdometerReading ?? default(int),

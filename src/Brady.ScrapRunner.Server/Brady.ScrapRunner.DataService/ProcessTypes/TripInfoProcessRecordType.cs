@@ -138,6 +138,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     List<TripSegment> fullTripSegmentList = new List<TripSegment>();
                     List<TripSegmentContainer> fullTripSegmentContainerList = new List<TripSegmentContainer>();
                     List<TripReferenceNumber> fullTripReferenceNumberList = new List<TripReferenceNumber>();
+                    List<CustomerMaster> fullCustomerMasterList = new List<CustomerMaster>();
                     List<CustomerDirections> fullCustomerDirectionsList = new List<CustomerDirections>();
                     List<CustomerCommodity> fullCustomerCommodityList = new List<CustomerCommodity>();
                     List<CustomerLocation> fullCustomerLocationList = new List<CustomerLocation>();
@@ -287,6 +288,27 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////
                     //Loop through the list of customer host codes
+                    //Get the customer master record for each customer host code 
+                    foreach (var custHostCode in customersInTrips)
+                    {
+                        var custMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
+                                            custHostCode, out fault);
+                        if (fault != null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        //Save the list for sending to driver
+                        fullCustomerMasterList.Add(custMaster);
+
+                        log.DebugFormat("SRTEST:TripInfoProcess:Customer Locations:HostCode:{0} Name:{1} Signature Flag:{2}",
+                                        custMaster.CustHostCode,
+                                        custMaster.CustName,
+                                        custMaster.CustSignatureRequired);
+                    }
+
+                    ////////////////////////////////////////////////////////////////////////////////////////////////
+                    //Loop through the list of customer host codes
                     //Get the directions to each customer host code 
                     foreach (var custHostCode in customersInTrips)
                     {
@@ -366,6 +388,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     tripInfoProcess.TripSegments = fullTripSegmentList;
                     tripInfoProcess.TripSegmentContainers = fullTripSegmentContainerList;
                     tripInfoProcess.TripReferenceNumbers = fullTripReferenceNumberList;
+                    tripInfoProcess.CustomerMasters = fullCustomerMasterList;
                     tripInfoProcess.CustomerDirections = fullCustomerDirectionsList;
                     tripInfoProcess.CustomerLocations = fullCustomerLocationList;
                     tripInfoProcess.CustomerCommodities = fullCustomerCommodityList;

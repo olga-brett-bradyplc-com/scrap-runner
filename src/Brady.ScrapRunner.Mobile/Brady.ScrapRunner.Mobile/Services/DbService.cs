@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Plugins.Sqlite;
+using SQLite.Net.Async;
 
 namespace Brady.ScrapRunner.Mobile.Services
 {
@@ -41,6 +42,8 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.DropTableAsync<CodeTableModel>();
             await asyncConnection.DropTableAsync<MessagesModel>();
             await asyncConnection.DropTableAsync<YardModel>();
+            await asyncConnection.DropTableAsync<TerminalChangeModel>();
+            //await asyncConnection.DropTableAsync<ContainerChangeModel>();
 
             await asyncConnection.CreateTableAsync<ContainerMasterModel>();
             await asyncConnection.CreateTableAsync<CustomerDirectionsModel>();
@@ -57,18 +60,37 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.CreateTableAsync<MessagesModel>();
             await asyncConnection.CreateTableAsync<QueueItemModel>();
             await asyncConnection.CreateTableAsync<YardModel>();
+            await asyncConnection.CreateTableAsync<TerminalChangeModel>();
 
-            //await asyncConnection.DeleteAllAsync<ContainerMasterModel>();
-            //await asyncConnection.DeleteAllAsync<CustomerDirectionsModel>();
-            //await asyncConnection.DeleteAllAsync<DriverStatusModel>();
-            //await asyncConnection.DeleteAllAsync<EmployeeMasterModel>();
-            //await asyncConnection.DeleteAllAsync<PowerMasterModel>();
-            //await asyncConnection.DeleteAllAsync<PreferenceModel>();
-            //await asyncConnection.DeleteAllAsync<TripModel>();
-            //await asyncConnection.DeleteAllAsync<TripSegmentModel>();
-            //await asyncConnection.DeleteAllAsync<TripSegmentContainerModel>();
-            //await asyncConnection.DeleteAllAsync<CustomerCommodityModel>();
-            //await asyncConnection.DeleteAllAsync<CustomerLocationModel>();
+            if(! await TableExists("ContainerChange", asyncConnection) )
+                await asyncConnection.CreateTableAsync<ContainerChangeModel>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public async Task RefreshTable<T>() where T : class
+        {
+            var asyncConnection = _sqliteConnectionFactory.GetAsyncConnection("scraprunner");
+            await asyncConnection.DropTableAsync<T>();
+            await asyncConnection.CreateTableAsync<T>();
+        }
+
+        private async Task<bool> TableExists(string tableName, SQLiteAsyncConnection connection)
+        {
+            var query = "SELECT * FROM sqlite_master WHERE type='table' AND name=?";
+            var cmd = await connection.QueryAsync<SqliteMasterTable>(query, tableName);
+            var any = cmd.Any();
+            return any;
+        }
+
+        // Because QueryAsync doesn't allow us to pass non referenced types for whatever reason ...
+        private class SqliteMasterTable
+        {
+            public string type { get; set; }
+            public string name { get; set; }
         }
 
     }

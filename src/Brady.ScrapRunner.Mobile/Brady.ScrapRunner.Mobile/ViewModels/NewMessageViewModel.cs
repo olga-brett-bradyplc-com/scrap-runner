@@ -27,19 +27,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Title = AppResources.Message;
         }
 
-        public override async void Start()
-        {
-            var currentUser = await _driverService.GetCurrentDriverStatusAsync();
-            LocalUserId = currentUser.EmployeeId;
-
-            var messages = await _messagesService.FindMsgsFromAsync(LocalUserId);
-            Messages = new ObservableCollection<MessagesModel>(messages);
-            base.Start();
-        }
-
-        public void Init(string remoteUserId)
+        public void Init(string remoteUserId, string remoteUserFullName)
         {
             RemoteUserId = remoteUserId;
+            RemoteUserFullName = remoteUserFullName;
+        }
+
+        public override async void Start()
+        {
+            SubTitle = RemoteUserFullName;
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
+            LocalUserId = CurrentDriver.EmployeeId;
+
+            var messages = await _messagesService.FindMessagesAsync(RemoteUserId);
+            Messages = new ObservableCollection<MessagesModel>(messages);
+            base.Start();
         }
         
         private string _remoteUserId;
@@ -47,6 +49,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             get { return _remoteUserId; }
             set { SetProperty(ref _remoteUserId, value); }
+        }
+
+        private string _remoteUserFullName;
+        public string RemoteUserFullName
+        {
+            get { return _remoteUserFullName; }
+            set { SetProperty(ref _remoteUserFullName, value); }
         }
 
         private ObservableCollection<MessagesModel> _messages;
@@ -69,6 +78,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _localUserId; }
             set { SetProperty(ref _localUserId, value); }
         }
+
+        private DriverStatusModel CurrentDriver { get; set; }
 
         private IMvxAsyncCommand _sendMessageCommand;
         public IMvxAsyncCommand SendMessageCommand => _sendMessageCommand ??
@@ -93,7 +104,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             using (var loginData = UserDialogs.Instance.Loading(AppResources.SavingData, maskType: MaskType.Black))
             {
-                var message = await _driverService.SendMessageRemoteAsync(new DriverMessageProcess
+                var message = await _driverService.ProcessDriverMessageAsync(new DriverMessageProcess
                 {
                     EmployeeId = LocalUserId,
                     ActionDateTime = DateTime.Now,
@@ -106,24 +117,31 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (message.WasSuccessful)
                 {
-                    //Add new message to the chain of messages
-                    Messages.Add(new MessagesModel
+                    var receiverName = await _messagesService.FindEmployeeAsync(RemoteUserId);
+                    var senderName = await _messagesService.FindEmployeeAsync(LocalUserId);
+                    var localMessage = new MessagesModel
                     {
                         CreateDateTime = DateTime.Now,
                         SenderId = LocalUserId,
                         ReceiverId = RemoteUserId,
+                        ReceiverName = receiverName.FullName,
+                        SenderName = senderName.FullName,
                         MsgText = MessageText,
                         Ack = "N",
                         MessageThread = 1,
-                        SenderName = "", //TODO: get Sender's name
-                        ReceiverName = "", //TODO: get Receiver's name
                         Urgent = Constants.No,
                         Processed = Constants.No,
-                        MsgSource = "R",//Driver's source
+                        MsgSource = "R", //Driver's source
                         DeleteFlag = Constants.No
-                    });
-                    
+                    };
+
+                    await _messagesService.CreateMessageAsync(localMessage);
+
+                    // Clear the typed message
                     MessageText = "";
+
+                    //Add new message to the chain of messages
+                    Messages.Add(localMessage);
 
                     return true;
                 }

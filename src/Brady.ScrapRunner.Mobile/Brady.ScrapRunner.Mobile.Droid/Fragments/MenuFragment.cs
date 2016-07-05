@@ -18,7 +18,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     public class MenuFragment : MvxFragment<MenuViewModel>, NavigationView.IOnNavigationItemSelectedListener
     {
         private NavigationView _navigationView;
-        private IMenuItem _previousMenuItem;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -28,27 +27,13 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             _navigationView.SetNavigationItemSelectedListener(this);
 
             _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(false);
-            _navigationView.Menu.FindItem(Resource.Id.nav_changereturnyard).SetVisible(false);
-            _navigationView.Menu.FindItem(Resource.Id.nav_addreturnyard).SetVisible(false);
-            _navigationView.Menu.FindItem(Resource.Id.nav_unabletoprocess).SetVisible(false);
 
             return view;
         }
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
-            if (menuItem != _previousMenuItem)
-            {
-                _previousMenuItem?.SetChecked(false);
-            }
-
-            menuItem.SetCheckable(true);
-            menuItem.SetChecked(true);
-
-            _previousMenuItem = menuItem;
-
             Navigate(menuItem.ItemId);
-
             return true;
         }
 

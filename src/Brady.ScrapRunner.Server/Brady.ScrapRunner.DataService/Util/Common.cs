@@ -23,6 +23,12 @@ namespace Brady.ScrapRunner.DataService.Util
     /// </summary>
     public class Common
     {
+        public static int CalculateStandardDriveMin(int miles)
+        {
+            int minutes = 0;
+
+            return minutes;
+        }
 
         /// <summary>
         /// Return driver's cumulative time in minutes.
@@ -108,6 +114,27 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return onPowerId;
         }
+        /// <summary>
+        /// Returns the string containing the partial path to store a trip's picture or signature
+        /// Directory will be created in a form of 0\0\0\1\2\3\4\5\6\7 '
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns></returns>
+        public static string CreateDirectoryStringForImage(string tripNumber)
+        {
+            //Pad with leading 0's to form a 10-character string
+            string paddedTripNumber = tripNumber.PadLeft(10, '0');
+            string path = @"\";     
+
+            int iLen = paddedTripNumber.Length - 1;
+            for (int i = 0; i < iLen; i++)
+            {
+                path += paddedTripNumber[i];
+                path += @"\";
+            }
+            return path;
+        }
+
         /// <summary>
         /// Determines if the segment is loaded.
         /// If any container on the truck is loaded, segment is loaded
@@ -1650,6 +1677,24 @@ namespace Brady.ScrapRunner.DataService.Util
             return changeSetResult;
         }
 
+        ///TABLE INSERTS
+        /// <summary>
+        /// Add/Update an GPSLocation record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="gpsLocation"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<int> UpdateGPSLocation(IDataService dataService, ProcessChangeSetSettings settings,
+                                              GPSLocation gpsLocation)
+        {
+            var recordType = (GPSLocationRecordType)dataService.RecordTypes.Single(x => x.TypeName == "GPSLocation");
+            var changeSet = (ChangeSet<int, GPSLocation>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(gpsLocation.Id, gpsLocation);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+
         //////////////////////////////////////////////////////////////////////////
         ///TABLE UPDATES
         /// <summary>
@@ -1852,7 +1897,23 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-        
+        /// <summary>
+        /// Update a TripSegmentImage record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="tripSegmentImage"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdateTripSegmentImage(IDataService dataService, ProcessChangeSetSettings settings,
+            TripSegmentImage tripSegmentImage)
+        {
+            var recordType = (TripSegmentImageRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripSegmentImage");
+            var changeSet = (ChangeSet<string, TripSegmentImage>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(tripSegmentImage.Id, tripSegmentImage);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+
         /// <summary>
         /// Update a TripSegmentContainer record.
         /// </summary>
@@ -3488,6 +3549,12 @@ namespace Brady.ScrapRunner.DataService.Util
                     return messages;
                 }
                 messages = queryResult.Records.Cast<Messages>().ToList();
+
+                foreach(var message in messages)
+                {
+                    message.SenderId = message.SenderId.Trim();
+                    message.ReceiverId = message.ReceiverId.Trim();
+                }
             }
             return messages;
         }
@@ -4291,6 +4358,74 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return response;
         }
+        /// <summary>
+        /// Checks if the trip segment has already been completed.
+        /// </summary>
+        /// <param name="tripSegmentRecord"></param>
+        /// <returns></returns>
+        public static bool IsTripSegmentComplete(TripSegment tripSegmentRecord)
+        {
+            bool response = false;
+            if (null != tripSegmentRecord)
+            {
+                var statuses = new List<string> {
+                            TripSegStatusConstants.Done,
+                            TripSegStatusConstants.ErrorQueue,
+                            TripSegStatusConstants.Review,
+                            TripSegStatusConstants.Exception};
+                if (statuses.Contains(tripSegmentRecord.TripSegStatus))
+                    response = true;
+            }
+            return response;
+        }
+        /// TRIPPOINTS Table  queries
+        /// <summary>
+        ///  Get a trip points record for a orig host code and dest host code.
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="origHostCode"></param>
+        /// <param name="destHostCode"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty Trip record if tripNumber is null or no record is found</returns>
+        public static TripPoints GetTripPoints(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string origHostCode,string destHostCode, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripPoints = new TripPoints();
+            if (null != origHostCode && null != destHostCode)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripPoints>()
+                    .Filter(y => y.Property(x => x.TripPointsHostCode1).EqualTo(origHostCode)
+                    .And().Property(x => x.TripPointsHostCode2).EqualTo(destHostCode))
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripPoints;
+                }
+                if (null == queryResult)
+                {
+                    query = new Query
+                    {
+                        CurrentQuery = new QueryBuilder<TripPoints>()
+                        .Filter(y => y.Property(x => x.TripPointsHostCode1).EqualTo(destHostCode)
+                        .And().Property(x => x.TripPointsHostCode2).EqualTo(origHostCode))
+                        .GetQuery()
+                    };
+                    queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+
+                }
+                tripPoints = queryResult.Records.Cast<TripPoints>().FirstOrDefault();
+            }
+            return tripPoints;
+        }
 
         /// TRIPREFERENCE Table queries
         /// <summary>
@@ -4776,6 +4911,43 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentContainer;
         }
+        /// TRIPSEGMENTIMAGE Table  queries
+        /// <summary>
+        ///  Gets the last trip segment image record for a given trip and segment.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNumber"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static TripSegmentImage GetTripSegmentImageLast(IDataService dataService, ProcessChangeSetSettings settings,
+                      string userCulture, IEnumerable<long> userRoleIds, string tripNumber, string tripSegNumber, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripSegmentImage = new TripSegmentImage();
+            if (null != tripNumber && null != tripSegNumber)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<TripSegmentImage>()
+                    .Filter(y => y.Property(x => x.TripNumber).EqualTo(tripNumber)
+                    .And().Property(x => x.TripSegNumber).EqualTo(tripSegNumber))
+                    .OrderBy(x => x.TripSegImageSeqId, Direction.Descending)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return tripSegmentImage;
+                }
+                tripSegmentImage = queryResult.Records.Cast<TripSegmentImage>().FirstOrDefault();
+            }
+            return tripSegmentImage;
+        }
+
         /// TRIPSEGMENTMILEAGE Table  queries
         /// <summary>
         ///  Gets the trip segment mileage records for a given trip.

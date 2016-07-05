@@ -5,6 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Process;
+using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Plugins.File;
@@ -16,16 +21,26 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         private readonly IMvxPictureChooserTask _pictureChooserTask;
         private readonly IMvxFileStore _fileStore;
+        private readonly IDriverService _driverService;
+        private readonly ITripService _tripService;
 
-        public PhotosViewModel(IMvxPictureChooserTask pictureChooserTask, IMvxFileStore fileStore)
+        public PhotosViewModel(
+            IMvxPictureChooserTask pictureChooserTask, 
+            IMvxFileStore fileStore,
+            IDriverService driverService,
+            ITripService tripService)
         {
             _pictureChooserTask = pictureChooserTask;
             _fileStore = fileStore;
+            _driverService = driverService;
+            _tripService = tripService;
             Title = AppResources.Photos;
         }
 
         public override async void Start()
         {
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
             Images = new ObservableCollection<string>();
 
             // Make sure all previous photos have been deleted from previous use
@@ -46,7 +61,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var memoryStream = new MemoryStream();
             stream.CopyTo(memoryStream);
 
-            var randomFileName = Guid.NewGuid().ToString("N") + ".jpg";
+            var randomFileName = Guid.NewGuid().ToString("N") + "." + ImageExtConstants.Picture;
             _fileStore.EnsureFolderExists(MobileConstants.ImagesDirectory);
             var path = _fileStore.PathCombine(MobileConstants.ImagesDirectory, randomFileName);
             _fileStore.WriteFile(path, memoryStream.ToArray());
@@ -62,6 +77,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             get { return _images; }
             set { SetProperty(ref _images, value); }
+        }
+
+        private DriverStatusModel _currentDriver;
+        public DriverStatusModel CurrentDriver
+        {
+            get { return _currentDriver; }
+            set { SetProperty(ref _currentDriver, value); }
         }
 
         private IMvxCommand _addAnotherPhotoCommand;
@@ -83,13 +105,39 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Close(this);
         }
 
-        private IMvxCommand _sendPhotosCommand;
-        public IMvxCommand SendPhotosCommand
-            => _sendPhotosCommand ?? (_sendPhotosCommand = new MvxCommand(ExecuteSendPhotosCommand, CanExecuteSendPhotosCommand));
+        private IMvxAsyncCommand _sendPhotosCommand;
+        public IMvxAsyncCommand SendPhotosCommand
+            => _sendPhotosCommand ?? (_sendPhotosCommand = new MvxAsyncCommand(ExecuteSendPhotosCommand, CanExecuteSendPhotosCommand));
 
-        private void ExecuteSendPhotosCommand()
+        private async Task ExecuteSendPhotosCommand()
         {
-            // @TODO : Implement send photos functionality once server-side component complete
+            using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
+            {
+                var fileList = _fileStore.GetFilesIn(MobileConstants.ImagesDirectory);
+                foreach (var file in fileList)
+                {
+                    byte[] bytes;
+                    _fileStore.TryReadBinaryFile(file, out bytes);
+
+                    var imageProcess = await _tripService.ProcessDriverImageAsync(new DriverImageProcess
+                    {
+                        EmployeeId = CurrentDriver.EmployeeId,
+                        TripNumber = CurrentDriver.TripNumber,
+                        TripSegNumber = CurrentDriver.TripSegNumber,
+                        ActionDateTime = DateTime.Now,
+                        ImageType = ImageTypeConstants.Picture,
+                        ImageByteArray = bytes
+                    });
+
+                    Array.Clear(bytes, 0, bytes.Length);
+
+                    if (!imageProcess.WasSuccessful)
+                    {
+                        UserDialogs.Instance.Alert(imageProcess.Failure.Summary, AppResources.Error);
+                        return;
+                    }
+                }
+            }
 
             // After files sent, remove them from disk
             _fileStore.DeleteFolder(MobileConstants.ImagesDirectory, true);

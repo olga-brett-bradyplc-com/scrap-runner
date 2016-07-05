@@ -129,7 +129,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                                     ContainerActionTypeConstants.Exception,
                                                     ContainerActionTypeConstants.Review,
                                                     ContainerActionTypeConstants.Load,
-                                                    ContainerActionTypeConstants.Dropped};
+                                                    ContainerActionTypeConstants.Dropped,
+                                                    ContainerActionTypeConstants.Added};
                     if (!actions.Contains(driverContainerActionProcess.ActionType))
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid ActionType: "
@@ -139,6 +140,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     //DriverContainerActionProcess has been called
                     log.DebugFormat("SRTEST:DriverContainerActionProcess Called by {0}", key);
+                    if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Added)
+                    {
+                        log.DebugFormat("SRTEST:DriverContainerActionProcess:ADDED Driver:{0} Container:{1} DT:{2} MethodOfEntry:{3} Contents:{4} Lat:{5} Lon:{6}",
+                                         driverContainerActionProcess.EmployeeId, driverContainerActionProcess.ContainerNumber,
+                                         driverContainerActionProcess.ActionDateTime, driverContainerActionProcess.MethodOfEntry,
+                                         driverContainerActionProcess.ContainerContents, driverContainerActionProcess.Latitude,
+                                         driverContainerActionProcess.Longitude);
+                    }
                     if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Load)
                     {
                         log.DebugFormat("SRTEST:DriverContainerActionProcess:LOAD Driver:{0} Container:{1} DT:{2} MethodOfEntry:{3}",
@@ -189,26 +198,37 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                                               + driverContainerActionProcess.ActionType));
                             break;
                         }
-                        if (driverContainerActionProcess.MethodOfEntry == null)
+                        if (driverContainerActionProcess.ActionType != ContainerActionTypeConstants.Added)
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("MethodOfEntry is required for ActionType:"
-                                                              + driverContainerActionProcess.ActionType));
-                            break;
-                        }
-                        if (driverContainerActionProcess.MethodOfEntry != ContainerMethodOfEntry.Manual &&
-                            driverContainerActionProcess.MethodOfEntry != ContainerMethodOfEntry.Scanned)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid MethodOfEntry:"
-                                                              + driverContainerActionProcess.MethodOfEntry));
-                            break;
+                            if (driverContainerActionProcess.ContainerContents == null)
+                            {
+                                //changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Container Contents is required for ActionType:"
+                                //                                  + driverContainerActionProcess.ActionType));
+                                //break;
+
+                            }
+                            if (driverContainerActionProcess.MethodOfEntry == null)
+                            {
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("MethodOfEntry is required for ActionType:"
+                                                                  + driverContainerActionProcess.ActionType));
+                                break;
+                            }
+                            if (driverContainerActionProcess.MethodOfEntry != ContainerMethodOfEntry.Manual &&
+                                driverContainerActionProcess.MethodOfEntry != ContainerMethodOfEntry.Scanned)
+                            {
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid MethodOfEntry:"
+                                                                  + driverContainerActionProcess.MethodOfEntry));
+                                break;
+                            }
                         }
                     }
 
                     ////////////////////////////////////////////////
-                    //Trip Number is required for Action Type:D=Done,E=Exception,R=Review.
+                    //Trip Number is required for Action Type:D=Done,E=Exception,R=Review,A=Added.
                     if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Done ||
                         driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Exception ||
-                        driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Review)
+                        driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Review ||
+                        driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Added)
                     {
                         if (driverContainerActionProcess.TripNumber == null ||
                             driverContainerActionProcess.TripSegNumber == null)
@@ -277,6 +297,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             break;
                         }
                 
+                    }
+                    //Added action type
+                    else if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Added)
+                    {
+                        if (!ContainerAdd(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
+                                    driverContainerActionProcess, employeeMaster))
+                        {
+                            break;
+                        }
                     }
                     //Exception action type
                     else if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Exception)
@@ -493,7 +522,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         }//end of public bool ContainerLoadDrop
 
         /// <summary>
-        /// Processing for Container Done actions:D=Done,E=Exception, R=Review
+        /// Processing for Container Done actions:D=Done, R=Review
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
@@ -558,6 +587,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     driverContainerActionProcess.TripNumber + "-" + driverContainerActionProcess.TripSegNumber));
                 return false;
             }
+            ////////////////////////////////////////////////
+            //Check if trip segment is complete
+            if (Common.IsTripSegmentComplete(currentTripSegment))
+            {
+                log.DebugFormat("SRTEST:TripSegNumber:{0}-{1} is Complete. Container done processing ends.",
+                                driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber);
+                return false;
+            }
+
             if (currentTripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
                currentTripSegment.TripSegType == BasicTripTypeConstants.Load)
             { 
@@ -745,7 +783,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     var statuses = new List<string> {ContainerStatusConstants.CustomerSite,
                                                      ContainerStatusConstants.Contractor,
                                                      ContainerStatusConstants.SpecialProject};
-                    if (statuses.Contains(containerLastTrip.ContainerStatus))
+                    if (statuses.Contains(containerLastTrip?.ContainerStatus))
                     {
                         containerMaster.LocationWarningFlag = Constants.Yes;
                     }
@@ -937,6 +975,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             return true;
         }//end of public bool ContainerDone
+
         /// <summary>
         /// Container Exception processing
         /// </summary>
@@ -977,6 +1016,37 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
                 log.DebugFormat("SRTEST:TripNumber:{0} is Complete. Container exception processing ends.",
                                 driverContainerActionProcess.TripNumber);
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            //Get a list of all segments for the trip
+            var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
+                              driverContainerActionProcess.TripNumber, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            // Get the current TripSegment record
+            var currentTripSegment = (from item in tripSegList
+                                      where item.TripSegNumber == driverContainerActionProcess.TripSegNumber
+                                      select item).FirstOrDefault();
+            if (null == currentTripSegment)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripSegment: " +
+                    driverContainerActionProcess.TripNumber + "-" + driverContainerActionProcess.TripSegNumber));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            //Check if trip segment is complete
+            if (Common.IsTripSegmentComplete(currentTripSegment))
+            {
+                log.DebugFormat("SRTEST:TripSegNumber:{0}-{1} is Complete. Container done processing ends.",
+                                driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber);
                 return false;
             }
 
@@ -1065,6 +1135,266 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             return true;
         }//end of public bool ContainerException
+
+        /// <summary>
+        /// Container Add Processing
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="changeSetResult"></param>
+        /// <param name="msgKey"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="driverContainerActionProcess"></param>
+        /// <param name="employeeMaster"></param>
+        /// <param name="containerHistoryInsertCount"></param>
+        /// <returns></returns>
+        public bool ContainerAdd(IDataService dataService, ProcessChangeSetSettings settings,
+           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+           DriverContainerActionProcess driverContainerActionProcess, EmployeeMaster employeeMaster)
+        {
+            DataServiceFault fault = null;
+
+            ////////////////////////////////////////////////
+            // Get the Trip record
+            var currentTrip = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
+                             driverContainerActionProcess.TripNumber, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (null == currentTrip)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid TripNumber: "
+                                + driverContainerActionProcess.TripNumber));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            //Check if trip is complete
+            if (Common.IsTripComplete(currentTrip))
+            {
+                log.DebugFormat("SRTEST:TripNumber:{0} is Complete. Container add processing ends.",
+                                driverContainerActionProcess.TripNumber);
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            //Get a list of all segments for the trip
+            var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
+                              driverContainerActionProcess.TripNumber, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            ////////////////////////////////////////////////
+            //Define the TripSegmentContainer for use later
+            TripSegment currentTripSegment = new TripSegment();
+            //Define the TripSegmentContainer for use later
+            TripSegmentContainer tripSegmentContainer = new TripSegmentContainer();
+
+            ////////////////////////////////////////////////
+            // Get the current TripSegment record
+            currentTripSegment = (from item in tripSegList
+                                      where item.TripSegNumber == driverContainerActionProcess.TripSegNumber
+                                      select item).FirstOrDefault();
+
+            ////////////////////////////////////////////////
+            //Get a list of all containers for the segment
+            var tripSegContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
+                                    driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+
+            ////////////////////////////////////////////////
+            //Get Container Information
+            var containerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
+                                  driverContainerActionProcess.ContainerNumber, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (null == containerMaster)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid ContainerNumber: "
+                                + driverContainerActionProcess.ContainerNumber));
+                return false;
+            }
+            ////////////////////////////////////////////////
+            //Update TripSegmentContainer table.
+            if (null != tripSegContainerList && tripSegContainerList.Count() > 0)
+            {
+                //First, try to find a container in the list that matches the container number on the power unit.
+                //Allow for the use of the same container number multiple times on a segment.
+                tripSegmentContainer = (from item in tripSegContainerList
+                                        where item.TripSegContainerNumber == containerMaster.ContainerNumber
+                                        && item.TripSegContainerComplete != Constants.Yes
+                                        select item).FirstOrDefault();
+                if (null == tripSegmentContainer)
+                {
+                    //Otherwise find a container record with no container number
+                    tripSegmentContainer = (from item in tripSegContainerList
+                                            where item.TripSegContainerNumber == null
+                                            select item).FirstOrDefault();
+                }
+            }
+            //If still not found, then add a new one
+            if (null == tripSegmentContainer || null == tripSegmentContainer.TripNumber)
+            {
+                tripSegmentContainer = new TripSegmentContainer();
+
+                //Look up the last trip segment container for this trip and segment
+                TripSegmentContainer tripSegmentContainerMax = new TripSegmentContainer();
+
+                //Use this to calculate the next sequence number.
+                tripSegmentContainerMax = Common.GetTripSegmentContainerLast(dataService, settings, userCulture, userRoleIds,
+                                              driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber, out fault);
+                if (null != fault)
+                {
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                    return false;
+                }
+                //Determine the next sequence number
+                tripSegmentContainer.TripSegContainerSeqNumber = 0;
+                if (null != tripSegmentContainerMax)
+                {
+                    tripSegmentContainer.TripSegContainerSeqNumber = ++tripSegmentContainerMax.TripSegContainerSeqNumber;
+                }
+                tripSegmentContainer.TripNumber = driverContainerActionProcess.TripNumber;
+                tripSegmentContainer.TripSegNumber = driverContainerActionProcess.TripSegNumber;
+            }
+            //Container number from the mobile device is required.
+            tripSegmentContainer.TripSegContainerNumber = driverContainerActionProcess.ContainerNumber;
+
+            //Action Date/Time from the mobile device is required.
+            tripSegmentContainer.TripSegContainerActionDateTime = driverContainerActionProcess.ActionDateTime;
+
+            //Use the type and size from the container master, not the mobile device.
+            tripSegmentContainer.TripSegContainerType = containerMaster.ContainerType;
+            tripSegmentContainer.TripSegContainerSize = containerMaster.ContainerSize;
+
+            //Comodity code and description are optional, from driver. May have been filled in by dispatch. 
+            if (driverContainerActionProcess.CommodityCode != null && driverContainerActionProcess.CommodityDesc != null)
+            {
+                tripSegmentContainer.TripSegContainerCommodityCode = driverContainerActionProcess.CommodityCode;
+                tripSegmentContainer.TripSegContainerCommodityDesc = driverContainerActionProcess.CommodityDesc;
+            }
+
+            //Location is optional, from driver. May have been filled in by dispatch. 
+            if (driverContainerActionProcess.ContainerLocation != null)
+            {
+                tripSegmentContainer.TripSegContainerLocation = driverContainerActionProcess.ContainerLocation;
+            }
+
+            //Level is optional, as determined by a preference.
+            if (driverContainerActionProcess.ContainerLevel != null)
+            {
+                tripSegmentContainer.TripSegContainerLevel = driverContainerActionProcess.ContainerLevel;
+            }
+
+            //This indicates whether the container number was scanned or manually (hand-typed) entered.
+            tripSegmentContainer.TripSegContainerEntryMethod = driverContainerActionProcess.MethodOfEntry;
+
+
+            //The ContainerLoaded flag is based on ContainerContents
+            if (driverContainerActionProcess.ContainerContents == ContainerContentsConstants.Loaded)
+            {
+                tripSegmentContainer.TripSegContainerLoaded = Constants.Yes;
+            }
+            else
+            {
+                tripSegmentContainer.TripSegContainerLoaded = Constants.No;
+            }
+
+
+            tripSegContainerList.Add(tripSegmentContainer);
+
+            //Do the update
+            changeSetResult = Common.UpdateTripSegmentContainer(dataService, settings, tripSegmentContainer);
+            log.DebugFormat("SRTEST:Saving TripSegmentContainer for ContainerNumber:{0} - Container Add.",
+                            tripSegmentContainer.TripSegContainerNumber);
+            if (Common.LogChangeSetFailure(changeSetResult, tripSegmentContainer, log))
+            {
+                var s = string.Format("Could not add TripSegmentContainer for ContainerNumber:{0}.",
+                            tripSegmentContainer.TripSegContainerNumber);
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                return false;
+            }
+
+            if (currentTripSegment != null)
+            {
+                ////////////////////////////////////////////////
+                //Update TripSegment Primary Container Information from first TripSegmentContainer information. 
+                if (tripSegContainerList.Count() > 0)
+                {
+                    var firstTripSegmentContainer = tripSegContainerList.First();
+
+                    if (null != firstTripSegmentContainer)
+                    {
+                        //Only if there is a container number
+                        if (null != firstTripSegmentContainer.TripSegContainerNumber)
+                        {
+                            currentTripSegment.TripSegPrimaryContainerNumber = firstTripSegmentContainer.TripSegContainerNumber;
+                            currentTripSegment.TripSegPrimaryContainerType = firstTripSegmentContainer.TripSegContainerType;
+                            currentTripSegment.TripSegPrimaryContainerSize = firstTripSegmentContainer.TripSegContainerSize;
+                            currentTripSegment.TripSegPrimaryContainerCommodityCode = firstTripSegmentContainer.TripSegContainerCommodityCode;
+                            currentTripSegment.TripSegPrimaryContainerCommodityDesc = firstTripSegmentContainer.TripSegContainerCommodityDesc;
+                            currentTripSegment.TripSegPrimaryContainerLocation = firstTripSegmentContainer.TripSegContainerLocation;
+                        }
+                    }
+                }
+
+                ////////////////////////////////////////////////
+                //Do the TripSegment table update
+                changeSetResult = Common.UpdateTripSegment(dataService, settings, currentTripSegment);
+                log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Container Add.",
+                                currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
+                if (Common.LogChangeSetFailure(changeSetResult, currentTripSegment, log))
+                {
+                    var s = string.Format("Container Add:Could not update TripSegment for Trip:{0}-{1}.",
+                        currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                    return false;
+                }
+
+                //Update Trip Table
+                currentTrip.TripPrimaryContainerNumber = currentTripSegment.TripSegPrimaryContainerNumber;
+                currentTrip.TripPrimaryContainerType = currentTripSegment.TripSegPrimaryContainerType;
+                currentTrip.TripPrimaryContainerSize = currentTripSegment.TripSegPrimaryContainerSize;
+                currentTrip.TripPrimaryCommodityCode = currentTripSegment.TripSegPrimaryContainerCommodityCode;
+                currentTrip.TripPrimaryCommodityDesc = currentTripSegment.TripSegPrimaryContainerCommodityDesc;
+                currentTrip.TripPrimaryContainerLocation = currentTripSegment.TripSegPrimaryContainerLocation;
+                currentTrip.TripStartedDateTime = currentTripSegment.TripSegStartDateTime;
+                if (currentTripSegment.TripSegContainerQty > 1)
+                {
+                    currentTrip.TripMultContainerFlag = Constants.Yes;
+                }
+                else
+                {
+                    currentTrip.TripMultContainerFlag = Constants.No;
+                }
+                currentTrip.TripInProgressFlag = Constants.Yes;
+
+                //Do the update
+                changeSetResult = Common.UpdateTrip(dataService, settings, currentTrip);
+                log.DebugFormat("SRTEST:Saving Trip Record for Trip:{0} - Container Add.",
+                                currentTrip.TripNumber);
+                if (Common.LogChangeSetFailure(changeSetResult, currentTrip, log))
+                {
+                    var s = string.Format("Container Add::Could not update Trip for Trip:{0}.",
+                        currentTrip.TripNumber);
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                    return false;
+                }
+            }
+            return true;
+        }//end of public bool ContainerAdd
 
     }
 }

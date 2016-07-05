@@ -37,6 +37,8 @@
             _yardInfoRepository = yardInfoRepository;
         }
 
+        #region General purpose trip methods
+
         /// <summary>
         /// Takes a list of trips provided by the server, and inserts into the local Trip SQLite DB
         /// </summary>
@@ -72,113 +74,69 @@
             return _tripSegmentContainerRepository.InsertRangeAsync(mapped);
         }
 
-        public async Task<ChangeResultWithItem<TripInfoProcess>> FindTripsRemoteAsync(TripInfoProcess tripInfoProcess)
-        {
-            var tripProcess =
-                await
-                    _connection.GetConnection(ConnectionType.Online).UpdateAsync(tripInfoProcess, requeryUpdated: false);
-            return tripProcess;
-        }
-
         /// <summary>
-        /// Retrieve whether trip order in enforced via preferences table
+        /// Create a new, local trip
         /// </summary>
+        /// <param name="trip"></param>
         /// <returns></returns>
-        public async Task<bool> IsTripSequenceEnforcedAsync()
+        public async Task<int> CreateTripAsync(TripModel trip)
         {
-            var preference = await _preferenceRepository.FindAsync(p => p.Parameter == "DEFEnforceSeqProcess");
-            return preference != null && preference.ParameterValue == Constants.Yes;
+            return await _tripRepository.InsertAsync(trip);
         }
 
         /// <summary>
-        /// Check to see if first segment of given leg contains a basic trip type that
-        /// warrants sending user to through the transaction summary screen.
-        /// 
-        /// Should note that we don't need to evaluate whether there are multiple trip segments
-        /// that should be processed together, as they'll automatically be picked up on the 
-        /// transaction screen together.
+        /// Create a new, local trip segment
         /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <returns>bool</returns>
-        public async Task<bool> IsTripLegTransactionAsync(string tripNumber)
-        {
-            var segment = await _tripSegmentRepository.AsQueryable()
-                .Where(ts =>
-                    ts.TripNumber == tripNumber
-                    &&
-                    (ts.TripSegStatus == TripSegStatusConstants.Pending ||
-                     ts.TripSegStatus == TripSegStatusConstants.Missed))
-                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
-
-            return segment?.TripSegType == BasicTripTypeConstants.DropEmpty ||
-                   segment?.TripSegType == BasicTripTypeConstants.DropFull ||
-                   segment?.TripSegType == BasicTripTypeConstants.PickupEmpty ||
-                   segment?.TripSegType == BasicTripTypeConstants.PickupFull ||
-                   segment?.TripSegType == BasicTripTypeConstants.Load ||
-                   segment?.TripSegType == BasicTripTypeConstants.Unload ||
-                   segment?.TripSegType == BasicTripTypeConstants.Respot;
-        }
-
-        /// <summary>
-        /// Check to see if first segment of given leg contains a basic trip type that
-        /// warrants sending user to through the scale summary screen.
-        /// 
-        /// Should note that we don't need to evaluate whether there are multiple trip segments
-        /// that should be processed together, as they'll automatically be picked up on the 
-        /// scale screen together.
-        /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <returns>bool</returns>
-        public async Task<bool> IsTripLegScaleAsync(string tripNumber)
-        {
-            var segment = await _tripSegmentRepository.AsQueryable()
-                .Where(ts =>
-                    ts.TripNumber == tripNumber
-                    &&
-                    (ts.TripSegStatus == TripSegStatusConstants.Pending ||
-                     ts.TripSegStatus == TripSegStatusConstants.Missed))
-                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
-
-            return segment?.TripSegType == BasicTripTypeConstants.Scale ||
-                   segment?.TripSegType == BasicTripTypeConstants.ReturnYard;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="tripNumber"></param>
+        /// <param name="tripSegment"></param>
         /// <returns></returns>
-        public async Task<bool> IsTripLegNoScreenAsync(string tripNumber)
+        public async Task<int> CreateTripSegmentAsync(TripSegmentModel tripSegment)
         {
-            var segment = await _tripSegmentRepository.AsQueryable()
-                .Where(ts =>
-                    ts.TripNumber == tripNumber
-                    &&
-                    (ts.TripSegStatus == TripSegStatusConstants.Pending ||
-                     ts.TripSegStatus == TripSegStatusConstants.Missed))
-                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
-
-            return segment?.TripSegType == BasicTripTypeConstants.YardWork ||
-                   segment?.TripSegType == BasicTripTypeConstants.ReturnYardNC;
+            return await _tripSegmentRepository.InsertAsync(tripSegment);
         }
 
         /// <summary>
-        /// Check to see if arriving segment of given trip type is W (Scale) type
-        /// 
+        /// Create a new, local trip segment container
         /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <returns>bool</returns>
-        public async Task<bool> IsTripLegTypePublicScale(string tripNumber)
+        /// <param name="tripSegmentContainer"></param>
+        /// <returns></returns>
+        public async Task<int> CreateTripSegmentContainerAsync(TripSegmentContainerModel tripSegmentContainer)
         {
-            var segment = await _tripSegmentRepository.AsQueryable()
-                .Where(ts =>
-                    ts.TripNumber == tripNumber
-                    && (ts.TripSegStatus == TripSegStatusConstants.Pending ||
-                     ts.TripSegStatus == TripSegStatusConstants.Missed))
-                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
-
-            return segment?.TripSegType == BasicTripTypeConstants.Scale;
+            return await _tripSegmentContainerRepository.InsertAsync(tripSegmentContainer);
         }
+
+        /// <summary>
+        /// Update the given trip model
+        /// </summary>
+        /// <param name="trip"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateTripAsync(TripModel trip)
+        {
+            return await _tripRepository.UpdateAsync(trip);
+        }
+
+        /// <summary>
+        /// Update the given tripSegment
+        /// </summary>
+        /// <param name="tripSegment"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateTripSegmentAsync(TripSegmentModel tripSegment)
+        {
+            return await _tripSegmentRepository.UpdateAsync(tripSegment);
+        }
+
+        /// <summary>
+        /// Update the given trip segment container
+        /// </summary>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateTripSegmentContainerAsync(TripSegmentContainerModel container)
+        {
+            return await _tripSegmentContainerRepository.UpdateAsync(container);
+        }
+
+        #endregion
+
+        #region Search methods
 
         /// <summary>
         /// Find a given trip from the local Trip SQLite DB
@@ -216,6 +174,42 @@
             return sortedTrips.FirstOrDefault();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns></returns>
+        public async Task<List<TripSegmentModel>> FindAllSegmentsForTripAsync(string tripNumber)
+        {
+            var tripSegments = await _tripSegmentRepository.AsQueryable()
+                .Where(t => t.TripNumber == tripNumber)
+                .OrderBy(t => t.TripSegNumber)
+                .ToListAsync();
+            return tripSegments;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegNumber"></param>
+        /// <returns></returns>
+        public async Task<List<TripSegmentContainerModel>> FindAllContainersForTripSegmentAsync(string tripNumber,
+            string tripSegNumber)
+        {
+            var tripSegmentContainers = await _tripSegmentContainerRepository.AsQueryable()
+                .Where(tscm => tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNumber)
+                .OrderBy(tscm => tscm.TripSegContainerSeqNumber)
+                .ToListAsync();
+            return tripSegmentContainers;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="tripSegmentNumber"></param>
+        /// <returns></returns>
         public async Task<TripSegmentModel> FindTripSegmentInfoAsync(string tripNumber, string tripSegmentNumber)
         {
             var segment = await _tripSegmentRepository.AsQueryable()
@@ -240,7 +234,8 @@
                     ts.TripNumber == tripNumber
                     &&
                     (ts.TripSegStatus == TripSegStatusConstants.Pending ||
-                     ts.TripSegStatus == TripSegStatusConstants.Missed))
+                     ts.TripSegStatus == TripSegStatusConstants.Missed ||
+                     ts.TripSegStatus == TripSegStatusConstants.Exception))
                 .OrderBy(ts => ts.TripSegNumber)
                 .ToListAsync();
             if (!segments.Any())
@@ -293,80 +288,155 @@
             return container.FirstOrDefault();
         }
 
+        #endregion
+
+        #region Helper methods
+
+        /// <summary>
+        /// Retrieve whether trip order in enforced via preferences table
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> IsTripSequenceEnforcedAsync()
+        {
+            var preference = await _preferenceRepository.FindAsync(p => p.Parameter == "DEFEnforceSeqProcess");
+            return preference != null && preference.ParameterValue == Constants.Yes;
+        }
+
+        /// <summary>
+        /// Check to see if first segment of given leg contains a basic trip type that
+        /// warrants sending user to through the transaction summary screen.
+        /// 
+        /// Should note that we don't need to evaluate whether there are multiple trip segments
+        /// that should be processed together, as they'll automatically be picked up on the 
+        /// transaction screen together.
+        /// </summary>
+        /// <param name="tripSegment"></param>
+        /// <returns>bool</returns>
+        public bool IsTripLegTransaction(TripSegmentModel tripSegment)
+        {
+            return tripSegment.TripSegType == BasicTripTypeConstants.DropEmpty ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.DropFull ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.PickupEmpty ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.Load ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.Unload ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.Respot;
+        }
+
+        /// <summary>
+        /// Check to see if first segment of given leg contains a basic trip type that
+        /// warrants sending user to through the scale summary screen.
+        /// 
+        /// Should note that we don't need to evaluate whether there are multiple trip segments
+        /// that should be processed together, as they'll automatically be picked up on the 
+        /// scale screen together.
+        /// </summary>
+        /// <param name="tripSegment"></param>
+        /// <returns>bool</returns>
+        public bool IsTripLegScale(TripSegmentModel tripSegment)
+        {
+            return tripSegment.TripSegType == BasicTripTypeConstants.Scale ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.ReturnYard;
+        }
+
+        /// <summary>
+        /// These trip types don't have an associated "next screen" and either
+        /// complete the trip or go to the next segment once they've confirmed their
+        /// arrival
+        /// </summary>
+        /// <param name="tripSegment"></param>
+        /// <returns></returns>
+        public bool IsTripLegNoScreen(TripSegmentModel tripSegment)
+        {
+            return tripSegment.TripSegType == BasicTripTypeConstants.YardWork ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.ReturnYardNC;
+        }
+
+        /// <summary>
+        /// Check to see if arriving segment of given trip type is W (Scale) type
+        /// 
+        /// </summary>
+        /// <param name="tripSegment"></param>
+        /// <returns>bool</returns>
+        public bool IsTripLegTypePublicScale(TripSegmentModel tripSegment)
+        {
+            return tripSegment.TripSegType == BasicTripTypeConstants.Scale;
+        }
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <param name="tripSegNo"></param>
-        /// <param name="tripSegContainerSeqNumber"></param>
-        /// <param name="tripSegContainerNumer"></param>
-        /// <param name="segmentComplete"></param>
+        /// <param name="tripSegment"></param>
         /// <returns></returns>
-        public async Task<int> CompleteTripSegmentContainerAsync(string tripNumber, string tripSegNo,
-            short tripSegContainerSeqNumber, string tripSegContainerNumer)
+        public bool IsContainerDropped(TripSegmentModel tripSegment)
         {
-            var container = await _tripSegmentContainerRepository.AsQueryable()
-                .Where(
-                    tscm =>
-                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
-                        tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).FirstOrDefaultAsync();
+            return tripSegment.TripSegType == BasicTripTypeConstants.DropEmpty ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.DropFull ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.Unload;
+        }
 
-            if (string.IsNullOrEmpty(container.TripSegContainerNumber))
-                container.TripSegContainerNumber = tripSegContainerNumer;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripSegment"></param>
+        /// <returns></returns>
+        public bool IsContainerLoaded(TripSegmentModel tripSegment)
+        {
+            return tripSegment.TripSegType == BasicTripTypeConstants.PickupEmpty ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.Load;
+        }
 
+        /// <summary>
+        /// Complete a given trip
+        /// We typically never have the trip object queried within the viewmodel, so we just pass the trip number
+        /// and do the query here
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns></returns>
+        public async Task<int> CompleteTripAsync(string tripNumber)
+        {
+            // @TODO : Implement remote process once it's completed
+            var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
+            trip.TripStatus = TripStatusConstants.Done;
+            return await _tripRepository.UpdateAsync(trip);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripSegment"></param>
+        /// <returns></returns>
+        public async Task<int> CompleteTripSegmentAsync(TripSegmentModel tripSegment)
+        {
+            tripSegment.TripSegStatus = TripSegStatusConstants.Done;
+            return await _tripSegmentRepository.UpdateAsync(tripSegment);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        public async Task<int> CompleteTripSegmentContainerAsync(TripSegmentContainerModel container)
+        {
+            container.TripSegContainerReviewFlag = Constants.No;
             container.TripSegContainerActionDateTime = DateTime.Now;
             container.TripSegContainerComplete = Constants.Yes;
-
             return await _tripSegmentContainerRepository.UpdateAsync(container);
         }
 
+    
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <param name="tripSegNo"></param>
-        /// <param name="tripSegContainerSeqNumber"></param>
-        /// <param name="tripSegContainerNumer"></param>
-        /// <param name="tripSegmentComplete"></param>
-        /// <returns></returns>
-        public async Task<int> ProcessTripSegmentContainerAsync(string tripNumber, string tripSegNo,
-            short tripSegContainerSeqNumber, string tripSegContainerNumer, bool tripSegmentComplete)
-        {
-            var container = await _tripSegmentContainerRepository.AsQueryable()
-                .Where(
-                    tscm =>
-                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
-                        tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).FirstOrDefaultAsync();
-
-            if (string.IsNullOrEmpty(container.TripSegContainerNumber))
-                container.TripSegContainerNumber = tripSegContainerNumer;
-
-            container.TripSegContainerActionDateTime = DateTime.Now;
-            container.TripSegContainerComplete = (tripSegmentComplete) ? Constants.Yes : Constants.No;
-
-            return await _tripSegmentContainerRepository.UpdateAsync(container);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <param name="tripSegNo"></param>
-        /// <param name="tripSegContainerNumber"></param>
+        /// <param name="container"></param>
         /// <param name="gsWt"></param>
         /// <param name="gs2Wt"></param>
         /// <param name="trWt"></param>
         /// <returns></returns>
-        public async Task<int> UpdateTripSegmentContainerWeightTimesAsync(string tripNumber, string tripSegNo,
-            string tripSegContainerNumber, DateTime? gsWt, DateTime? gs2Wt, DateTime? trWt)
+        public async Task<int> UpdateTripSegmentContainerWeightTimesAsync(TripSegmentContainerModel container, DateTime? gsWt, DateTime? gs2Wt, DateTime? trWt)
         {
-            // @TODO : Not complete
-            var container = await _tripSegmentContainerRepository.AsQueryable()
-                .Where(
-                    tscm =>
-                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
-                        tscm.TripSegContainerNumber == tripSegContainerNumber).FirstOrDefaultAsync();
-
             container.WeightGrossDateTime = gsWt;
             container.WeightGross2ndDateTime = gs2Wt;
             container.WeightTareDateTime = trWt;
@@ -377,41 +447,28 @@
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <param name="tripSegNo"></param>
-        /// <param name="tripSegContainerNumber"></param>
+        /// <param name="container"></param>
         /// <param name="latitude"></param>
         /// <param name="longitude"></param>
         /// <returns></returns>
-        public async Task<int> UpdateTripSegmentContainerLongLatAsync(string tripNumber, string tripSegNo,
-            string tripSegContainerNumber, int? latitude, int? longitude)
+        public async Task<int> UpdateTripSegmentContainerLongLatAsync(TripSegmentContainerModel container, int? latitude, int? longitude)
         {
-
-            // @TODO : Not complete
-            var container = await _tripSegmentContainerRepository.AsQueryable()
-                .Where(
-                    tscm =>
-                        tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
-                        tscm.TripSegContainerNumber == tripSegContainerNumber).FirstOrDefaultAsync();
-
             container.TripSegContainerLongitude = longitude;
             container.TripSegContainerLatitude = latitude;
 
             return await _tripSegmentContainerRepository.UpdateAsync(container);
         }
 
-
         /// <summary>
-        /// Complete a given trip
+        /// 
         /// </summary>
-        /// <param name="tripNumber"></param>
+        /// <param name="terminalId"></param>
         /// <returns></returns>
-        public async Task<int> CompleteTripAsync(string tripNumber)
+        public Task<YardModel> FindYardInfo(string terminalId)
         {
-            // @TODO : Implement remote process once it's completed
-            var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
-            trip.TripStatus = TripStatusConstants.Done;
-            return await _tripRepository.UpdateAsync(trip);
+            var yardInfo = _yardInfoRepository.AsQueryable()
+                .Where(y => y.TerminalId == terminalId).FirstOrDefaultAsync();
+            return yardInfo;
         }
 
         /// <summary>
@@ -428,69 +485,96 @@
         }
 
         /// <summary>
-        /// Complete a given leg of a trip; @TODO : This is not implemented correctly?
+        /// 
         /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <param name="tripSegNumber"></param>
+        /// <param name="tripSegment"></param>
         /// <returns></returns>
-        public async Task<int> CompleteTripSegmentAsync(string tripNumber, string tripSegNumber)
+        public async Task<int> MarkExceptionTripSegmentAsync(TripSegmentModel tripSegment)
         {
-            var tripSegment =
-                await _tripSegmentRepository.FindAsync(
-                    ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
-            tripSegment.TripSegStatus = TripSegStatusConstants.Done;
-            return await _tripSegmentRepository.UpdateAsync(tripSegment);
-        }
-
-        /// <summary>
-        /// Mark a given leg of a trip as exception; 
-        /// </summary>
-        /// <param name="tripNumber"></param>
-        /// <param name="tripSegNumber"></param>
-        /// <returns></returns>
-        public async Task<int> MarkExceptionTripSegmentAsync(string tripNumber, string tripSegNumber)
-        {
-            var tripSegment =
-                await _tripSegmentRepository.FindAsync(
-                    ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
             tripSegment.TripSegStatus = TripSegStatusConstants.Exception;
             return await _tripSegmentRepository.UpdateAsync(tripSegment);
         }
 
-        public async Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessPublicScaleAsync(
-            DriverContainerActionProcess driverContainerActionProcess)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="container"></param>
+        /// <param name="reviewReason"></param>
+        /// <returns></returns>
+        public async Task<int> MarkExceptionTripSegmentContainerAsync(TripSegmentContainerModel container, string reviewReason)
         {
-            var publicScaleProcess =
-                await _connection.GetConnection().UpdateAsync(driverContainerActionProcess, requeryUpdated: false);
-            return publicScaleProcess;
+            container.TripSegContainerReviewFlag = TripSegStatusConstants.Exception;
+            container.TripSegContainerReviewReason = reviewReason;
+            return await _tripSegmentContainerRepository.UpdateAsync(container);
+        }
+        
+        #endregion
 
+        #region Remote process calls
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tripInfoProcess"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<TripInfoProcess>> ProcessTripInfoAsync(TripInfoProcess tripInfoProcess)
+        {
+            var tripProcess =
+                await
+                    _connection.GetConnection(ConnectionType.Online).UpdateAsync(tripInfoProcess, requeryUpdated: false);
+            return tripProcess;
         }
 
-        public async Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessContainerDoneAsync(
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverSegmentDoneProcess"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverSegmentDoneProcess>> ProcessTripSegmentDoneAsync(
             DriverSegmentDoneProcess driverSegmentDoneProcess)
         {
             var containerProcess =
                 await _connection.GetConnection().UpdateAsync(driverSegmentDoneProcess, requeryUpdated: false);
             return containerProcess;
-
         }
 
-        public Task<YardModel> FindYardInfo(string terminalId)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverContainerAction"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessContainerActionAsync(
+            DriverContainerActionProcess driverContainerAction)
         {
-            var yardInfo = _yardInfoRepository.AsQueryable()
-                .Where(y => y.TerminalId == terminalId).FirstOrDefaultAsync();
-            return yardInfo;
+            var actionProcess =
+                await _connection.GetConnection().UpdateAsync(driverContainerAction, requeryUpdated: false);
+            return actionProcess;
         }
-        public async Task<int> MarkExceptionTripSegmentContainerAsync(string tripNumber, string tripSegNumber, string tripSegContainerNumber,
-            string reviewReason)
-        {
-            var tripSegmentContainer =
-                await _tripSegmentContainerRepository.FindAsync(
-                    ts => ts.TripNumber == tripNumber && ts.TripSegNumber == tripSegNumber);
-            tripSegmentContainer.TripSegContainerReviewFlag = TripSegStatusConstants.Exception;
-            tripSegmentContainer.TripSegContainerReviewReason = reviewReason;
 
-            return await _tripSegmentContainerRepository.UpdateAsync(tripSegmentContainer);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverImage"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverImageProcess>> ProcessDriverImageAsync(
+            DriverImageProcess driverImage)
+        {
+            var imageProcess = await _connection.GetConnection().UpdateAsync(driverImage, requeryUpdated: false);
+            return imageProcess;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverAck"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverTripAckProcess>> ProcessDriverTripAck(
+            DriverTripAckProcess driverAck)
+        {
+            var tripAckProcess = await _connection.GetConnection().UpdateAsync(driverAck, requeryUpdated: false);
+            return tripAckProcess;
+        }
+
+        #endregion
     }
 }

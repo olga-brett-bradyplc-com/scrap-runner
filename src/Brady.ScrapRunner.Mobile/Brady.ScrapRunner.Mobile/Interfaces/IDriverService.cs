@@ -13,13 +13,21 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
     {
         Task UpdateDriverStatus(DriverStatus driverStatus);
 
-        Task<ChangeResultWithItem<DriverEnrouteProcess>> SetDriverEnrouteRemoteAsync(DriverEnrouteProcess driverEnrouteProcess);
+        Task UpdateDriverEmployeeRecord(EmployeeMaster employee);
 
-        Task<ChangeResultWithItem<DriverArriveProcess>> SetDriverArrivedRemoteAsync(DriverArriveProcess driverArriveProcess);
+        Task<int> UpdateDriver(DriverStatusModel driver);
 
-        Task<ChangeResultWithItem<DriverFuelEntryProcess>> SetFuelEntryRemoteAsync(DriverFuelEntryProcess driverFuelEntryProcess);
+        Task<EmployeeMaster> FindEmployeeMasterForDriverRemoteAsync(string employeeId);
 
-        Task<ChangeResultWithItem<DriverMessageProcess>> SendMessageRemoteAsync(DriverMessageProcess driverMessageEntryProcess);
+        Task<ChangeResultWithItem<DriverEnrouteProcess>> ProcessDriverEnrouteAsync(DriverEnrouteProcess driverEnrouteProcess);
+
+        Task<ChangeResultWithItem<DriverArriveProcess>> ProcessDriverArrivedAsync(DriverArriveProcess driverArriveProcess);
+
+        Task<ChangeResultWithItem<DriverDelayProcess>> ProcessDriverDelayAsync(DriverDelayProcess driverDelayProcess);
+
+        Task<ChangeResultWithItem<DriverFuelEntryProcess>> ProcessDriverFuelEntryAsync(DriverFuelEntryProcess driverFuelEntryProcess);
+
+        Task<ChangeResultWithItem<DriverMessageProcess>> ProcessDriverMessageAsync(DriverMessageProcess driverMessageEntryProcess);
 
         Task<DriverStatusModel> GetCurrentDriverStatusAsync();
     }

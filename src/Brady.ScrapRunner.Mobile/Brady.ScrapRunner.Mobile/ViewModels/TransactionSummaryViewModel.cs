@@ -23,23 +23,23 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class TransactionSummaryViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
+        private readonly IPreferenceService _preferenceService;
 
-        public TransactionSummaryViewModel(ITripService tripService)
+        public TransactionSummaryViewModel(ITripService tripService, IPreferenceService preferenceService)
         {
             _tripService = tripService;
+            _preferenceService = preferenceService;
             Title = AppResources.Transactions;
         }
 
-        // Initialize parameter passed from Route Detail Screen
         public void Init(string tripNumber, string methodOfEntry)
         {
             TripNumber = tripNumber;
             MethodOfEntry = methodOfEntry;
-            SubTitle = AppResources.Trip + $" {TripNumber}";
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
             //SelectNextTransactionCommand = new MvxCommand(ExecuteSelectNextTransactionCommand);
         }
 
-        // Grab all relevant data
         public override async void Start()
         {
             FinishLabel = AppResources.FinishLabel;
@@ -47,7 +47,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
-            foreach (var tsm in segments)
+            /*
+                A trip leg can contain, for example, trip segments of DE, PF and SC. We don't want to
+                process the SC containers on this screen, but navigate them to the scale screens after
+                they're done with the DE/PF containers
+            */
+            foreach (var tsm in segments.Where(s => !_tripService.IsTripLegScale(s)))
             {
                 var containers =
                     await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
@@ -55,18 +60,23 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 Containers.Add(grouping);
             }
 
+            // Set the very first trip segment container as the default current transaction
             if (Containers.Any())
-            {
-                // Set the very first trip segment container as the default current transaction
                 CurrentTransaction = Containers.FirstOrDefault().FirstOrDefault();
-            }
 
-            MenuFilter = MenuFilterEnum.OnTrip; // Make sure we reset in case coming back from transaction detail
+            // Is the user allowed to add a rt/rn segment? RT/RN must not exist as last segment
+            var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
+            var doesRtnSegExistAtEnd = tripSegments.All(sg => sg.TripSegType != BasicTripTypeConstants.ReturnYard && sg.TripSegType != BasicTripTypeConstants.ReturnYardNC);
+            // User preference DEFAllowAddRT must be set to 'Y'
+            var defAllowAddRt = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAllowAddRT);
+
+            AllowRtnAdd = doesRtnSegExistAtEnd && Constants.Yes.Equals(defAllowAddRt);
+
+            MenuFilter = MenuFilterEnum.OnTrip;
 
             base.Start();
         }
 
-        // Listview bindings
         private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
         public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
         {
@@ -74,18 +84,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _containers, value); }
         }
 
-        // Command bindings
-        private IMvxCommand _transactionSelectedCommand;
-        public IMvxCommand TransactionSelectedCommand => _transactionSelectedCommand ?? (_transactionSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteTransactionSelectedCommand));
-
-        private IMvxAsyncCommand _transactionScannedCommandAsync;
-        public IMvxAsyncCommand TransactionScannedCommandAsync => _transactionScannedCommandAsync ?? (_transactionScannedCommandAsync = new MvxAsyncCommand<string>(ExecuteTransactionScannedCommandAsync));
-        //public IMvxCommand SelectNextTransactionCommand { get; private set; }
-
-        private IMvxCommand _confirmationSelectedCommand;
-        public IMvxCommand ConfirmationSelectedCommand => _confirmationSelectedCommand ?? (_confirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand, CanExecuteConfirmationSelectedCommand));
-
-        // Field bindings
         private TripSegmentContainerModel _currentTransaction;
         public TripSegmentContainerModel CurrentTransaction
         {
@@ -93,9 +91,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set
             {
                 SetProperty(ref _currentTransaction, value);
-                // Used for scanning and when to determine whether we can go to signature page
                 ConfirmationSelectedCommand.RaiseCanExecuteChanged();
             }
+        }
+
+        private bool? _allowRtnAdd;
+        public bool? AllowRtnAdd
+        {
+            get { return _allowRtnAdd; }
+            set { SetProperty(ref _allowRtnAdd, value); }
         }
 
         private string _tripNumber;
@@ -118,29 +122,40 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _finishLabel; }
             set { SetProperty(ref _finishLabel, value); }
         }
-        private string _methodOfEntry;
 
+        private string _methodOfEntry;
         public string MethodOfEntry
         {
             get { return _methodOfEntry; }
             set { SetProperty(ref _methodOfEntry, value); }
         }
 
-        // Command impl
+        private IMvxCommand _transactionSelectedCommand;
+        public IMvxCommand TransactionSelectedCommand => _transactionSelectedCommand ?? (_transactionSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteTransactionSelectedCommand));
+
+        private IMvxAsyncCommand _transactionScannedCommandAsync;
+        public IMvxAsyncCommand TransactionScannedCommandAsync => _transactionScannedCommandAsync ?? (_transactionScannedCommandAsync = new MvxAsyncCommand<string>(ExecuteTransactionScannedCommandAsync));
+        //public IMvxCommand SelectNextTransactionCommand { get; private set; }
+
+        private IMvxCommand _confirmationSelectedCommand;
+        public IMvxCommand ConfirmationSelectedCommand => _confirmationSelectedCommand ?? (_confirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand, CanExecuteConfirmationSelectedCommand));
+
+        private IMvxCommand _addRtnYardCommand;
+        public IMvxCommand AddRtnYardCommand => _addRtnYardCommand ?? (_addRtnYardCommand = new MvxCommand(ExecuteAddRtnYardCommand));
+
+        private void ExecuteAddRtnYardCommand()
+        {
+            ShowViewModel<ModifyReturnToYardViewModel>(
+                new { changeType = TerminalChangeEnum.Add, tripNumber = TripNumber });
+        }
+
         private async Task ExecuteTransactionScannedCommandAsync(string scannedNumber)
         {
             foreach (var currentTripSeg in Containers.Select(container2 => container2.FirstOrDefault(tscm => tscm.TripSegContainerNumber == scannedNumber && string.IsNullOrEmpty(tscm.TripSegContainerComplete))))
-            {
                 CurrentTransaction = currentTripSeg ?? CurrentTransaction;
-            }
 
             if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
                 CurrentTransaction.TripSegContainerNumber = scannedNumber;
-
-            await
-                _tripService.ProcessTripSegmentContainerAsync(CurrentTransaction.TripNumber,
-                    CurrentTransaction.TripSegNumber, CurrentTransaction.TripSegContainerSeqNumber,
-                    CurrentTransaction.TripSegContainerNumber, true);
 
             // Update local copy of container list
             var container = await _tripService.FindTripSegmentContainer(CurrentTransaction.TripNumber,
@@ -161,40 +176,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        private async void ExecuteTransactionSelectedCommand(TripSegmentContainerModel tripContainer)
+        private void ExecuteTransactionSelectedCommand(TripSegmentContainerModel tripContainer)
         {
-            //for Scale leg we should show Public Scale screen not the Container screen data entry
-            var segment = await _tripService.FindTripSegmentInfoAsync(TripNumber, tripContainer.TripSegNumber);
-
-            //TODO testing: pending on saving entered Container Number in the previous leg
-            if (segment != null && segment.TripSegType == BasicTripTypeConstants.Scale)
-            {
-                //for testing
-                //tripContainer.TripSegContainerNumber and tripContainer.MethodOfEntry should be saved from previous segment PF
-                //tripContainer.TripSegContainerNumber = tripContainer.TripSegContainerNumber ?? "161S10";
-
-                ShowViewModel<PublicScaleDetailViewModel>(
+            ShowViewModel<TransactionDetailViewModel>(
                 new
                 {
                     tripNumber = tripContainer.TripNumber,
                     tripSegmentNumber = tripContainer.TripSegNumber,
                     tripSegmentSeqNo = tripContainer.TripSegContainerSeqNumber,
-                    tripSegContainerNumber = tripContainer.TripSegContainerNumber,
-                    methodOfEntry = MethodOfEntry
+                    methodOfEntry = TripMethodOfCompletionConstants.Manual
                 });
-            }
-            else
-            {
-                MethodOfEntry = TripMethodOfCompletionConstants.Manual;
-                ShowViewModel<TransactionDetailViewModel>(
-                    new
-                    {
-                        tripNumber = tripContainer.TripNumber,
-                        tripSegmentNumber = tripContainer.TripSegNumber,
-                        tripSegmentSeqNo = tripContainer.TripSegContainerSeqNumber,
-                        methodOfEntry = MethodOfEntry
-                    });
-            }
         }
 
         private void ExecuteConfirmationSelectedCommand()
@@ -205,7 +196,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private bool CanExecuteConfirmationSelectedCommand()
         {
-            return Containers.All(container => !container.All(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)));
+            return Containers.All(container => !container.All(tscm => string.IsNullOrEmpty(tscm.TripSegContainerReviewFlag)));
         }
 
         private void UpdateLocalContainers(TripSegmentContainerModel tripContainer)

@@ -414,7 +414,7 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <comment>NEEDS TRANSLATION; Transaction Detail View</comment>
   </data>
   <data name="Photos" xml:space="preserve">
-    <value>Photos</value>
+    <value>Photos ( Spanish )</value>
     <comment>NEEDS TRANSLATION; PhotosViewModel</comment>
   </data>
   <data name="BackOnDuty" xml:space="preserve">
@@ -428,5 +428,77 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
   <data name="Signature" xml:space="preserve">
     <value>Signature</value>
     <comment>Transaction Summary</comment>
+  </data>
+  <data name="ReturnToYardAdd" xml:space="preserve">
+    <value>Add Return To Yard (Spanish)</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="ReturnToYardEdit" xml:space="preserve">
+    <value>Edit Return To Yard (Spanish)</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="Delay" xml:space="preserve">
+    <value>Delay (Spanish)</value>
+    <comment>NEEDS TRANSLATION; DelayViewModel</comment>
+  </data>
+  <data name="ConfirmBackOnDuty" xml:space="preserve">
+    <value>Are you back on duty? (Spanish)</value>
+    <comment>NEEDS TRANSLATION; DelayViewModel</comment>
+  </data>
+  <data name="ConfirmReturnToYardAdd" xml:space="preserve">
+    <value>You are about to add the following terminal as a Return To Yard segment :{0}{2}{1}{3}{1}{4}{0}Are you sure you want to add this? ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="ConfirmReturnToYardEdit" xml:space="preserve">
+    <value>You are about to change the Return To Yard Segment from :{0}{2}{1}{3}{1}{4}{0}To:{0}{5}{1}{6}{1}{7}{0}Are you sure you want to change this? ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="SelectYard" xml:space="preserve">
+    <value>Select A Yard ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="ConfirmLabel" xml:space="preserve">
+    <value>Confirm (Spanish)</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+  </data>
+  <data name="PerformActionLabel" xml:space="preserve">
+    <value>Performing this action will complete this trip. {0} Are you sure you want to do this? ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; TransactionConfirmationViewModel</comment>
+  </data>
+  <data name="NewSegmentCreated" xml:space="preserve">
+    <value>New Segment Successfully Created ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardFragment</comment>
+  </data>
+  <data name="SegmentUpdated" xml:space="preserve">
+    <value>Trip Segment Successfully Updated! ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; ModifyReturnToYardFragment</comment>
+  </data>
+  <data name="ContainerComplete" xml:space="preserve">
+    <value>Container Complete ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
+  </data>
+  <data name="MarkContainerComplete" xml:space="preserve">
+    <value>Mark this container as complete? ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
+  </data>
+  <data name="SelectException" xml:space="preserve">
+    <value>Select Exception Code ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
+  </data>
+  <data name="SelectDelay" xml:space="preserve">
+    <value>Select Delay Reason ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
+  </data>
+  <data name="SelectUser" xml:space="preserve">
+    <value>Select User To Message ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
+  </data>
+  <data name="NoUsers" xml:space="preserve">
+    <value>No users found to message ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
+  </data>
+  <data name="SignAndPrint" xml:space="preserve">
+    <value>You must sign and print your name ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; TransactionConfirmationViewModel</comment>
   </data>
 </root>

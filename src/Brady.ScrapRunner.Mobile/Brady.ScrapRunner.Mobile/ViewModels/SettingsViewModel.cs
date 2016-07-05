@@ -1,6 +1,8 @@
 ﻿using System.Windows.Input;
+using Brady.ScrapRunner.Mobile.Helpers;
 using MvvmCross.Localization;
 using Brady.ScrapRunner.Mobile.Resources;
+using Plugin.Settings.Abstractions;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {

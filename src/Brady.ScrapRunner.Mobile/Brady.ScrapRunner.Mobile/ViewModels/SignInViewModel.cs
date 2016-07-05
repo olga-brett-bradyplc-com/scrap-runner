@@ -9,11 +9,13 @@ using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Plugins.Sqlite;
 using Brady.ScrapRunner.Mobile.Resources;
 using Brady.ScrapRunner.Mobile.Services;
 using Brady.ScrapRunner.Mobile.Validators;
+using Plugin.Settings.Abstractions;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -26,6 +28,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
         private readonly IContainerService _containerService;
         private readonly ICodeTableService _codeTableService;
+        private readonly ITerminalService _terminalService;
         private readonly IConnectionService _connection;
         private readonly IMessagesService _messagesService;
         private readonly IQueueScheduler _queueScheduler;
@@ -41,6 +44,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IDriverService driverService,
             IContainerService containerService,
             ICodeTableService codeTableService,
+            ITerminalService terminalService,
             IMessagesService messagesService,
             IConnectionService connection, 
             IQueueScheduler queueScheduler, 
@@ -54,6 +58,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _driverService = driverService;
             _containerService = containerService;
             _codeTableService = codeTableService;
+            _terminalService = terminalService;
             _messagesService = messagesService;
 
             _connection = connection;
@@ -163,8 +168,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 // Delete/Create necesscary SQLite tables
                 await _dbService.RefreshAll();
-
-                // Check username/password against BWF, and create session if valid
                 IClientSettings clientSettings = new DemoClientSettings();
                 _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
                     clientSettings.UserName, clientSettings.Password, "ScrapRunner");
@@ -172,6 +175,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _queueScheduler.Unschedule();
                 _locationService.Stop();
                 _locationOdometerService.Stop();
+
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
                 // have a need for a login service, leaving this as it is.
                 var loginProcess = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(
@@ -181,7 +185,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         PowerId = TruckId,
                         Odometer = Odometer,
                         LocaleCode = 1033,
-                        OverrideFlag = "N",
+                        OverrideFlag = Constants.No,
                         Mdtid = "Phone",
                         LoginDateTime = DateTime.Now
                     }, requeryUpdated: false);
@@ -189,7 +193,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (loginProcess.WasSuccessful)
                 {
                     await _containerService.UpdateContainerMaster(loginProcess.Item.ContainersOnPowerId);
-
+                    await _messagesService.UpdateApprovedUsersForMessaging(loginProcess.Item.UsersForMessaging);
                     await _driverService.UpdateDriverStatus(new DriverStatus
                     {
                         EmployeeId = loginProcess.Item.EmployeeId,
@@ -205,6 +209,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         LoginProcessedDateTime = loginProcess.Item.LoginDateTime,
                         DriverLCID = loginProcess.Item.LocaleCode
                     });
+
+                    // Get the EmployeeMaster record for the current driver and update local DB
+                    var driverEmployeeRecord =
+                        await _driverService.FindEmployeeMasterForDriverRemoteAsync(loginProcess.Item.EmployeeId);
+                    await _driverService.UpdateDriverEmployeeRecord(driverEmployeeRecord);
                 }
                 else
                 {
@@ -215,11 +224,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 loginData.Title = AppResources.LoadingPreferences;
 
-                var preferenceObj = new PreferencesProcess
-                {
-                    EmployeeId = UserName
-                };
-
+                // Retrieve preferences from remote server and populate local DB
+                var preferenceObj = new PreferencesProcess { EmployeeId = UserName };
                 var preferenceProcess = await _preferenceService.FindPreferencesRemoteAsync(new PreferencesProcess { EmployeeId = UserName });
 
                 if (preferenceProcess.WasSuccessful)
@@ -233,6 +239,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
+                // Retrieve code table info from remote server and populate local DB
                 var codesTable = await _codeTableService.FindCodesRemoteAsync(new CodeTableProcess { EmployeeId = UserName });
 
                 if (codesTable.WasSuccessful)
@@ -246,7 +253,52 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return false;
                 }
 
-                var messagesTable = await _messagesService.FindMsgsRemoteAsync(new DriverMessageProcess { EmployeeId = UserName });
+                // If there's no last updated for container settings, manually refresh the containers
+                if (PhoneSettings.ContainerSettings == null)
+                    await _dbService.RefreshTable<ContainerChangeModel>();
+
+                // Retrieve container info from remote server and populate local DB
+                var containerChanges =
+                    await _containerService.ProcessContainerChangeAsync(new ContainerChangeProcess
+                    {
+                        EmployeeId = UserName,
+                        LastContainerMasterUpdate = PhoneSettings.ContainerSettings.HasValue ? PhoneSettings.ContainerSettings.Value.ToLocalTime() : (DateTime?) null
+                    });
+
+                if (containerChanges.WasSuccessful)
+                {
+                    PhoneSettings.ContainerSettings = DateTime.Now;
+                    if (containerChanges.Item?.Containers?.Count > 0)
+                        await _containerService.UpdateContainerChange(containerChanges.Item.Containers);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(containerChanges.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
+
+                // Retrieve terminal change info and populate local DB
+                var terminalChanges =
+                    await _terminalService.FindTerminalChangesRemoteAsync(new TerminalChangeProcess
+                    {
+                        EmployeeId = UserName,
+                        TerminalId = loginProcess.Item.TermId
+                    });
+
+                if (terminalChanges.WasSuccessful)
+                {
+                    if (terminalChanges.Item?.Terminals?.Count > 0)
+                        await _terminalService.UpdateTerminalChange(terminalChanges.Item.Terminals);
+                }
+                else
+                {
+                    await UserDialogs.Instance.AlertAsync(terminalChanges.Failure.Summary,
+                        AppResources.Error, AppResources.OK);
+                    return false;
+                }
+
+                var messagesTable = await _messagesService.ProcessDriverMessagesAsync(new DriverMessageProcess { EmployeeId = UserName });
 
                 if (messagesTable.WasSuccessful)
                 {
@@ -262,7 +314,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 loginData.Title = AppResources.LoadingTripInformation;
 
-                var tripProcess = await _tripService.FindTripsRemoteAsync(new TripInfoProcess
+                var tripProcess = await _tripService.ProcessTripInfoAsync(new TripInfoProcess
                 {
                     EmployeeId = UserName
                 });
@@ -270,9 +322,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (tripProcess.WasSuccessful)
                 {
                     // @TODO : Should we throw an error/alert dialog to the end user if any of these fail?
-
-                    if( tripProcess.Item?.Trips?.Count > 0 )
+                    if (tripProcess.Item?.Trips?.Count > 0)
+                    {
                         await _tripService.UpdateTrips(tripProcess.Item.Trips);
+
+                        // Acknowledge each trip
+                        foreach (var trip in tripProcess.Item.Trips)
+                        {
+                            var tripAck = await _tripService.ProcessDriverTripAck(new DriverTripAckProcess
+                            {
+                                EmployeeId = UserName,
+                                TripNumber = trip.TripNumber,
+                                ActionDateTime = DateTime.Now,
+                                Mdtid = UserName
+                            });
+
+                            if (!tripAck.WasSuccessful)
+                                UserDialogs.Instance.Alert(tripAck.Failure.Summary, AppResources.Error);
+                        }
+                    }
 
                     if(tripProcess.Item?.TripSegments?.Count > 0)
                         await _tripService.UpdateTripSegments(tripProcess.Item.TripSegments);

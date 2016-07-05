@@ -357,6 +357,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Membership\PasswordHasher.cs" />
     <Compile Include="Membership\ScrapRunMembershipProvider.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

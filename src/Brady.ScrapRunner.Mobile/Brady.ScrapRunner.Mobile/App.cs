@@ -1,9 +1,12 @@
+using System;
 using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Resources;
 using Microsoft.VisualBasic;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Platform;
 using MvvmCross.Platform.IoC;
+using Plugin.Settings.Abstractions;
 using static MvvmCross.Platform.Mvx;
 
 namespace Brady.ScrapRunner.Mobile
@@ -56,6 +59,10 @@ namespace Brady.ScrapRunner.Mobile
                 SqliteRepository<QueueItemModel>>();
             Mvx.RegisterType<IRepository<YardModel>,
                 SqliteRepository<YardModel>>();
+            Mvx.RegisterType<IRepository<TerminalChangeModel>, 
+                SqliteRepository<TerminalChangeModel>>();
+            Mvx.RegisterType<IRepository<ContainerChangeModel>,
+                SqliteRepository<ContainerChangeModel>>();
 
 
             Mapper.Initialize(cfg =>

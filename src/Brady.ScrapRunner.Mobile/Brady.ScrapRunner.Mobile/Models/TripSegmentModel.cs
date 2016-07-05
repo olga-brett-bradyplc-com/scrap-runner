@@ -51,5 +51,8 @@
         public int? TripSegStartLatitude { get; set; }
         public int? TripSegEndLatitude { get; set; }
         public int? TripSegContainerQty { get; set; }
+
+        [Ignore]
+        public string DestCustCityStateZip => $"{TripSegDestCustCity}, {TripSegDestCustState} {TripSegDestCustZip}";
     }
 }

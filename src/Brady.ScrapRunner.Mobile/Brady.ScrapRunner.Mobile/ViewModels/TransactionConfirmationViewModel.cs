@@ -1,7 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
@@ -13,21 +16,26 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class TransactionConfirmationViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
+        private readonly IDriverService _driverService;
+        private readonly ICodeTableService _codeTableService;
 
-        public TransactionConfirmationViewModel(ITripService tripService)
+        public TransactionConfirmationViewModel(ITripService tripService, IDriverService driverService, ICodeTableService codeTableService)
         {
             _tripService = tripService;
+            _driverService = driverService;
+            _codeTableService = codeTableService;
             Title = AppResources.SignatureReceipt;
         }
 
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
-            SubTitle = AppResources.Trip + $" {tripNumber}";
+            SubTitle = $"{AppResources.Trip} {tripNumber}";
         }
 
         public override async void Start()
         {
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
             var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
@@ -64,6 +72,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
+        private DriverStatusModel _currentDriver;
+        public DriverStatusModel CurrentDriver
+        {
+            get { return _currentDriver; }
+            set { SetProperty(ref _currentDriver, value); }
+        }
+
         // Listview bindings
         private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
         public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
@@ -74,31 +89,129 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         // Command bindings
         private IMvxAsyncCommand _confirmTransactionsCommand;
-        public IMvxAsyncCommand ConfirmTransactionsCommand => _confirmTransactionsCommand ?? (_confirmTransactionsCommand = new MvxAsyncCommand(ExecuteConfirmTransactionsCommandAsync, CanExecuteConfirmTransactionsCommandAsync));
+        public IMvxAsyncCommand ConfirmTransactionsCommand => _confirmTransactionsCommand ?? (_confirmTransactionsCommand = new MvxAsyncCommand<byte[]>(ExecuteConfirmTransactionsCommandAsync, CanExecuteConfirmTransactionsCommandAsync));
 
         // Command Impl
-        private async Task ExecuteConfirmTransactionsCommandAsync()
+        private async Task ExecuteConfirmTransactionsCommandAsync(byte[] image)
         {
-            using (var completeTripSegment = UserDialogs.Instance.Loading("Completing Trip Segment", maskType: MaskType.Clear))
+            // Check to see if this is the last leg of the trip, and if so, warn them.
+            // We can't use FindNextTripSegment like we normally do because we haven't
+            // marked the segment as complete yet.
+            var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
+            var lastSegment = tripSegments.Last();
+
+            if (Containers.Any(ts => ts.Key.TripSegNumber == lastSegment.TripSegNumber))
             {
-                foreach (var grouping in Containers)
+                var message = string.Format(AppResources.PerformActionLabel, "\n\n");
+                var confirm =
+                    await
+                        UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes,
+                            AppResources.No);
+                if (confirm)
+                    await FinishTripLeg(image);
+            }
+            else
+            {
+                await FinishTripLeg(image);
+            }
+        }
+
+        private async Task FinishTripLeg(byte[] image)
+        {
+
+            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Clear))
+            {
+                foreach (var segment in Containers)
                 {
-                    await _tripService.CompleteTripSegmentAsync(TripNumber, grouping.Key.TripSegNumber);
+                    foreach (var container in segment)
+                    {
+                        var reviewReason = (!string.IsNullOrEmpty(container.TripSegContainerReviewReason))
+                            ? await
+                                _codeTableService.FindCodeTableObject(CodeTableNameConstants.ExceptionCodes,
+                                    container.TripSegContainerReviewReason)
+                            : null;
+
+                        var containerAction =
+                        await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                        {
+                            EmployeeId = CurrentDriver.EmployeeId,
+                            PowerId = CurrentDriver.PowerId,
+                            ActionType = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? ContainerActionTypeConstants.Exception : ContainerActionTypeConstants.Done,
+                            ActionCode = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? container.TripSegContainerReviewReason : null,
+                            ActionDesc = reviewReason?.CodeDisp1,
+                            ActionDateTime = DateTime.Now,
+                            MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                            TripNumber = TripNumber,
+                            TripSegNumber = container.TripSegNumber,
+                            ContainerNumber = container.TripSegContainerNumber,
+                            ContainerLevel = container.TripSegContainerLevel
+                        });
+
+                        if (containerAction.WasSuccessful) continue;
+
+                        UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                        return;
+                    }
+
+                    var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                    {
+                        EmployeeId = CurrentDriver.EmployeeId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = segment.Key.TripSegNumber,
+                        ActionType = TripSegmentActionTypeConstants.Done,
+                        ActionDateTime = DateTime.Now,
+                        PowerId = CurrentDriver.PowerId
+                    });
+
+                    if (tripSegmentProcess.WasSuccessful)
+                        await _tripService.CompleteTripSegmentAsync(segment.Key);
+                    else
+                        UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
                 }
+            }
+            
+            // After segment(s) have been completed, upload the signature
+            var firstSegment = Containers.FirstOrDefault().Key.TripSegNumber;
+            var imageProcess = await _tripService.ProcessDriverImageAsync(new DriverImageProcess
+            {
+                EmployeeId = CurrentDriver.EmployeeId,
+                TripNumber = TripNumber,
+                TripSegNumber = firstSegment,
+                ActionDateTime = DateTime.Now,
+                PrintedName = PrintedName,
+                ImageType = ImageTypeConstants.Signature,
+                ImageByteArray = image
+            });
+
+            if (!imageProcess.WasSuccessful)
+            {
+                UserDialogs.Instance.Alert(imageProcess.Failure.Summary, AppResources.Error);
+                return;
             }
 
             var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             Close(this);
 
             if (nextTripSegment.Any())
+            {
                 ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
+            }
             else
+            {
+                await _tripService.CompleteTripAsync(TripNumber);
                 ShowViewModel<RouteSummaryViewModel>();
+            }
         }
 
-        private bool CanExecuteConfirmTransactionsCommandAsync()
+        private bool CanExecuteConfirmTransactionsCommandAsync(byte[] image)
         {
-            return !string.IsNullOrEmpty(PrintedName);
+            if (string.IsNullOrEmpty(PrintedName) || image == null)
+            {
+                UserDialogs.Instance.Alert(AppResources.SignAndPrint, AppResources.Error);
+                return false;
+            }
+
+            return true;
         }
 
     }
