@@ -179,7 +179,30 @@
             }
         }
 
-        private Task<QueryResult<ContainerChange>> GetContainerChangesAsync(string terminalId, string regionId, DateTime modifiedAfter)
+        private Task<QueryResult<ContainerChange>> GetContainerChangesAsync(string terminalId, string regionId)
+        {
+            QueryBuilder<ContainerChange> queryBuilder;
+            if (regionId != null)
+            {
+                queryBuilder = new QueryBuilder<ContainerChange>().Filter(containerChange => containerChange
+                    .Property(x => x.RegionId).EqualTo(regionId))
+                    .OrderBy(x => x.ContainerNumber);
+            }
+            else if (terminalId != null)
+            {
+                queryBuilder = new QueryBuilder<ContainerChange>().Filter(containerChange => containerChange
+                    .Property(x => x.TerminalId).EqualTo(terminalId))
+                    .OrderBy(x => x.ContainerNumber);
+            }
+            else
+            {
+                queryBuilder = new QueryBuilder<ContainerChange>()
+                    .OrderBy(x => x.ContainerNumber);
+            }
+            return _connectionService.GetConnection(ConnectionType.Online).QueryAsync(queryBuilder);
+        }
+
+        private Task<QueryResult<ContainerChange>> GetContainerChangesAfterAsync(string terminalId, string regionId, DateTime modifiedAfter)
         {
             QueryBuilder<ContainerChange> queryBuilder;
             if (regionId != null)
@@ -208,7 +231,15 @@
         private async Task PollForContainerChangesAsync(string terminalId, string regionId)
         {
             var modifiedAfter = _settings.GetValueOrDefault(ContainerMasterSettingsKey, default(DateTime));
-            var containerChanges = await GetContainerChangesAsync(terminalId, regionId, modifiedAfter);
+            QueryResult<ContainerChange> containerChanges;
+            if (modifiedAfter == default(DateTime))
+            {
+                containerChanges = await GetContainerChangesAsync(terminalId, regionId);
+            }
+            else
+            {
+                containerChanges = await GetContainerChangesAfterAsync(terminalId, regionId, modifiedAfter);
+            }
             foreach (var container in containerChanges.Records)
             {
                 // @TODO: Update local database.
@@ -224,7 +255,34 @@
             }
         }
 
-        private async Task<QueryResult<TerminalChange>> GetTerminalChangesAsync(string areaId, string regionId, DateTime modifiedAfter, string defSendOnlyYardsForArea)
+        private async Task<QueryResult<TerminalChange>> GetTerminalChangesAsync(string areaId, string regionId, string defSendOnlyYardsForArea)
+        {
+            QueryBuilder<TerminalChange> queryBuilder;
+            if (defSendOnlyYardsForArea == Constants.Yes && areaId != null)
+            {
+                var areaMasterQueryBuilder = new QueryBuilder<AreaMaster>().Filter(y => y
+                    .Property(x => x.AreaId).EqualTo(areaId));
+                var areaMasterQuery = await _connectionService.GetConnection(ConnectionType.Online).QueryAsync(areaMasterQueryBuilder);
+                var terminalList = areaMasterQuery.Records.Select(x => x.TerminalId).ToArray();
+                queryBuilder = new QueryBuilder<TerminalChange>().Filter(terminalChange => terminalChange
+                    .Property(x => x.TerminalId).In(terminalList))
+                    .OrderBy(x => x.TerminalId);
+            }
+            else if (regionId != null)
+            {
+                queryBuilder = new QueryBuilder<TerminalChange>().Filter(terminalChange => terminalChange
+                    .Property(x => x.RegionId).EqualTo(regionId))
+                    .OrderBy(x => x.TerminalId);
+            }
+            else
+            {
+                queryBuilder = new QueryBuilder<TerminalChange>()
+                    .OrderBy(x => x.TerminalId);
+            }
+            return await _connectionService.GetConnection(ConnectionType.Online).QueryAsync(queryBuilder);
+        }
+
+        private async Task<QueryResult<TerminalChange>> GetTerminalChangesAfterAsync(string areaId, string regionId, DateTime modifiedAfter, string defSendOnlyYardsForArea)
         {
             QueryBuilder<TerminalChange> queryBuilder;
             if (defSendOnlyYardsForArea == Constants.Yes && areaId != null)
@@ -259,7 +317,15 @@
             var modifiedAfter = _settings.GetValueOrDefault(TerminalMasterSettingsKey, default(DateTime));
             // @TODO: Figure out how to get "DEFSendOnlyYardsForArea" preference from here? (It's not in the preference table)
             var defSendOnlyYardsForArea = "Y";
-            var terminalChanges = await GetTerminalChangesAsync(areaId, regionId, modifiedAfter, defSendOnlyYardsForArea);
+            QueryResult<TerminalChange> terminalChanges;
+            if (modifiedAfter == default(DateTime))
+            {
+                terminalChanges = await GetTerminalChangesAsync(areaId, regionId, defSendOnlyYardsForArea);
+            }
+            else
+            {
+                terminalChanges = await GetTerminalChangesAfterAsync(areaId, regionId, modifiedAfter, defSendOnlyYardsForArea);
+            }
             foreach (var terminalChange in terminalChanges.Records)
             {
                 // @TODO: Update local database.
