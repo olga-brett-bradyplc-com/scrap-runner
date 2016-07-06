@@ -98,28 +98,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             // We can't use FindNextTripSegment like we normally do because we haven't
             // marked the segment as complete yet.
             var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
-            var lastSegment = tripSegments.Last();
+            var lastSegment = Containers.Any(ts => ts.Key.TripSegNumber == tripSegments.Last().TripSegNumber);
 
-            if (Containers.Any(ts => ts.Key.TripSegNumber == lastSegment.TripSegNumber))
-            {
-                var message = string.Format(AppResources.PerformActionLabel, "\n\n");
-                var confirm =
-                    await
-                        UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes,
-                            AppResources.No);
-                if (confirm)
-                    await FinishTripLeg(image);
-            }
-            else
-            {
+            var message = (lastSegment) ? AppResources.PerformTripSegmentComplete + "\n\n" + AppResources.CompleteTrip : AppResources.PerformTripSegmentComplete;
+            var confirm =
+                await
+                    UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes,
+                        AppResources.No);
+            if (confirm)
                 await FinishTripLeg(image);
-            }
         }
 
         private async Task FinishTripLeg(byte[] image)
         {
 
-            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Clear))
+            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
             {
                 foreach (var segment in Containers)
                 {

@@ -27,6 +27,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         private IDisposable _containersToken;
         private IDisposable _currentStatusToken;
         private IDisposable _allowRtnEditToken;
+        private string _currentStatus;
 
         protected override int FragmentId => Resource.Layout.fragment_routedetail;
         protected override bool NavMenuEnabled => true;
@@ -40,6 +41,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             if (ViewModel.Containers != null)
                 LoadContainers(ViewModel.Containers);
+
+            if (_currentStatus != null)
+                OnCurrentStatusChanged(this, null);
 
             _allowRtnEditToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnEdit, OnAllowRtnEditChanged);
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
@@ -103,6 +107,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         private void OnCurrentStatusChanged(object sender, PropertyChangedEventArgs args)
         {
+            _currentStatus = ViewModel.CurrentStatus;
+
             var layout = View.FindViewById<TextView>(Resource.Id.TripCompanyName);
             var toolbar = View.FindViewById<Toolbar>(Resource.Id.toolbar);
 
@@ -112,7 +118,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             var buttonLayout = View.FindViewById<LinearLayout>(Resource.Id.transactionButtonLayout);
 
             // @TODO: Add animations, etc., 
-            switch (ViewModel.CurrentStatus)
+            switch (_currentStatus)
             {
                 case "EN":
                     layout.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
@@ -139,6 +145,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                         Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
                     }
 
+                    enrouteButton.Visibility = ViewStates.Invisible;
                     arriveButton.Visibility = ViewStates.Invisible;
                     directionsButton.SetX(directionsButton.GetX() + 135);
                     buttonLayout.Visibility = ViewStates.Visible;

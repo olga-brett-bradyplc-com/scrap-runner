@@ -14,8 +14,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
     {
         Task UpdateContainerMaster(List<ContainerMaster> containerMaster);
 
-        Task UpdateContainerChange(List<ContainerChange> containerChange);
-
         Task UpdateContainerChangeIntoMaster(List<ContainerChange> containerChange);
 
         Task<List<ContainerMasterModel>> FindPowerIdContainersAsync(string powerId);

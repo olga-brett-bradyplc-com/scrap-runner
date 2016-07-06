@@ -16,13 +16,11 @@ namespace Brady.ScrapRunner.Mobile.Services
     {
         private readonly IConnectionService _connection;
         private readonly IRepository<ContainerMasterModel> _containerMasterRepository;
-        private readonly IRepository<ContainerChangeModel> _containerChangeRepository; 
 
-        public ContainerService(IConnectionService connection, IRepository<ContainerMasterModel> containerMasterRepository, IRepository<ContainerChangeModel> containerChangeRepository)
+        public ContainerService(IConnectionService connection, IRepository<ContainerMasterModel> containerMasterRepository)
         {
             _connection = connection;
             _containerMasterRepository = containerMasterRepository;
-            _containerChangeRepository = containerChangeRepository;
         }
 
         /// <summary>
@@ -34,17 +32,6 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var mapped = AutoMapper.Mapper.Map<List<ContainerMaster>, List<ContainerMasterModel>>(containerMaster);
             return _containerMasterRepository.UpdateRangeAsync(mapped);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="containerChange"></param>
-        /// <returns></returns>
-        public Task UpdateContainerChange(List<ContainerChange> containerChange)
-        {
-            var mapped = AutoMapper.Mapper.Map<List<ContainerChange>, List<ContainerChangeModel>>(containerChange);
-            return _containerChangeRepository.InsertOrReplaceRangeAsync(mapped);
         }
 
         /// <summary>

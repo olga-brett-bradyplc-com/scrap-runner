@@ -258,10 +258,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 
                 // If there's no last updated for container settings, manually refresh the containers
                 if (PhoneSettings.ContainerSettings == null)
-                {
-                    await _dbService.RefreshTable<ContainerChangeModel>();
                     await _dbService.RefreshTable<ContainerMasterModel>();
-                }
 
                 // Retrieve container info from remote server and populate local DB
                 var containerChanges =

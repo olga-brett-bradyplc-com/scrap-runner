@@ -245,6 +245,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     CurrentDriver.TripNumber = TripNumber;
                     CurrentDriver.TripSegNumber = Containers.FirstOrDefault().Key.TripSegNumber;
+                    CurrentDriver.Status = DriverStatusSRConstants.Enroute;
                     await _driverService.UpdateDriver(CurrentDriver);
 
                     CurrentStatus = DriverStatusConstants.Enroute;
@@ -264,7 +265,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmArrivalTitle);
             if (confirm)
             {
-                using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
+                using (var loading = UserDialogs.Instance.Loading(AppResources.Loading, maskType: MaskType.Black))
                 {
                     var setDriverArrived = await _driverService.ProcessDriverArrivedAsync(new DriverArriveProcess
                     {
@@ -279,6 +280,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     if (setDriverArrived.WasSuccessful)
                     {
                         CurrentStatus = DriverStatusConstants.Arrive;
+
+                        CurrentDriver.Status = DriverStatusSRConstants.Arrive;
+                        await _driverService.UpdateDriver(CurrentDriver);
 
                         //TODO: GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
                         var tripInfo = await _tripService.FindTripAsync(TripNumber);
@@ -345,7 +349,44 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (confirm)
                 {
                     foreach (var segment in Containers)
-                        await _tripService.CompleteTripSegmentAsync(segment.Key);
+                    {
+                        foreach (var container in segment)
+                        {
+                            var containerAction =
+                                await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                                {
+                                    EmployeeId = CurrentDriver.EmployeeId,
+                                    PowerId = CurrentDriver.PowerId,
+                                    ActionType = ContainerActionTypeConstants.Done,
+                                    ActionDateTime = DateTime.Now,
+                                    MethodOfEntry = TripMethodOfCompletionConstants.Driver,
+                                    TripNumber = TripNumber,
+                                    TripSegNumber = container.TripSegNumber,
+                                    ContainerNumber = container.TripSegContainerNumber,
+                                    ContainerLevel = container.TripSegContainerLevel
+                                });
+
+                            if (containerAction.WasSuccessful) continue;
+
+                            UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                            return;
+                        }
+
+                        var tripSegmentProcess =
+                            await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                            {
+                                EmployeeId = CurrentDriver.EmployeeId,
+                                TripNumber = TripNumber,
+                                ActionType = TripSegmentActionTypeConstants.Done,
+                                ActionDateTime = DateTime.Now,
+                                PowerId = CurrentDriver.PowerId
+                            });
+
+                        if (tripSegmentProcess.WasSuccessful)
+                            await _tripService.CompleteTripSegmentAsync(segment.Key);
+                        else
+                            UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
+                    }
 
                     await _tripService.CompleteTripAsync(TripNumber);
 
