@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/state_name"
+        style="@style/ScrapRunnerTheme.SpinnerSelection"
+        local:MvxBind="Text Format('{0}-{1}',CodeDisp1, CodeDisp2)" />
+</RelativeLayout>

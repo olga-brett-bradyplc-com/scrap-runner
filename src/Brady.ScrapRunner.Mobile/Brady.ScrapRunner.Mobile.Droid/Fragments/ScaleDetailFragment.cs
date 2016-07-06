@@ -41,21 +41,29 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         public override void OnDestroyView()
         {
-            if (_containersToken == null) return;
-            _containersToken.Dispose();
-            _containersToken = null;
+            if (_containersToken != null)
+            {
+                _containersToken.Dispose();
+                _containersToken = null;
+            }
 
-            if (_grossTimeToken == null) return;
-            _grossTimeToken.Dispose();
-            _grossTimeToken = null;
+            if (_grossTimeToken != null)
+            {
+                _grossTimeToken.Dispose();
+                _grossTimeToken = null;
+            }
 
-            if (_tareTimeToken == null) return;
-            _tareTimeToken.Dispose();
-            _tareTimeToken = null;
+            if (_tareTimeToken != null)
+            {
+                _tareTimeToken.Dispose();
+                _tareTimeToken = null;
+            }
 
-            if (_secondGrossTimeToken == null) return;
-            _secondGrossTimeToken.Dispose();
-            _secondGrossTimeToken = null;
+            if (_secondGrossTimeToken != null)
+            {
+                _secondGrossTimeToken.Dispose();
+                _secondGrossTimeToken = null;
+            }
 
             base.OnDestroyView();
         }

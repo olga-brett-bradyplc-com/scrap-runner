@@ -16,6 +16,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task UpdateDriverEmployeeRecord(EmployeeMaster employee);
 
         Task<int> UpdateDriver(DriverStatusModel driver);
+        
+        Task<DriverStatusModel> GetCurrentDriverStatusAsync();
 
         Task<EmployeeMaster> FindEmployeeMasterForDriverRemoteAsync(string employeeId);
 
@@ -29,6 +31,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<ChangeResultWithItem<DriverMessageProcess>> ProcessDriverMessageAsync(DriverMessageProcess driverMessageEntryProcess);
 
-        Task<DriverStatusModel> GetCurrentDriverStatusAsync();
+        Task<ChangeResultWithItem<DriverOdomUpdateProcess>> ProcessDriverOdomUpdateAsync(DriverOdomUpdateProcess driverOdomUpdateProcess);
     }
 }

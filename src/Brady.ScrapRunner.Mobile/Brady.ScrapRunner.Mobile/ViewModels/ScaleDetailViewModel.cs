@@ -194,7 +194,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 // Show review exception dialog if gross time isn't set
                 var reasonDialogAsync = (!GrossTime.HasValue)
                     ? await
-                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, AppResources.Cancel, "",
+                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, AppResources.Cancel, "", null,
                             reasons.Select(ct => ct.CodeDisp1).ToArray())
                     : "";
 

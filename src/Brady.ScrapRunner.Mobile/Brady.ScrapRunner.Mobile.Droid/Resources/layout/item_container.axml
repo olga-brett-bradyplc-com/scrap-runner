@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_margin_half"
-            local:MvxBind="Text Format('{0}-{1}', ContainerMasterItem.ContainerNumber, ContainerMasterItem.ContainerCustHostCode)"
+            local:MvxBind="Text ContainerMasterItem.ContainerNumber"
             android:textColor="#000000"
             android:textSize="17dp"
             android:textStyle="bold"
@@ -42,11 +42,14 @@
         android:layout_width="95dp"
         android:layout_alignParentRight="true"
         android:visibility="gone">
-        <ImageButton
+        <Button
             android:id="@+id/ContainerImageButtonDrop"
             android:layout_height="95dp"
             android:layout_width="95dp"
-            android:src="@drawable/ic_delete_sweep_white_36dp"
+            android:text="Drop"
+            android:textColor="#fff"
+            android:drawableTop="@drawable/ic_delete_sweep_white_36dp"
+            android:paddingTop="25dp"
             android:background="#ec0707"
             local:MvxBind="Click DropContainerCommand" />
     </RelativeLayout>

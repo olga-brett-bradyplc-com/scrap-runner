@@ -501,4 +501,82 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>You must sign and print your name ( Spanish )</value>
     <comment>NEEDS TRANSLATION; TransactionConfirmationViewModel</comment>
   </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>Language( Spanish )</value>
+    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+  </data>
+  <data name="NoServerEndpoint" xml:space="preserve">
+    <value>No Server Endpoint Set ( Spanish )</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
+  <data name="NoServerSummary" xml:space="preserve">
+    <value>Please go to the settings menu and set a server endpoint ( Spanish )</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Select Language ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+  </data>
+  <data name="ServerInput" xml:space="preserve">
+    <value>Enter the server endpoint address( Spanish )</value>
+    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+  </data>
+  <data name="ServerLabel" xml:space="preserve">
+    <value>Server Endpoint( Spanish )</value>
+    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+  </data>
+  <data name="LoadDropContainer" xml:space="preserve">
+    <value>Load/Drop Containers ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; LoadDropContainerViewModel</comment>
+  </data>
+  <data name="AddContainer" xml:space="preserve">
+    <value>Add Container ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+  </data>
+  <data name="ContainerNotFound" xml:space="preserve">
+    <value>Container {0} not found in ContainerMaster ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+  </data>
+  <data name="ContainerNumber" xml:space="preserve">
+    <value>Container # ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+  </data>
+  <data name="ContainerTitle" xml:space="preserve">
+    <value>Container #{0} ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; ContainerDetailViewModel</comment>
+  </data>
+  <data name="DroppingContainer" xml:space="preserve">
+    <value>Dropping Container ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+  </data>
+  <data name="EnterContainerNumber" xml:space="preserve">
+    <value>Enter the container number you wish to add ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+  </data>
+  <data name="LoadingContainer" xml:space="preserve">
+    <value>Loading Container ( Spanish )</value>
+    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+  </data>
+  <data name="AddingContainer" xml:space="preserve">
+    <value>Adding Container ( Spanish )</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
+  <data name="AddNewContainer" xml:space="preserve">
+    <value>Add New Container ( Spanish )</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
+  <data name="ContainerLoaded" xml:space="preserve">
+    <value>Container {0} has already been loaded ( Spanish )</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading ( Spanish )</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
+  <data name="EnterOdometer" xml:space="preserve">
+    <value>Enter the corrected odometer reading</value>
+  </data>
+  <data name="PerformTripSegmentComplete" xml:space="preserve">
+    <value>Are you sure you want to complete this leg of the trip?</value>
+  </data>
 </root>

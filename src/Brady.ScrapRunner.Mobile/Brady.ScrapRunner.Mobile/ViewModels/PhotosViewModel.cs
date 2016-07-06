@@ -76,7 +76,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public ObservableCollection<string> Images
         {
             get { return _images; }
-            set { SetProperty(ref _images, value); }
+            set
+            {
+                SetProperty(ref _images, value);
+                SendPhotosCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private DriverStatusModel _currentDriver;
@@ -111,7 +115,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteSendPhotosCommand()
         {
-            using (var loading = UserDialogs.Instance.Loading("Loading ...", maskType: MaskType.Black))
+            using (var loading = UserDialogs.Instance.Loading(AppResources.Loading, maskType: MaskType.Black))
             {
                 var fileList = _fileStore.GetFilesIn(MobileConstants.ImagesDirectory);
                 foreach (var file in fileList)

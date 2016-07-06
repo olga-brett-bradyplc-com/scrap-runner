@@ -5,9 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
+using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
@@ -16,19 +19,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         private readonly IContainerService _containerService;
         private readonly ICodeTableService _codeTableService;
+        private readonly IDriverService _driverService;
 
-        public NbScanViewModel(IContainerService containerService, ICodeTableService codeTableService)
+        public NbScanViewModel(IContainerService containerService, ICodeTableService codeTableService, IDriverService driverService)
         {
             _containerService = containerService;
             _codeTableService = codeTableService;
-            Title = "Add New Container";
+            _driverService = driverService;
+            Title = AppResources.AddNewContainer;
         }
 
-        public void Init(string containerNumber, bool loginProcessed)
+        public void Init(string containerNumber, bool loginProcessed, string methodOfEntry)
         {
             ContainerId = containerNumber;
             BarcodeNumber = containerNumber;
             LoginProcessed = loginProcessed;
+            MethodOfEntry = methodOfEntry;
         }
 
         public override async void Start()
@@ -40,6 +46,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             SizeList = new ObservableCollection<CodeTableModel>(containerSizes);
             LevelList = new ObservableCollection<CodeTableModel>(containerLevels);
             TypeList = new ObservableCollection<CodeTableModel>(containerTypes);
+
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
         }
 
         private string _containerId;
@@ -84,13 +92,87 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _levelList, value); }
         }
 
+        private CodeTableModel _selectedType;
+        public CodeTableModel SelectedType
+        {
+            get { return _selectedType; }
+            set { SetProperty(ref _selectedType, value); }
+        }
+
+        private CodeTableModel _selectedSize;
+        public CodeTableModel SelectedSize
+        {
+            get { return _selectedSize; }
+            set { SetProperty(ref _selectedSize, value); }
+        }
+
+        private CodeTableModel _selectedLevel;
+        public CodeTableModel SelectedLevel
+        {
+            get { return _selectedLevel; }
+            set { SetProperty(ref _selectedLevel, value); }
+        }
+
+        private string MethodOfEntry { get; set; }
+
         private IMvxAsyncCommand _addContainerCommand;
         public IMvxAsyncCommand AddContainerCommand => _addContainerCommand ?? (_addContainerCommand = new MvxAsyncCommand(ExecuteAddContainerCommandAsync));
 
         protected async Task ExecuteAddContainerCommandAsync()
         {
-            await _containerService.UpdateNbContainerAsync(ContainerId);
-            ShowViewModel<LoadDropContainerViewModel>(new {loginProcessed = LoginProcessed});
+            var container = await _containerService.FindContainerAsync(ContainerId);
+
+            if (container == null) return;
+
+            using (var loginData = UserDialogs.Instance.Loading(AppResources.AddingContainer, maskType: MaskType.Black)) {
+
+                var containerNewProcess = await _containerService.ProcessNewContainerAsync(new DriverNewContainerProcess
+                {
+                    EmployeeId = CurrentDriver.EmployeeId,
+                    ActionDateTime = DateTime.Now,
+                    ContainerNumber = ContainerId,
+                    ContainerType = SelectedType.CodeValue,
+                    ContainerSize = SelectedSize.CodeValue,
+                    ContainerBarcode = BarcodeNumber
+                });
+
+                if (!containerNewProcess.WasSuccessful)
+                {
+                    UserDialogs.Instance.Alert(containerNewProcess.Failure.Summary, AppResources.Error);
+                    return;
+                }
+
+                loginData.Title = AppResources.LoadingContainer;
+
+                var containerLoadProcess =
+                await _containerService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                {
+                    EmployeeId = CurrentDriver.EmployeeId,
+                    PowerId = CurrentDriver.PowerId,
+                    ContainerNumber = ContainerId,
+                    ActionType = ContainerActionTypeConstants.Load,
+                    ActionDateTime = DateTime.Now,
+                    MethodOfEntry = MethodOfEntry
+                });
+
+                if (!containerLoadProcess.WasSuccessful)
+                {
+                    UserDialogs.Instance.Alert(containerLoadProcess.Failure.Summary, AppResources.Error);
+                    return;
+                }
+
+                container.ContainerNumber = ContainerId;
+                container.ContainerType = SelectedType.CodeValue;
+                container.ContainerSize = SelectedSize.CodeValue;
+                container.ContainerBarCodeNo = BarcodeNumber;
+                container.ContainerPowerId = CurrentDriver.PowerId;
+
+                await _containerService.UpdateContainerAsync(container);
+
+                ShowViewModel<LoadDropContainerViewModel>(new {loginProcessed = LoginProcessed});
+            }
         }
+
+        private DriverStatusModel CurrentDriver { get; set; }
     }
 }

@@ -18,6 +18,7 @@
         Task<int> InsertOrReplaceAsync(T entity);
         Task<int> InsertOrReplaceRangeAsync(IEnumerable<T> entities);
         Task<int> UpdateAsync(T entity);
+        Task<int> UpdateRangeAsync(IEnumerable<T> entities);
         Task<int> DeleteAsync(T entity);
     }
 

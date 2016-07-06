@@ -72,7 +72,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 var approvedListAsync =
                     await
-                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectUser, "", AppResources.Cancel,
+                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectUser, "", AppResources.Cancel, null,
                             approvedUsers.Select(u => u.FullName).ToArray());
 
                 if (approvedListAsync != AppResources.Cancel)

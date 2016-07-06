@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Enums;
 using BWF.DataServices.Metadata.Models;
 using MvvmCross.Binding.ExtensionMethods;
@@ -24,11 +26,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         private readonly ITripService _tripService;
         private readonly IPreferenceService _preferenceService;
+        private readonly ICustomerService _customerService;
+        private readonly IDriverService _driverService;
+        private readonly ICodeTableService _codeTableService;
 
-        public TransactionSummaryViewModel(ITripService tripService, IPreferenceService preferenceService)
+        public TransactionSummaryViewModel(ITripService tripService, 
+            IPreferenceService preferenceService, 
+            ICustomerService customerService, 
+            IDriverService driverService, 
+            ICodeTableService codeTableService)
         {
             _tripService = tripService;
             _preferenceService = preferenceService;
+            _customerService = customerService;
+            _driverService = driverService;
+            _codeTableService = codeTableService;
             Title = AppResources.Transactions;
         }
 
@@ -43,6 +55,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public override async void Start()
         {
             FinishLabel = AppResources.FinishLabel;
+
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
             var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
@@ -130,6 +144,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _methodOfEntry, value); }
         }
 
+        private DriverStatusModel CurrentDriver { get; set; }
+
         private IMvxCommand _transactionSelectedCommand;
         public IMvxCommand TransactionSelectedCommand => _transactionSelectedCommand ?? (_transactionSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteTransactionSelectedCommand));
 
@@ -137,8 +153,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public IMvxAsyncCommand TransactionScannedCommandAsync => _transactionScannedCommandAsync ?? (_transactionScannedCommandAsync = new MvxAsyncCommand<string>(ExecuteTransactionScannedCommandAsync));
         //public IMvxCommand SelectNextTransactionCommand { get; private set; }
 
-        private IMvxCommand _confirmationSelectedCommand;
-        public IMvxCommand ConfirmationSelectedCommand => _confirmationSelectedCommand ?? (_confirmationSelectedCommand = new MvxCommand(ExecuteConfirmationSelectedCommand, CanExecuteConfirmationSelectedCommand));
+        private IMvxAsyncCommand _confirmationSelectedCommand;
+        public IMvxAsyncCommand ConfirmationSelectedCommand => _confirmationSelectedCommand ?? (_confirmationSelectedCommand = new MvxAsyncCommand(ExecuteConfirmationSelectedCommand, CanExecuteConfirmationSelectedCommand));
 
         private IMvxCommand _addRtnYardCommand;
         public IMvxCommand AddRtnYardCommand => _addRtnYardCommand ?? (_addRtnYardCommand = new MvxCommand(ExecuteAddRtnYardCommand));
@@ -188,10 +204,33 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 });
         }
 
-        private void ExecuteConfirmationSelectedCommand()
+        private async Task ExecuteConfirmationSelectedCommand()
         {
-            Close(this);
-            ShowViewModel<TransactionConfirmationViewModel>(new {tripNumber = TripNumber});
+            var segment = Containers.FirstOrDefault().Key;
+            var customer = await _customerService.FindCustomerMaster(segment.TripSegDestCustHostCode);
+
+            if (customer?.CustSignatureRequired == Constants.No)
+            {
+                // Check to see if this is the last leg of the trip, and if so, warn them.
+                // We can't use FindNextTripSegment like we normally do because we haven't
+                // marked the segment as complete yet.
+                var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
+                var lastSegment = Containers.Any(ts => ts.Key.TripSegNumber == tripSegments.Last().TripSegNumber);
+                    
+                var message = (lastSegment) ? string.Format(AppResources.PerformActionLabel, "\n\n") : AppResources.PerformTripSegmentComplete;
+                var confirm =
+                    await
+                        UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes,
+                            AppResources.No);
+                if (confirm)
+                    await FinishTripLeg();
+            }
+            else if (customer?.CustSignatureRequired == Constants.Yes)
+            {
+                Close(this);
+                ShowViewModel<TransactionConfirmationViewModel>(new { tripNumber = TripNumber });
+            }
+
         }
 
         private bool CanExecuteConfirmationSelectedCommand()
@@ -210,6 +249,73 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     tscm => tscm.TripSegContainerSeqNumber == CurrentTransaction.TripSegContainerSeqNumber));
 
             Containers[cotainerGroupingPos][containerListPos] = tripContainer;
+        }
+
+        private async Task FinishTripLeg()
+        {
+            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Clear))
+            {
+                foreach (var segment in Containers)
+                {
+                    foreach (var container in segment)
+                    {
+                        var reviewReason = (!string.IsNullOrEmpty(container.TripSegContainerReviewReason))
+                            ? await
+                                _codeTableService.FindCodeTableObject(CodeTableNameConstants.ExceptionCodes,
+                                    container.TripSegContainerReviewReason)
+                            : null;
+
+                        var containerAction =
+                        await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                        {
+                            EmployeeId = CurrentDriver.EmployeeId,
+                            PowerId = CurrentDriver.PowerId,
+                            ActionType = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? ContainerActionTypeConstants.Exception : ContainerActionTypeConstants.Done,
+                            ActionCode = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? container.TripSegContainerReviewReason : null,
+                            ActionDesc = reviewReason?.CodeDisp1,
+                            ActionDateTime = DateTime.Now,
+                            MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                            TripNumber = TripNumber,
+                            TripSegNumber = container.TripSegNumber,
+                            ContainerNumber = container.TripSegContainerNumber,
+                            ContainerLevel = container.TripSegContainerLevel
+                        });
+
+                        if (containerAction.WasSuccessful) continue;
+
+                        UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                        return;
+                    }
+
+                    var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                    {
+                        EmployeeId = CurrentDriver.EmployeeId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = segment.Key.TripSegNumber,
+                        ActionType = TripSegmentActionTypeConstants.Done,
+                        ActionDateTime = DateTime.Now,
+                        PowerId = CurrentDriver.PowerId
+                    });
+
+                    if (tripSegmentProcess.WasSuccessful)
+                        await _tripService.CompleteTripSegmentAsync(segment.Key);
+                    else
+                        UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
+                }
+            }
+
+            var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            Close(this);
+
+            if (nextTripSegment.Any())
+            {
+                ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
+            }
+            else
+            {
+                await _tripService.CompleteTripAsync(TripNumber);
+                ShowViewModel<RouteSummaryViewModel>();
+            }
         }
     }
 }

@@ -28,7 +28,6 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var asyncConnection = _sqliteConnectionFactory.GetAsyncConnection("scraprunner");
 
-            await asyncConnection.DropTableAsync<ContainerMasterModel>();
             await asyncConnection.DropTableAsync<CustomerDirectionsModel>();
             await asyncConnection.DropTableAsync<DriverStatusModel>();
             await asyncConnection.DropTableAsync<EmployeeMasterModel>();
@@ -43,6 +42,8 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.DropTableAsync<MessagesModel>();
             await asyncConnection.DropTableAsync<YardModel>();
             await asyncConnection.DropTableAsync<TerminalChangeModel>();
+            await asyncConnection.DropTableAsync<CustomerMasterModel>();
+            //await asyncConnection.DropTableAsync<ContainerMasterModel>();
             //await asyncConnection.DropTableAsync<ContainerChangeModel>();
 
             await asyncConnection.CreateTableAsync<ContainerMasterModel>();
@@ -61,8 +62,9 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.CreateTableAsync<QueueItemModel>();
             await asyncConnection.CreateTableAsync<YardModel>();
             await asyncConnection.CreateTableAsync<TerminalChangeModel>();
+            await asyncConnection.CreateTableAsync<CustomerMasterModel>();
 
-            if(! await TableExists("ContainerChange", asyncConnection) )
+            if (! await TableExists("ContainerChange", asyncConnection) )
                 await asyncConnection.CreateTableAsync<ContainerChangeModel>();
         }
 
