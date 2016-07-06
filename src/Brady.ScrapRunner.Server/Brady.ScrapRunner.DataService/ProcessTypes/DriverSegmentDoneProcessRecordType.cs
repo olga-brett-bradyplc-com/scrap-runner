@@ -282,6 +282,25 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
                     ////////////////////////////////////////////////
+                    // Get the current TripSegment record
+                    var currentTripSegment = (from item in tripSegList
+                                              where item.TripSegNumber == driverSegmentDoneProcess.TripSegNumber
+                                              select item).FirstOrDefault();
+                    if (null == currentTripSegment)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid TripSegment: " +
+                            driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
+                        break;
+                    }
+                    ////////////////////////////////////////////////
+                    //Check if trip segment is complete
+                    if (Common.IsTripSegmentComplete(currentTripSegment))
+                    {
+                        log.DebugFormat("SRTEST:TripSegNumber:{0}-{1} is Complete. Segment done processing ends.",
+                                        driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber);
+                        break;
+                    }
+                    ////////////////////////////////////////////////
                     // Get a list of all containers for the trip from the TripSegmentContainer table
                     var tripContainerList = Common.GetTripContainersForTrip(dataService, settings, userCulture, userRoleIds,
                                         driverSegmentDoneProcess.TripNumber, out fault);
@@ -316,17 +335,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         break;
                     }
-                    ////////////////////////////////////////////////
-                    // Get the current TripSegment record
-                    var currentTripSegment = (from item in tripSegList
-                                              where item.TripSegNumber == driverSegmentDoneProcess.TripSegNumber
-                                              select item).FirstOrDefault();
-                    if (null == currentTripSegment)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid TripSegment: " +
-                            driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
-                        break;
-                    }
+
                     ////////////////////////////////////////////////
                     // Get the Customer record for the destination cust host code
                     var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
@@ -1374,10 +1383,29 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             newTripSegment.TripSegDestCustPhone1 = destCustomerMaster.CustPhone1;
             newTripSegment.TripSegDestCustTimeFactor = destCustomerMaster.CustTimeFactor;
 
-            //ToDo:Calculate the standard drive time and standard stop time and standard miles.
-            newTripSegment.TripSegStandardDriveMinutes = 0;
+            //Try to find a matching entry in the TripPoints table based on origin host code and destination host code
+            var tripPoints = Common.GetTripPoints(dataService, settings, userCulture, userRoleIds,
+                             newTripSegment.TripSegOrigCustHostCode, newTripSegment.TripSegDestCustHostCode, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            if (tripPoints == null)
+            {
+                newTripSegment.TripSegStandardDriveMinutes = 0;
+                newTripSegment.TripSegStandardMiles = 0;
+                //ToDo: Send off a request to maps
+            }
+            else
+            {
+                newTripSegment.TripSegStandardMiles = tripPoints.TripPointsStandardMiles;
+                newTripSegment.TripSegStandardDriveMinutes = tripPoints.TripPointsStandardMinutes;
+                //ToDo: Do we recalculate the minutes based on miles, just in case it changed?
+                //We do that in the current ScrapRunner
+            }
+
+            //ToDo:Calculate the standard stop time.
             newTripSegment.TripSegStandardStopMinutes = 0;
-            newTripSegment.TripSegStandardMiles = 0;
 
             //Set driver generated flag to Y
             newTripSegment.TripSegDriverGenerated = driverSegmentDoneProcess.DriverGenerated;
@@ -1951,53 +1979,55 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             //remove the current trip information.      
 
             // From the list of containers used on the trip, pull out a list of distinct container numbers. 
-            var containerList = (from item in tripContainerList
+            var distinctTripContainerList = (from item in tripContainerList
+                                 where item.TripSegContainerNumber != null
                                  select item.TripSegContainerNumber).Distinct().ToList();
-
-            // Get the Container records from the ContainerMaster
-            var containersOnTrip = Common.GetContainersForTrip(dataService, settings, userCulture, userRoleIds,
-                                   containerList, out fault);
-            if (null != fault)
+            if (distinctTripContainerList != null && distinctTripContainerList.Count > 0)
             {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                return false;
-            }
-            if (null != containersOnTrip)
-            {
-                foreach (var containerMaster in containersOnTrip)
+                // Get the Container records from the ContainerMaster
+                var containersOnTrip = Common.GetContainersForTrip(dataService, settings, userCulture, userRoleIds,
+                                       distinctTripContainerList, out fault);
+                if (null != fault)
                 {
-                    //Remove current trip information
-                    containerMaster.ContainerCurrentTripNumber = null;
-                    containerMaster.ContainerCurrentTripSegNumber = null;
-                    containerMaster.ContainerCurrentTripSegType = null;
-
-                    //This is where the Pending Move DateTime is removed in the current ScrapRunner.
-                    containerMaster.ContainerPendingMoveDateTime = null;
-
-                    //Do the update to the container master table
-                    changeSetResult = Common.UpdateContainerMaster(dataService, settings, containerMaster);
-                    log.DebugFormat("SRTEST:Saving Container Record for Container:{0} - Trip Done.",
-                                    containerMaster.ContainerNumber);
-                    if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                    return false;
+                }
+                if (null != containersOnTrip)
+                {
+                    foreach (var containerMaster in containersOnTrip)
                     {
-                        var s = string.Format("Trip Done:Could not update Container:{0}.",
-                            containerMaster.ContainerNumber);
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                        return false;
-                    }
-                    ////////////////////////////////////////////////
-                    //Add record to Container History. 
-                    if (!Common.InsertContainerHistory(dataService, settings, containerMaster, destCustomerMaster,null,
-                        ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                        log.ErrorFormat("Trip Done:InsertContainerHistory failed: {0} during segment done request: {1}",
-                                         fault.Message, driverSegmentDoneProcess);
-                        return false;
-                    }
-                }//foreach (var containerMaster in containersOnTrip)
-            }// if (null != containersOnTrip)
+                        //Remove current trip information
+                        containerMaster.ContainerCurrentTripNumber = null;
+                        containerMaster.ContainerCurrentTripSegNumber = null;
+                        containerMaster.ContainerCurrentTripSegType = null;
 
+                        //This is where the Pending Move DateTime is removed in the current ScrapRunner.
+                        containerMaster.ContainerPendingMoveDateTime = null;
+
+                        //Do the update to the container master table
+                        changeSetResult = Common.UpdateContainerMaster(dataService, settings, containerMaster);
+                        log.DebugFormat("SRTEST:Saving Container Record for Container:{0} - Trip Done.",
+                                        containerMaster.ContainerNumber);
+                        if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
+                        {
+                            var s = string.Format("Trip Done:Could not update Container:{0}.",
+                                containerMaster.ContainerNumber);
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            return false;
+                        }
+                        ////////////////////////////////////////////////
+                        //Add record to Container History. 
+                        if (!Common.InsertContainerHistory(dataService, settings, containerMaster, destCustomerMaster, null,
+                            ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            log.ErrorFormat("Trip Done:InsertContainerHistory failed: {0} during segment done request: {1}",
+                                             fault.Message, driverSegmentDoneProcess);
+                            return false;
+                        }
+                    }//foreach (var containerMaster in containersOnTrip)
+                }// if (null != containersOnTrip)
+            }//if (distinctTripContainerList != null)
             ////////////////////////////////////////////////
             //Add record to the DriverEfficiency table.  
             if (!Common.InsertDriverEfficiency(dataService, settings, userRoleIds, userCulture, log,
