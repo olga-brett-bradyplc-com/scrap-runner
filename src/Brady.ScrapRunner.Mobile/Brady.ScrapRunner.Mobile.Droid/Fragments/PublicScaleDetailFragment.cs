@@ -13,7 +13,7 @@ using MvvmCross.Platform.WeakSubscription;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame)]
+    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame, true)]
     [Register("brady.scraprunner.mobile.droid.fragments.PublicScaleDetailFragment")]
     public class PublicScaleDetailFragment : BaseFragment<PublicScaleDetailViewModel>
     {

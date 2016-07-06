@@ -71,6 +71,33 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Container.
+        /// </summary>
+        public static string AddContainer {
+            get {
+                return ResourceManager.GetString("AddContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adding Container.
+        /// </summary>
+        public static string AddingContainer {
+            get {
+                return ResourceManager.GetString("AddingContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add New Container.
+        /// </summary>
+        public static string AddNewContainer {
+            get {
+                return ResourceManager.GetString("AddNewContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Amount.
         /// </summary>
         public static string AmountHint {
@@ -260,6 +287,42 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Container {0} has already been loaded.
+        /// </summary>
+        public static string ContainerLoaded {
+            get {
+                return ResourceManager.GetString("ContainerLoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Container {0} not found in ContainerMaster.
+        /// </summary>
+        public static string ContainerNotFound {
+            get {
+                return ResourceManager.GetString("ContainerNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Container #.
+        /// </summary>
+        public static string ContainerNumber {
+            get {
+                return ResourceManager.GetString("ContainerNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Container #{0}.
+        /// </summary>
+        public static string ContainerTitle {
+            get {
+                return ResourceManager.GetString("ContainerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Continue.
         /// </summary>
         public static string Continue {
@@ -305,6 +368,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dropping Container.
+        /// </summary>
+        public static string DroppingContainer {
+            get {
+                return ResourceManager.GetString("DroppingContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to English.
         /// </summary>
         public static string English {
@@ -328,6 +400,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string EnrouteButtonLabel {
             get {
                 return ResourceManager.GetString("EnrouteButtonLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the container number you wish to add.
+        /// </summary>
+        public static string EnterContainerNumber {
+            get {
+                return ResourceManager.GetString("EnterContainerNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the corrected odometer reading.
+        /// </summary>
+        public static string EnterOdometer {
+            get {
+                return ResourceManager.GetString("EnterOdometer", resourceCulture);
             }
         }
         
@@ -424,6 +514,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Language.
+        /// </summary>
+        public static string LanguageLabel {
+            get {
+                return ResourceManager.GetString("LanguageLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Left On Truck.
         /// </summary>
         public static string LeftOnTruck {
@@ -447,6 +546,33 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Level {
             get {
                 return ResourceManager.GetString("Level", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load/Drop Containers.
+        /// </summary>
+        public static string LoadDropContainer {
+            get {
+                return ResourceManager.GetString("LoadDropContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading.
+        /// </summary>
+        public static string Loading {
+            get {
+                return ResourceManager.GetString("Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading Container.
+        /// </summary>
+        public static string LoadingContainer {
+            get {
+                return ResourceManager.GetString("LoadingContainer", resourceCulture);
             }
         }
         
@@ -568,6 +694,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Server Endpoint Set.
+        /// </summary>
+        public static string NoServerEndpoint {
+            get {
+                return ResourceManager.GetString("NoServerEndpoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please go to the settings menu and set a server endpoint.
+        /// </summary>
+        public static string NoServerSummary {
+            get {
+                return ResourceManager.GetString("NoServerSummary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Notes.
         /// </summary>
         public static string Notes {
@@ -681,6 +825,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string PerformActionLabel {
             get {
                 return ResourceManager.GetString("PerformActionLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to complete this leg of the trip?.
+        /// </summary>
+        public static string PerformTripSegmentComplete {
+            get {
+                return ResourceManager.GetString("PerformTripSegmentComplete", resourceCulture);
             }
         }
         
@@ -820,6 +973,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Language.
+        /// </summary>
+        public static string SelectLanguage {
+            get {
+                return ResourceManager.GetString("SelectLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select User To Message.
         /// </summary>
         public static string SelectUser {
@@ -843,6 +1005,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Send {
             get {
                 return ResourceManager.GetString("Send", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the server endpoint address.
+        /// </summary>
+        public static string ServerInput {
+            get {
+                return ResourceManager.GetString("ServerInput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server Endpoint.
+        /// </summary>
+        public static string ServerLabel {
+            get {
+                return ResourceManager.GetString("ServerLabel", resourceCulture);
             }
         }
         

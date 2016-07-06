@@ -3,12 +3,17 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto">
   <item
-    android:id="@+id/add_new_container_loaddrop"
+    android:id="@+id/add_new_container_loaddrop_nav"
     android:icon="@drawable/ic_add_white_36dp"
     android:title="Add New Container"
     app:showAsAction="always" />
   <item
-    android:id="@+id/developer_nb_scan"
+    android:id="@+id/load_scanner_nav"
+    android:icon="@drawable/ic_add_white_36dp"
+    android:title="Load Scanner"
+    app:showAsAction="never" />
+  <item
+    android:id="@+id/developer_nb_scan_nav"
     android:title="NB Add Ct ( Dev )"
     app:showAsAction="never"/>
 </menu>

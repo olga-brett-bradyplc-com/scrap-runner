@@ -10,10 +10,14 @@
           android:id="@+id/nav_routesummary"
           android:icon="@drawable/ic_assignment_black_36dp"
           android:title="Route Summary" />
-      <item
+      <!--<item
           android:id="@+id/nav_changepowerunit"
           android:icon="@drawable/ic_directions_bus_black_36dp"
-          android:title="Change Power Unit" />
+          android:title="Change Power Unit" />-->
+      <item
+          android:id="@+id/nav_changeodometer"
+          android:icon="@drawable/ic_directions_bus_black_36dp"
+          android:title="Change Odometer Reading" />
       <item
           android:id="@+id/nav_adddelay"
           android:icon="@drawable/ic_alarm_off_black_36dp"

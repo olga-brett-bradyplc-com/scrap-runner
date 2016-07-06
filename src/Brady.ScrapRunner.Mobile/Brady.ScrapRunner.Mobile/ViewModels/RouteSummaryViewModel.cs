@@ -16,7 +16,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             _tripService = tripService;
             Title = AppResources.RouteSummary;
-            RouteSelectedCommand = new MvxCommand<TripModel>(ExecuteRouteSelectedCommand);
         }
 
         public override async void Start()
@@ -40,8 +39,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _selectedTrip; }
             set { SetProperty(ref _selectedTrip, value); }
         }
+        
 
-        public MvxCommand<TripModel> RouteSelectedCommand { get; private set; }
+        private IMvxCommand _routeSelectedCommand;
+        public IMvxCommand RouteSelectedCommand => _routeSelectedCommand ?? (_routeSelectedCommand = new MvxCommand<TripModel>(ExecuteRouteSelectedCommand));
+
 
         // @TODO : Put in logic that makes this read-only if driver is currently on a trip
         public void ExecuteRouteSelectedCommand(TripModel selectedTrip)

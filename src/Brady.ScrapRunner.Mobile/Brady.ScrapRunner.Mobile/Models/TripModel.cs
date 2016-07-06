@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.Models
+﻿using Brady.ScrapRunner.Mobile.Resources;
+
+namespace Brady.ScrapRunner.Mobile.Models
 {
     using System;
     using SQLite.Net.Attributes;
@@ -77,6 +79,9 @@
 
         [Ignore]
         public string CityStateZipFormatted => $"{TripCustCity}, {TripCustState} {TripCustZip}";
+
+        [Ignore]
+        public string TripNumberDesc => $"{AppResources.Trip} {TripNumber}";
 
         [Ignore]
         public string TripCustOpenTime24Hr

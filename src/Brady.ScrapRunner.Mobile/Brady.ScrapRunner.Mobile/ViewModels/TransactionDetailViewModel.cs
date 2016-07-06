@@ -96,7 +96,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async Task ExecuteTransactionUnableToProcessCommand()
         {
             var exceptions = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ExceptionCodes);
-            var exceptionDialogAsync = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, "", AppResources.Cancel,
+            var exceptionDialogAsync = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, "", AppResources.Cancel, null,
                         exceptions.Select(ct => ct.CodeDisp1).ToArray());
             if (exceptionDialogAsync != AppResources.Cancel)
             {

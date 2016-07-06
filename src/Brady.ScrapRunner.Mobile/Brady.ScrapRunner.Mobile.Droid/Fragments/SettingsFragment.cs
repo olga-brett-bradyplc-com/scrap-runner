@@ -1,10 +1,17 @@
+using System;
+using System.ComponentModel;
+using System.Globalization;
 using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
+using Android.Widget;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Droid.BindingContext;
+using MvvmCross.Binding.Droid.Views;
 using MvvmCross.Droid.Shared.Attributes;
+using MvvmCross.Platform.WeakSubscription;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
@@ -13,7 +20,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     public class SettingsFragment : BaseFragment<SettingsViewModel>
     {
         protected override int FragmentId => Resource.Layout.fragment_settings;
-        // @TODO : Determine if logged in, show menu, otherwise, hide menu?
         protected override bool NavMenuEnabled => false;
     }
 }

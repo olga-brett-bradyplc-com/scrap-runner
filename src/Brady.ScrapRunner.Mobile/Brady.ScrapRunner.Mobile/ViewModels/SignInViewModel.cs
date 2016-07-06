@@ -34,8 +34,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IQueueScheduler _queueScheduler;
         private readonly ILocationService _locationService;
         private readonly ILocationOdometerService _locationOdometerService;
-
-
+        
         public SignInViewModel(
             IDbService dbService,
             IPreferenceService preferenceService,
@@ -117,6 +116,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         protected async Task ExecuteSignInCommandAsync()
         {
+            if (string.IsNullOrEmpty(PhoneSettings.ServerSettings))
+            {
+                UserDialogs.Instance.ErrorToast(AppResources.NoServerEndpoint, AppResources.NoServerSummary);
+                return;
+            }
+
             var userNameResults = Validate<UsernameValidator, string>(UserName);
             if (!userNameResults.IsValid)
             {
@@ -169,8 +174,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 // Delete/Create necesscary SQLite tables
                 await _dbService.RefreshAll();
                 IClientSettings clientSettings = new DemoClientSettings();
-                _connection.CreateConnection(clientSettings.ServiceBaseUri.ToString(),
-                    clientSettings.UserName, clientSettings.Password, "ScrapRunner");
+                _connection.CreateConnection(MobileConstants.DefaultServiceProtocol + PhoneSettings.ServerSettings, clientSettings.UserName, clientSettings.Password, MobileConstants.DefaultServiceName);
 
                 _queueScheduler.Unschedule();
                 _locationService.Stop();
@@ -192,7 +196,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (loginProcess.WasSuccessful)
                 {
-                    await _containerService.UpdateContainerMaster(loginProcess.Item.ContainersOnPowerId);
                     await _messagesService.UpdateApprovedUsersForMessaging(loginProcess.Item.UsersForMessaging);
                     await _driverService.UpdateDriverStatus(new DriverStatus
                     {
@@ -252,10 +255,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
-
+                
                 // If there's no last updated for container settings, manually refresh the containers
                 if (PhoneSettings.ContainerSettings == null)
+                {
                     await _dbService.RefreshTable<ContainerChangeModel>();
+                    await _dbService.RefreshTable<ContainerMasterModel>();
+                }
 
                 // Retrieve container info from remote server and populate local DB
                 var containerChanges =
@@ -267,9 +273,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (containerChanges.WasSuccessful)
                 {
-                    PhoneSettings.ContainerSettings = DateTime.Now;
                     if (containerChanges.Item?.Containers?.Count > 0)
-                        await _containerService.UpdateContainerChange(containerChanges.Item.Containers);
+                        await _containerService.UpdateContainerChangeIntoMaster(containerChanges.Item.Containers);
+
+                    PhoneSettings.ContainerSettings = DateTime.Now;
                 }
                 else
                 {
@@ -277,6 +284,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
+
+                // Update container master if driver has any containers on their vehicle
+                await _containerService.UpdateContainerMaster(loginProcess.Item.ContainersOnPowerId);
 
                 // Retrieve terminal change info and populate local DB
                 var terminalChanges =
@@ -356,6 +366,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     if(tripProcess.Item?.CustomerLocations?.Count > 0)
                         await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
+
+                    if (tripProcess.Item?.CustomerMasters?.Count > 0)
+                        await _customerService.UpdateCustomerMaster(tripProcess.Item.CustomerMasters);
                 }
                 else
                 {

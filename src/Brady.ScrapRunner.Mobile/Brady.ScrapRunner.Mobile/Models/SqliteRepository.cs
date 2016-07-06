@@ -79,6 +79,11 @@ namespace Brady.ScrapRunner.Mobile.Models
             return _connection.UpdateAsync(entity);
         }
 
+        public Task<int> UpdateRangeAsync(IEnumerable<T> entities)
+        {
+            return _connection.UpdateAllAsync(entities);
+        }
+
         public Task<int> DeleteAsync(T entity)
         {
             return _connection.DeleteAsync(entity);

@@ -1,24 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-  <LinearLayout
-        android:id="@+id/center_panel"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_centerInParent="true">
-    <Button
-      local:MvxBind="Click ChangeLanguageCommand"
-      local:MvxLang="Text ChangeLanguage"
+    <include
+        layout="@layout/toolbar" />
+
+    <RelativeLayout
       android:layout_width="match_parent"
-      android:layout_height="48dp"
-      android:layout_marginTop="4dp"
-      />
-  </LinearLayout>
-  <include
-      layout="@layout/toolbar" />
-</RelativeLayout>
+      android:layout_height="45dp"
+      android:orientation="vertical"
+      local:MvxBind="Click ChangeLanguageCommand"
+      android:background="#fff">
+      <ImageView
+        android:id="@+id/LanguageSettingsImage"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/ic_language_black_24dp"/>
+      <TextView
+        android:id="@+id/LanguageSettingsLabel"
+        android:layout_height="20dp"
+        android:layout_width="match_parent"
+        android:paddingLeft="20dp"
+        android:textSize="15sp"
+        android:textColor="#000000"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@id/LanguageSettingsImage"
+        local:MvxBind="Text LanguageSettingLabel"/>
+      <TextView
+        android:layout_toRightOf="@id/LanguageSettingsImage"
+        android:layout_below="@id/LanguageSettingsLabel"
+        android:layout_height="20dp"
+        android:paddingLeft="20dp"
+        android:layout_width="match_parent"
+        android:textSize="10sp"
+        android:textColor="#b5b5b5"
+        android:text="Test"
+        local:MvxBind="Text LanguageSettingSubLabel"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="45dp"
+      android:orientation="vertical"
+      local:MvxBind="Click ChangeServerSettings"
+      android:background="#fff">
+      <ImageView
+        android:id="@+id/ServerSettingsImage"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/ic_settings_input_antenna_black_24dp"/>
+      <TextView
+        android:id="@+id/ServerSettingsLabel"
+        android:layout_height="20dp"
+        android:layout_width="match_parent"
+        android:paddingLeft="20dp"
+        android:textSize="15sp"
+        android:textColor="#000000"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@id/ServerSettingsImage"
+        local:MvxBind="Text ServerSettingLabel"/>
+      <TextView
+        android:layout_toRightOf="@id/ServerSettingsImage"
+        android:layout_below="@id/ServerSettingsLabel"
+        android:layout_height="20dp"
+        android:paddingLeft="20dp"
+        android:layout_width="match_parent"
+        android:textSize="10sp"
+        android:textColor="#b5b5b5"
+        android:text="Test"
+        local:MvxBind="Text ServerSettingSubLabel"/>
+    </RelativeLayout>
+  
+</LinearLayout>
