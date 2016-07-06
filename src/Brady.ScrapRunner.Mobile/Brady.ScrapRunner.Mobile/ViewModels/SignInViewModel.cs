@@ -196,7 +196,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (loginProcess.WasSuccessful)
                 {
-                    await _containerService.UpdateContainerMaster(loginProcess.Item.ContainersOnPowerId);
                     await _messagesService.UpdateApprovedUsersForMessaging(loginProcess.Item.UsersForMessaging);
                     await _driverService.UpdateDriverStatus(new DriverStatus
                     {
@@ -256,10 +255,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
-
+                
                 // If there's no last updated for container settings, manually refresh the containers
                 if (PhoneSettings.ContainerSettings == null)
+                {
                     await _dbService.RefreshTable<ContainerChangeModel>();
+                    await _dbService.RefreshTable<ContainerMasterModel>();
+                }
 
                 // Retrieve container info from remote server and populate local DB
                 var containerChanges =
@@ -271,9 +273,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (containerChanges.WasSuccessful)
                 {
-                    PhoneSettings.ContainerSettings = DateTime.Now;
                     if (containerChanges.Item?.Containers?.Count > 0)
-                        await _containerService.UpdateContainerChange(containerChanges.Item.Containers);
+                        await _containerService.UpdateContainerChangeIntoMaster(containerChanges.Item.Containers);
+
+                    PhoneSettings.ContainerSettings = DateTime.Now;
                 }
                 else
                 {
@@ -281,6 +284,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
+
+                // Update container master if driver has any containers on their vehicle
+                await _containerService.UpdateContainerMaster(loginProcess.Item.ContainersOnPowerId);
 
                 // Retrieve terminal change info and populate local DB
                 var terminalChanges =

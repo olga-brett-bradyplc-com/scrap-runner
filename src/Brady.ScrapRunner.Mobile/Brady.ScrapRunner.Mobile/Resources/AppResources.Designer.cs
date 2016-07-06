@@ -71,6 +71,33 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Container.
+        /// </summary>
+        public static string AddContainer {
+            get {
+                return ResourceManager.GetString("AddContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adding Container.
+        /// </summary>
+        public static string AddingContainer {
+            get {
+                return ResourceManager.GetString("AddingContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add New Container.
+        /// </summary>
+        public static string AddNewContainer {
+            get {
+                return ResourceManager.GetString("AddNewContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Amount.
         /// </summary>
         public static string AmountHint {
@@ -260,6 +287,42 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Container {0} has already been loaded.
+        /// </summary>
+        public static string ContainerLoaded {
+            get {
+                return ResourceManager.GetString("ContainerLoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Container {0} not found in ContainerMaster.
+        /// </summary>
+        public static string ContainerNotFound {
+            get {
+                return ResourceManager.GetString("ContainerNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Container #.
+        /// </summary>
+        public static string ContainerNumber {
+            get {
+                return ResourceManager.GetString("ContainerNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Container #{0}.
+        /// </summary>
+        public static string ContainerTitle {
+            get {
+                return ResourceManager.GetString("ContainerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Continue.
         /// </summary>
         public static string Continue {
@@ -305,6 +368,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dropping Container.
+        /// </summary>
+        public static string DroppingContainer {
+            get {
+                return ResourceManager.GetString("DroppingContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to English.
         /// </summary>
         public static string English {
@@ -328,6 +400,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string EnrouteButtonLabel {
             get {
                 return ResourceManager.GetString("EnrouteButtonLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the container number you wish to add.
+        /// </summary>
+        public static string EnterContainerNumber {
+            get {
+                return ResourceManager.GetString("EnterContainerNumber", resourceCulture);
             }
         }
         
@@ -456,6 +537,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Level {
             get {
                 return ResourceManager.GetString("Level", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load/Drop Containers.
+        /// </summary>
+        public static string LoadDropContainer {
+            get {
+                return ResourceManager.GetString("LoadDropContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading Container.
+        /// </summary>
+        public static string LoadingContainer {
+            get {
+                return ResourceManager.GetString("LoadingContainer", resourceCulture);
             }
         }
         

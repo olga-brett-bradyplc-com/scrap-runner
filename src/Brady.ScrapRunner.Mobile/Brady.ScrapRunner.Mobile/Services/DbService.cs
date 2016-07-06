@@ -28,7 +28,6 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var asyncConnection = _sqliteConnectionFactory.GetAsyncConnection("scraprunner");
 
-            await asyncConnection.DropTableAsync<ContainerMasterModel>();
             await asyncConnection.DropTableAsync<CustomerDirectionsModel>();
             await asyncConnection.DropTableAsync<DriverStatusModel>();
             await asyncConnection.DropTableAsync<EmployeeMasterModel>();
@@ -43,6 +42,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.DropTableAsync<MessagesModel>();
             await asyncConnection.DropTableAsync<YardModel>();
             await asyncConnection.DropTableAsync<TerminalChangeModel>();
+            //await asyncConnection.DropTableAsync<ContainerMasterModel>();
             //await asyncConnection.DropTableAsync<ContainerChangeModel>();
 
             await asyncConnection.CreateTableAsync<ContainerMasterModel>();

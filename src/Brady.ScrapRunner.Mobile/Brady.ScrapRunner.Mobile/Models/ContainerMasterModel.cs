@@ -37,6 +37,9 @@ namespace Brady.ScrapRunner.Mobile.Models
         [MaxLength(16)]
         public string ContainerPowerId { get; set; }
 
+        [MaxLength(15)]
+        public string ContainerBarCodeNo { get; set; }
+
         [Ignore]
         // Convienence methods
         public string ContainerFullDescription
