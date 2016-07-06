@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
@@ -15,14 +17,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ICodeTableService _codeTableService;
         private readonly IMessagesService _messagesService;
         private readonly ILocationService _locationService;
+        private readonly IDriverService _driverService;
 
-        public MenuViewModel(IConnectionService connection, IQueueScheduler queueScheduler, ICodeTableService codeTableService, ILocationService locationService, IMessagesService messageService)
+        public MenuViewModel(IConnectionService connection, 
+            IQueueScheduler queueScheduler, 
+            ICodeTableService codeTableService, 
+            ILocationService locationService, 
+            IMessagesService messageService,
+            IDriverService driverService)
         {
             _connection = connection;
             _queueScheduler = queueScheduler;
             _codeTableService = codeTableService;
             _locationService = locationService;
             _messagesService = messageService;
+            _driverService = driverService;
         }
 
         private IMvxAsyncCommand _logoutCommand;
@@ -111,8 +120,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 await
                     UserDialogs.Instance.ActionSheetAsync(AppResources.SelectDelay, "", AppResources.Cancel, null,
                         delays.Select(ct => ct.CodeDisp1).ToArray());
-
-            // Hitting "Cancel" on an ActionSheet dialog returns a string of "Cancel" ...
+            
             if (delayAlertAsync != AppResources.Cancel)
             {
                 var delayReasonObj = delays.FirstOrDefault(ct => ct.CodeDisp1 == delayAlertAsync);
@@ -136,6 +144,39 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private void ExecuteLoadDropContainersCommand()
         {
             ShowViewModel<LoadDropContainerViewModel>();
+        }
+
+        private IMvxAsyncCommand _changeOdometerCommand;
+        public IMvxAsyncCommand ChangeOdometerCommand => _changeOdometerCommand ?? ( _changeOdometerCommand = new MvxAsyncCommand(ExecuteChangeOdometer));
+
+        private async Task ExecuteChangeOdometer()
+        {
+            var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
+            var odometerPrompt = await UserDialogs.Instance.PromptAsync(AppResources.EnterOdometer, AppResources.OdometerReadingHint,
+                AppResources.OK, AppResources.Cancel, "", InputType.Number);
+
+            if (!string.IsNullOrEmpty(odometerPrompt.Text))
+            {
+                using ( var loginData = UserDialogs.Instance.Loading(AppResources.Loading, maskType: MaskType.Black))
+                {
+                    var processOdom = await _driverService.ProcessDriverOdomUpdateAsync(new DriverOdomUpdateProcess
+                    {
+                        EmployeeId = currentDriver.EmployeeId,
+                        ActionDateTime = DateTime.Now,
+                        PowerId = currentDriver.PowerId,
+                        Odometer = int.Parse(odometerPrompt.Text),
+                        Mdtid = currentDriver.EmployeeId
+                    });
+
+                    if (!processOdom.WasSuccessful)
+                        UserDialogs.Instance.Alert(processOdom.Failure.Summary, AppResources.Error);
+                    else
+                    {
+                        currentDriver.Odometer = int.Parse(odometerPrompt.Text);
+                        await _driverService.UpdateDriver(currentDriver);
+                    }
+                }
+            }
         }
     }
 }

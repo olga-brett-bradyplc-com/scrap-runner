@@ -2790,32 +2790,32 @@ namespace Brady.ScrapRunner.Mobile.Droid
 		public partial class Color
 		{
 			
-			// aapt resource value: 0x7f08007a
-			public const int abc_background_cache_hint_selector_material_dark = 2131230842;
-			
-			// aapt resource value: 0x7f08007b
-			public const int abc_background_cache_hint_selector_material_light = 2131230843;
-			
 			// aapt resource value: 0x7f08007c
-			public const int abc_color_highlight_material = 2131230844;
+			public const int abc_background_cache_hint_selector_material_dark = 2131230844;
+			
+			// aapt resource value: 0x7f08007d
+			public const int abc_background_cache_hint_selector_material_light = 2131230845;
+			
+			// aapt resource value: 0x7f08007e
+			public const int abc_color_highlight_material = 2131230846;
 			
 			// aapt resource value: 0x7f080004
 			public const int abc_input_method_navigation_guard = 2131230724;
 			
-			// aapt resource value: 0x7f08007d
-			public const int abc_primary_text_disable_only_material_dark = 2131230845;
-			
-			// aapt resource value: 0x7f08007e
-			public const int abc_primary_text_disable_only_material_light = 2131230846;
-			
 			// aapt resource value: 0x7f08007f
-			public const int abc_primary_text_material_dark = 2131230847;
+			public const int abc_primary_text_disable_only_material_dark = 2131230847;
 			
 			// aapt resource value: 0x7f080080
-			public const int abc_primary_text_material_light = 2131230848;
+			public const int abc_primary_text_disable_only_material_light = 2131230848;
 			
 			// aapt resource value: 0x7f080081
-			public const int abc_search_url_text = 2131230849;
+			public const int abc_primary_text_material_dark = 2131230849;
+			
+			// aapt resource value: 0x7f080082
+			public const int abc_primary_text_material_light = 2131230850;
+			
+			// aapt resource value: 0x7f080083
+			public const int abc_search_url_text = 2131230851;
 			
 			// aapt resource value: 0x7f080005
 			public const int abc_search_url_text_normal = 2131230725;
@@ -2826,11 +2826,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f080007
 			public const int abc_search_url_text_selected = 2131230727;
 			
-			// aapt resource value: 0x7f080082
-			public const int abc_secondary_text_material_dark = 2131230850;
+			// aapt resource value: 0x7f080084
+			public const int abc_secondary_text_material_dark = 2131230852;
 			
-			// aapt resource value: 0x7f080083
-			public const int abc_secondary_text_material_light = 2131230851;
+			// aapt resource value: 0x7f080085
+			public const int abc_secondary_text_material_light = 2131230853;
 			
 			// aapt resource value: 0x7f08005d
 			public const int accent = 2131230813;
@@ -2841,14 +2841,17 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f080009
 			public const int accent_material_light = 2131230729;
 			
-			// aapt resource value: 0x7f080074
-			public const int arrive = 2131230836;
-			
 			// aapt resource value: 0x7f080075
-			public const int arrive_pressed = 2131230837;
+			public const int arrive = 2131230837;
 			
 			// aapt resource value: 0x7f080076
-			public const int arrived_disabled = 2131230838;
+			public const int arrive_pressed = 2131230838;
+			
+			// aapt resource value: 0x7f080078
+			public const int arrived_dark = 2131230840;
+			
+			// aapt resource value: 0x7f080077
+			public const int arrived_disabled = 2131230839;
 			
 			// aapt resource value: 0x7f08000a
 			public const int background_floating_material_dark = 2131230730;
@@ -2913,11 +2916,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f080049
 			public const int colorPrimaryDark = 2131230793;
 			
-			// aapt resource value: 0x7f080077
-			public const int delayed = 2131230839;
+			// aapt resource value: 0x7f080079
+			public const int delayed = 2131230841;
 			
-			// aapt resource value: 0x7f080078
-			public const int delayed_pressed = 2131230840;
+			// aapt resource value: 0x7f08007a
+			public const int delayed_pressed = 2131230842;
 			
 			// aapt resource value: 0x7f08003e
 			public const int design_fab_shadow_end_color = 2131230782;
@@ -2961,14 +2964,17 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f080019
 			public const int dim_foreground_material_light = 2131230745;
 			
-			// aapt resource value: 0x7f080072
-			public const int directions = 2131230834;
-			
 			// aapt resource value: 0x7f080073
-			public const int directions_pressed = 2131230835;
+			public const int directions = 2131230835;
+			
+			// aapt resource value: 0x7f080074
+			public const int directions_pressed = 2131230836;
 			
 			// aapt resource value: 0x7f080070
 			public const int enroute = 2131230832;
+			
+			// aapt resource value: 0x7f080072
+			public const int enroute_dark = 2131230834;
 			
 			// aapt resource value: 0x7f080071
 			public const int enroute_pressed = 2131230833;
@@ -2991,8 +2997,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f08001f
 			public const int hint_foreground_material_light = 2131230751;
 			
-			// aapt resource value: 0x7f080079
-			public const int incoming_message = 2131230841;
+			// aapt resource value: 0x7f08007b
+			public const int incoming_message = 2131230843;
 			
 			// aapt resource value: 0x7f08005f
 			public const int material_100 = 2131230815;
@@ -3180,11 +3186,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f08003b
 			public const int switch_thumb_disabled_material_light = 2131230779;
 			
-			// aapt resource value: 0x7f080084
-			public const int switch_thumb_material_dark = 2131230852;
+			// aapt resource value: 0x7f080086
+			public const int switch_thumb_material_dark = 2131230854;
 			
-			// aapt resource value: 0x7f080085
-			public const int switch_thumb_material_light = 2131230853;
+			// aapt resource value: 0x7f080087
+			public const int switch_thumb_material_light = 2131230855;
 			
 			// aapt resource value: 0x7f08003c
 			public const int switch_thumb_normal_material_dark = 2131230780;
@@ -4582,7 +4588,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			public const int nav_adddelay = 2131099912;
 			
 			// aapt resource value: 0x7f060107
-			public const int nav_changepowerunit = 2131099911;
+			public const int nav_changeodometer = 2131099911;
 			
 			// aapt resource value: 0x7f06010d
 			public const int nav_composemessage = 2131099917;

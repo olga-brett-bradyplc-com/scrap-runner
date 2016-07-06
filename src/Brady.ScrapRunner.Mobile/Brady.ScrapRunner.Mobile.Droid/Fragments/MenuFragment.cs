@@ -66,6 +66,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 case Resource.Id.nav_loadcontainer:
                     ViewModel.LoadDropContainersCommand.Execute();
                     break;
+                case Resource.Id.nav_changeodometer:
+                    await ViewModel.ChangeOdometerCommand.ExecuteAsync();
+                    break;
             }
         }
     }

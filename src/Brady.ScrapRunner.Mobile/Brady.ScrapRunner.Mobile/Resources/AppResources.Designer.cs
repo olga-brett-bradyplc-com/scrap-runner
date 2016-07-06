@@ -413,6 +413,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter the corrected odometer reading.
+        /// </summary>
+        public static string EnterOdometer {
+            get {
+                return ResourceManager.GetString("EnterOdometer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string Error {

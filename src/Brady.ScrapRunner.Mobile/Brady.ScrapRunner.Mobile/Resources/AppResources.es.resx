@@ -573,4 +573,7 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Loading ( Spanish )</value>
     <comment>NEEDS TRANSLATION;</comment>
   </data>
+  <data name="EnterOdometer" xml:space="preserve">
+    <value>Enter the corrected odometer reading</value>
+  </data>
 </root>

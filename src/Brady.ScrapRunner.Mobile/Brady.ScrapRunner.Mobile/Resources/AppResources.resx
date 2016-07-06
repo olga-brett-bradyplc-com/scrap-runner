@@ -598,6 +598,9 @@ You will now be sent back to the login.</value>
     <value>Loading Container</value>
     <comment>LoadDropContainer</comment>
   </data>
+  <data name="EnterOdometer" xml:space="preserve">
+    <value>Enter the corrected odometer reading</value>
+  </data>
   <data name="Loading" xml:space="preserve">
     <value>Loading</value>
   </data>
