@@ -245,6 +245,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     CurrentDriver.TripNumber = TripNumber;
                     CurrentDriver.TripSegNumber = Containers.FirstOrDefault().Key.TripSegNumber;
+                    CurrentDriver.Status = DriverStatusSRConstants.Enroute;
                     await _driverService.UpdateDriver(CurrentDriver);
 
                     CurrentStatus = DriverStatusConstants.Enroute;
@@ -279,6 +280,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     if (setDriverArrived.WasSuccessful)
                     {
                         CurrentStatus = DriverStatusConstants.Arrive;
+
+                        CurrentDriver.Status = DriverStatusSRConstants.Arrive;
+                        await _driverService.UpdateDriver(CurrentDriver);
 
                         //TODO: GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
                         var tripInfo = await _tripService.FindTripAsync(TripNumber);
