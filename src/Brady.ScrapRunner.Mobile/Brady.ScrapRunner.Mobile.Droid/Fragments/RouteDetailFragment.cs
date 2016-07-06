@@ -145,6 +145,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                         Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
                     }
 
+                    enrouteButton.Visibility = ViewStates.Invisible;
                     arriveButton.Visibility = ViewStates.Invisible;
                     directionsButton.SetX(directionsButton.GetX() + 135);
                     buttonLayout.Visibility = ViewStates.Visible;
