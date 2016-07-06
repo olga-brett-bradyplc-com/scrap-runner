@@ -569,4 +569,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Container {0} has already been loaded ( Spanish )</value>
     <comment>NEEDS TRANSLATION;</comment>
   </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading ( Spanish )</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
 </root>
