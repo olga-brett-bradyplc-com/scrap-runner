@@ -14,15 +14,18 @@ namespace Brady.ScrapRunner.Mobile.Services
         private readonly IRepository<CustomerCommodityModel> _customerCommodityRepository;
         private readonly IRepository<CustomerLocationModel> _customerLocationRepository;
         private readonly IRepository<CustomerDirectionsModel> _customerDirectionsRepository;
+        private readonly IRepository<CustomerMasterModel> _customerMasterRepository;
 
         public CustomerService(
             IRepository<CustomerCommodityModel> customerCommodityRepository,
             IRepository<CustomerLocationModel> customerLocationRepository,
-            IRepository<CustomerDirectionsModel> customerDirectionsRepository)
+            IRepository<CustomerDirectionsModel> customerDirectionsRepository,
+            IRepository<CustomerMasterModel> customerMasteRepository )
         {
             _customerDirectionsRepository = customerDirectionsRepository;
             _customerCommodityRepository = customerCommodityRepository;
             _customerLocationRepository = customerLocationRepository;
+            _customerMasterRepository = customerMasteRepository;
         }
 
         /// <summary>
@@ -65,6 +68,19 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
+        /// Update the local DB with customer masters provided by the server
+        /// </summary>
+        /// <param name="customerMasters"></param>
+        /// <returns></returns>
+        public Task UpdateCustomerMaster(IEnumerable<CustomerMaster> customerMasters)
+        {
+            var mapped =
+                AutoMapper.Mapper.Map<IEnumerable<CustomerMaster>, IEnumerable<CustomerMasterModel>>(
+                    customerMasters);
+            return _customerMasterRepository.InsertRangeAsync(mapped);
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
@@ -83,5 +99,16 @@ namespace Brady.ScrapRunner.Mobile.Services
             var locations = await _customerLocationRepository.AllAsync();
             return locations;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="custHostCode"></param>
+        /// <returns></returns>
+        public async Task<CustomerMasterModel> FindCustomerMaster(string custHostCode)
+        {
+            var customer = await _customerMasterRepository.FindAsync(cs => cs.CustHostCode == custHostCode);
+            return customer;
+        } 
     }
 }

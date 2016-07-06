@@ -12,6 +12,9 @@ namespace Brady.ScrapRunner.Mobile
         public static readonly string ImagesDirectory = "Images";
         public static readonly string NewContainerKey = "NB#";
 
+        public static readonly string DefaultServiceProtocol = "https://";
+        public static readonly string DefaultServiceName = "ScrapRunner";
+
         // These could possibly be configurable options instead of constants
         public static readonly int MaxPixelDimension = 1000;
         public static readonly int ImageQuality = 50;

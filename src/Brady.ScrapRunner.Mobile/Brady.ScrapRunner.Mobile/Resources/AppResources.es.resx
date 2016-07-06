@@ -576,4 +576,7 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
   <data name="EnterOdometer" xml:space="preserve">
     <value>Enter the corrected odometer reading</value>
   </data>
+  <data name="PerformTripSegmentComplete" xml:space="preserve">
+    <value>Are you sure you want to complete this leg of the trip?</value>
+  </data>
 </root>

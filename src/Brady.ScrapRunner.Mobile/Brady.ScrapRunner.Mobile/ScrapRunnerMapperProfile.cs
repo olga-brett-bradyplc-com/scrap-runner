@@ -34,9 +34,11 @@
             CreateMap<CodeTable, CodeTableModel>();
             CreateMap<Domain.Models.Messages, MessagesModel>()
                 .ForMember(m => m.MessageThread, o => o.Ignore());
+            // Mapping ContainerChange's into ContainerMaster
             CreateMap<ContainerChange, ContainerMasterModel>()
                 .ForSourceMember(cc => cc.ActionDate, o => o.Ignore())
                 .ForSourceMember(cc => cc.ActionFlag, o => o.Ignore());
+            CreateMap<CustomerMaster, CustomerMasterModel>();
         }
     }
 }

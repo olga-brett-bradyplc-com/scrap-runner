@@ -174,7 +174,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 // Delete/Create necesscary SQLite tables
                 await _dbService.RefreshAll();
                 IClientSettings clientSettings = new DemoClientSettings();
-                _connection.CreateConnection("https://" + PhoneSettings.ServerSettings, UserName, Password, "ScrapRunner");
+                _connection.CreateConnection(MobileConstants.DefaultServiceProtocol + PhoneSettings.ServerSettings, clientSettings.UserName, clientSettings.Password, MobileConstants.DefaultServiceName);
 
                 _queueScheduler.Unschedule();
                 _locationService.Stop();
@@ -366,6 +366,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     if(tripProcess.Item?.CustomerLocations?.Count > 0)
                         await _customerService.UpdateCustomerLocation(tripProcess.Item.CustomerLocations);
+
+                    if (tripProcess.Item?.CustomerMasters?.Count > 0)
+                        await _customerService.UpdateCustomerMaster(tripProcess.Item.CustomerMasters);
                 }
                 else
                 {
