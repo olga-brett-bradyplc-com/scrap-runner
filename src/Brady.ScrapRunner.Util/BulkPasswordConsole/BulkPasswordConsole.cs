@@ -17,6 +17,16 @@ namespace BulkPasswordConsole
     /// 124\tdrv124\n
     /// ...
     /// </code>
+    ///
+    /// One way to generate the above file would be:
+    /// <code>
+    /// use [ScrapDev2]
+    /// go
+    /// SELECT concat(dm.EmployeeId, char(9), concat('drv', dm.EmployeeId)) AS "Username	Password"
+    /// FROM dbo.DriverMaster AS dm
+    /// go
+    ///</code>
+    /// 
     /// The usernames and passwords are trimmed after splitting on the tab.
     /// Optional arguments are the input file or the input file and output file in that order.
     /// </summary>
