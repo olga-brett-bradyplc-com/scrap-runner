@@ -69,19 +69,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionCompleteCommand()
         {
-            var confirm = await UserDialogs.Instance.ConfirmAsync(AppResources.MarkContainerComplete, AppResources.ContainerComplete);
-            if (confirm)
-            {
-                if (!string.IsNullOrEmpty(TripSegContainerNumber))
-                    Container.TripSegContainerNumber = TripSegContainerNumber;
+            if (!string.IsNullOrEmpty(TripSegContainerNumber))
+                Container.TripSegContainerNumber = TripSegContainerNumber;
 
-                Container.TripSegContainerLevel = short.Parse(Level.CodeValue);
+            Container.TripSegContainerLevel = short.Parse(Level.CodeValue);
 
-                await _tripService.CompleteTripSegmentContainerAsync(Container);
+            await _tripService.CompleteTripSegmentContainerAsync(Container);
                 
-                Close(this);
-                ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
-            }
+            Close(this);
+            ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
         }
 
         private bool CanExecuteTransactionCompleteCommand()

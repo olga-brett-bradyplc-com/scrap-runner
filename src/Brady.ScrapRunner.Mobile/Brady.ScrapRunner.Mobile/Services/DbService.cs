@@ -43,8 +43,6 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.DropTableAsync<YardModel>();
             await asyncConnection.DropTableAsync<TerminalChangeModel>();
             await asyncConnection.DropTableAsync<CustomerMasterModel>();
-            //await asyncConnection.DropTableAsync<ContainerMasterModel>();
-            //await asyncConnection.DropTableAsync<ContainerChangeModel>();
 
             await asyncConnection.CreateTableAsync<ContainerMasterModel>();
             await asyncConnection.CreateTableAsync<CustomerDirectionsModel>();
@@ -63,13 +61,10 @@ namespace Brady.ScrapRunner.Mobile.Services
             await asyncConnection.CreateTableAsync<YardModel>();
             await asyncConnection.CreateTableAsync<TerminalChangeModel>();
             await asyncConnection.CreateTableAsync<CustomerMasterModel>();
-
-            if (! await TableExists("ContainerChange", asyncConnection) )
-                await asyncConnection.CreateTableAsync<ContainerChangeModel>();
         }
 
         /// <summary>
-        /// 
+        /// Recreate the SQLite table; We could also just map SQLiteAsyncConnection.DeleteAllAsync(T type) in SqliteRepository if we wanted
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>

@@ -217,7 +217,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
                 var lastSegment = Containers.Any(ts => ts.Key.TripSegNumber == tripSegments.Last().TripSegNumber);
                     
-                var message = (lastSegment) ? string.Format(AppResources.PerformActionLabel, "\n\n") : AppResources.PerformTripSegmentComplete;
+                var message = (lastSegment) ? AppResources.PerformTripSegmentComplete + "\n\n" + AppResources.CompleteTrip : AppResources.PerformTripSegmentComplete;
                 var confirm =
                     await
                         UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes,
@@ -253,7 +253,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task FinishTripLeg()
         {
-            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Clear))
+            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
             {
                 foreach (var segment in Containers)
                 {
