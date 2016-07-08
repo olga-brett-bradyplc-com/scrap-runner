@@ -116,36 +116,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 foreach (var segment in Containers)
                 {
-                    foreach (var container in segment)
-                    {
-                        var reviewReason = (!string.IsNullOrEmpty(container.TripSegContainerReviewReason))
-                            ? await
-                                _codeTableService.FindCodeTableObject(CodeTableNameConstants.ExceptionCodes,
-                                    container.TripSegContainerReviewReason)
-                            : null;
-
-                        var containerAction =
-                        await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
-                        {
-                            EmployeeId = CurrentDriver.EmployeeId,
-                            PowerId = CurrentDriver.PowerId,
-                            ActionType = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? ContainerActionTypeConstants.Exception : ContainerActionTypeConstants.Done,
-                            ActionCode = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? container.TripSegContainerReviewReason : null,
-                            ActionDesc = reviewReason?.CodeDisp1,
-                            ActionDateTime = DateTime.Now,
-                            MethodOfEntry = TripMethodOfCompletionConstants.Manual,
-                            TripNumber = TripNumber,
-                            TripSegNumber = container.TripSegNumber,
-                            ContainerNumber = container.TripSegContainerNumber,
-                            ContainerLevel = container.TripSegContainerLevel
-                        });
-
-                        if (containerAction.WasSuccessful) continue;
-
-                        UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
-                        return;
-                    }
-
                     var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
                     {
                         EmployeeId = CurrentDriver.EmployeeId,

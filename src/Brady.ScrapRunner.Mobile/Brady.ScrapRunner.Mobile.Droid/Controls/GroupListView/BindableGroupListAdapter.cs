@@ -107,32 +107,34 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
             var tempView = base.GetView(position, convertView, parent, templateId);
             var item = GetRawItem(position);
 
+            var parentLayout = tempView.FindViewById<RelativeLayout>(Resource.Id.TripLayoutParent);
             var icon = tempView.FindViewById<ImageView>(Resource.Id.arrow_image);
 
-            // Should note that currently the grouped listview only on transaction stop screen,
-            // but if we decided to use it elsewhere, we may want to move this to a custom
-            // adapter specifically just for the transactions
-            if (icon != null)
+            if (parentLayout != null)
             {
-                var flatItem = (FlatItem)item;
+                var flatItem = (FlatItem) item;
                 var tscm = (TripSegmentContainerModel) flatItem.Item;
-
-                switch (tscm.TripSegContainerReviewFlag)
+                // Should note that currently the grouped listview only on transaction stop screen,
+                // but if we decided to use it elsewhere, we may want to move this to a custom
+                // adapter specifically just for the transactions
+                if (icon != null)
                 {
-                    case "N":
-                        icon.SetImageResource(Resource.Drawable.check_circle_green_tint_icon);
-                        break;
-                    case "E":
-                        icon.SetImageResource(Resource.Drawable.cancelled_red_tint_icon);
-                        break;
-                    default:
-                        icon.SetImageResource(Resource.Drawable.ic_keyboard_arrow_right_black_24dp);
-                        break;
+                    switch (tscm.TripSegContainerReviewFlag)
+                    {
+                        case "N":
+                            icon.SetImageResource(Resource.Drawable.check_circle_green_tint_icon);
+                            break;
+                        case "E":
+                            icon.SetImageResource(Resource.Drawable.cancelled_red_tint_icon);
+                            break;
+                        default:
+                            icon.SetImageResource(Resource.Drawable.ic_keyboard_arrow_right_black_24dp);
+                            break;
+                    }
                 }
             }
 
             return tempView;
         }
-
     }
 }
