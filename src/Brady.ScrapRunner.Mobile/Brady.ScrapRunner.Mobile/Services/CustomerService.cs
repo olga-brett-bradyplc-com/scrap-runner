@@ -84,9 +84,9 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<CustomerCommodityModel>> FindCustomerCommodites()
+        public async Task<IEnumerable<CustomerCommodityModel>> FindCustomerCommodites(string custHostCode)
         {
-            var commodities = await _customerCommodityRepository.AllAsync();
+            var commodities = await _customerCommodityRepository.AsQueryable().Where(cc => cc.CustHostCode == custHostCode).ToListAsync();
             return commodities;
         }
 
@@ -94,9 +94,9 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<CustomerLocationModel>> FindCustomerLocations()
+        public async Task<IEnumerable<CustomerLocationModel>> FindCustomerLocations(string custHostCode)
         {
-            var locations = await _customerLocationRepository.AllAsync();
+            var locations = await _customerLocationRepository.AsQueryable().Where(ct => ct.CustHostCode == custHostCode).ToListAsync();
             return locations;
         }
 

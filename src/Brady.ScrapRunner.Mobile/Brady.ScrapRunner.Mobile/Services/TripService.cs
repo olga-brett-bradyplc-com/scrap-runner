@@ -1,4 +1,6 @@
-﻿namespace Brady.ScrapRunner.Mobile.Services
+﻿using Brady.ScrapRunner.Mobile.Helpers;
+
+namespace Brady.ScrapRunner.Mobile.Services
 {
     using System;
     using System.Collections.Generic;
@@ -368,7 +370,7 @@
         /// </summary>
         /// <param name="tripSegment"></param>
         /// <returns></returns>
-        public bool IsContainerDropped(TripSegmentModel tripSegment)
+        public bool IsTripLegDropped(TripSegmentModel tripSegment)
         {
             return tripSegment.TripSegType == BasicTripTypeConstants.DropEmpty ||
                    tripSegment.TripSegType == BasicTripTypeConstants.DropFull ||
@@ -380,7 +382,7 @@
         /// </summary>
         /// <param name="tripSegment"></param>
         /// <returns></returns>
-        public bool IsContainerLoaded(TripSegmentModel tripSegment)
+        public bool IsTripLegLoaded(TripSegmentModel tripSegment)
         {
             return tripSegment.TripSegType == BasicTripTypeConstants.PickupEmpty ||
                    tripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
@@ -507,7 +509,51 @@
             container.TripSegContainerReviewReason = reviewReason;
             return await _tripSegmentContainerRepository.UpdateAsync(container);
         }
-        
+
+        /// <summary>
+        /// Propogate any container changes on loaded containers to RT segment. Currently this will only work if
+        /// the trip has a RT segment, as it will only copy containers updates to said RT segment.
+        /// TODO : Do we need to include more scenarios for when we copy container information to other segments?
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <param name="containers"></param>
+        /// <returns></returns>
+        public async Task PropagateContainerUpdates(string tripNumber, IEnumerable<Grouping<TripSegmentModel, TripSegmentContainerModel>> containers)
+        {
+            // For any containers we're loading on the truck, make sure the information is proprogated to the RT segment
+            var tripSegments = await FindAllSegmentsForTripAsync(tripNumber);
+            var rtSegment = tripSegments.FirstOrDefault(ts => ts.TripSegType == BasicTripTypeConstants.ReturnYard);
+
+            if (rtSegment == null) return;
+
+            var rtContainers =
+                await FindAllContainersForTripSegmentAsync(rtSegment.TripNumber, rtSegment.TripSegNumber);
+
+            foreach (var container in containers.Where(segment => IsTripLegLoaded(segment.Key)).SelectMany(segment => segment))
+            {
+                var sameContainerNumber = rtContainers.FirstOrDefault(ct => ct.TripSegContainerNumber == container.TripSegContainerNumber);
+                var noContainerNumber = rtContainers.FirstOrDefault(ct => ct.TripSegContainerNumber == null);
+
+                if (sameContainerNumber != null || noContainerNumber != null)
+                {
+                    container.TripNumber = sameContainerNumber?.TripNumber ?? noContainerNumber.TripNumber;
+                    container.TripSegNumber = sameContainerNumber?.TripSegNumber ?? noContainerNumber.TripSegNumber;
+                    container.TripSegContainerSeqNumber = sameContainerNumber?.TripSegContainerSeqNumber ?? noContainerNumber.TripSegContainerSeqNumber;
+
+                    await UpdateTripSegmentContainerAsync(container);
+                }
+                else // Create new trip segment container for RT
+                {
+                    var newSeqNumber = rtContainers.LastOrDefault().TripSegContainerSeqNumber + 1;
+                    container.TripSegContainerSeqNumber = (short)newSeqNumber;
+                    container.TripSegNumber = rtSegment.TripSegNumber;
+                    container.TripNumber = rtSegment.TripNumber;
+
+                    await CreateTripSegmentContainerAsync(container);
+                }
+            }
+        }
+
         #endregion
 
         #region Remote process calls

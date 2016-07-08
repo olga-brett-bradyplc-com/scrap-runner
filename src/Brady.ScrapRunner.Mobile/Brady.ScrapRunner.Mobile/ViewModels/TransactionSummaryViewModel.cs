@@ -173,13 +173,33 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
                 CurrentTransaction.TripSegContainerNumber = scannedNumber;
 
-            // Update local copy of container list
-            var container = await _tripService.FindTripSegmentContainer(CurrentTransaction.TripNumber,
-                CurrentTransaction.TripSegNumber, CurrentTransaction.TripSegContainerSeqNumber);
 
-            MethodOfEntry = TripMethodOfCompletionConstants.Scanned;
+            foreach (var container in Containers.SelectMany(segment => segment))
+            {
+                var containerAction =
+                    await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                    {
+                        EmployeeId = CurrentDriver.EmployeeId,
+                        PowerId = CurrentDriver.PowerId,
+                        ActionType = ContainerActionTypeConstants.Done,
+                        ActionDateTime = DateTime.Now,
+                        MethodOfEntry = TripMethodOfCompletionConstants.Scanned,
+                        TripNumber = TripNumber,
+                        TripSegNumber = container.TripSegNumber,
+                        ContainerNumber = scannedNumber,
+                    });
 
-            UpdateLocalContainers(container);
+                if (containerAction.WasSuccessful)
+                {
+                    CurrentTransaction.TripSegContainerNumber = scannedNumber;
+                    await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
+                    UpdateLocalContainers(CurrentTransaction);
+                    return;
+                }
+
+                UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                return;
+            }
         }
 
         private void ExecuteSelectNextTransactionCommand()
@@ -230,7 +250,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 Close(this);
                 ShowViewModel<TransactionConfirmationViewModel>(new { tripNumber = TripNumber });
             }
-
         }
 
         private bool CanExecuteConfirmationSelectedCommand()
@@ -257,36 +276,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 foreach (var segment in Containers)
                 {
-                    foreach (var container in segment)
-                    {
-                        var reviewReason = (!string.IsNullOrEmpty(container.TripSegContainerReviewReason))
-                            ? await
-                                _codeTableService.FindCodeTableObject(CodeTableNameConstants.ExceptionCodes,
-                                    container.TripSegContainerReviewReason)
-                            : null;
-
-                        var containerAction =
-                        await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
-                        {
-                            EmployeeId = CurrentDriver.EmployeeId,
-                            PowerId = CurrentDriver.PowerId,
-                            ActionType = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? ContainerActionTypeConstants.Exception : ContainerActionTypeConstants.Done,
-                            ActionCode = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? container.TripSegContainerReviewReason : null,
-                            ActionDesc = reviewReason?.CodeDisp1,
-                            ActionDateTime = DateTime.Now,
-                            MethodOfEntry = TripMethodOfCompletionConstants.Manual,
-                            TripNumber = TripNumber,
-                            TripSegNumber = container.TripSegNumber,
-                            ContainerNumber = container.TripSegContainerNumber,
-                            ContainerLevel = container.TripSegContainerLevel
-                        });
-
-                        if (containerAction.WasSuccessful) continue;
-
-                        UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
-                        return;
-                    }
-
                     var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
                     {
                         EmployeeId = CurrentDriver.EmployeeId,
@@ -303,6 +292,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
                 }
             }
+
+            await _tripService.PropagateContainerUpdates(TripNumber, Containers);
 
             var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             Close(this);
