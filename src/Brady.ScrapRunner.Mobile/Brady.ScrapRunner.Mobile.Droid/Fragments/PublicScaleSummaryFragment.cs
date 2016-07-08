@@ -40,7 +40,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
         {
-            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.ScaleSummaryListView);
+            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.PublicScaleSummaryListView);
             if (ViewModel.Containers != null)
                 listGrouping.ItemsSource = ViewModel.Containers;
         }
