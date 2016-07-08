@@ -63,8 +63,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _methodOfEntry, value); }
         }
 
+        private DriverStatusModel CurrentDriver { get; set; }
+
         public override async void Start()
         {
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
             var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
@@ -203,6 +207,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     TripNumber = TripNumber,
                     TripSegNumber = TripSegNumber,
                     ActionDateTime = DateTime.Now,
+                    ActionType = TripSegmentActionTypeConstants.Done,
                     PowerId = currentUser.PowerId,
                     DriverModified = Constants.Yes
                 });
@@ -309,15 +314,32 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             // Otherwise, we'd go to the next point in the trip
             var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
 
-            if (!tripSegmentContainers.Any())
+            if (!tripSegmentContainers.TakeWhile(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)).Any())
             {
                 await _tripService.CompleteTripAsync(TripNumber);
-                foreach(var segment in Containers)
-                    await _tripService.CompleteTripSegmentAsync(segment.Key);
+
+                foreach (var segment in Containers)
+                {
+                    var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                    {
+                        EmployeeId = CurrentDriver.EmployeeId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = segment.Key.TripSegNumber,
+                        ActionDateTime = DateTime.Now,
+                        PowerId = CurrentDriver.PowerId,
+                        ActionType = TripSegStatusConstants.Done
+                    });
+
+                    if (tripSegmentProcess.WasSuccessful)
+                        await _tripService.CompleteTripSegmentAsync(segment.Key);
+                    else
+                        UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
+                }
 
                 Close(this);
-                ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                ShowViewModel<RouteSummaryViewModel>();
             }
+
             else
             {
                 Close(this);
