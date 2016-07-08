@@ -694,6 +694,51 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NO COMMODITIES AVALIABLE.
+        /// </summary>
+        public static string NoCommoditiesAval {
+            get {
+                return ResourceManager.GetString("NoCommoditiesAval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO COMMODITY SELECTED.
+        /// </summary>
+        public static string NoCommoditySelected {
+            get {
+                return ResourceManager.GetString("NoCommoditySelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO LEVEL SELECTED.
+        /// </summary>
+        public static string NoLevelSelected {
+            get {
+                return ResourceManager.GetString("NoLevelSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO LOCATIONS AVALIABLE.
+        /// </summary>
+        public static string NoLocationAval {
+            get {
+                return ResourceManager.GetString("NoLocationAval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO LOCATION SELECTED.
+        /// </summary>
+        public static string NoLocationSelected {
+            get {
+                return ResourceManager.GetString("NoLocationSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Server Endpoint Set.
         /// </summary>
         public static string NoServerEndpoint {

@@ -607,4 +607,24 @@ You will now be sent back to the login.</value>
   <data name="PerformTripSegmentComplete" xml:space="preserve">
     <value>Are you sure you want to complete this leg of the trip?</value>
   </data>
+  <data name="NoCommoditiesAval" xml:space="preserve">
+    <value>NO COMMODITIES AVALIABLE</value>
+    <comment>TransactionDetail</comment>
+  </data>
+  <data name="NoCommoditySelected" xml:space="preserve">
+    <value>NO COMMODITY SELECTED</value>
+    <comment>TransactionDetail</comment>
+  </data>
+  <data name="NoLevelSelected" xml:space="preserve">
+    <value>NO LEVEL SELECTED</value>
+    <comment>TransactionDetail</comment>
+  </data>
+  <data name="NoLocationAval" xml:space="preserve">
+    <value>NO LOCATIONS AVALIABLE</value>
+    <comment>TransactionDetail</comment>
+  </data>
+  <data name="NoLocationSelected" xml:space="preserve">
+    <value>NO LOCATION SELECTED</value>
+    <comment>TransactionDetail</comment>
+  </data>
 </root>

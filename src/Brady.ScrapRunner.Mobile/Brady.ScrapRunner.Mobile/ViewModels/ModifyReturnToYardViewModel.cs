@@ -119,7 +119,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (confirm)
                 {
                     var lastSegment = tripSegments.Last();
-                    var tripSegType = _tripService.IsContainerDropped(lastSegment)
+                    var tripSegType = _tripService.IsTripLegDropped(lastSegment)
                         ? BasicTripTypeConstants.ReturnYardNC
                         : BasicTripTypeConstants.ReturnYard;
                     
