@@ -61,7 +61,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 CodeName = null,
                 CodeValue = null,
-                CodeDisp1 = "NO LEVEL SELECTED"
+                CodeDisp1 = AppResources.NoLevelSelected
             });
 
             var customerLocations = await _customerService.FindCustomerLocations(Segment.TripSegDestCustHostCode);
@@ -69,7 +69,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             CustomerLocationList.Insert(0, new CustomerLocationModel
             {
                 CustHostCode = null,
-                CustLocation = CustomerLocationList.Count > 0 ? "NO LOCATION SELECTED" : "NO LOCATIONS AVALIABLE"
+                CustLocation = CustomerLocationList.Count > 0 ? AppResources.NoLocationSelected : AppResources.NoLocationAval
             });
 
             var customerCommodities = await _customerService.FindCustomerCommodites(Segment.TripSegDestCustHostCode);
@@ -78,7 +78,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 CustHostCode = null,
                 CustCommodityCode = null,
-                CustCommodityDesc = CustomerCommodityList.Count > 0 ? "NO COMMODITY SELECTED" : "NO COMMODITIES AVALIABLE"
+                CustCommodityDesc = CustomerCommodityList.Count > 0 ? AppResources.NoCommoditySelected : AppResources.NoCommoditiesAval
             });
 
             if (!string.IsNullOrEmpty(Container.TripSegContainerCommodityCode))

@@ -579,4 +579,24 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
   <data name="PerformTripSegmentComplete" xml:space="preserve">
     <value>Are you sure you want to complete this leg of the trip?</value>
   </data>
+  <data name="NoCommoditiesAval" xml:space="preserve">
+    <value>NO COMMODITIES AVALIABLE</value>
+    <comment>NEEDS TRANSLATION; TransactionDetail</comment>
+  </data>
+  <data name="NoCommoditySelected" xml:space="preserve">
+    <value>NO COMMODITY SELECTED</value>
+    <comment>NEEDS TRANSLATION; TransactionDetail</comment>
+  </data>
+  <data name="NoLevelSelected" xml:space="preserve">
+    <value>NO LEVEL SELECTED</value>
+    <comment>NEEDS TRANSLATION; TransactionDetail</comment>
+  </data>
+  <data name="NoLocationAval" xml:space="preserve">
+    <value>NO LOCATIONS AVALIABLE</value>
+    <comment>NEEDS TRANSLATION; TransactionDetail</comment>
+  </data>
+  <data name="NoLocationSelected" xml:space="preserve">
+    <value>NO LOCATION SELECTED</value>
+    <comment>NEEDS TRANSLATION; TransactionDetail</comment>
+  </data>
 </root>
