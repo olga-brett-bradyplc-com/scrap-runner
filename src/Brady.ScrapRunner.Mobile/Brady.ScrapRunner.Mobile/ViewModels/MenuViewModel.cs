@@ -20,7 +20,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
 
         public MenuViewModel(IConnectionService connection, 
-            IQueueScheduler queueScheduler, 
+            IBackgroundScheduler backgroundScheduler, 
             ICodeTableService codeTableService, 
             ILocationService locationService, 
             IMessagesService messageService,

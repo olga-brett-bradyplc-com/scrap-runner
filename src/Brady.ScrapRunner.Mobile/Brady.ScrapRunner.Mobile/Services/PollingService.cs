@@ -258,7 +258,7 @@
                     Change = container
                 });
             }
-            await _containerService.UpdateContainerChange(containerChanges.Records);
+            await _containerService.UpdateContainerChangeIntoMaster(containerChanges.Records);
             var maxActionDate = containerChanges.Records.Max(c => c.ActionDate);
             if (maxActionDate.HasValue)
             {
