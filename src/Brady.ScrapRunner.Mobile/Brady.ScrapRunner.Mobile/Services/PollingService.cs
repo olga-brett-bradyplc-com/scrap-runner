@@ -24,6 +24,7 @@
         private readonly IMessagesService _messagesService;
         private readonly ITerminalService _terminalService;
         private readonly IContainerService _containerService;
+        private readonly ITripService _tripService;
         private const string TerminalMasterSettingsKey = "TerminalMasterDateTime";
         private const string ContainerMasterSettingsKey = "ContainerMasterDateTime";
 
@@ -33,7 +34,8 @@
             IMvxMessenger mvxMessenger, 
             IMessagesService messagesService, 
             ITerminalService terminalService, 
-            IContainerService containerService)
+            IContainerService containerService, 
+            ITripService tripService)
         {
             _connectionService = connectionService;
             _notificationService = notificationService;
@@ -42,6 +44,7 @@
             _messagesService = messagesService;
             _terminalService = terminalService;
             _containerService = containerService;
+            _tripService = tripService;
         }
 
         public async Task PollForChangesAsync(string driverId, string terminalId, string regionId, string areaId)
@@ -75,9 +78,17 @@
             var tripsAfterLogin = await GetTripsAfterLoginAsync(driverId);
             foreach (var trip in tripsAfterLogin.Records)
             {
-                // @TODO: Update local database.
-                var newTrip = false;
-                // @TODO: Determine if trip is a modification or new.
+                var existingTrip = _tripService.FindTripAsync(trip.TripNumber);
+                var tripModel = Mapper.Map<Trip, TripModel>(trip);
+                var newTrip = existingTrip != null;
+                if (newTrip)
+                {
+                    await _tripService.CreateTripAsync(tripModel);
+                }
+                else
+                {
+                    await _tripService.UpdateTripAsync(tripModel);
+                }
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
                 {
                     Context = newTrip ? TripNotificationContext.New : TripNotificationContext.Modified,
@@ -104,7 +115,8 @@
             var canceledTrips = await GetTripsCanceledAsync(driverId);
             foreach (var trip in canceledTrips.Records)
             {
-                // @TODO: Update local database.
+                var tripModel = Mapper.Map<Trip, TripModel>(trip);
+                await _tripService.UpdateTripAsync(tripModel);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
                 {
                     Context = TripNotificationContext.Canceled,
@@ -130,7 +142,8 @@
             var unassignedTrips = await GetTripsUnassignedAsync(driverId);
             foreach (var trip in unassignedTrips.Records)
             {
-                // @TODO: Update local database.
+                var tripModel = Mapper.Map<Trip, TripModel>(trip);
+                await _tripService.UpdateTripAsync(tripModel);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
                 {
                     Context = TripNotificationContext.Unassigned,
@@ -155,7 +168,8 @@
             var doneTrips = await GetTripsMarkedDoneAsync(driverId);
             foreach (var trip in doneTrips.Records)
             {
-                // @TODO: Update local database.
+                var tripModel = Mapper.Map<Trip, TripModel>(trip);
+                await _tripService.UpdateTripAsync(tripModel);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
                 {
                     Context = TripNotificationContext.MarkedDone,
@@ -181,11 +195,12 @@
             var doneTrips = await GetTripsResequencedAsync(driverId);
             foreach (var trip in doneTrips.Records)
             {
-                // @TODO: Update local database.
-                _mvxMessenger.Publish(new TripResequencedMessage(this));
+                var tripModel = Mapper.Map<Trip, TripModel>(trip);
+                await _tripService.UpdateTripAsync(tripModel);
             }
             if (doneTrips.Records.Any())
             {
+                _mvxMessenger.Publish(new TripResequencedMessage(this));
                 _notificationService.TripsResequenced();
             }
         }
@@ -368,7 +383,7 @@
             if (forceLogoff.Records.Any())
             {
                 _mvxMessenger.Publish(new ForceLogoffMessage(this));
-                // @TODO: Show ACR.UserDialog here.
+                // @TODO: Handle forced logoff here.
             }
         }
 
