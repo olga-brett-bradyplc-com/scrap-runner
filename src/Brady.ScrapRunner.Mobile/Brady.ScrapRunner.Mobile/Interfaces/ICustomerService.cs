@@ -13,7 +13,9 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task UpdateCustomerDirections(IEnumerable<CustomerDirections> customerDirections);
         Task UpdateCustomerLocation(IEnumerable<CustomerLocation> customerLocations);
         Task UpdateCustomerCommodity(IEnumerable<CustomerCommodity> customerCommodities);
-        Task<IEnumerable<CustomerCommodityModel>> FindCustomerCommodites();
-        Task<IEnumerable<CustomerLocationModel>> FindCustomerLocations();
+        Task UpdateCustomerMaster(IEnumerable<CustomerMaster> customerMasters);
+        Task<IEnumerable<CustomerCommodityModel>> FindCustomerCommodites(string custHostCode);
+        Task<IEnumerable<CustomerLocationModel>> FindCustomerLocations(string custHostCode);
+        Task<CustomerMasterModel> FindCustomerMaster(string custHostCode);
     }
 }

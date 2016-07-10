@@ -4,12 +4,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-  <include
-      layout="@layout/toolbar" />
-  <Mvx.MvxListView
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     local:MvxItemTemplate="@layout/item_locale"
-     local:MvxBind="ItemsSource Languages; ItemClick SelectLanguageCommand"
-     />
+    <include
+        layout="@layout/toolbar" />
+    <Mvx.MvxListView
+        android:id="@+id/LanguageListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        local:MvxItemTemplate="@layout/item_locale"
+        local:MvxBind="ItemsSource Languages; ItemClick SelectLanguageCommand" />
 </LinearLayout>

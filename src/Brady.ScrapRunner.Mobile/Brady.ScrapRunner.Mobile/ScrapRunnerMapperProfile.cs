@@ -18,7 +18,6 @@
             CreateMap<Trip, TripModel>();
             CreateMap<TerminalMaster, YardModel>();
             CreateMap<TerminalChange, TerminalChangeModel>();
-            CreateMap<ContainerChange, ContainerChangeModel>();
             CreateMap<TripSegment, TripSegmentModel>()
                 .ForMember(m => m.CompositeKey, o => o.Ignore());
             CreateMap<CustomerLocation, CustomerLocationModel>()
@@ -34,6 +33,11 @@
             CreateMap<CodeTable, CodeTableModel>();
             CreateMap<Domain.Models.Messages, MessagesModel>()
                 .ForMember(m => m.MessageThread, o => o.Ignore());
+            // Mapping ContainerChange's into ContainerMaster
+            CreateMap<ContainerChange, ContainerMasterModel>()
+                .ForSourceMember(cc => cc.ActionDate, o => o.Ignore())
+                .ForSourceMember(cc => cc.ActionFlag, o => o.Ignore());
+            CreateMap<CustomerMaster, CustomerMasterModel>();
         }
     }
 }

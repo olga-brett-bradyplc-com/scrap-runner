@@ -177,12 +177,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async Task ProcessContainers(bool setDownInYard, string confirmationMessage)
         {
             var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
-            var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
 
-            var completeMessage = (nextTripSegment.TakeWhile(ts => ts.TripSegNumber != TripSegNumber).Any() ||
-                                   tripSegmentContainers.TakeWhile(
-                                       tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete) && tscm.TripSegContainerNumber != TripSegContainerNumber).Any())
+            var completeMessage = tripSegmentContainers.TakeWhile(
+                                       tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete) && tscm.TripSegContainerNumber != TripSegContainerNumber).Any()
                 ? confirmationMessage
                 : confirmationMessage + "\n\n" + AppResources.CompleteTrip;
 
@@ -191,49 +189,52 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             // If user confirms action
             if (result)
             {
-                // Show review exception dialog if gross time isn't set
-                var reasonDialogAsync = (!GrossTime.HasValue)
-                    ? await
-                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, AppResources.Cancel, "",
-                            reasons.Select(ct => ct.CodeDisp1).ToArray())
-                    : "";
-
-                var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
-
-                // Go through each container, updating both the local and remote db
-                foreach (var container in Containers.SelectMany(grouping => grouping))
+                using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
                 {
-                    await _tripService.UpdateTripSegmentContainerWeightTimesAsync(container, GrossTime, SecondGrossTime, TareTime);
-                    await _tripService.CompleteTripSegmentContainerAsync(container);
-                    // @TODO : Implement once we have our location service working
-                    //await _tripService.UpdateTripSegmentContainerLongLatAsync(TripSegmentContainerModel container , Latitude, Longitude);
+                    // Show review exception dialog if gross time isn't set
+                    var reasonDialogAsync = (!GrossTime.HasValue)
+                        ? await
+                            UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, AppResources.Cancel, "", null,
+                                reasons.Select(ct => ct.CodeDisp1).ToArray())
+                        : "";
 
-                    var containerAction =
-                        await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
-                        {
-                            EmployeeId = CurrentDriver.EmployeeId,
-                            PowerId = CurrentDriver.PowerId,
-                            ActionType = (string.IsNullOrEmpty(reason?.CodeDisp1)) ? ContainerActionTypeConstants.Done : ContainerActionTypeConstants.Review,
-                            ActionDateTime = DateTime.Now,
-                            TripNumber = TripNumber,
-                            TripSegNumber = container.TripSegNumber,
-                            ContainerNumber = container.TripSegContainerNumber,
-                            Gross1ActionDateTime = GrossTime,
-                            TareActionDateTime = TareTime,
-                            Gross2ActionDateTime = SecondGrossTime,
-                            SetInYardFlag = setDownInYard ? Constants.Yes : Constants.No,
-                            MethodOfEntry = ContainerMethodOfEntry.Manual,
-                            ActionCode = reason?.CodeValue,
-                            ActionDesc = reason?.CodeDisp1
-                        });
+                    var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
 
-                    if (containerAction.WasSuccessful) continue;
+                    // Go through each container, updating both the local and remote db
+                    foreach (var container in Containers.SelectMany(grouping => grouping))
+                    {
+                        await _tripService.UpdateTripSegmentContainerWeightTimesAsync(container, GrossTime, SecondGrossTime, TareTime);
+                        await _tripService.CompleteTripSegmentContainerAsync(container);
+                        // @TODO : Implement once we have our location service working
+                        //await _tripService.UpdateTripSegmentContainerLongLatAsync(TripSegmentContainerModel container , Latitude, Longitude);
 
-                    UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
-                    return;
+                        var containerAction =
+                            await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                            {
+                                EmployeeId = CurrentDriver.EmployeeId,
+                                PowerId = CurrentDriver.PowerId,
+                                ActionType = (string.IsNullOrEmpty(reason?.CodeDisp1)) ? ContainerActionTypeConstants.Done : ContainerActionTypeConstants.Review,
+                                ActionDateTime = DateTime.Now,
+                                TripNumber = TripNumber,
+                                TripSegNumber = container.TripSegNumber,
+                                ContainerNumber = container.TripSegContainerNumber,
+                                Gross1ActionDateTime = GrossTime,
+                                TareActionDateTime = TareTime,
+                                Gross2ActionDateTime = SecondGrossTime,
+                                SetInYardFlag = setDownInYard ? Constants.Yes : Constants.No,
+                                MethodOfEntry = ContainerMethodOfEntry.Manual,
+                                ActionCode = reason?.CodeValue,
+                                ActionDesc = reason?.CodeDisp1
+                            });
+
+                        if (containerAction.WasSuccessful) continue;
+
+                        UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                        return;
+                    }
+
+                    await ExecuteNextStage();
                 }
-
-                await ExecuteNextStage();
             }
         }
 

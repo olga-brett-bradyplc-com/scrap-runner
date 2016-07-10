@@ -28,9 +28,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         private MvxListView _listView;
         private IDisposable _containersToken;
 
-        private static readonly int SWIPE_MIN_DISTANCE = 120;
-        private static readonly int SWIPE_MAX_OFF_PATH = 250;
-        private static readonly int SWIPE_THRESHOLD_VELOCITY = 200;
+        private const int SwipeMinDistance = 120;
+        private const int SwipeMaxOffPath = 250;
+        private const int SwipeThresholdVelocity = 200;
 
         protected override int FragmentId => Resource.Layout.fragment_loaddropcontainer;
         protected override bool NavMenuEnabled => false;
@@ -59,10 +59,13 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             switch (item.ItemId)
             {
-                case Resource.Id.add_new_container_loaddrop:
+                case Resource.Id.add_new_container_loaddrop_nav:
+                    ViewModel.AddContainerCommand.ExecuteAsync();
+                    return true;
+                case Resource.Id.load_scanner_nav:
                     LoadScanner();
                     return true;
-                case Resource.Id.developer_nb_scan:
+                case Resource.Id.developer_nb_scan_nav:
                     ViewModel.ScanContainerCommand.ExecuteAsync("89997");
                     return true;
                 default:
@@ -81,9 +84,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             base.OnDestroyView();
 
-            if (_containersToken == null) return;
-            _containersToken.Dispose();
-            _containersToken = null;
+            if (_containersToken != null)
+            {
+                _containersToken.Dispose();
+                _containersToken = null;
+            }
 
             _scannerFragment?.StopScanning();
         }
@@ -139,22 +144,20 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             var pos = _listView.PointToPosition((int) e1.GetX(), (int) e1.GetY());
             var temp = _listView.GetItemAtPosition(pos);
             var child = _listView.GetChildAt(pos);
-            var button = child.FindViewById<RelativeLayout>(Resource.Id.ContainerItemButtons);
+            var button = child?.FindViewById<RelativeLayout>(Resource.Id.ContainerItemButtons);
 
             try
             {
-                if (Math.Abs(e1.GetY() - e2.GetY()) > SWIPE_MAX_OFF_PATH)
+                if (Math.Abs(e1.GetY() - e2.GetY()) > SwipeMaxOffPath)
                     return false;
 
-                if (e1.GetX() - e2.GetX() > SWIPE_MIN_DISTANCE && Math.Abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)
+                if (e1.GetX() - e2.GetX() > SwipeMinDistance && Math.Abs(velocityX) > SwipeThresholdVelocity)
                 {
                     button.Visibility = ViewStates.Visible;
-                    //Toast.MakeText(Activity, "Left Swipe: " + pos, ToastLength.Short).Show();
                 }
-                else if (e2.GetX() - e1.GetX() > SWIPE_MIN_DISTANCE && Math.Abs(velocityX) > SWIPE_THRESHOLD_VELOCITY)
+                else if (e2.GetX() - e1.GetX() > SwipeMinDistance && Math.Abs(velocityX) > SwipeThresholdVelocity)
                 {
                     button.Visibility = ViewStates.Gone;
-                    //Toast.MakeText(Activity, "Right Swipe: " + pos, ToastLength.Short).Show();
                 }
             }
             catch (Exception e)

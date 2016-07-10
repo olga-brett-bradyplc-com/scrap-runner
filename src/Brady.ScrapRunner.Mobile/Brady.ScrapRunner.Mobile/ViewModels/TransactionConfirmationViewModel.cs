@@ -98,61 +98,24 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             // We can't use FindNextTripSegment like we normally do because we haven't
             // marked the segment as complete yet.
             var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
-            var lastSegment = tripSegments.Last();
+            var lastSegment = Containers.Any(ts => ts.Key.TripSegNumber == tripSegments.Last().TripSegNumber);
 
-            if (Containers.Any(ts => ts.Key.TripSegNumber == lastSegment.TripSegNumber))
-            {
-                var message = string.Format(AppResources.PerformActionLabel, "\n\n");
-                var confirm =
-                    await
-                        UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes,
-                            AppResources.No);
-                if (confirm)
-                    await FinishTripLeg(image);
-            }
-            else
-            {
+            var message = (lastSegment) ? AppResources.PerformTripSegmentComplete + "\n\n" + AppResources.CompleteTrip : AppResources.PerformTripSegmentComplete;
+            var confirm =
+                await
+                    UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes,
+                        AppResources.No);
+            if (confirm)
                 await FinishTripLeg(image);
-            }
         }
 
         private async Task FinishTripLeg(byte[] image)
         {
 
-            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Clear))
+            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
             {
                 foreach (var segment in Containers)
                 {
-                    foreach (var container in segment)
-                    {
-                        var reviewReason = (!string.IsNullOrEmpty(container.TripSegContainerReviewReason))
-                            ? await
-                                _codeTableService.FindCodeTableObject(CodeTableNameConstants.ExceptionCodes,
-                                    container.TripSegContainerReviewReason)
-                            : null;
-
-                        var containerAction =
-                        await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
-                        {
-                            EmployeeId = CurrentDriver.EmployeeId,
-                            PowerId = CurrentDriver.PowerId,
-                            ActionType = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? ContainerActionTypeConstants.Exception : ContainerActionTypeConstants.Done,
-                            ActionCode = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? container.TripSegContainerReviewReason : null,
-                            ActionDesc = reviewReason?.CodeDisp1,
-                            ActionDateTime = DateTime.Now,
-                            MethodOfEntry = TripMethodOfCompletionConstants.Manual,
-                            TripNumber = TripNumber,
-                            TripSegNumber = container.TripSegNumber,
-                            ContainerNumber = container.TripSegContainerNumber,
-                            ContainerLevel = container.TripSegContainerLevel
-                        });
-
-                        if (containerAction.WasSuccessful) continue;
-
-                        UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
-                        return;
-                    }
-
                     var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
                     {
                         EmployeeId = CurrentDriver.EmployeeId,

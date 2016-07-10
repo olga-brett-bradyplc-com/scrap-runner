@@ -14,15 +14,18 @@ namespace Brady.ScrapRunner.Mobile.Services
         private readonly IRepository<CustomerCommodityModel> _customerCommodityRepository;
         private readonly IRepository<CustomerLocationModel> _customerLocationRepository;
         private readonly IRepository<CustomerDirectionsModel> _customerDirectionsRepository;
+        private readonly IRepository<CustomerMasterModel> _customerMasterRepository;
 
         public CustomerService(
             IRepository<CustomerCommodityModel> customerCommodityRepository,
             IRepository<CustomerLocationModel> customerLocationRepository,
-            IRepository<CustomerDirectionsModel> customerDirectionsRepository)
+            IRepository<CustomerDirectionsModel> customerDirectionsRepository,
+            IRepository<CustomerMasterModel> customerMasteRepository )
         {
             _customerDirectionsRepository = customerDirectionsRepository;
             _customerCommodityRepository = customerCommodityRepository;
             _customerLocationRepository = customerLocationRepository;
+            _customerMasterRepository = customerMasteRepository;
         }
 
         /// <summary>
@@ -65,12 +68,25 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
+        /// Update the local DB with customer masters provided by the server
+        /// </summary>
+        /// <param name="customerMasters"></param>
+        /// <returns></returns>
+        public Task UpdateCustomerMaster(IEnumerable<CustomerMaster> customerMasters)
+        {
+            var mapped =
+                AutoMapper.Mapper.Map<IEnumerable<CustomerMaster>, IEnumerable<CustomerMasterModel>>(
+                    customerMasters);
+            return _customerMasterRepository.InsertRangeAsync(mapped);
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<CustomerCommodityModel>> FindCustomerCommodites()
+        public async Task<IEnumerable<CustomerCommodityModel>> FindCustomerCommodites(string custHostCode)
         {
-            var commodities = await _customerCommodityRepository.AllAsync();
+            var commodities = await _customerCommodityRepository.AsQueryable().Where(cc => cc.CustHostCode == custHostCode).ToListAsync();
             return commodities;
         }
 
@@ -78,10 +94,21 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<CustomerLocationModel>> FindCustomerLocations()
+        public async Task<IEnumerable<CustomerLocationModel>> FindCustomerLocations(string custHostCode)
         {
-            var locations = await _customerLocationRepository.AllAsync();
+            var locations = await _customerLocationRepository.AsQueryable().Where(ct => ct.CustHostCode == custHostCode).ToListAsync();
             return locations;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="custHostCode"></param>
+        /// <returns></returns>
+        public async Task<CustomerMasterModel> FindCustomerMaster(string custHostCode)
+        {
+            var customer = await _customerMasterRepository.FindAsync(cs => cs.CustHostCode == custHostCode);
+            return customer;
+        } 
     }
 }

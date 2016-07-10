@@ -14,15 +14,20 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
     {
         Task UpdateContainerMaster(List<ContainerMaster> containerMaster);
 
-        Task UpdateContainerChange(List<ContainerChange> containerChange);
+        Task UpdateContainerChangeIntoMaster(List<ContainerChange> containerChange);
 
-        Task<IEnumerable<ContainerMasterModel>> FindPowerIdContainersAsync(string powerId);
+        Task<List<ContainerMasterModel>> FindPowerIdContainersAsync(string powerId);
 
         Task<ContainerMasterModel> FindContainerAsync(string containerNumber);
 
-        Task<int> UpdateNbContainerAsync(string containerNumber);
+        Task<int> UpdateContainerAsync(ContainerMasterModel container);
+
+        Task<int> CreateContainerAsync(ContainerMasterModel container);
 
         Task<int> RemoveContainerFromPowerId(string powerId, string containerNumber);
+
+        Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessContainerActionAsync(
+            DriverContainerActionProcess containerActionProcess);
 
         Task<ChangeResultWithItem<ContainerChangeProcess>> ProcessContainerChangeAsync(
             ContainerChangeProcess containerChangeProcess);

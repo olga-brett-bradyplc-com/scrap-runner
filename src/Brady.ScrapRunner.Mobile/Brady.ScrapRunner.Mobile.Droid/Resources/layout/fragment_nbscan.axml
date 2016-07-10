@@ -1,97 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <include
         layout="@layout/toolbar" />
-    <LinearLayout
-        android:id="@+id/center_panel"
-        android:orientation="vertical"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_centerInParent="true">
+        android:layout_height="wrap_content">
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/containerid_input_field_nbscan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:layout_marginBottom="4dp">
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/containerId"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
+            android:layout_marginBottom="1dp"
+            android:background="@drawable/background_white_bottom_border">
+          <android.support.design.widget.TextInputEditText
+              android:layout_width="match_parent"
+                android:layout_height="30dp"
                 local:MvxBind="Text ContainerId"
-                android:hint="Container #" />
+                android:hint="Container #"
+                android:background="@color/material_gray_100" />
         </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/containerbarcode_input_field_nbscan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:layout_marginBottom="4dp">
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/containerId"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
+            android:layout_marginBottom="1dp"
+            android:layout_below="@id/containerid_input_field_nbscan"
+            android:background="@drawable/background_white_bottom_border">
+          <android.support.design.widget.TextInputEditText
+              android:layout_width="match_parent"
+                android:layout_height="30dp"
                 local:MvxBind="Text BarcodeNumber"
-                android:hint="Barcode #" />
+                android:hint="Barcode #"
+                android:background="@color/material_gray_100" />
         </android.support.design.widget.TextInputLayout>
-        <MvxSpinner
+        <TextView
+          android:id="@+id/customer_type_label_nbscan"
+          style="@style/ScrapRunnerTheme.Label"
+          android:layout_below="@id/containerbarcode_input_field_nbscan"
+          android:text="Container Type" />
+        <LinearLayout
+            android:id="@+id/container_type_container_nbscan"
+            android:layout_below="@id/customer_type_label_nbscan"
+            style="@style/ScrapRunnerTheme.SpinnerContainer">
+          <MvxSpinner
+              android:id="@+id/container_type_spinner"
+              style="@style/ScrapRunnerTheme.SpinnerBase"
+              local:MvxItemTemplate="@layout/item_codetable"
+              local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
+              local:MvxBind="ItemsSource TypeList; SelectedItem SelectedType" />
+        </LinearLayout>
+        <TextView
+          android:id="@+id/customer_size_label_nbscan"
+          style="@style/ScrapRunnerTheme.Label"
+          android:layout_below="@id/container_type_container_nbscan"
+          android:text="Container Size" />
+        <LinearLayout
+            android:id="@+id/container_size_container_nbscan"
+            android:layout_below="@id/customer_size_label_nbscan"
+            style="@style/ScrapRunnerTheme.SpinnerContainer">
+          <MvxSpinner
+              android:id="@+id/container_size_spinner_nbscan"
+              style="@style/ScrapRunnerTheme.SpinnerBase"
+              local:MvxItemTemplate="@layout/item_codetable_multi"
+              local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable_multi"
+              local:MvxBind="ItemsSource SizeList; SelectedItem SelectedSize" />
+        </LinearLayout>
+        <TextView
+          android:id="@+id/customer_level_label_nbscan"
+          style="@style/ScrapRunnerTheme.Label"
+          android:layout_below="@id/container_size_container_nbscan"
+          android:text="Container Level" />
+        <LinearLayout
+            android:id="@+id/container_level_container_nbscan"
+            android:layout_below="@id/customer_level_label_nbscan"
+            style="@style/ScrapRunnerTheme.SpinnerContainer">
+          <MvxSpinner
+              android:id="@+id/container_level_spinner_nbscan"
+              style="@style/ScrapRunnerTheme.SpinnerBase"
+              local:MvxItemTemplate="@layout/item_codetable"
+              local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
+              local:MvxBind="ItemsSource LevelList; SelectedItem SelectedLevel" />
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:padding="10dp"
-            android:paddingRight="40dp"
-            android:layout_marginRight="15dip"
-            android:foreground="#ffffff"
-            android:textSize="40dp"
-            android:spinnerMode="dialog"
-            android:id="@+id/MvxTypeSpinner"
-            local:MvxItemTemplate="@layout/item_codetable"
-            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
-            local:MvxBind="ItemsSource TypeList" />
-        <MvxSpinner
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:foreground="#ffffff"
-            android:spinnerMode="dialog"
-            android:layout_marginBottom="10dp"
-            android:padding="10dp"
-            android:paddingRight="40dp"
-            android:layout_marginRight="15dip"
-            android:textSize="40dp"
-            android:id="@+id/MvxSizeSpinner"
-            local:MvxItemTemplate="@layout/item_codetable"
-            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
-            local:MvxBind="ItemsSource SizeList" />
-        <MvxSpinner
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:foreground="#ffffff"
-            android:layout_marginBottom="10dp"
-            android:spinnerMode="dialog"
-            android:padding="10dp"
-            android:paddingRight="40dp"
-            android:layout_marginRight="15dip"
-            android:textSize="40dp"
-            android:id="@+id/MvxLevelSpinner"
-            local:MvxItemTemplate="@layout/item_codetable"
-            local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
-            local:MvxBind="ItemsSource LevelList" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical">
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="#ffffff"
-            android:background="@color/material_gray_900"
-            local:MvxBind="Click AddContainerCommand"
-            android:text="Add Container" />
-    </LinearLayout>
-</RelativeLayout>
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical">
+          <Button
+              style="@style/ScrapRunnerTheme.StandardButtonStyle"
+              android:background="@color/material_gray_900"
+              local:MvxBind="Click AddContainerCommand"
+              android:text="Add Container" />
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

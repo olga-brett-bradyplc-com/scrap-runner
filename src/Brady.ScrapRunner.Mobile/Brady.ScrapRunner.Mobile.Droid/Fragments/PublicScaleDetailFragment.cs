@@ -13,7 +13,7 @@ using MvvmCross.Platform.WeakSubscription;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame)]
+    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame, true)]
     [Register("brady.scraprunner.mobile.droid.fragments.PublicScaleDetailFragment")]
     public class PublicScaleDetailFragment : BaseFragment<PublicScaleDetailViewModel>
     {
@@ -58,7 +58,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
         {
-            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.ScaleDetailListView);
+            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.PublicScaleDetailListView);
             if (ViewModel.Containers != null)
                 listGrouping.ItemsSource = ViewModel.Containers;
         }

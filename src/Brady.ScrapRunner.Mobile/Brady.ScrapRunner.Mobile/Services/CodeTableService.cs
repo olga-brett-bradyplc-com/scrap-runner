@@ -56,7 +56,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// </summary>
         /// <param name="codeName"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<CodeTableModel>> FindCodeTableList(string codeName)
+        public async Task<List<CodeTableModel>> FindCodeTableList(string codeName)
         {
             var sortedCodes = await _codeTableRepository.AsQueryable()
                 .Where(t => t.CodeName == codeName)

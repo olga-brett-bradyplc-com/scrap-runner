@@ -48,7 +48,13 @@ namespace Brady.ScrapRunner.Mobile.Helpers
         public static DateTime? ContainerSettings
         {
             get { return AppSettings.GetValueOrDefault<DateTime?>(LastContainerUpdateKey, LastContainerUpdateDefault); }
-            set { AppSettings.AddOrUpdateValue<DateTime?>(LastContainerUpdateKey, value); }
+            set
+            {
+                if( value == null )
+                    AppSettings.Remove(LastContainerUpdateKey);
+                else
+                    AppSettings.AddOrUpdateValue<DateTime?>(LastContainerUpdateKey, value);
+            }
         }
     }
 }

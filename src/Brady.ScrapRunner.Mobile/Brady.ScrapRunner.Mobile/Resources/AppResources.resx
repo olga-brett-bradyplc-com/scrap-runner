@@ -535,6 +535,98 @@ You will now be sent back to the login.</value>
     <value>You must sign and print your name</value>
     <comment>TransactionConfirmationViewModel</comment>
   </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>Language</value>
+    <comment>SettingsViewModel</comment>
+  </data>
+  <data name="NoServerEndpoint" xml:space="preserve">
+    <value>No Server Endpoint Set</value>
+  </data>
+  <data name="NoServerSummary" xml:space="preserve">
+    <value>Please go to the settings menu and set a server endpoint</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Select Language</value>
+    <comment>SettingsViewModel</comment>
+  </data>
+  <data name="ServerInput" xml:space="preserve">
+    <value>Enter the server endpoint address</value>
+    <comment>SettingsViewModel</comment>
+  </data>
+  <data name="ServerLabel" xml:space="preserve">
+    <value>Server Endpoint</value>
+    <comment>SettingsViewModel</comment>
+  </data>
+  <data name="LoadDropContainer" xml:space="preserve">
+    <value>Load/Drop Containers</value>
+    <comment>LoadDropContainerViewModel</comment>
+  </data>
+  <data name="AddContainer" xml:space="preserve">
+    <value>Add Container</value>
+    <comment>LoadDropContainer</comment>
+  </data>
+  <data name="AddingContainer" xml:space="preserve">
+    <value>Adding Container</value>
+  </data>
+  <data name="AddNewContainer" xml:space="preserve">
+    <value>Add New Container</value>
+  </data>
+  <data name="ContainerLoaded" xml:space="preserve">
+    <value>Container {0} has already been loaded</value>
+  </data>
+  <data name="ContainerNotFound" xml:space="preserve">
+    <value>Container {0} not found in ContainerMaster</value>
+    <comment>LoadDropContainer</comment>
+  </data>
+  <data name="ContainerNumber" xml:space="preserve">
+    <value>Container #</value>
+    <comment>LoadDropContainer</comment>
+  </data>
+  <data name="ContainerTitle" xml:space="preserve">
+    <value>Container #{0}</value>
+    <comment>ContainerDetailViewModel</comment>
+  </data>
+  <data name="DroppingContainer" xml:space="preserve">
+    <value>Dropping Container</value>
+    <comment>LoadDropContainer</comment>
+  </data>
+  <data name="EnterContainerNumber" xml:space="preserve">
+    <value>Enter the container number you wish to add</value>
+    <comment>LoadDropContainer</comment>
+  </data>
+  <data name="LoadingContainer" xml:space="preserve">
+    <value>Loading Container</value>
+    <comment>LoadDropContainer</comment>
+  </data>
+  <data name="EnterOdometer" xml:space="preserve">
+    <value>Enter the corrected odometer reading</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading</value>
+  </data>
+  <data name="PerformTripSegmentComplete" xml:space="preserve">
+    <value>Are you sure you want to complete this leg of the trip?</value>
+  </data>
+  <data name="NoCommoditiesAval" xml:space="preserve">
+    <value>NO COMMODITIES AVALIABLE</value>
+    <comment>TransactionDetail</comment>
+  </data>
+  <data name="NoCommoditySelected" xml:space="preserve">
+    <value>NO COMMODITY SELECTED</value>
+    <comment>TransactionDetail</comment>
+  </data>
+  <data name="NoLevelSelected" xml:space="preserve">
+    <value>NO LEVEL SELECTED</value>
+    <comment>TransactionDetail</comment>
+  </data>
+  <data name="NoLocationAval" xml:space="preserve">
+    <value>NO LOCATIONS AVALIABLE</value>
+    <comment>TransactionDetail</comment>
+  </data>
+  <data name="NoLocationSelected" xml:space="preserve">
+    <value>NO LOCATION SELECTED</value>
+    <comment>TransactionDetail</comment>
+  </data>
   <data name="NotificationMessageText" xml:space="preserve">
     <value>{0}</value>
     <comment>AndroidNotificationService</comment>

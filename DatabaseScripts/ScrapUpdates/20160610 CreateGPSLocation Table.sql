@@ -1,9 +1,9 @@
-
+--Change C:\Scrap\Router to location of router folder
 if not exists (select 1 from [Preferences] where parameter = 'DEFRouterPath')
 INSERT INTO [Preferences] VALUES('0000','DEFRouterPath','C:\Scrap\Router','Router Path')
 else
 update preferences set ParameterValue = 'C:\Scrap\Router' where parameter = 'DEFRouterPath'
-
+GO
 
 IF OBJECT_ID('[dbo].[GPSLocation]', 'U') IS NOT NULL 
   DROP TABLE [dbo].[GPSLocation]

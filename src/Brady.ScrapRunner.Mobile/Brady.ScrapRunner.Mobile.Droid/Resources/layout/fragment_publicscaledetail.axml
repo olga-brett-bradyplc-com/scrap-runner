@@ -72,7 +72,6 @@
             style="@style/ScrapRunnerTheme.StandardButtonStyle"
             android:layout_weight=".5"
             local:MvxBind="Text CantProcessLabel; Click NoProcessCommandAsync"
-            local:MvxLang="Text CantProcessLabel"
             android:background="@color/material_gray_900" />
         <Button
             style="@style/ScrapRunnerTheme.StandardButtonStyle"

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Enums;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
@@ -17,12 +18,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ITripService _tripService;
         private readonly ICodeTableService _codeTableService;
         private readonly ICustomerService _customerService;
+        private readonly IDriverService _driverService;
 
-        public TransactionDetailViewModel(ITripService tripService, ICodeTableService codeTableService, ICustomerService customerService)
+        public TransactionDetailViewModel(ITripService tripService, 
+            ICodeTableService codeTableService, 
+            ICustomerService customerService,
+            IDriverService driverService)
         {
             _tripService = tripService;
             _codeTableService = codeTableService;
             _customerService = customerService;
+            _driverService = driverService;
 
             Title = AppResources.TransactionDetail;
         }
@@ -39,6 +45,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
             Segment = await _tripService.FindTripSegmentInfoAsync(TripNumber, TripSegNumber);
             Container =
                 await _tripService.FindTripSegmentContainer(TripNumber, TripSegNumber, TripSegContainerSeqNumber);
@@ -50,12 +57,41 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             var containerLevels = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerLevel);
             LevelList = new ObservableCollection<CodeTableModel>(containerLevels);
+            LevelList.Insert(0, new CodeTableModel
+            {
+                CodeName = null,
+                CodeValue = null,
+                CodeDisp1 = AppResources.NoLevelSelected
+            });
 
-            var customerLocations = await _customerService.FindCustomerLocations();
+            var customerLocations = await _customerService.FindCustomerLocations(Segment.TripSegDestCustHostCode);
             CustomerLocationList = new ObservableCollection<CustomerLocationModel>(customerLocations);
+            CustomerLocationList.Insert(0, new CustomerLocationModel
+            {
+                CustHostCode = null,
+                CustLocation = CustomerLocationList.Count > 0 ? AppResources.NoLocationSelected : AppResources.NoLocationAval
+            });
 
-            var customerCommodities = await _customerService.FindCustomerCommodites();
+            var customerCommodities = await _customerService.FindCustomerCommodites(Segment.TripSegDestCustHostCode);
             CustomerCommodityList = new ObservableCollection<CustomerCommodityModel>(customerCommodities);
+            CustomerCommodityList.Insert(0, new CustomerCommodityModel
+            {
+                CustHostCode = null,
+                CustCommodityCode = null,
+                CustCommodityDesc = CustomerCommodityList.Count > 0 ? AppResources.NoCommoditySelected : AppResources.NoCommoditiesAval
+            });
+
+            if (!string.IsNullOrEmpty(Container.TripSegContainerCommodityCode))
+                SelectedCommodity =
+                    CustomerCommodityList.FirstOrDefault(
+                        cc => cc.CustCommodityCode == Container.TripSegContainerCommodityCode);
+
+            if (Container.TripSegContainerLevel.HasValue)
+                SelectedLevel = LevelList.FirstOrDefault(l => l.CodeValue == Container.TripSegContainerLevel.ToString());
+
+            if (!string.IsNullOrEmpty(Container.TripSegContainerLocation))
+                SelectedLocation =
+                    CustomerLocationList.FirstOrDefault(l => string.Equals(l.CustLocation, Container.TripSegContainerLocation, StringComparison.CurrentCultureIgnoreCase));
 
             MenuFilter = MenuFilterEnum.OnTrip;
 
@@ -69,18 +105,44 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionCompleteCommand()
         {
-            var confirm = await UserDialogs.Instance.ConfirmAsync(AppResources.MarkContainerComplete, AppResources.ContainerComplete);
-            if (confirm)
+            short selectedLevel;
+            var containerAction =
+                        await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                        {
+                            EmployeeId = CurrentDriver.EmployeeId,
+                            PowerId = CurrentDriver.PowerId,
+                            ActionType = ContainerActionTypeConstants.Done,
+                            ActionDateTime = DateTime.Now,
+                            MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                            TripNumber = TripNumber,
+                            TripSegNumber = Container.TripSegNumber,
+                            ContainerNumber = TripSegContainerNumber,
+                            ContainerLevel = short.TryParse(SelectedLevel.CodeValue, out selectedLevel) ? selectedLevel : (short?) null,
+                            ContainerLocation = SelectedLocation?.CustLocation,
+                            CommodityCode = SelectedCommodity?.CustCommodityCode,
+                            CommodityDesc = SelectedCommodity?.CustCommodityDesc
+                        });
+
+            if (containerAction.WasSuccessful)
             {
                 if (!string.IsNullOrEmpty(TripSegContainerNumber))
                     Container.TripSegContainerNumber = TripSegContainerNumber;
 
-                Container.TripSegContainerLevel = short.Parse(Level.CodeValue);
+                Container.TripSegContainerLevel = string.IsNullOrEmpty(SelectedLevel?.CodeValue) ? (short?) null : short.Parse(SelectedLevel?.CodeValue);
+                Container.TripSegContainerCommodityCode = string.IsNullOrEmpty(SelectedCommodity?.CustHostCode) ? null : SelectedCommodity.CustCommodityCode;
+                Container.TripSegContainerCommodityDesc = string.IsNullOrEmpty(SelectedCommodity?.CustHostCode) ? null : SelectedCommodity.CustCommodityDesc;
+                Container.TripSegContainerLocation = string.IsNullOrEmpty(SelectedLocation?.CustHostCode) ? null : SelectedLocation.CustLocation;
+
+                // Container.TripSegContainerNotes = not implemented server side
 
                 await _tripService.CompleteTripSegmentContainerAsync(Container);
-                
+
                 Close(this);
-                ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
+                ShowViewModel<TransactionSummaryViewModel>(new {tripNumber = TripNumber, methodOfEntry = MethodOfEntry});
+            }
+            else
+            {
+                UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
             }
         }
 
@@ -96,24 +158,52 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async Task ExecuteTransactionUnableToProcessCommand()
         {
             var exceptions = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ExceptionCodes);
-            var exceptionDialogAsync = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, "", AppResources.Cancel,
+            var exceptionDialogAsync = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, "", AppResources.Cancel, null,
                         exceptions.Select(ct => ct.CodeDisp1).ToArray());
             if (exceptionDialogAsync != AppResources.Cancel)
             {
+                short selectedLevel;
                 var exceptionObj = exceptions.FirstOrDefault(ct => ct.CodeDisp1 == exceptionDialogAsync);
+                var containerAction =
+                            await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                            {
+                                EmployeeId = CurrentDriver.EmployeeId,
+                                PowerId = CurrentDriver.PowerId,
+                                ActionType = ContainerActionTypeConstants.Exception,
+                                ActionCode = exceptionDialogAsync,
+                                ActionDesc = exceptionObj?.CodeDisp1,
+                                ActionDateTime = DateTime.Now,
+                                MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                                TripNumber = TripNumber,
+                                TripSegNumber = Container.TripSegNumber,
+                                ContainerNumber = TripSegContainerNumber,
+                                ContainerLevel = short.TryParse(SelectedLevel.CodeValue, out selectedLevel) ? selectedLevel : (short?)null,
+                                ContainerLocation = SelectedLocation?.CustLocation,
+                                CommodityCode = SelectedCommodity?.CustCommodityCode,
+                                CommodityDesc = SelectedCommodity?.CustCommodityDesc
+                            });
 
-                if (!string.IsNullOrEmpty(TripSegContainerNumber))
-                    Container.TripSegContainerNumber = TripSegContainerNumber;
+                if (containerAction.WasSuccessful)
+                {
+                    if (!string.IsNullOrEmpty(TripSegContainerNumber))
+                        Container.TripSegContainerNumber = TripSegContainerNumber;
 
-                Container.TripSegContainerLevel = short.Parse(Level.CodeValue);
-                await _tripService.UpdateTripSegmentContainerAsync(Container);
+                    Container.TripSegContainerLevel = short.TryParse(SelectedLevel.CodeValue, out selectedLevel) ? selectedLevel : (short?)null;
 
-                await _tripService.MarkExceptionTripAsync(TripNumber);
-                await _tripService.MarkExceptionTripSegmentAsync(Segment);
-                await _tripService.MarkExceptionTripSegmentContainerAsync(Container, exceptionObj.CodeValue);
+                    await _tripService.UpdateTripSegmentContainerAsync(Container);
 
-                Close(this);
-                ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
+                    await _tripService.MarkExceptionTripAsync(TripNumber);
+                    await _tripService.MarkExceptionTripSegmentAsync(Segment);
+                    await _tripService.MarkExceptionTripSegmentContainerAsync(Container, exceptionObj?.CodeValue);
+
+                    Close(this);
+                    ShowViewModel<TransactionSummaryViewModel>(
+                        new {tripNumber = TripNumber, methodOfEntry = MethodOfEntry});
+                }
+                else
+                {
+                    UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                }
             }
         }
 
@@ -177,11 +267,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _commodity, value); }
         }
 
-        private CodeTableModel _level;
-        public CodeTableModel Level
+        private CodeTableModel _selectedLevel;
+        public CodeTableModel SelectedLevel
         {
-            get { return _level; }
-            set{ SetProperty(ref _level, value); }
+            get { return _selectedLevel; }
+            set{ SetProperty(ref _selectedLevel, value); }
+        }
+
+        private CustomerLocationModel _selectedLocation;
+        public CustomerLocationModel SelectedLocation
+        {
+            get { return _selectedLocation; }
+            set { SetProperty(ref _selectedLocation, value); }
+        }
+
+        private CustomerCommodityModel _selectedCommodity;
+        public CustomerCommodityModel SelectedCommodity
+        {
+            get { return _selectedCommodity; }
+            set { SetProperty(ref _selectedCommodity, value); }
         }
 
         private string _notes;
@@ -222,5 +326,29 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private TripSegmentContainerModel Container { get; set; }
 
         private TripSegmentModel Segment { get; set; }
+
+        private DriverStatusModel CurrentDriver { get; set; }
+
+        private async Task ProcessContainer()
+        {
+            var reviewReason = await
+                _codeTableService.FindCodeTableObject(CodeTableNameConstants.ExceptionCodes,
+                    Container.TripSegContainerReviewReason);
+            var containerAction =
+            await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+            {
+                EmployeeId = CurrentDriver.EmployeeId,
+                PowerId = CurrentDriver.PowerId,
+                ActionType = (Container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? ContainerActionTypeConstants.Exception : ContainerActionTypeConstants.Done,
+                ActionCode = (Container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? Container.TripSegContainerReviewReason : null,
+                ActionDesc = reviewReason?.CodeDisp1,
+                ActionDateTime = DateTime.Now,
+                MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                TripNumber = TripNumber,
+                TripSegNumber = Container.TripSegNumber,
+                ContainerNumber = Container.TripSegContainerNumber,
+                ContainerLevel = Container.TripSegContainerLevel
+            });
+        }
     }
 }

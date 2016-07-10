@@ -1,6 +1,7 @@
 ﻿using System;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
+using Brady.ScrapRunner.Mobile.Helpers;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using MvvmCross.Core.Platform;
@@ -63,9 +64,9 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         bool IsTripLegTypePublicScale(TripSegmentModel tripSegmentContainer);
 
-        bool IsContainerDropped(TripSegmentModel tripSegment);
+        bool IsTripLegDropped(TripSegmentModel tripSegment);
 
-        bool IsContainerLoaded(TripSegmentModel tripSegment);
+        bool IsTripLegLoaded(TripSegmentModel tripSegment);
 
         Task<bool> IsTripSequenceEnforcedAsync();
 
@@ -86,6 +87,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<int> MarkExceptionTripSegmentAsync(TripSegmentModel tripSegment);
 
         Task<int> MarkExceptionTripSegmentContainerAsync(TripSegmentContainerModel container, string reviewReason);
+
+        Task PropagateContainerUpdates(string tripNumber, IEnumerable<Grouping<TripSegmentModel, TripSegmentContainerModel>> containers);
 
 
 

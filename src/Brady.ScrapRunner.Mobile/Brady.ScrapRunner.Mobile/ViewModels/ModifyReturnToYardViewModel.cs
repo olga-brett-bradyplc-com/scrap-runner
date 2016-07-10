@@ -52,7 +52,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 var selectYardAsync =
                 await
-                    UserDialogs.Instance.ActionSheetAsync(AppResources.SelectYard, "", AppResources.Cancel,
+                    UserDialogs.Instance.ActionSheetAsync(AppResources.SelectYard, "", AppResources.Cancel, null,
                         grouping.Select(gp => gp.CustName).ToArray());
 
                 if (selectYardAsync != AppResources.Cancel)
@@ -119,7 +119,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (confirm)
                 {
                     var lastSegment = tripSegments.Last();
-                    var tripSegType = _tripService.IsContainerDropped(lastSegment)
+                    var tripSegType = _tripService.IsTripLegDropped(lastSegment)
                         ? BasicTripTypeConstants.ReturnYardNC
                         : BasicTripTypeConstants.ReturnYard;
                     

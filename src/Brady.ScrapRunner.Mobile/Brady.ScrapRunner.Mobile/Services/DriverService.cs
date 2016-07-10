@@ -139,7 +139,18 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var message = await _connection.GetConnection().UpdateAsync(driverMessageEntryProcess, requeryUpdated: false);
             return message;
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverOdomUpdateProcess"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverOdomUpdateProcess>> ProcessDriverOdomUpdateAsync(DriverOdomUpdateProcess driverOdomUpdateProcess)
+        {
+            var odomupdate =
+                await _connection.GetConnection().UpdateAsync(driverOdomUpdateProcess, requeryUpdated: false);
+            return odomupdate;
         }
     }
 }
