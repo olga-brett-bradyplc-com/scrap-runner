@@ -50,6 +50,10 @@
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLoginProcess"
         },
         {
+          "text": "DriverLogoffProcess",
+          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverLogoffProcess"
+        },
+        {
           "text": "DriverMessageProcess",
           "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/DriverMessageProcess"
         },
