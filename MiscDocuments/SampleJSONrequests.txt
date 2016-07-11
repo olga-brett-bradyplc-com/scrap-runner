@@ -449,8 +449,14 @@ curl --silent --insecure --request PUT \
 ***
 *** Sample DrivcerLoginProcess
 ***
+
+curl --silent --insecure --request POST \
+     --header "Content-Type: application/json" \
+     --data "{\"username\":\"1000\", \"password\":\"drv1000\"}" \
+"https://maunb-stm10.bradyplc.com:7776/authentication/login"
+
 curl --silent --insecure --request PUT \
      --header "Content-Type: application/json" \
-     --header "cookie: bwftoken=87ec787e-604b-40d5-a2d2-3ada17dc0298" \
-     --data "{\"EmployeeId\":\"001\", \"Password\":\"ABC123\", \"PowerId\":\"001\", \"Odometer\":12345, \"OverrrideFlag\":\"Y\", \"LoginDateTime\":\"2016-03-31T15:00:00\" }" \
+     --header "cookie: bwftoken=6d52feb5-616e-4556-9ab4-51ebf45fe87f" \
+     --data "{\"EmployeeId\":\"1000\", \"Password\":\"drv1000\", \"PowerId\":\"001\", \"Odometer\":12345, \"LocaleCode\":\"1033\", \"OverrrideFlag\":\"N\", \"PndVer\":\"001\",  \"LoginDateTime\":\"2016-03-31T15:00:00\" }" \
 "https://maunb-stm10.bradyplc.com:7776//api/scraprunner/DriverLoginProcess/001/withoutrequery"
