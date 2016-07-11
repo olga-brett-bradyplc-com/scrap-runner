@@ -1768,22 +1768,28 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			public const int abc_slide_out_top = 2130968585;
 			
 			// aapt resource value: 0x7f04000a
-			public const int design_bottom_sheet_slide_in = 2130968586;
+			public const int custom_enter_anim = 2130968586;
 			
 			// aapt resource value: 0x7f04000b
-			public const int design_bottom_sheet_slide_out = 2130968587;
+			public const int custom_leave_anim = 2130968587;
 			
 			// aapt resource value: 0x7f04000c
-			public const int design_fab_in = 2130968588;
+			public const int design_bottom_sheet_slide_in = 2130968588;
 			
 			// aapt resource value: 0x7f04000d
-			public const int design_fab_out = 2130968589;
+			public const int design_bottom_sheet_slide_out = 2130968589;
 			
 			// aapt resource value: 0x7f04000e
-			public const int design_snackbar_in = 2130968590;
+			public const int design_fab_in = 2130968590;
 			
 			// aapt resource value: 0x7f04000f
-			public const int design_snackbar_out = 2130968591;
+			public const int design_fab_out = 2130968591;
+			
+			// aapt resource value: 0x7f040010
+			public const int design_snackbar_in = 2130968592;
+			
+			// aapt resource value: 0x7f040011
+			public const int design_snackbar_out = 2130968593;
 			
 			static Animation()
 			{

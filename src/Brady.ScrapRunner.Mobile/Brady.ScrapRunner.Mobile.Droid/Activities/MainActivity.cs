@@ -6,6 +6,7 @@ using Android.Support.V4.Widget;
 using Android.Views;
 using Android.Views.InputMethods;
 using Brady.ScrapRunner.Mobile.ViewModels;
+using MvvmCross.Droid.Shared.Caching;
 using MvvmCross.Droid.Support.V7.AppCompat;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Activities
@@ -17,6 +18,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
     public class MainActivity : MvxCachingFragmentCompatActivity<MainViewModel>
     {
         public DrawerLayout DrawerLayout;
+
+        private const string MenuViewModel = "MenuViewModel";
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -66,6 +69,15 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
                 DrawerLayout.CloseDrawers();
             else
                 base.OnBackPressed();
+        }
+
+        public override void OnBeforeFragmentChanging(IMvxCachedFragmentInfo fragmentInfo, Android.Support.V4.App.FragmentTransaction transaction)
+        {
+            if (!fragmentInfo.Tag.Contains(MenuViewModel))
+            {
+                transaction.SetCustomAnimations(Resource.Animation.custom_enter_anim,
+                    Resource.Animation.custom_leave_anim);
+            }
         }
 
         public void HideSoftKeyboard()
