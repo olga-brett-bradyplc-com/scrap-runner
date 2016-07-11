@@ -70,13 +70,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 var containers =
                     await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+
+                if (CurrentTransaction == null && containers.FirstOrDefault(ct => string.IsNullOrEmpty(ct.TripSegContainerComplete)) != null)
+                {
+                    var current = containers.FirstOrDefault(ct => string.IsNullOrEmpty(ct.TripSegContainerComplete));
+                    current.SelectedTransaction = true;
+                    CurrentTransaction = current;
+                }
+
                 var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
                 Containers.Add(grouping);
             }
-
-            // Set the very first trip segment container as the default current transaction
-            if (Containers.Any())
-                CurrentTransaction = Containers.FirstOrDefault().FirstOrDefault();
 
             // Is the user allowed to add a rt/rn segment? RT/RN must not exist as last segment
             var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
@@ -167,50 +171,64 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionScannedCommandAsync(string scannedNumber)
         {
+            if (string.IsNullOrEmpty(scannedNumber))
+            {
+                UserDialogs.Instance.ErrorToast(AppResources.Error, "Could not scan barcode");
+                return;
+            }
+
             foreach (var currentTripSeg in Containers.Select(container2 => container2.FirstOrDefault(tscm => tscm.TripSegContainerNumber == scannedNumber && string.IsNullOrEmpty(tscm.TripSegContainerComplete))))
                 CurrentTransaction = currentTripSeg ?? CurrentTransaction;
 
-            if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
-                CurrentTransaction.TripSegContainerNumber = scannedNumber;
-
             using ( var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
             {
-                foreach (var container in Containers.SelectMany(segment => segment))
-                {
-                    var containerAction =
-                        await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
-                        {
-                            EmployeeId = CurrentDriver.EmployeeId,
-                            PowerId = CurrentDriver.PowerId,
-                            ActionType = ContainerActionTypeConstants.Done,
-                            ActionDateTime = DateTime.Now,
-                            MethodOfEntry = TripMethodOfCompletionConstants.Scanned,
-                            TripNumber = TripNumber,
-                            TripSegNumber = container.TripSegNumber,
-                            ContainerNumber = scannedNumber,
-                        });
-
-                    if (containerAction.WasSuccessful)
+                var containerAction =
+                    await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
                     {
-                        CurrentTransaction.TripSegContainerNumber = scannedNumber;
-                        await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
-                        UpdateLocalContainers(CurrentTransaction);
-                        return;
-                    }
+                        EmployeeId = CurrentDriver.EmployeeId,
+                        PowerId = CurrentDriver.PowerId,
+                        ActionType = ContainerActionTypeConstants.Done,
+                        ActionDateTime = DateTime.Now,
+                        MethodOfEntry = TripMethodOfCompletionConstants.Scanned,
+                        TripNumber = TripNumber,
+                        TripSegNumber = CurrentTransaction.TripSegNumber,
+                        ContainerNumber = scannedNumber,
+                    });
 
-                    UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                if (containerAction.WasSuccessful)
+                {
+                    if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
+                        CurrentTransaction.TripSegContainerNumber = scannedNumber;
+
+                    await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
+                    await _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction);
+                    UpdateLocalContainers(CurrentTransaction);
+
+                    SelectNextTransactionContainer();
                     return;
                 }
+
+                UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                return;
             }
         }
 
-        private void ExecuteSelectNextTransactionCommand()
+        private void SelectNextTransactionContainer()
         {
-            // Find next trip segment container that hasn't been completed
-            foreach (var currentTripSeg in Containers.Select(container2 => container2.FirstOrDefault(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete))))
+            CurrentTransaction.SelectedTransaction = false;
+
+            foreach (var segment in Containers)
             {
-                CurrentTransaction = currentTripSeg;
-                break;
+                foreach (var container in segment.Where(container => string.IsNullOrEmpty(container.TripSegContainerComplete)))
+                {
+                    CurrentTransaction = container;
+                    CurrentTransaction.SelectedTransaction = true;
+                    break;
+                }
+
+                // Assume we've found the next transaction
+                if (CurrentTransaction.SelectedTransaction)
+                    break;
             }
         }
 
@@ -261,15 +279,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private void UpdateLocalContainers(TripSegmentContainerModel tripContainer)
         {
-            var cotainerGroupingPos =
+            var segmentPos =
                 Containers.IndexOf(
                     Containers.First(ts => ts.Key.TripSegNumber == CurrentTransaction.TripSegNumber));
 
-            var containerListPos =
-                Containers[cotainerGroupingPos].IndexOf(Containers[cotainerGroupingPos].First(
+            var containerPos =
+                Containers[segmentPos].IndexOf(Containers[segmentPos].First(
                     tscm => tscm.TripSegContainerSeqNumber == CurrentTransaction.TripSegContainerSeqNumber));
 
-            Containers[cotainerGroupingPos][containerListPos] = tripContainer;
+            Containers[segmentPos][containerPos] = tripContainer;
         }
 
         private async Task FinishTripLeg()

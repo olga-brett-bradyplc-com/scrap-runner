@@ -7,6 +7,7 @@ using System.Text;
 
 using Android.App;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
@@ -109,6 +110,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
 
             var parentLayout = tempView.FindViewById<RelativeLayout>(Resource.Id.TripLayoutParent);
             var icon = tempView.FindViewById<ImageView>(Resource.Id.arrow_image);
+            var info = tempView.FindViewById<TextView>(Resource.Id.tripContainerInfo);
 
             if (parentLayout != null)
             {
@@ -117,6 +119,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                 // Should note that currently the grouped listview only on transaction stop screen,
                 // but if we decided to use it elsewhere, we may want to move this to a custom
                 // adapter specifically just for the transactions
+                if( tscm.SelectedTransaction )
+                    parentLayout.SetBackgroundColor(Color.ParseColor("#d2e8fe"));
+                else
+                    parentLayout.SetBackgroundColor(Color.ParseColor("#ffffff"));
+
                 if (icon != null)
                 {
                     switch (tscm.TripSegContainerReviewFlag)
@@ -132,6 +139,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                             break;
                     }
                 }
+
+                if (info != null)
+                    info.Text = $"{tscm.DefaultTripSegContainerNumber} {tscm.TripSegContainerType}-{tscm.TripSegContainerSize}";
             }
 
             return tempView;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Acr.UserDialogs;
 using Android.OS;
 using Android.Runtime;
 using Android.Util;
@@ -12,6 +13,7 @@ using Android.Graphics;
 using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
+using Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView;
 using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Bindings;
@@ -59,9 +61,12 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             _allowRtnAddToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnAdd, OnAllowRtnAddChanged);
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
 
-            await Task.Delay(1000);
-            Scan();
+            await Task.Delay(3000);
 
+            using (var loading = UserDialogs.Instance.Loading("Loading Scanner"))
+            {
+                Scan();
+            }
         }
         
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
@@ -105,8 +110,12 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             base.OnResume();
 
-            await Task.Delay(1000);
-            Scan();
+            await Task.Delay(3000);
+
+            using (var loading = UserDialogs.Instance.Loading("Loading Scanner"))
+            {
+                Scan();
+            }
         }
 
         public override void OnPause()
@@ -125,29 +134,24 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         private void Scan()
         {
+            var barcodeScanningOptions = new MobileBarcodeScanningOptions
+            {
+                DelayBetweenContinuousScans = 3000
+            };
+            
             _scannerFragment.StartScanning(result =>
             {
-                if (string.IsNullOrEmpty(result?.Text))
-                {
-                    Toast.MakeText(Activity, "Could not read bar code", ToastLength.Long).Show();
-                    return;
-                }
-                
-                ViewModel.TransactionScannedCommandAsync.Execute(result.Text);
-                var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
-                //ViewModel.SelectNextTransactionCommand.Execute();
-
+                ViewModel.TransactionScannedCommandAsync.Execute(result?.Text);
                 VibrateDevice();
+
+                var listview = View.FindViewById<BindableGroupListView>(Resource.Id.TransactionSummaryListView);
 
                 Activity.RunOnUiThread(() =>
                 {
-                    // Update adapters item source
-                    listGrouping.Adapter.ItemsSource = ViewModel.Containers;
-                    listGrouping.InvalidateViews();
-                    Toast.MakeText(Activity, "Scanned: " + result.Text, ToastLength.Short).Show();
+                    listview.InvalidateViews();
+                    listview.Invalidate();
                 });
-
-            }, MobileBarcodeScanningOptions.Default);
+            }, barcodeScanningOptions);
         }
 
         private void OnAllowRtnAddChanged(object sender, PropertyChangedEventArgs args)
