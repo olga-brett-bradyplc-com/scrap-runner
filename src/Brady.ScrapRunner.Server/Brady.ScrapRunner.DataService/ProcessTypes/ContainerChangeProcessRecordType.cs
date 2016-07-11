@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -92,17 +91,23 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             // So we loop over the one to many keys in the changeSetResult.SuccessfullyUpdated
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() && !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
-                    ChangeSetResult<string> scratchChangeSetResult;
 
                     ContainerChangeProcess containersProcess = (ContainerChangeProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -157,7 +162,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //If no date is provided, get the entire Container list
                         // from the ContainerMaster table instead of the ContainerChange table.
                         //Since the date is provided, get the container changes since the last container update was provided to this driver.
-                        var containerMasterList = new List<ContainerMaster>();
+                        List<ContainerMaster> containerMasterList;
                         if (prefAllowAnyContainer == Constants.Yes)
                         {
                             containerMasterList = Common.GetContainerMasterAll(dataService, settings, userCulture, userRoleIds,
@@ -249,8 +254,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     //Now there is a driverStatus
                     driverStatus.ContainerMasterDateTime = DateTime.Now;
-                    scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
-
+                    ChangeSetResult<string> scratchChangeSetResult = Common.UpdateDriverStatus(dataService, settings, driverStatus);
                     log.DebugFormat("SRTEST:ContainerChangeProcess Saving DriverStatus Record: DriverId:{0} ContainerMasterDateTime:{1}",
                                      driverStatus.EmployeeId,
                                      driverStatus.ContainerMasterDateTime);

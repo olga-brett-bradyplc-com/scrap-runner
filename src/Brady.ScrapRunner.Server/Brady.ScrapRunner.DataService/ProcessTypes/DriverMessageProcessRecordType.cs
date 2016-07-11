@@ -2,9 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -63,6 +61,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+
         /// <summary>
         /// Perform the driver message processing.
         /// </summary>
@@ -95,16 +94,23 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
 
                     var driverMessageProcess = (DriverMessageProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -150,7 +156,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         //Sending message(s)
                         if (!SendMessage(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
-                                    driverMessageProcess, employeeMaster))
+                                    driverMessageProcess))
                         {
                             break;
                         }
@@ -195,6 +201,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             return changeSetResult;
         }
+
         /// <summary>
         /// Method to send messages to a driver
         /// </summary>
@@ -205,14 +212,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="userRoleIds"></param>
         /// <param name="userCulture"></param>
         /// <param name="driverMessageProcess"></param>
-        /// <param name="employeeMaster"></param>
         /// <returns></returns>
-        public bool SendMessage(IDataService dataService, ProcessChangeSetSettings settings,
+        private bool SendMessage(IDataService dataService, ProcessChangeSetSettings settings,
            ChangeSetResult<string> changeSetResult, string msgKey, IEnumerable<long> userRoleIds, string userCulture,
-           DriverMessageProcess driverMessageProcess, EmployeeMaster employeeMaster)
+           DriverMessageProcess driverMessageProcess)
         {
-            DataServiceFault fault = null;
-            ChangeSetResult<int> scratchChangeSetResult;
+            DataServiceFault fault;
 
             //Process will return the following list.
             List<Messages> fullMessageList = new List<Messages>();
@@ -239,7 +244,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 message.Processed = Constants.Yes;
 
                 //Do the update
-                scratchChangeSetResult = Common.UpdateMessages(dataService, settings, message);
+                ChangeSetResult<int> scratchChangeSetResult = Common.UpdateMessages(dataService, settings, message);
                 log.DebugFormat("SRTEST:Saving Message sent to DriverId:{0} From:{1}-Message:{2}.",
                                 message.ReceiverId.Trim(),message.SenderId.Trim(), message.MsgId);
                 //Check for Messages failure.
@@ -251,15 +256,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     return false;
                 }
             }
-
-
             return true;
         }
-        public bool ProcessMessage(IDataService dataService, ProcessChangeSetSettings settings,
-                   ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+
+        private bool ProcessMessage(IDataService dataService, ProcessChangeSetSettings settings,
+                   ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
                    DriverMessageProcess driverMessageProcess, EmployeeMaster employeeMaster)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
 
             if (driverMessageProcess.ReceiverId == null)
             {

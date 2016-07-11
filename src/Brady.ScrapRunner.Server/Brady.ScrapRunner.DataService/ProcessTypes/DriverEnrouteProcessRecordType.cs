@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -64,6 +62,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+
         /// <summary>
         /// Perform the driver enroute processing.
         /// </summary>
@@ -96,21 +95,27 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
-
                     int tripSegmentMileageCount = 0;
                     int containerHistoryInsertCount = 0;
                     int driverHistoryInsertCount = 0;
                     int powerHistoryInsertCount = 0;
 
                     var driverEnrouteProcess = (DriverEnrouteProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -182,14 +187,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (driverEnrouteProcess.Mdtid == null)
                     {
                         // Lookup Preference: DEFMDTPrefix
-                        string prefMDTPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                        string prefMdtPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                       Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
-                        driverEnrouteProcess.Mdtid = prefMDTPrefix + driverEnrouteProcess.EmployeeId;                        
+                        driverEnrouteProcess.Mdtid = prefMdtPrefix + driverEnrouteProcess.EmployeeId;                        
                     }
 
                     ////////////////////////////////////////////////
@@ -251,8 +256,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Get a list of all containers for the segment
-                    var tripSegContainerList = new List<TripSegmentContainer>();
-                    tripSegContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
+                    var tripSegContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
                                         driverEnrouteProcess.TripNumber, driverEnrouteProcess.TripSegNumber, out fault);
                     if (null != fault)
                     {
@@ -500,7 +504,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         // Find the previous segment
                         var previousTripSegment = (from item in tripSegList
-                                                   where -1 == item.TripSegNumber.CompareTo(driverEnrouteProcess.TripSegNumber)
+                                                   where -1 == String.Compare(item.TripSegNumber, driverEnrouteProcess.TripSegNumber, StringComparison.Ordinal)
                                                    select item).LastOrDefault();
                         if (previousTripSegment != null)
                         {
@@ -639,7 +643,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     // Preferences:  Lookup the yard preference "DEFTHScale".  
                     // If preference DEFTHScale set to Y then set the send scale flag.
-                    string preDEFTHScale = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                    string preDefthScale = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                            currentTrip.TripTerminalId, PrefYardConstants.DEFTHScale, out fault);
                     if (null != fault)
                     {
@@ -647,7 +651,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
                     //First, this flag must be set to Y or nothing will be sent.
-                    if (preDEFTHScale == Constants.Yes)
+                    if (preDefthScale == Constants.Yes)
                     {
                         //Also these flags must be set on the trip record
                         if (currentTrip.TripCommodityScaleMsg == Constants.Yes ||
