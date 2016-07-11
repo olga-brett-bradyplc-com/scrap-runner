@@ -195,6 +195,7 @@
     <Compile Include="Mappings\DriverDelayProcessMap.cs" />
     <Compile Include="Mappings\DriverGPSLocationProcessMap.cs" />
     <Compile Include="Mappings\DriverImageProcessMap.cs" />
+    <Compile Include="Mappings\DriverLogoffProcessMap.cs" />
     <Compile Include="Mappings\DriverMessageProcessMap.cs" />
     <Compile Include="Mappings\DriverNewContainerProcessMap.cs" />
     <Compile Include="Mappings\DriverOdomUpdateProcessMap.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="ProcessTypes\DriverDelayProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverGPSLocationProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverImageProcessRecordType.cs" />
+    <Compile Include="ProcessTypes\DriverLogoffProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverMessageProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverNewContainerProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverOdomUpdateProcessRecordType.cs" />
@@ -380,6 +382,8 @@
     <Compile Include="Validators\DriverGPSLocationProcessValidator.cs" />
     <Compile Include="Validators\DriverImageProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverImageProcessValidator.cs" />
+    <Compile Include="Validators\DriverLogoffProcessDeletionValidator.cs" />
+    <Compile Include="Validators\DriverLogoffProcessValidator.cs" />
     <Compile Include="Validators\DriverMessageProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverMessageProcessValidator.cs" />
     <Compile Include="Validators\DriverNewContainerProcessDeletionValidator.cs" />

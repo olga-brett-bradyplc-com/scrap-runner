@@ -31,7 +31,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ITerminalService _terminalService;
         private readonly IConnectionService _connection;
         private readonly IMessagesService _messagesService;
-        private readonly IQueueScheduler _queueScheduler;
+        private readonly IBackgroundScheduler _backgroundScheduler;
         private readonly ILocationService _locationService;
         private readonly ILocationOdometerService _locationOdometerService;
         
@@ -46,7 +46,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ITerminalService terminalService,
             IMessagesService messagesService,
             IConnectionService connection, 
-            IQueueScheduler queueScheduler, 
+            IBackgroundScheduler backgroundScheduler, 
             ILocationService locationService, 
             ILocationOdometerService locationOdometerService)
         {
@@ -61,7 +61,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _messagesService = messagesService;
 
             _connection = connection;
-            _queueScheduler = queueScheduler;
+            _backgroundScheduler = backgroundScheduler;
             _locationService = locationService;
             _locationOdometerService = locationOdometerService;
             Title = AppResources.SignInTitle;
@@ -176,7 +176,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 IClientSettings clientSettings = new DemoClientSettings();
                 _connection.CreateConnection(MobileConstants.DefaultServiceProtocol + PhoneSettings.ServerSettings, clientSettings.UserName, clientSettings.Password, MobileConstants.DefaultServiceName);
 
-                _queueScheduler.Unschedule();
+                _backgroundScheduler.Unschedule();
                 _locationService.Stop();
                 _locationOdometerService.Stop();
 
@@ -375,7 +375,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
 
             }
-            _queueScheduler.Schedule(60000);
+            _backgroundScheduler.Schedule(60000);
             _locationService.Start();
             _locationOdometerService.Start(Convert.ToDouble(Odometer));
             return true;

@@ -13,21 +13,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class MenuViewModel : BaseViewModel
     {
         private readonly IConnectionService _connection;
-        private readonly IQueueScheduler _queueScheduler;
+        private readonly IBackgroundScheduler _backgroundScheduler;
         private readonly ICodeTableService _codeTableService;
         private readonly IMessagesService _messagesService;
         private readonly ILocationService _locationService;
         private readonly IDriverService _driverService;
 
         public MenuViewModel(IConnectionService connection, 
-            IQueueScheduler queueScheduler, 
+            IBackgroundScheduler backgroundScheduler, 
             ICodeTableService codeTableService, 
             ILocationService locationService, 
             IMessagesService messageService,
             IDriverService driverService)
         {
             _connection = connection;
-            _queueScheduler = queueScheduler;
+            _backgroundScheduler = backgroundScheduler;
             _codeTableService = codeTableService;
             _locationService = locationService;
             _messagesService = messageService;
@@ -44,7 +44,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (logoutDialog)
             {
-                _queueScheduler.Unschedule();
+                _backgroundScheduler.Unschedule();
                 _locationService.Stop();
                 _connection.DeleteConnection();
                 ShowViewModel<SignInViewModel>();
@@ -59,7 +59,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             await UserDialogs.Instance.AlertAsync(
                             AppResources.ForcedLogoffMessage, AppResources.ForcedLogoff, AppResources.OK);
 
-            _queueScheduler.Unschedule();
+            _backgroundScheduler.Unschedule();
             _locationService.Stop();
             _connection.DeleteConnection();
             ShowViewModel<SignInViewModel>();

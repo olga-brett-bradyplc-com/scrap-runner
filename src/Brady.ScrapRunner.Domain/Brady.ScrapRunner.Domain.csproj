@@ -59,6 +59,7 @@
     <Compile Include="Metadata\DriverEnrouteProcessMetadata.cs" />
     <Compile Include="Metadata\DriverGPSLocationMetadata.cs" />
     <Compile Include="Metadata\DriverImageProcessMetadata.cs" />
+    <Compile Include="Metadata\DriverLogoffProcessMetadata.cs" />
     <Compile Include="Metadata\DriverMessageProcessMetadata.cs" />
     <Compile Include="Metadata\DriverNewContainerProcessMetadata.cs" />
     <Compile Include="Metadata\DriverOdomUpdateProcessMetadata.cs" />
@@ -185,6 +186,7 @@
     <Compile Include="Process\DriverGPSLocation.cs" />
     <Compile Include="Process\DriverImageProcess.cs" />
     <Compile Include="Process\DriverLoginProcess.cs" />
+    <Compile Include="Process\DriverLogoffProcess.cs" />
     <Compile Include="Process\DriverMessageProcess.cs" />
     <Compile Include="Process\DriverNewContainerProcess.cs" />
     <Compile Include="Process\DriverOdomUpdateProcess.cs" />

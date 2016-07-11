@@ -507,7 +507,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     oldDriverDelay.DriverId, oldDriverDelay.DelaySeqNumber, oldDriverDelay.TripNumber);
                     if (Common.LogChangeSetFailure(changeSetResult, oldDriverDelay, log))
                     {
-                        var s = string.Format("DriverDelayProcess:Could not update DriverDelay for DriverId:{0} Seq#:{1} Trip:{2}.",
+                        var s = string.Format("DriverDelayProcess:Could not delete DriverDelay for DriverId:{0} Seq#:{1} Trip:{2}.",
                                 oldDriverDelay.DriverId, oldDriverDelay.DelaySeqNumber, oldDriverDelay.TripNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;

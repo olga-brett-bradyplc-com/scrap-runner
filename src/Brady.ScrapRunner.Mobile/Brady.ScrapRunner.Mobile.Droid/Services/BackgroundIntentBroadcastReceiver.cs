@@ -4,12 +4,12 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
     using Android.Support.V4.Content;
 
     [BroadcastReceiver]
-    public class QueueIntentBroadcastReceiver : WakefulBroadcastReceiver
+    public class BackgroundIntentBroadcastReceiver : WakefulBroadcastReceiver
     {
         public override void OnReceive(Context context, Intent intent)
         {
-            var queueServiceIntent = new Intent(context, typeof(QueueIntentService));
-            StartWakefulService(context, queueServiceIntent);
+            var serviceIntent = new Intent(context, typeof(BackgroundIntentService));
+            StartWakefulService(context, serviceIntent);
         }
     }
 }

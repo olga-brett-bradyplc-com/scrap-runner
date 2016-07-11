@@ -541,7 +541,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     tripContainer.TripSegContainerSeqNumber);
                     if (Common.LogChangeSetFailure(changeSetResult, tripContainer, log))
                     {
-                        var s = string.Format("DriverSegmentDoneProcess:Could not update TripSegmentMileage for Trip:{0}-{1} Seq:{2} - Segment Canceled.",
+                        var s = string.Format("DriverSegmentDoneProcess:Could not delete TripSegmentMileage for Trip:{0}-{1} Seq:{2} - Segment Canceled.",
                                 tripContainer.TripNumber, tripContainer.TripSegNumber,
                                 tripContainer.TripSegContainerSeqNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
@@ -567,7 +567,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     tripMileage.TripSegMileageSeqNumber);
                     if (Common.LogChangeSetFailure(changeSetResult, tripMileage, log))
                     {
-                        var s = string.Format("DriverSegmentDoneProcess:Could not update TripSegmentMileage for Trip:{0}-{1} Seq:{2} - Segment Canceled.",
+                        var s = string.Format("DriverSegmentDoneProcess:Could not delete TripSegmentMileage for Trip:{0}-{1} Seq:{2} - Segment Canceled.",
                                 tripMileage.TripNumber, tripMileage.TripSegNumber,
                                 tripMileage.TripSegMileageSeqNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
@@ -598,7 +598,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     tripSegment.TripNumber, tripSegment.TripSegNumber);
                     if (Common.LogChangeSetFailure(changeSetResult, tripSegment, log))
                     {
-                        var s = string.Format("DriverSegmentDoneProcess:Could not update TripSegment for Trip:{0}-{1} - Segment Canceled.",
+                        var s = string.Format("DriverSegmentDoneProcess:Could not delete TripSegment for Trip:{0}-{1} - Segment Canceled.",
                                 tripSegment.TripNumber, tripSegment.TripSegNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                         break;

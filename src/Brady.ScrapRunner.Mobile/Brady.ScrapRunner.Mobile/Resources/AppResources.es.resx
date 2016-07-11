@@ -308,12 +308,12 @@
     <value>ScrapRunner Registrarse</value>
   </data>
   <data name="LogOutMessage" xml:space="preserve">
-    <value>Are you sure you want to log out of ScrapRunner? (Spanish)</value>
+    <value>¿Seguro que desea cerrar la sesión de ScrapRunner?</value>
     <comment>MenuViewModel</comment>
   </data>
   <data name="LogOut" xml:space="preserve">
-    <value>Log Out (Spanish)</value>
-    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
+    <value>Cerrar sesión</value>
+    <comment>MenuViewModel</comment>
   </data>
   <data name="No" xml:space="preserve">
     <value>No</value>
@@ -324,12 +324,12 @@
     <comment>MenuViewModel</comment>
   </data>
   <data name="LoadingPreferences" xml:space="preserve">
-    <value>Loading Preferences ( spanish )</value>
-    <comment>NEEDS TRANSLATION; sign in view</comment>
+    <value>Cargando Preferencias</value>
+    <comment>sign in view</comment>
   </data>
   <data name="FinishTripLabel" xml:space="preserve">
-    <value>Complete Trip ( spanish )</value>
-    <comment>NEEDS TRANSLATION; RouteDetail</comment>
+    <value>de viaje completa</value>
+    <comment>RouteDetail</comment>
   </data>
   <data name="YardScaleLabel" xml:space="preserve">
     <value>Jardin / Escala</value>
@@ -355,8 +355,8 @@
     <comment>Fuel Entry View</comment>
   </data>
   <data name="LoadingMiscInformation" xml:space="preserve">
-    <value>Loading Miscellaneous Information (es)</value>
-    <comment>NEEDS TRANSLATION; SignInViewModel</comment>
+    <value>Información de carga Varios</value>
+    <comment>SignInViewModel</comment>
   </data>
   <data name="Messages" xml:space="preserve">
     <value>Mensajes</value>
@@ -402,201 +402,275 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <comment>Public Scale Detail button label text</comment>
   </data>
   <data name="TransactionDetail" xml:space="preserve">
-    <value>Transaction Detail ( Spanish)</value>
-    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
+    <value>Detalle de transacciones</value>
+    <comment>TransactionDetailViewModel</comment>
   </data>
   <data name="Complete" xml:space="preserve">
-    <value>Complete ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; Transaction Detail View</comment>
+    <value>Completar</value>
+    <comment>Transaction Detail View</comment>
   </data>
   <data name="UnableToProcess" xml:space="preserve">
-    <value>Unable To Process ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; Transaction Detail View</comment>
+    <value>No se puede procesar</value>
+    <comment>Transaction Detail View</comment>
   </data>
   <data name="Photos" xml:space="preserve">
-    <value>Photos ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; PhotosViewModel</comment>
+    <value>fotos</value>
+    <comment>PhotosViewModel</comment>
   </data>
   <data name="BackOnDuty" xml:space="preserve">
-    <value>Back On Duty (Spanish)</value>
-    <comment>NEEDS TRANSLATION; DelayViewModel</comment>
+    <value>Volver On Duty</value>
+    <comment>DelayViewModel</comment>
   </data>
   <data name="CompleteTrip" xml:space="preserve">
-    <value>Performing this action will complete this trip ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; Scale Detail</comment>
+    <value>La realización de esta acción será completar este viaje</value>
+    <comment>Scale Detail</comment>
   </data>
   <data name="Signature" xml:space="preserve">
-    <value>Signature</value>
+    <value>Firma</value>
     <comment>Transaction Summary</comment>
   </data>
   <data name="ReturnToYardAdd" xml:space="preserve">
-    <value>Add Return To Yard (Spanish)</value>
-    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+    <value>Añadir Volver a Yard</value>
+    <comment>ModifyReturnToYardViewModel</comment>
   </data>
   <data name="ReturnToYardEdit" xml:space="preserve">
-    <value>Edit Return To Yard (Spanish)</value>
-    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+    <value>Editar Volver a Yard</value>
+    <comment>ModifyReturnToYardViewModel</comment>
   </data>
   <data name="Delay" xml:space="preserve">
-    <value>Delay (Spanish)</value>
-    <comment>NEEDS TRANSLATION; DelayViewModel</comment>
+    <value>Retrasar</value>
+    <comment>DelayViewModel</comment>
   </data>
   <data name="ConfirmBackOnDuty" xml:space="preserve">
-    <value>Are you back on duty? (Spanish)</value>
-    <comment>NEEDS TRANSLATION; DelayViewModel</comment>
+    <value>¿Estás de nuevo en servicio ?</value>
+    <comment>DelayViewModel</comment>
   </data>
   <data name="ConfirmReturnToYardAdd" xml:space="preserve">
-    <value>You are about to add the following terminal as a Return To Yard segment :{0}{2}{1}{3}{1}{4}{0}Are you sure you want to add this? ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+    <value>Vas a agregar el siguiente terminal, como un segmento Volver a Yard :{0}{2}{1}{3}{1}{4}{0}¿Está seguro de que quiere añadir este ?</value>
+    <comment>ModifyReturnToYardViewModel</comment>
   </data>
   <data name="ConfirmReturnToYardEdit" xml:space="preserve">
-    <value>You are about to change the Return To Yard Segment from :{0}{2}{1}{3}{1}{4}{0}To:{0}{5}{1}{6}{1}{7}{0}Are you sure you want to change this? ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+    <value>Usted está a punto de cambiar el Segmento Volver a Yard de :{0}{2}{1}{3}{1}{4}{0}To:{0}{5}{1}{6}{1}{7}{0}¿Está seguro de que desea cambiar esto?</value>
+    <comment>ModifyReturnToYardViewModel</comment>
   </data>
   <data name="SelectYard" xml:space="preserve">
-    <value>Select A Yard ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+    <value>Seleccionar un patio</value>
+    <comment>ModifyReturnToYardViewModel</comment>
   </data>
   <data name="ConfirmLabel" xml:space="preserve">
-    <value>Confirm (Spanish)</value>
-    <comment>NEEDS TRANSLATION; ModifyReturnToYardViewModel</comment>
+    <value>Confirmar</value>
+    <comment>ModifyReturnToYardViewModel</comment>
   </data>
   <data name="PerformActionLabel" xml:space="preserve">
-    <value>Performing this action will complete this trip. {0} Are you sure you want to do this? ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; TransactionConfirmationViewModel</comment>
+    <value>La realización de esta acción será completar este viaje. {0} ¿Seguro que quieres hacer esto?</value>
+    <comment>TransactionConfirmationViewModel</comment>
   </data>
   <data name="NewSegmentCreated" xml:space="preserve">
-    <value>New Segment Successfully Created ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; ModifyReturnToYardFragment</comment>
+    <value>Nuevo Segmento creó correctamente</value>
+    <comment>ModifyReturnToYardFragment</comment>
   </data>
   <data name="SegmentUpdated" xml:space="preserve">
-    <value>Trip Segment Successfully Updated! ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; ModifyReturnToYardFragment</comment>
+    <value>Segmento de viaje Actualizado con éxito !</value>
+    <comment>ModifyReturnToYardFragment</comment>
   </data>
   <data name="ContainerComplete" xml:space="preserve">
-    <value>Container Complete ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
+    <value>contenedor completo</value>
+    <comment>TransactionDetailViewModel</comment>
   </data>
   <data name="MarkContainerComplete" xml:space="preserve">
-    <value>Mark this container as complete? ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
+    <value>Marcar este recipiente tan completa ?</value>
+    <comment>TransactionDetailViewModel</comment>
   </data>
   <data name="SelectException" xml:space="preserve">
-    <value>Select Exception Code ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; TransactionDetailViewModel</comment>
+    <value>Seleccione Código de excepción</value>
+    <comment>TransactionDetailViewModel</comment>
   </data>
   <data name="SelectDelay" xml:space="preserve">
-    <value>Select Delay Reason ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
+    <value>Selecciona la razón de retardo</value>
+    <comment>MenuViewModel</comment>
   </data>
   <data name="SelectUser" xml:space="preserve">
-    <value>Select User To Message ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
+    <value>Seleccionar usuarios a los mensajes</value>
+    <comment>MenuViewModel</comment>
   </data>
   <data name="NoUsers" xml:space="preserve">
-    <value>No users found to message ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; MenuViewModel</comment>
+    <value>No se encontraron usuarios al mensaje</value>
+    <comment>MenuViewModel</comment>
   </data>
   <data name="SignAndPrint" xml:space="preserve">
-    <value>You must sign and print your name ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; TransactionConfirmationViewModel</comment>
+    <value>Debe firmar y escribir su nombre</value>
+    <comment>TransactionConfirmationViewModel</comment>
   </data>
   <data name="LanguageLabel" xml:space="preserve">
-    <value>Language( Spanish )</value>
-    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+    <value>Idioma</value>
+    <comment>SettingsViewModel</comment>
   </data>
   <data name="NoServerEndpoint" xml:space="preserve">
-    <value>No Server Endpoint Set ( Spanish )</value>
-    <comment>NEEDS TRANSLATION;</comment>
+    <value>Ningún servidor de punto final Set</value>
   </data>
   <data name="NoServerSummary" xml:space="preserve">
-    <value>Please go to the settings menu and set a server endpoint ( Spanish )</value>
-    <comment>NEEDS TRANSLATION;</comment>
+    <value>Por favor, vaya al menú de configuración y establecer un punto final de servidor</value>
   </data>
   <data name="SelectLanguage" xml:space="preserve">
-    <value>Select Language ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+    <value>Seleccione el idioma</value>
+    <comment>SettingsViewModel</comment>
   </data>
   <data name="ServerInput" xml:space="preserve">
-    <value>Enter the server endpoint address( Spanish )</value>
-    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+    <value>Introduzca la dirección de punto final de servidor</value>
+    <comment>SettingsViewModel</comment>
   </data>
   <data name="ServerLabel" xml:space="preserve">
-    <value>Server Endpoint( Spanish )</value>
-    <comment>NEEDS TRANSLATION; SettingsViewModel</comment>
+    <value>servidor de punto final</value>
+    <comment>SettingsViewModel</comment>
   </data>
   <data name="LoadDropContainer" xml:space="preserve">
-    <value>Load/Drop Containers ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; LoadDropContainerViewModel</comment>
+    <value>Cargar / gota Contenedores</value>
+    <comment>LoadDropContainerViewModel</comment>
   </data>
   <data name="AddContainer" xml:space="preserve">
-    <value>Add Container ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+    <value>Añadir Container</value>
+    <comment>LoadDropContainer</comment>
   </data>
   <data name="ContainerNotFound" xml:space="preserve">
-    <value>Container {0} not found in ContainerMaster ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+    <value>Recipiente {0} no se encuentra en ContainerMaster</value>
+    <comment>LoadDropContainer</comment>
   </data>
   <data name="ContainerNumber" xml:space="preserve">
-    <value>Container # ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+    <value>Envase #</value>
+    <comment>LoadDropContainer</comment>
   </data>
   <data name="ContainerTitle" xml:space="preserve">
-    <value>Container #{0} ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; ContainerDetailViewModel</comment>
+    <value>Envase #{0}</value>
+    <comment>ContainerDetailViewModel</comment>
   </data>
   <data name="DroppingContainer" xml:space="preserve">
-    <value>Dropping Container ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+    <value>Recipiente de goteo</value>
+    <comment>LoadDropContainer</comment>
   </data>
   <data name="EnterContainerNumber" xml:space="preserve">
-    <value>Enter the container number you wish to add ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+    <value>Introduce el número de contenedores que desea añadir</value>
+    <comment>LoadDropContainer</comment>
   </data>
   <data name="LoadingContainer" xml:space="preserve">
-    <value>Loading Container ( Spanish )</value>
-    <comment>NEEDS TRANSLATION; LoadDropContainer</comment>
+    <value>carga de contenedores</value>
+    <comment>LoadDropContainer</comment>
   </data>
   <data name="AddingContainer" xml:space="preserve">
-    <value>Adding Container ( Spanish )</value>
-    <comment>NEEDS TRANSLATION;</comment>
+    <value>Adición de contenedores</value>
   </data>
   <data name="AddNewContainer" xml:space="preserve">
-    <value>Add New Container ( Spanish )</value>
-    <comment>NEEDS TRANSLATION;</comment>
+    <value>Añadir envase nuevo</value>
   </data>
   <data name="ContainerLoaded" xml:space="preserve">
-    <value>Container {0} has already been loaded ( Spanish )</value>
-    <comment>NEEDS TRANSLATION;</comment>
+    <value>Recipiente {0} ya se ha cargado</value>
   </data>
   <data name="Loading" xml:space="preserve">
-    <value>Loading ( Spanish )</value>
-    <comment>NEEDS TRANSLATION;</comment>
+    <value>Cargando</value>
   </data>
   <data name="EnterOdometer" xml:space="preserve">
-    <value>Enter the corrected odometer reading</value>
+    <value>Introduzca la lectura del odómetro corregido</value>
   </data>
   <data name="PerformTripSegmentComplete" xml:space="preserve">
-    <value>Are you sure you want to complete this leg of the trip?</value>
+    <value>¿Está seguro de que desea completar esta etapa del viaje ?</value>
   </data>
   <data name="NoCommoditiesAval" xml:space="preserve">
-    <value>NO COMMODITIES AVALIABLE</value>
-    <comment>NEEDS TRANSLATION; TransactionDetail</comment>
+    <value>Ninguna mercancía DISPONIBLE</value>
+    <comment>TransactionDetail</comment>
   </data>
   <data name="NoCommoditySelected" xml:space="preserve">
-    <value>NO COMMODITY SELECTED</value>
-    <comment>NEEDS TRANSLATION; TransactionDetail</comment>
+    <value>NO algunos productos básicos</value>
+    <comment>TransactionDetail</comment>
   </data>
   <data name="NoLevelSelected" xml:space="preserve">
-    <value>NO LEVEL SELECTED</value>
-    <comment>NEEDS TRANSLATION; TransactionDetail</comment>
+    <value>NO nivel seleccionado</value>
+    <comment>TransactionDetail</comment>
   </data>
   <data name="NoLocationAval" xml:space="preserve">
-    <value>NO LOCATIONS AVALIABLE</value>
-    <comment>NEEDS TRANSLATION; TransactionDetail</comment>
+    <value>No hay ubicaciones disponible</value>
+    <comment>TransactionDetail</comment>
   </data>
   <data name="NoLocationSelected" xml:space="preserve">
-    <value>NO LOCATION SELECTED</value>
-    <comment>NEEDS TRANSLATION; TransactionDetail</comment>
+    <value>NO posición deseada</value>
+    <comment>TransactionDetail</comment>
+  </data>
+  <data name="NotificationMessageTitle" xml:space="preserve">
+    <value>Message from {0}</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationNewTripText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been dispatched.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationNewTripTitle" xml:space="preserve">
+    <value>New Trip</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripCanceledText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been canceled by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripCanceledTitle" xml:space="preserve">
+    <value>Trip Canceled</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripFutureText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been moved to a future date.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripFutureTitle" xml:space="preserve">
+    <value>Future Trip</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripMarkedDoneText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been marked done by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripMarkedDoneTitle" xml:space="preserve">
+    <value>Trip Marked Done</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationMessageText" xml:space="preserve">
+    <value>{0}</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripModifiedText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been modified by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripModifiedTitle" xml:space="preserve">
+    <value>Trip Modified</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripOnHoldText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been placed on hold by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripOnHoldTitle" xml:space="preserve">
+    <value>Trip Placed On Hold</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripReassignedText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been reassigned to a different driver by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripReassignedTitle" xml:space="preserve">
+    <value>Trip Reassigned</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripResequenceText" xml:space="preserve">
+    <value>Dispatch has changed the trip order.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripResequenceTitle" xml:space="preserve">
+    <value>Trips Resequenced</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripUnassignedText" xml:space="preserve">
+    <value>{0} trip {1} ({2}) has been unassigned by dispatch.</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
+  </data>
+  <data name="NotificationTripUnassignedTitle" xml:space="preserve">
+    <value>Trip Unassigned</value>
+    <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
   </data>
 </root>

@@ -4,7 +4,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
     using Android.Net;
     using Interfaces;
 
-    public class NetworkAvailabilityServiceAndroid : INetworkAvailabilityService
+    public class AndroidNetworkAvailabilityService : INetworkAvailabilityService
     {
         public bool IsNetworkConnectionAvailable()
         {

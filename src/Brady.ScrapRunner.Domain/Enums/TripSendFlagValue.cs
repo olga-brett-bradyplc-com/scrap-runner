@@ -6,6 +6,32 @@ namespace Brady.ScrapRunner.Domain.Enums
 {
     [JsonConverter(typeof(RichEnumConverter))]
 
+    public enum ForceLogoffFlagValue
+    {
+        /// <summary>
+        /// 0 - Default (Not Ready).
+        /// </summary>
+        [RichEnum("Default", "Default")]
+        NotReady = 0,
+
+        /// <summary>
+        /// 1 - Force Logoff ready to be sent to driver.
+        /// </summary>
+        [RichEnum("Ready", "Ready")]
+        Ready = 1,
+
+        /// <summary>
+        /// 2 - Force Logoff sent to driver.
+        /// </summary> 
+        [RichEnum("Sent To Driver", "SentToDriver")]
+        SentToTracker = 2,
+
+        /// <summary>
+        /// 3 - Force Logoff Failed. (Not sent to driver)
+        /// </summary> 
+        [RichEnum("Send Failed", "SendFailed")]
+        SendFailed = 3,
+    }
     public enum GPSSendFlagValue
     {
         /// <summary>
@@ -21,15 +47,15 @@ namespace Brady.ScrapRunner.Domain.Enums
         Ready = 1,
 
         /// <summary>
-        /// 2 - Sent to driver.
+        /// 2 - Sent to tracker.
         /// </summary> 
         [RichEnum("Sent To Tracker", "SentToTracker")]
         SentToTracker = 2,
 
         /// <summary>
-        /// 2 - Sent to driver.
+        /// 3 - Send Failed (Not sent to tracker).
         /// </summary> 
-        [RichEnum("Sent To Tracker", "SentToTracker")]
+        [RichEnum("Send Failed", "SendFailed")]
         SendFailed = 3,
     }
     //Trip Send Auto Receipt Flag Values

@@ -17,7 +17,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     {
         private IDisposable _containersToken;
 
-        protected override int FragmentId => Resource.Layout.fragment_scalesummary;
+        protected override int FragmentId => Resource.Layout.fragment_publicscalesummary;
         protected override bool NavMenuEnabled => true;
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)

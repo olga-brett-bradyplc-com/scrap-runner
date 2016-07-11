@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -27,13 +26,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     /// <summary>
     /// The process for logging in a driver.  Call this process "withoutrequery".
     /// </summary>
-    // The mobile device will also call these processes:
-    //    ContainerChangeProcess for container master updates.
-    //    TerminalChangeProcess for terminal master updates.
-    //    CommodityMasterProcess for universal commodities.
-    //    PreferencesProcess for driver preferences.
-    //    CodeTableProcess for code table values.
-    //    TripInfoProcess for trips dispatched to the driver.
+    /// The mobile device will also call these processes:
+    ///    ContainerChangeProcess for container master updates.
+    ///    TerminalChangeProcess for terminal master updates.
+    ///    CommodityMasterProcess for universal commodities.
+    ///    PreferencesProcess for driver preferences.
+    ///    CodeTableProcess for code table values.
+    ///    TripInfoProcess for trips dispatched to the driver.
     /// 
     /// Note this processes is relatively independent of the "trivial" backing query and results
     /// are simply built up in memory.  As such, make this service call using the form of 
@@ -99,19 +98,46 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
 
             // Running the base process changeset first in this case.  This should give up the benefit of validators, 
-            // auditing, security, pipelines, etc.  Note however, we will lose non-persisted user input values which 
+            // auditing, security checks, etc.  Note however, we will lose non-persisted user input values which 
             // will not be propagated through into the changeSetResult.
+
             ChangeSetResult<string> changeSetResult = base.ProcessChangeSet(dataService, changeSet, settings);
 
-            // If no problems, we are free to process.
-            // We only log in one person at a time but in the more general cases we could be processing multiple records.
+            // If no problems, we are free to process.   Note we only log in one person at a time but in the more 
+            // general cases we could be processing multiple incoming records.
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
+                // This is coded as a loop but there will only be one login at a time.
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
-                    DriverLoginProcess driverLoginProcess = (DriverLoginProcess) changeSetResult.GetSuccessfulUpdateForId(key);
                     string msgKey = key;
+
+                    // In our case we are doing all the processing rather than a bit of light post processing.
+                    // So we want all initial values passed in by the driver.  Thus we grab the DriverLoginProcess
+                    // record from the submitted ChangeSet rather than the one from the ChangeSetResult.
+                    //DriverLoginProcess driverLoginProcess = (DriverLoginProcess) changeSetResult.GetSuccessfulUpdateForId(key);
+                    DriverLoginProcess driverLoginProcess;                    
+                    if (!changeSet.Update.TryGetValue(key, out driverLoginProcess))
+                    {
+                        var str = "Unable to process login for Driver ID.  Cannot find base request object for " +
+                                  driverLoginProcess.EmployeeId;
+                        log.Error(str);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(str));
+                        break;
+                    }
+
                     try
                     {
                         DataServiceFault fault;
@@ -119,40 +145,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         int powerHistoryInsertCount = 0;
                         int driverHistoryInsertCount = 0;
-
-                        // TODO: Determine userCulture and userRoleIds on a per user basis.
-                        string userCulture = "en-GB";
-                        IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
-
-                        // It appears in the general case I must backfill non-persisted user input values from the initial change set.
-                        // They will not be propagated through into the changeSetResult of base base.ProcessChangeSet() method.
-                        DriverLoginProcess backfillDriverLoginProcess;
-                        if (changeSet.Update.TryGetValue(key, out backfillDriverLoginProcess))
-                        {
-                            // Use a mapper?  This might not always be the best approach.  
-                            // And these are static!  Can I set this to map a subset?
-                            Mapper.Map(backfillDriverLoginProcess, driverLoginProcess);
-
-                            // OR do I just simply backfill the minimalist set?
-                            //driverLoginProcess.CodeListVersion = backfillDriverLoginProcess.CodeListVersion;
-                            //driverLoginProcess.LastContainerMasterUpdate = backfillDriverLoginProcess.LastContainerMasterUpdate;
-                            //driverLoginProcess.LastTerminalMasterUpdate = backfillDriverLoginProcess.LastTerminalMasterUpdate;
-                            //driverLoginProcess.LocaleCode = backfillDriverLoginProcess.LocaleCode;
-                            //driverLoginProcess.Mdtid = backfillDriverLoginProcess.Mdtid;
-                            //driverLoginProcess.Odometer = backfillDriverLoginProcess.Odometer;
-                            //driverLoginProcess.OverrideFlag = backfillDriverLoginProcess.OverrideFlag;
-                            //driverLoginProcess.PndVer = backfillDriverLoginProcess.PndVer;
-                            //driverLoginProcess.PowerId = backfillDriverLoginProcess.PowerId;
-                            //driverLoginProcess.LoginDateTime = backfillDriverLoginProcess.LoginDateTime
-                        }
-                        else
-                        {
-                            var str = "Unable to process login for Driver ID.  Can find base request object." +
-                                      driverLoginProcess.EmployeeId;
-                            log.Error(str);
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(str));
-                            break;
-                        }
 
                         //TripInfoProcess will return the following lists.
                         List<ContainerMaster> containersOnPowerIdList = new List<ContainerMaster>();
@@ -170,9 +162,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // UserId must be a valid EmployeeId in the EmployeeMaster and SecurityLevel must be DR for driver.
                         var employeeMaster = Common.GetEmployeeDriver(dataService, settings, userCulture, userRoleIds,
                                 driverLoginProcess.EmployeeId, out fault);
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
                         if (null == employeeMaster)
@@ -190,16 +181,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // Otherwise the power unit's region must match the driver's region. This is the norm.
                         string prefAllowAnyPowerUnit = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                        Constants.SystemTerminalId, PrefSystemConstants.DEFAllowAnyPowerUnit, out fault);
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
 
                         ////////////////////////////////////////////////
                         // Get the PowerMaster record
                         // PowerId must be a valid PowerId in the PowerMaster 
-                        var powerMaster = new PowerMaster();
+                        PowerMaster powerMaster;
                         if (prefAllowAnyPowerUnit == Constants.Yes)
                         {
                             powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
@@ -210,9 +200,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             powerMaster = Common.GetPowerUnitForRegion(dataService, settings, userCulture, userRoleIds,
                                                       driverLoginProcess.PowerId, employeeMaster.RegionId, out fault);
                         }
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
                         if (null == powerMaster)
@@ -250,9 +239,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //Get the preference DEFOdomWarnRange which is an integer representing the + or - range, typically 5 
                             string prefOdomWarnRange = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                         employeeMaster.TerminalId, PrefDriverConstants.DEFOdomWarnRange, out fault);
-                            if (null != fault)
+                            if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                             {
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                                 break;
                             }
                             if (null != prefOdomWarnRange)
@@ -271,22 +259,20 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         ////////////////////////////////////////////////
                         // Preferences:  Lookup the system preference "DEFMDTPrefix".  
-                        string prefMDTPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                        string prefMdtPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                        Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
-                        driverLoginProcess.Mdtid = prefMDTPrefix + driverLoginProcess.EmployeeId;
+                        driverLoginProcess.Mdtid = prefMdtPrefix + driverLoginProcess.EmployeeId;
 
                         ////////////////////////////////////////////////
                         //Get the driver status record for the driver. If one does not exist (which is common), add one.
                         var driverStatus = Common.GetDriverStatus(dataService, settings, userCulture, userRoleIds,
                                                     driverLoginProcess.EmployeeId, out fault);
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
 
@@ -339,9 +325,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             {
                                 var nextTripSegment = Common.GetNextIncompleteTripSegment(dataService, settings, userCulture, userRoleIds,
                                                               driverStatus.TripNumber, out fault);
-                                if (null != fault)
+                                if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                                 {
-                                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                                     break;
                                 }
                                 driverLoginProcess.TripSegNumber = nextTripSegment.TripSegNumber;
@@ -387,9 +372,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                     // Update Trip in progress flag in the trip table to 'N'
                                     var trip = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
                                                                 driverStatus.TripNumber, out fault);
-                                    if (null != fault)
+                                    if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                                     {
-                                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                                         break;
                                     }
 
@@ -420,16 +404,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (null != driverLoginProcess.TripNumber && null != driverLoginProcess.TripSegNumber)
                         {
                             CheckForPowerIdChange(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
-                                                driverLoginProcess, powerMaster, employeeMaster);
+                                                driverLoginProcess, employeeMaster);
                         }
 
                         ////////////////////////////////////////////////
                         // Get the Trip record
                         var currentTrip = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
                                                       driverLoginProcess.TripNumber, out fault);
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
                         if (null == currentTrip)
@@ -443,9 +426,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // Get the TripSegment record
                         var currentTripSegment = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
                                                       driverLoginProcess.TripNumber, driverLoginProcess.TripSegNumber,out fault);
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
                         if (null == currentTripSegment)
@@ -458,9 +440,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // Get the Customer record for the destination cust host code
                         var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
                                                  currentTripSegment.TripSegDestCustHostCode, out fault);
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
                         if (null == destCustomerMaster)
@@ -475,7 +456,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //             driverLoginProcess, employeeMaster, driverStatus, ref driverHistoryInsertCount);
 
                         if (CheckForOpenEndedDelays(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
-                                     driverLoginProcess, employeeMaster, currentTripSegment))
+                                     driverLoginProcess))
                         {
                             // Add "Back On Duty" flag to Driver History table.
                             // For the last open-ended delay that we added an end time, record a back on duty status in the DriverHistory table.
@@ -487,7 +468,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             // In that case the trip number in the DriverDelay table is #driverid
                             driverStatus.Status = DriverStatusSRConstants.BackOnDuty;
                             //Add 1 second to the action date time, so the BackOnDuty will display after the Login on the Driver History report
-                            System.TimeSpan tSpan = new System.TimeSpan(0, 0, 0, 1);
+                            var tSpan = new TimeSpan(0, 0, 0, 1);
                             driverStatus.ActionDateTime = driverLoginProcess.LoginDateTime + tSpan;
                             //The delay code is stored in the DriverStatus table but not in the DriverHistory table, so it is not needed.
                             log.Debug("SRTEST:Add BackOnDuty to DriverHistory");
@@ -495,7 +476,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster, currentTripSegment,
                                 ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                             {
-                                if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
+                                if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                                 {
                                     break;
                                 }
@@ -539,9 +520,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //for all incomplete trip segments 
                         var incompleteTripSegList = Common.GetTripSegmentsIncompleteForDriver(dataService, settings, userCulture, userRoleIds,
                                           driverLoginProcess.EmployeeId, out fault);
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
                         if (incompleteTripSegList != null)
@@ -570,7 +550,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (!Common.InsertDriverHistory(dataService, settings, driverStatus, employeeMaster, currentTripSegment,
                                 ++driverHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                         {
-                            if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
+                            if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                             {
                                 break;
                             }
@@ -609,7 +589,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (!Common.InsertPowerHistory(dataService, settings, powerMaster, employeeMaster, destCustomerMaster,
                                 ++powerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
                         {
-                            if (handleFault(changeSetResult, msgKey, fault, driverLoginProcess))
+                            if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                             {
                                 break;
                             }
@@ -683,14 +663,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //Get a list of container on the power id
                         var containersOnPowerId = Common.GetContainersForPowerId(dataService, settings, userCulture, userRoleIds,
                                                   driverLoginProcess.PowerId, out fault);
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
+                        {
+                            break;
+                        }
                         //This will be sent back to the driver
                         containersOnPowerIdList.AddRange(containersOnPowerId);
 
-                        if (null != fault)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            break;
-                        }
                         //For testing
                         log.Debug("SRTEST:GetContainersForPowerId");
                         foreach (var container in containersOnPowerId)
@@ -713,14 +692,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         // Otherwise send a list of dispatchers whose region matches the driver's region.
                         string prefSendDispatchersForArea = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                        employeeMaster.TerminalId, PrefDriverConstants.DEFSendDispatchersForArea, out fault);
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
 
                         //Get a list of users that can access messaging. This isn't just dispatchers.
-                        var usersForMessaging = new List<EmployeeMaster>();
+                        List<EmployeeMaster> usersForMessaging;
                         if (prefSendDispatchersForArea == Constants.Yes)
                         {
                             //Get just the users whose default terminal id is in the driver's area.
@@ -733,13 +711,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             usersForMessaging = Common.GetDispatcherListForRegion(dataService, settings, userCulture, userRoleIds,
                                                        employeeMaster.RegionId, out fault);
                         }
-                        //This will be sent back to the driver
-                        usersForMessagingList.AddRange(usersForMessaging);
-                        if (null != fault)
+                        if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
+                        //This will be sent back to the driver
+                        usersForMessagingList.AddRange(usersForMessaging);
+
                         //For testing
                         log.DebugFormat("SRTEST:GetDispatcherList: Sending:{0} Dispatchers", usersForMessaging.Count);
 
@@ -781,12 +759,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedDeletions.Any())
             {
                 transaction.Rollback();
-                log.Debug("SRTEST:Transaction Rollback - Login");
+                log.Debug("SRTEST:Transaction Rollback - DriverLoginProcess");
             }
             else
             {
                 transaction.Commit();
-                log.Debug("SRTEST:Transaction Committed- Login");
+                log.Debug("SRTEST:Transaction Committed - DriverLoginProcess");
                 // We need to notify that data has changed for any types we have updated
                 // We always need to notify for the current type
                 dataService.NotifyOfExternalChangesToData();
@@ -797,19 +775,20 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             return changeSetResult;
         }
+
         /// <summary>
         /// Check for open ended delays for this driver
         /// </summary>
-        public bool CheckForOpenEndedDelays(IDataService dataService, ProcessChangeSetSettings settings,
+        /// 
+        private bool CheckForOpenEndedDelays(IDataService dataService, ProcessChangeSetSettings settings,
                ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
-               DriverLoginProcess driverLoginProcess, EmployeeMaster employeeMaster, TripSegment currentTripSegment)
+               DriverLoginProcess driverLoginProcess)
         {
             DataServiceFault fault;
             var driverDelays = Common.GetDriverDelaysOpenEnded(dataService, settings, userCulture, userRoleIds,
                                              driverLoginProcess.EmployeeId, out fault);
-            if (null != fault)
+            if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
             {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                 return false;
             }
             //Even though no entries were found, the list was not null. Now also checking if count > 0.
@@ -823,7 +802,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                 //Add 1 second to the action date time, so the BackOnDuty will display after the Login on the Driver History report
                 //and the delay end time will match the driver history
-                System.TimeSpan tSpan = new System.TimeSpan(0, 0, 0, 1);
+                var tSpan = new TimeSpan(0, 0, 0, 1);
                 driverDelays[0].DelayEndDateTime = driverLoginProcess.LoginDateTime + tSpan;
 
                 for (int i = 1; i < driverDelays.Count; i++)
@@ -865,28 +844,26 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             return false;
         }
 
-  
         /// <summary>
-        /// Check for power unit change in the middle of a segment
+        /// Check for power unit change in the middle of a segment.
+        /// If trip segment is partially completed & power unit id from the login is different that the
+        /// power unit in the trip segment table, then we want to use the new power unit
+        /// Also check for an open ended entry in the TripSegmentMileage table.
+        /// There should only be one, but there may be more.
+        /// Here I think, we just want to get the last one, since our purpose here is to adjust the power id
+        /// not to close open-ended entries.
         /// </summary>
-        // If trip segment is partially completed & power unit id from the login is different that the
-        // power unit in the trip segment table, then we want to use the new power unit
-        // Also check for an open ended entry in the TripSegmentMileage table.
-        // There should only be one, but there may be more.
-        // Here I think, we just want to get the last one, since our purpose here is to adjust the power id
-        // not to close open-ended entries.
-        public static void CheckForPowerIdChange(IDataService dataService, ProcessChangeSetSettings settings,
-                   ChangeSetResult<string> changeSetResult,String msgKey, IEnumerable<long> userRoleIds, string userCulture,
-                   DriverLoginProcess driverLoginProcess, PowerMaster powerMaster, EmployeeMaster employeeMaster)
+        private void CheckForPowerIdChange(IDataService dataService, ProcessChangeSetSettings settings,
+                   ChangeSetResult<string> changeSetResult,String msgKey, long[] userRoleIds, string userCulture,
+                   DriverLoginProcess driverLoginProcess, EmployeeMaster employeeMaster)
         {
             ChangeSetResult<string> scratchChangeSetResult;
             DataServiceFault fault;
             //Get the current trip segment if open-ended
             var tripSegment = Common.GetTripSegmentOpenEnded(dataService, settings, userCulture, userRoleIds,
                                     driverLoginProcess.TripNumber, driverLoginProcess.TripSegNumber, out fault);
-            if (null != fault)
+            if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
             {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                 return;
             }
             if (null != tripSegment)
@@ -924,9 +901,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             //Get the last open-ended trip segment mileage 
             var tripSegmentMileage = Common.GetTripSegmentMileageOpenEndedLast(dataService, settings, userCulture, userRoleIds,
                                     driverLoginProcess.TripNumber, driverLoginProcess.TripSegNumber, out fault);
-            if (null != fault)
+            if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
             {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                 return;
             }
             if (null != tripSegmentMileage)
@@ -957,7 +933,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         var s = string.Format("DriverLoginProcess:Could not update TripSegmentMileage for TripNumber {0}-{1} Seq#{2}.",
                                 tripSegmentMileage.TripNumber, tripSegmentMileage.TripSegNumber, tripSegmentMileage.TripSegMileageSeqNumber);
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                        return;
                     }
                 }
             }
@@ -971,7 +946,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="fault"></param>
         /// <param name="driverLoginProcess"></param>
         /// <returns>true if a fault is detected</returns>
-        private bool handleFault(ChangeSetResult<String> changeSetResult, String msgKey, DataServiceFault fault,
+        private bool FaultHandled(ChangeSetResult<String> changeSetResult, String msgKey, DataServiceFault fault,
             DriverLoginProcess driverLoginProcess)
         {
             bool faultDetected = false;
@@ -984,8 +959,20 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             return faultDetected;
         }
 
+        /// <summary>
+        /// Send message to tracker.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="changeSetResult"></param>
+        /// <param name="msgKey"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="driverLoginProcess"></param>
+        /// <param name="employeeMaster"></param>
+        /// <returns></returns>
         private bool SendToTracker(IDataService dataService, ProcessChangeSetSettings settings,
-                   ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture, 
+                   ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture, 
                    DriverLoginProcess driverLoginProcess, EmployeeMaster employeeMaster)
         {
             DataServiceFault fault;
@@ -997,11 +984,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (fault != null)
             {
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                log.ErrorFormat("Fault occured: {0} during login request: {1}", fault.Message, driverLoginProcess);
                 return false;
             }
             ////////////////////////////////////////////////////////
             // Lookup Preference: DEFMDTPrefix
-            string prefMDTPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+            string prefMdtPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                           Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
             if (fault != null)
             {
@@ -1014,9 +1002,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
                 //Build the mdtId
                 string mdtId = driverLoginProcess.EmployeeId;
-                if (prefMDTPrefix != null && prefMDTPrefix != "")
+                if (!string.IsNullOrEmpty(prefMdtPrefix))
                 {
-                    mdtId = prefMDTPrefix + mdtId;
+                    mdtId = prefMdtPrefix + mdtId;
                 }
 
                 // Build the complete path.
