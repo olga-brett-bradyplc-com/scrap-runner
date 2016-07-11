@@ -551,7 +551,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                             oldTripSegmentMileage.TripSegMileageSeqNumber);
                             if (Common.LogChangeSetFailure(changeSetResult, oldTripSegmentMileage, log))
                             {
-                                var s = string.Format("DriverEnrouteProcess:Could not update TripSegmentContainer for Trip:{0}-{1} Seq:{2}.",
+                                var s = string.Format("DriverEnrouteProcess:Could not delete TripSegmentContainer for Trip:{0}-{1} Seq:{2}.",
                                         oldTripSegmentMileage.TripNumber, oldTripSegmentMileage.TripSegNumber,
                                         oldTripSegmentMileage.TripSegMileageSeqNumber);
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
