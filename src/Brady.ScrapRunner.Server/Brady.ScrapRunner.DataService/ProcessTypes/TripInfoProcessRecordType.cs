@@ -301,7 +301,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //Save the list for sending to driver
                         fullCustomerMasterList.Add(custMaster);
 
-                        log.DebugFormat("SRTEST:TripInfoProcess:Customer Locations:HostCode:{0} Name:{1} Signature Flag:{2}",
+                        log.DebugFormat("SRTEST:TripInfoProcess:Customer Master:HostCode:{0} Name:{1} Signature Flag:{2}",
                                         custMaster.CustHostCode,
                                         custMaster.CustName,
                                         custMaster.CustSignatureRequired);

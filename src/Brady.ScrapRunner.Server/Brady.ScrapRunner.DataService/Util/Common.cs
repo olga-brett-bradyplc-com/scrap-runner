@@ -2031,6 +2031,24 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
+        /// <summary>
+        /// Delete a DriverStatus record
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="driverStatus"></param>
+        /// <returns></returns>
+        public static ChangeSetResult<string> DeleteDriverStatus(IDataService dataService, ProcessChangeSetSettings settings,
+                                              DriverStatus driverStatus)
+        {
+            var recordType = (DriverStatusRecordType)dataService.RecordTypes.Single(x => x.TypeName == "DriverStatus");
+            var changeSet = (ChangeSet<string, DriverStatus>)recordType.GetNewChangeSet();
+            changeSet.AddDelete(driverStatus.Id);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
+
         /// <summary>
         /// Delete a TripSegment record.
         /// </summary>
