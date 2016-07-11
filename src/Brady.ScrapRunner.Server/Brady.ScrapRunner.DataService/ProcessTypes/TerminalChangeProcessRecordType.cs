@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -93,6 +92,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             // So we loop over the one to many keys in the changeSetResult.SuccessfullyUpdated
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() && !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
@@ -100,10 +110,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ChangeSetResult<string> scratchChangeSetResult;
 
                     TerminalChangeProcess terminalsProcess = (TerminalChangeProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the gernal case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -159,7 +165,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         // If no date is provided, get the entire Terminal list from the Terminal Master and the details
                         // from the CustomerMaster instead of the TerminalChange table.
-                        var terminalMasterList = new List<TerminalMaster>();
+                        List<TerminalMaster> terminalMasterList;
                         if (prefSendOnlyYardsForArea == Constants.Yes)
                         {
                             terminalMasterList = Common.GetTerminalMastersForArea(dataService, settings, userCulture, userRoleIds,
@@ -179,14 +185,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         foreach (var terminal in terminalMasterList)
                         {
                             var terminalChange = new TerminalChange();
-                            var terminalCustomerMaster = new CustomerMaster();
-
                             terminalChange.TerminalId = terminal.TerminalId;
                             terminalChange.RegionId = terminal.Region;
 
                             ////////////////////////////////////////////////
                             // Get the Customer record for the each terminal
-                            terminalCustomerMaster = Common.GetCustomerForTerminal(dataService, settings, userCulture, userRoleIds,
+                            CustomerMaster terminalCustomerMaster = Common.GetCustomerForTerminal(dataService, settings, userCulture, userRoleIds,
                                                          terminal.TerminalId, out fault);
                             if (null != fault)
                             {

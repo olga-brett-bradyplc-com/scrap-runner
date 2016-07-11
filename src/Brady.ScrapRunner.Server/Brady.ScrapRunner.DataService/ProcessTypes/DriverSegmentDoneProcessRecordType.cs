@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -64,6 +63,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+
         /// <summary>
         /// Perform the driver "segment done" processing.
         /// </summary>
@@ -96,16 +96,23 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
 
                     var driverSegmentDoneProcess = (DriverSegmentDoneProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -317,8 +324,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (driverSegmentDoneProcess.DriverGenerated == Constants.Yes)
                         {
                             if (!SegmentAdd(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
-                                               driverSegmentDoneProcess, employeeMaster, powerMaster,
-                                               currentTrip, tripSegList, tripContainerList))
+                                               driverSegmentDoneProcess, employeeMaster, tripSegList, tripContainerList))
                             {
                                 break;
                             }
@@ -478,6 +484,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             return changeSetResult;
         }
+
         /// <summary>
         /// Driver canceled segment
         /// </summary>
@@ -499,14 +506,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="tripMileageList"></param>
         /// <param name="tripDelayList"></param>
         /// <returns></returns>
-        public bool SegmentCancel(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+        private bool SegmentCancel(IDataService dataService, ProcessChangeSetSettings settings,
+           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
            DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
            CustomerMaster destCustomerMaster, Trip currentTrip, List<TripSegment> tripSegList, TripSegment currentTripSegment,
            List<TripSegmentContainer> tripContainerList, List<TripReferenceNumber> tripReferenceNumberList,
            List<TripSegmentMileage> tripMileageList, List<DriverDelay> tripDelayList)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
 
             ////////////////////////////////////////////////
             //Get the DriverStatus record. 
@@ -637,8 +644,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         EventComment = comment,
                     };
 
-                    ChangeSetResult<int> eventChangeSetResult;
-                    eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
+                    ChangeSetResult<int> eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
                     log.Debug("SRTEST:Saving EventLog Record - Segment Canceled");
                     log.DebugFormat("SRTEST:Saving EventLog Record for Trip:{0}-{1} - Segment Canceled.",
                                     currentTripSegment.TripNumber, currentTripSegment.TripSegNumber);
@@ -770,14 +776,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="tripMileageList"></param>
         /// <param name="tripDelayList"></param>
         /// <returns></returns>
-        public bool SegmentDone(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+        private bool SegmentDone(IDataService dataService, ProcessChangeSetSettings settings,
+           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
            DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
            CustomerMaster destCustomerMaster, Trip currentTrip, List<TripSegment> tripSegList, TripSegment currentTripSegment,
            List<TripSegmentContainer> tripContainerList, List<TripReferenceNumber> tripReferenceNumberList,
            List<TripSegmentMileage> tripMileageList, List<DriverDelay> tripDelayList)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
             int driverHistoryInsertCount = 0;
 
             ////////////////////////////////////////////////
@@ -1274,12 +1280,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             return true;
         }
-        public bool SegmentAdd(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
-           DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
-           Trip currentTrip, List<TripSegment> tripSegList, List<TripSegmentContainer> tripContainerList)
+
+        private bool SegmentAdd(IDataService dataService, ProcessChangeSetSettings settings,
+           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
+           DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster,
+           List<TripSegment> tripSegList, List<TripSegmentContainer> tripContainerList)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
             ////////////////////////////////////////////////
             // Get the Customer record for the destination cust host code
             var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
@@ -1513,11 +1520,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         }
 
         public bool SegmentModify(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
            DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
            Trip currentTrip, List<TripSegment> tripSegList, List<TripSegmentContainer> tripContainerList)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
             ////////////////////////////////////////////////
             // Get the Customer record for the destination cust host code
             var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
@@ -1704,11 +1711,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="tripSegList"></param>
         /// <param name="tripContainerList"></param>
         /// <param name="tripReferenceNumberList"></param>
-        /// <param name="tripSegmentMileageList"></param>
+        /// <param name="tripMileageList"></param>
         /// <param name="tripDelayList"></param>
         /// <returns></returns>
-        public bool MarkTripDone(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+        private bool MarkTripDone(IDataService dataService, ProcessChangeSetSettings settings,
+           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
            DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
            CustomerMaster destCustomerMaster,Trip currentTrip, List<TripSegment> tripSegList, 
            List<TripSegmentContainer> tripContainerList,List<TripReferenceNumber> tripReferenceNumberList, 
@@ -1860,7 +1867,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             // Preferences:  Lookup the yard preference "DEFTHTrip".  
             // If preference DefTHTrip set to Y then set the send flag according to the trip status
             // Otherwise set the flag to indicate that completed trip information will not be sent to the host.
-            string prefDEFTHTrip = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+            string prefDefthTrip = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                    currentTrip.TripTerminalId, PrefYardConstants.DEFTHTrip, out fault);
             if (null != fault)
             {
@@ -1889,7 +1896,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             string tripTypeCompTripMsg = tripTypeMasterDesc?.TripTypeCompTripMsg;
 
             //First, this flag must be set to Y or nothing will be sent.
-            if (prefDEFTHTrip == Constants.Yes)
+            if (prefDefthTrip == Constants.Yes)
             {
                 //Next this flag must be set to Y or nothing will be sent
                 if (tripTypeCompTripMsg == Constants.Yes)
@@ -1931,7 +1938,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             ////////////////////////////////////////////////
             // Preferences:  Lookup the yard preference "DEFTHScale".  
             // If preference DEFTHScale set to Y then set the send scale flag.
-            string preDEFTHScale = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+            string preDefthScale = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                    currentTrip.TripTerminalId, PrefYardConstants.DEFTHScale, out fault);
             if (null != fault)
             {
@@ -1939,7 +1946,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 return false;
             }
             //First, this flag must be set to Y or nothing will be sent.
-            if (preDEFTHScale == Constants.Yes)
+            if (preDefthScale == Constants.Yes)
             {
                 //Also this flag must be set on the trip record
                 if (currentTrip.TripCommodityScaleMsg == Constants.Yes)

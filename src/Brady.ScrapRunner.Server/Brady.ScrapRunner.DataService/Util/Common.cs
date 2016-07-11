@@ -223,6 +223,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return errorsDetected;
         }
+
         /// <summary>
         /// Log an entry into the specified logger for every detected failure within a changeSetResult.
         /// </summary>
