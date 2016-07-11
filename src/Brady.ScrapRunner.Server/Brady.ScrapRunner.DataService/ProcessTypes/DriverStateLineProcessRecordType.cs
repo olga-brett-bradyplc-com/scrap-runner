@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -63,6 +61,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+
         /// <summary>
         /// Perform the driver state line crossing processing.
         /// </summary>
@@ -95,20 +94,26 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
-
                     int tripSegmentMileageCount = 0;
                     int driverHistoryInsertCount = 0;
                     int powerHistoryInsertCount = 0;
 
                     var driverStateLineProcess = (DriverStateLineProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -176,7 +181,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         driverStateLineProcess.TripNumber);
                         break;
                     }
-
 
                     ////////////////////////////////////////////////
                     //Get a list of all  segments for the trip
@@ -251,21 +255,20 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (driverStateLineProcess.Mdtid == null)
                     {
                         // Lookup Preference: DEFMDTPrefix
-                        string prefMDTPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                        string prefMdtPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
                                                       Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
                         if (fault != null)
                         {
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
                             break;
                         }
-                        driverStateLineProcess.Mdtid = prefMDTPrefix + driverStateLineProcess.EmployeeId;
+                        driverStateLineProcess.Mdtid = prefMdtPrefix + driverStateLineProcess.EmployeeId;
                     }
                     ////////////////////////////////////////////////
                     //First validate country
-                    var codeTableCountry = new CodeTable();
                     if (null != driverStateLineProcess.Country)
                     {
-                        codeTableCountry = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                        CodeTable codeTableCountry = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                                               CodeTableNameConstants.Countries, driverStateLineProcess.Country, out fault);
                         if (null != fault)
                         {
@@ -281,11 +284,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     ////////////////////////////////////////////////
                     //Now validate state and country combination
-                    var codeTableStateCountry = new CodeTable();
-                    if (null != driverStateLineProcess.State && 
-                        null != driverStateLineProcess.Country)
+                    if (null != driverStateLineProcess.State && null != driverStateLineProcess.Country)
                     {
-                        codeTableStateCountry = Common.GetCodeTableEntryForStateCountry(dataService, settings, userCulture, userRoleIds,
+                        CodeTable codeTableStateCountry = Common.GetCodeTableEntryForStateCountry(dataService, settings, userCulture, userRoleIds,
                                               CodeTableNameConstants.States, driverStateLineProcess.State, driverStateLineProcess.Country, out fault);
                         if (null != fault)
                         {

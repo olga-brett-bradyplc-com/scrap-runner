@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -63,6 +61,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+
         /// <summary>
         /// Perform the driver fuel entry processing.
         /// </summary>
@@ -95,19 +94,25 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
-
                     int driverHistoryInsertCount = 0;
                     int driverDelayInsertCount = 0;
 
                     var driverDelayProcess = (DriverDelayProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -256,12 +261,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             return changeSetResult;
         }
-        public bool ProcessDelay(IDataService dataService, ProcessChangeSetSettings settings,
-                ChangeSetResult<string> changeSetResult, string msgKey, IEnumerable<long> userRoleIds, string userCulture,
+
+        private bool ProcessDelay(IDataService dataService, ProcessChangeSetSettings settings,
+                ChangeSetResult<string> changeSetResult, string msgKey, long[] userRoleIds, string userCulture,
                 DriverDelayProcess driverDelayProcess, EmployeeMaster employeeMaster, Trip currentTrip, TripSegment currentTripSegment, 
                 int driverDelayInsertCount, int driverHistoryInsertCount)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
 
             ////////////////////////////////////////////////
             //Add a new DriverDelay Record
@@ -473,12 +479,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             return true;
         }
-        public bool ProcessBackOnDuty(IDataService dataService, ProcessChangeSetSettings settings,
-                 ChangeSetResult<string> changeSetResult, string msgKey, IEnumerable<long> userRoleIds, string userCulture,
+
+        private bool ProcessBackOnDuty(IDataService dataService, ProcessChangeSetSettings settings,
+                 ChangeSetResult<string> changeSetResult, string msgKey, long[] userRoleIds, string userCulture,
                  DriverDelayProcess driverDelayProcess, EmployeeMaster employeeMaster, Trip currentTrip, TripSegment currentTripSegment,
                  int driverDelayInsertCount, int driverHistoryInsertCount)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
 
             ////////////////////////////////////////////////
             //Find the last open ended DriverDelay Record

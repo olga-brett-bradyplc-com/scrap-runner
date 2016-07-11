@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -63,6 +62,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+
         /// <summary>
         /// Perform the driver container action processing.
         /// </summary>
@@ -95,18 +95,24 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
-
                     int containerHistoryInsertCount = 0;
 
                     var driverContainerActionProcess = (DriverContainerActionProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -407,6 +413,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             return changeSetResult;
         }
+
         /// <summary>
         ///  Processing for Container Load/Drop actions:
         /// </summary>
@@ -421,11 +428,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="containerHistoryInsertCount"></param>
         /// <returns></returns>
         public bool ContainerLoadDrop(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
            DriverContainerActionProcess driverContainerActionProcess, EmployeeMaster employeeMaster, 
            int containerHistoryInsertCount)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
             ////////////////////////////////////////////////
             //Update Container Information
             var containerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
@@ -535,11 +542,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="containerHistoryInsertCount"></param>
         /// <returns></returns>
         public bool ContainerDone(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
            DriverContainerActionProcess driverContainerActionProcess, EmployeeMaster employeeMaster,
            int containerHistoryInsertCount)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
 
             ////////////////////////////////////////////////
             // Get the Trip record
@@ -662,8 +669,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             ////////////////////////////////////////////////
             //Define the TripSegmentContainer for use later
-            TripSegmentContainer tripSegmentContainer = new TripSegmentContainer();
-            tripSegmentContainer = null;
+            TripSegmentContainer tripSegmentContainer = null;
 
             ////////////////////////////////////////////////
             //Update Container Information
@@ -989,10 +995,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="employeeMaster"></param>
         /// <returns></returns>
         public bool ContainerException(IDataService dataService, ProcessChangeSetSettings settings,
-          ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+          ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
           DriverContainerActionProcess driverContainerActionProcess, EmployeeMaster employeeMaster)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
 
             ////////////////////////////////////////////////
             // Get the Trip record
@@ -1052,8 +1058,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             ////////////////////////////////////////////////
             //Define the TripSegmentContainer for use later
-            TripSegmentContainer tripSegmentContainer = new TripSegmentContainer();
-            tripSegmentContainer = null;
+            TripSegmentContainer tripSegmentContainer = null;
 
             ////////////////////////////////////////////////
             //Get a list of all containers for the segment
@@ -1147,13 +1152,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="userCulture"></param>
         /// <param name="driverContainerActionProcess"></param>
         /// <param name="employeeMaster"></param>
-        /// <param name="containerHistoryInsertCount"></param>
         /// <returns></returns>
         public bool ContainerAdd(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
            DriverContainerActionProcess driverContainerActionProcess, EmployeeMaster employeeMaster)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
 
             ////////////////////////////////////////////////
             // Get the Trip record
@@ -1191,13 +1195,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             ////////////////////////////////////////////////
             //Define the TripSegmentContainer for use later
-            TripSegment currentTripSegment = new TripSegment();
-            //Define the TripSegmentContainer for use later
             TripSegmentContainer tripSegmentContainer = new TripSegmentContainer();
 
             ////////////////////////////////////////////////
             // Get the current TripSegment record
-            currentTripSegment = (from item in tripSegList
+            TripSegment currentTripSegment = (from item in tripSegList
                                       where item.TripSegNumber == driverContainerActionProcess.TripSegNumber
                                       select item).FirstOrDefault();
 
@@ -1250,10 +1252,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 tripSegmentContainer = new TripSegmentContainer();
 
                 //Look up the last trip segment container for this trip and segment
-                TripSegmentContainer tripSegmentContainerMax = new TripSegmentContainer();
-
                 //Use this to calculate the next sequence number.
-                tripSegmentContainerMax = Common.GetTripSegmentContainerLast(dataService, settings, userCulture, userRoleIds,
+                TripSegmentContainer tripSegmentContainerMax = Common.GetTripSegmentContainerLast(dataService, settings, userCulture, userRoleIds,
                                               driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber, out fault);
                 if (null != fault)
                 {
@@ -1311,7 +1311,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
                 tripSegmentContainer.TripSegContainerLoaded = Constants.No;
             }
-
 
             tripSegContainerList.Add(tripSegmentContainer);
 

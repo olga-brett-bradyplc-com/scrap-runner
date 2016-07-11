@@ -124,12 +124,18 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 {
                     string msgKey = key;
 
+                    DriverLoginProcess driverLoginProcess = (DriverLoginProcess)changeSetResult.GetSuccessfulUpdateForId(key);
+
                     // In our case we are doing all the processing rather than a bit of light post processing.
                     // So we want all initial values passed in by the driver.  Thus we grab the DriverLoginProcess
                     // record from the submitted ChangeSet rather than the one from the ChangeSetResult.
                     //DriverLoginProcess driverLoginProcess = (DriverLoginProcess) changeSetResult.GetSuccessfulUpdateForId(key);
-                    DriverLoginProcess driverLoginProcess;                    
-                    if (!changeSet.Update.TryGetValue(key, out driverLoginProcess))
+                    DriverLoginProcess backfillDriverLoginProcess;
+                    if (changeSet.Update.TryGetValue(key, out backfillDriverLoginProcess))
+                    {
+                        Mapper.Map(backfillDriverLoginProcess, driverLoginProcess);
+                    }
+                    else
                     {
                         var str = "Unable to process login for Driver ID.  Cannot find base request object for " +
                                   driverLoginProcess.EmployeeId;

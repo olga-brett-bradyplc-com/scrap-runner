@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -18,7 +17,6 @@ using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.Util;
-using Brady.ScrapRunner.Domain.Enums;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -42,6 +40,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     public class DriverOdomUpdateProcessRecordType : ChangeableRecordType
         <DriverOdomUpdateProcess, string, DriverOdomUpdateProcessValidator, DriverOdomUpdateProcessDeletionValidator>
     {
+
         /// <summary>
         /// Mandatory implementation of virtual base class method.
         /// </summary>
@@ -64,6 +63,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+    
         /// <summary>
         /// Perform the driver OdomUpdate processing.
         /// </summary>
@@ -96,16 +96,23 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
 
                     var driverOdomUpdateProcess = (DriverOdomUpdateProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -161,8 +168,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (!ChangePowerUnit(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                     driverOdomUpdateProcess, employeeMaster, driverStatus))
                         {
-                            var s = string.Format("Could not change for PowerId:{0} Odom:{1}.",
-                                    driverOdomUpdateProcess.PowerId, driverOdomUpdateProcess.Odometer);
+                            //var s = string.Format("Could not change for PowerId:{0} Odom:{1}.",
+                            //        driverOdomUpdateProcess.PowerId, driverOdomUpdateProcess.Odometer);
                             break;
                         }
                     }
@@ -171,13 +178,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         if (!CorrectOdometer(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                     driverOdomUpdateProcess, employeeMaster, driverStatus))
                         {
-                            var s = string.Format("Could not correct odometer for PowerId:{0} Odom:{1}.",
-                                    driverOdomUpdateProcess.PowerId, driverOdomUpdateProcess.Odometer);
+                            //var s = string.Format("Could not correct odometer for PowerId:{0} Odom:{1}.",
+                            //        driverOdomUpdateProcess.PowerId, driverOdomUpdateProcess.Odometer);
                             break;
                         }
                     }
-
- 
 
                 } //end of foreach...
             }//end of if (!changeSetResult.Failed...
@@ -209,6 +214,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             return changeSetResult;
         }
+
         /// <summary>
         /// Change Power Unit
         /// </summary>
@@ -222,11 +228,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="employeeMaster"></param>
         /// <param name="driverStatus"></param>
         /// <returns></returns>
-        public bool ChangePowerUnit(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+        private bool ChangePowerUnit(IDataService dataService, ProcessChangeSetSettings settings,
+           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
            DriverOdomUpdateProcess driverOdomUpdateProcess, EmployeeMaster employeeMaster, DriverStatus driverStatus)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
             int powerHistoryInsertCount = 0;
             int origPowerHistoryInsertCount = 0;
 
@@ -245,7 +251,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             ////////////////////////////////////////////////
             // Get the PowerMaster record
             // PowerId must be a valid PowerId in the PowerMaster 
-            var powerMaster = new PowerMaster();
+            PowerMaster powerMaster;
             if (prefAllowAnyPowerUnit == Constants.Yes)
             {
                 powerMaster = Common.GetPowerUnit(dataService, settings, userCulture, userRoleIds,
@@ -596,12 +602,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// <param name="driverOdomUpdateProcess"></param>
         /// <param name="employeeMaster"></param>
         /// <param name="driverStatus"></param>
-        /// <returns></returns>
-        public bool CorrectOdometer(IDataService dataService, ProcessChangeSetSettings settings,
-           ChangeSetResult<string> changeSetResult, String msgKey, IEnumerable<long> userRoleIds, string userCulture,
+        /// <returns>Success indicator</returns>
+        private bool CorrectOdometer(IDataService dataService, ProcessChangeSetSettings settings,
+           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
            DriverOdomUpdateProcess driverOdomUpdateProcess, EmployeeMaster employeeMaster, DriverStatus driverStatus)
         {
-            DataServiceFault fault = null;
+            DataServiceFault fault;
 
             ////////////////////////////////////////////////
             // Get the PowerMaster record.  
@@ -673,17 +679,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             ////////////////////////////////////////////////
             //Do not insert a driver history as it creates too many entries.
 
-            //Define for use later
-            Trip currentTrip = new Trip();
-            List<TripSegment> tripSegList = new List<TripSegment>();
-            TripSegment currentTripSegment = new TripSegment();
-            List<TripSegmentMileage> tripMileageList = new List<TripSegmentMileage>();
-
             if (driverStatus.TripNumber != null)
             {
                 ////////////////////////////////////////////////
                 // Get the Trip record
-                currentTrip = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
+                Trip currentTrip = Common.GetTrip(dataService, settings, userCulture, userRoleIds,
                                               driverStatus.TripNumber, out fault);
                 if (null != fault)
                 {
@@ -698,7 +698,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 }
                 ////////////////////////////////////////////////
                 //Get a list of all  segments for the trip
-                tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
+                List<TripSegment> tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
                                     driverStatus.TripNumber, out fault);
                 if (null != fault)
                 {
@@ -713,7 +713,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 }
                 ////////////////////////////////////////////////
                 // Get the current TripSegment record
-                currentTripSegment = (from item in tripSegList
+                TripSegment currentTripSegment = (from item in tripSegList
                                           where item.TripSegNumber == driverStatus.TripSegNumber
                                           select item).FirstOrDefault();
                 if (null == currentTripSegment)
@@ -725,7 +725,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 //Update the odometers in the TripSegment records
                 foreach (var tripSegment in tripSegList)
                 {
-                    if (0 >= tripSegment.TripSegNumber.CompareTo(currentTripSegment.TripSegNumber)) 
+                    if (0 >= String.Compare(tripSegment.TripSegNumber, currentTripSegment.TripSegNumber, StringComparison.Ordinal)) 
                     {
                         if (tripSegment.TripSegOdometerStart != null)
                             tripSegment.TripSegOdometerStart += odometerDifference;
@@ -748,7 +748,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                 ////////////////////////////////////////////////
                 //Get a list of all  mileage records for the trip
-                tripMileageList = Common.GetTripSegmentMileageForTrip(dataService, settings, userCulture, userRoleIds,
+                List<TripSegmentMileage> tripMileageList = Common.GetTripSegmentMileageForTrip(dataService, settings, userCulture, userRoleIds,
                                     driverStatus.TripNumber, out fault);
                 if (null != fault)
                 {
@@ -761,7 +761,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Update the odometers in the TripSegmentMileage records
                     foreach (var tripMileage in tripMileageList)
                     {
-                        if (0 >= tripMileage.TripSegNumber.CompareTo(currentTripSegment.TripSegNumber)) 
+                        if (0 >= String.Compare(tripMileage.TripSegNumber, currentTripSegment.TripSegNumber, StringComparison.Ordinal)) 
                         {
                             if (tripMileage.TripSegMileageOdometerStart != null)
                                 tripMileage.TripSegMileageOdometerStart += odometerDifference;
