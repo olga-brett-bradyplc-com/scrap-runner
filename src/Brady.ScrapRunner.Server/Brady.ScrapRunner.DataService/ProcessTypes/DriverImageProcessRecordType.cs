@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -18,7 +16,6 @@ using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.Util;
-using Brady.ScrapRunner.Domain.Enums;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -68,6 +65,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+
         /// <summary>
         /// Perform the driver image processing.
         /// </summary>
@@ -100,16 +98,23 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() &&
                 !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
 
                     var driverImageProcess = (DriverImageProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the general case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -202,8 +207,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                     //////////////////////////////////////////////
                     //Calculate the next sequence number.
-                    var tripSegmentImageMax = new TripSegmentImage();
-                    tripSegmentImageMax = Common.GetTripSegmentImageLast(dataService, settings, userCulture, userRoleIds,
+                    var tripSegmentImageMax = Common.GetTripSegmentImageLast(dataService, settings, userCulture, userRoleIds,
                                                   driverImageProcess.TripNumber, driverImageProcess.TripSegNumber, out fault);
                     if (null != fault)
                     {
@@ -218,7 +222,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     //////////////////////////////////////////////
-                    string fullImagePath = "";
+                    string fullImagePath;
                     //Processing for pictures
                     if (driverImageProcess.ImageType == ImageTypeConstants.Picture)
                     {
@@ -244,7 +248,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             MemoryStream ms = new MemoryStream(driverImageProcess.ImageByteArray);
                             Image pictureImage = Image.FromStream(ms);
                             //Create the directory if it does not already exist
-                            System.IO.FileInfo file = new System.IO.FileInfo(imagePath);
+                            var file = new FileInfo(imagePath);
                             file.Directory.Create(); 
                             //Save the image to a file of type jpeg
                             pictureImage.Save(fullImagePath, ImageFormat.Jpeg);
@@ -280,10 +284,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //Converts the byte array to an image 
                             MemoryStream ms = new MemoryStream(driverImageProcess.ImageByteArray);
                             Image signatureImage = Image.FromStream(ms);
-                            string temp = "haii";
-                            var gofuckyourself = temp;
+
                             //Create the directory if it does not already exist
-                            System.IO.FileInfo file = new System.IO.FileInfo(imagePath);
+                            var file = new FileInfo(imagePath);
                             file.Directory.Create();
                             //Save the image to a file of type png
                             signatureImage.Save(fullImagePath, ImageFormat.Png);

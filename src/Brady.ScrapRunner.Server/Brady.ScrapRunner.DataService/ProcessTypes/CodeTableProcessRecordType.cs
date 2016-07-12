@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NHibernate;
 using BWF.DataServices.Core.Concrete.ChangeSets;
@@ -11,7 +10,6 @@ using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using Brady.ScrapRunner.Domain;
-using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
@@ -58,6 +56,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+    
         /// <summary>
         /// This is the "real" method implementation.
         /// </summary>
@@ -93,16 +92,23 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             // So we loop over the one to many keys in the changeSetResult.SuccessfullyUpdated
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() && !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
 
                     var codetablesProcess = (CodeTableProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the gernal case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -160,9 +166,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Lookup code tables.  
-                    var codeTableList = new List<CodeTable>();
                     //This query does not include container level
-                    codeTableList = Common.GetCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
+                    var codeTableList = Common.GetCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
                                     employeeMaster.RegionId, prefDefCountry, prefUseContainerLevel,out fault);
                     if (fault != null)
                     {
@@ -173,7 +178,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     // Don't forget to actually backfill the CodeTableProcess object contained within 
                     // the ChangeSetResult that exits this method and is returned to the caller.
                     codetablesProcess.CodeTables = codeTableList;
-
                 }
             }
 

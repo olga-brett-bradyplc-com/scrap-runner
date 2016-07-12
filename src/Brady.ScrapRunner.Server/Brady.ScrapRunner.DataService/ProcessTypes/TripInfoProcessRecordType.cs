@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NHibernate;
-using NHibernate.Util;
 using BWF.DataServices.Core.Concrete.ChangeSets;
 using BWF.DataServices.Metadata.Attributes.Actions;
 using BWF.DataServices.Support.NHibernate.Abstract;
@@ -17,7 +16,6 @@ using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
-using Brady.ScrapRunner.DataService.RecordTypes;
 using Brady.ScrapRunner.Domain.Enums;
 using Brady.ScrapRunner.DataService.Util;
 
@@ -69,6 +67,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         {
             return ProcessChangeSet(dataService, changeSet, new ProcessChangeSetSettings(token, username, persistChanges));
         }
+
         /// <summary>
         /// This is the "real" method implementation.
         /// </summary>
@@ -104,17 +103,23 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             // So we loop over the one to many keys in the changeSetResult.SuccessfullyUpdated
             if (!changeSetResult.FailedCreates.Any() && !changeSetResult.FailedUpdates.Any() && !changeSetResult.FailedDeletions.Any())
             {
+
+                // Determine userCulture and userRoleIds.
+                var userCulture = "en-GB";
+                var userRoleIds = Enumerable.Empty<long>().ToArray();
+                if (null != settings.Username && null != settings.Token)
+                {
+                    var userCultureDetails = authorisation.GetUserCultureDetailsAsync(settings.Token, settings.Username).Result;
+                    userCulture = userCultureDetails.LanguageCulture;
+                    userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
+                }
+
                 foreach (String key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
-                    ChangeSetResult<string> scratchChangeSetResult;
 
                     var tripInfoProcess = (TripInfoProcess)changeSetResult.GetSuccessfulUpdateForId(key);
-
-                    // TODO:  Determine userCulture and userRoleIds on a per user basis.
-                    string userCulture = "en-GB";
-                    IEnumerable<long> userRoleIds = Enumerable.Empty<long>().ToList();
 
                     // It appears, in the gernal case, I may need to backfill any additional user input values other than driverID.
                     // They will get clobbered by the call to the base process method.
@@ -176,7 +181,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Get the list of trips for driver
-                    var tripList = new List<Trip>();
+                    List<Trip> tripList;
                     //ToDo: Need to be able to determine if we are sending trips because of a login request or because
                     //a new trip has been entered or an existing one modified for a driver that is logged in.
                     //For now bLogin is true;
@@ -263,8 +268,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         //For each trip, get the containers for all of the segments
-                        var tripContainerList = new List<TripSegmentContainer>();
-                        tripContainerList = Common.GetTripContainersForTrip(dataService, settings, userCulture, userRoleIds,
+                        var tripContainerList = Common.GetTripContainersForTrip(dataService, settings, userCulture, userRoleIds,
                                             tripInfo.TripNumber, out fault);
                         if (fault != null)
                         {
@@ -401,7 +405,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         trip.TripSendFlag = TripSendFlagValue.SentToDriver;
 
-                        scratchChangeSetResult = Common.UpdateTrip(dataService, settings, trip);
+                        ChangeSetResult<string> scratchChangeSetResult = Common.UpdateTrip(dataService, settings, trip);
                         log.DebugFormat("SRTEST:TripInfoProcess:Saving Trip Record:{0} TripSendFlag:{1}",
                                        trip.TripNumber,
                                        TripSendFlagValue.SentToDriver);
