@@ -21,6 +21,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
         public const int MarkedDoneTripNotificationId = 8;
         public const int NewMessageNotificationId = 9;
         public const int ResequencedTripNotficationId = 10;
+        public const int ForcedLogoffNotificationId = 11;
 
         public const string TripNotificationGroup = "TripNotificationGroup";
         public const string TripResequenceNotificationGroup = "TripResequenceNotificationGroup";
@@ -101,6 +102,16 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                 .SetSmallIcon(Resource.Drawable.ic_email_black_36dp);
             var notification = builder.Build();
             NotifyUser(notification, NewMessageNotificationId);
+        }
+
+        public void ForcedLogoff()
+        {
+            var builder = BuildNotification(AppResources.ForcedLogoff,
+                    AppResources.ForcedLogoffMessage)
+                .SetGroup(MessageNotificationGroup)
+                .SetSmallIcon(Resource.Drawable.ic_email_black_36dp);
+            var notification = builder.Build();
+            NotifyUser(notification, ForcedLogoffNotificationId);
         }
 
         private NotificationManagerCompat NotificationManager => NotificationManagerCompat.From(Application.Context);
