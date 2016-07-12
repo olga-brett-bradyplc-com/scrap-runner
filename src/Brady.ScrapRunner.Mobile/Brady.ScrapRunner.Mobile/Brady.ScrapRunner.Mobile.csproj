@@ -80,6 +80,7 @@
     <Compile Include="Models\DriverStatusModel.cs" />
     <Compile Include="Models\LocationModel.cs" />
     <Compile Include="Models\MessagesModel.cs" />
+    <Compile Include="Models\NotificationModel.cs" />
     <Compile Include="Models\PowerMasterModel.cs" />
     <Compile Include="Models\ContainerMasterModel.cs" />
     <Compile Include="Models\CustomerDirectionsModel.cs" />
