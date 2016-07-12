@@ -133,6 +133,7 @@
     <Compile Include="ViewModels\NbScanViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\NotificationViewModel.cs" />
     <Compile Include="ViewModels\PhotosViewModel.cs" />
     <Compile Include="ViewModels\PublicScaleDetailViewModel.cs" />
     <Compile Include="ViewModels\PublicScaleSummaryViewModel.cs" />

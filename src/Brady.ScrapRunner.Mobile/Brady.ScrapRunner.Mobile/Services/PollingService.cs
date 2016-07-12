@@ -94,7 +94,7 @@
                     Context = newTrip ? TripNotificationContext.New : TripNotificationContext.Modified,
                     Trip = trip
                 });
-                _notificationService.Trip(trip, TripNotificationContext.New);
+                await _notificationService.TripAsync(trip, TripNotificationContext.New);
             }
         }
 
@@ -122,7 +122,7 @@
                     Context = TripNotificationContext.Canceled,
                     Trip = trip
                 });
-                _notificationService.Trip(trip, TripNotificationContext.Canceled);
+                await _notificationService.TripAsync(trip, TripNotificationContext.Canceled);
             }
         }
 
@@ -149,7 +149,7 @@
                     Context = TripNotificationContext.Unassigned,
                     Trip = trip
                 });
-                _notificationService.Trip(trip, TripNotificationContext.Unassigned);
+                await _notificationService.TripAsync(trip, TripNotificationContext.Unassigned);
             }
         }
 
@@ -175,7 +175,7 @@
                     Context = TripNotificationContext.MarkedDone,
                     Trip = trip
                 });
-                _notificationService.Trip(trip, TripNotificationContext.MarkedDone);
+                await _notificationService.TripAsync(trip, TripNotificationContext.MarkedDone);
             }
         }
 
@@ -201,7 +201,7 @@
             if (doneTrips.Records.Any())
             {
                 _mvxMessenger.Publish(new TripResequencedMessage(this));
-                _notificationService.TripsResequenced();
+                await _notificationService.TripsResequencedAsync();
             }
         }
 
@@ -409,7 +409,7 @@
                 {
                     Message = message
                 });
-                _notificationService.Message(message);
+                await _notificationService.MessageAsync(message);
             }
         }
     }
