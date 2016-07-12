@@ -522,7 +522,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             // For any containers we're loading on the truck, make sure the information is proprogated to the RT segment
             var tripSegments = await FindAllSegmentsForTripAsync(tripNumber);
-            var rtSegment = tripSegments.FirstOrDefault(ts => ts.TripSegType == BasicTripTypeConstants.ReturnYard);
+            var rtSegment = tripSegments.FirstOrDefault(ts => ts.TripSegType == BasicTripTypeConstants.ReturnYard || ts.TripSegType == BasicTripTypeConstants.Scale);
 
             if (rtSegment == null) return;
 
@@ -542,7 +542,7 @@ namespace Brady.ScrapRunner.Mobile.Services
 
                     await UpdateTripSegmentContainerAsync(container);
                 }
-                else // Create new trip segment container for RT
+                else // Create new trip segment container for RT or SC
                 {
                     var newSeqNumber = rtContainers.LastOrDefault().TripSegContainerSeqNumber + 1;
                     container.TripSegContainerSeqNumber = (short)newSeqNumber;

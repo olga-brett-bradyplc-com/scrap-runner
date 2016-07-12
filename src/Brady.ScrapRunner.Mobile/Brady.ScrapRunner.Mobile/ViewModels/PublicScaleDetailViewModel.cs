@@ -336,14 +336,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
                 }
 
+                await _tripService.PropagateContainerUpdates(TripNumber, Containers);
+
+                var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
                 Close(this);
-                ShowViewModel<RouteSummaryViewModel>();
+                if (nextTripSegment.Any())
+                {
+                    ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
+                }
+                else
+                {
+                    await _tripService.CompleteTripAsync(TripNumber);
+                    ShowViewModel<RouteSummaryViewModel>();
+                }
             }
 
             else
             {
                 Close(this);
-                ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
             }
         }
 
