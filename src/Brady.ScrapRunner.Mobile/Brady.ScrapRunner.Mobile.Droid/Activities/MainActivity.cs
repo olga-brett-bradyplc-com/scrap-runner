@@ -18,7 +18,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
     public class MainActivity : MvxCachingFragmentCompatActivity<MainViewModel>
     {
         public DrawerLayout DrawerLayout;
-
         private const string MenuViewModel = "MenuViewModel";
 
         protected override void OnCreate(Bundle bundle)
@@ -79,6 +78,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
                     Resource.Animation.custom_leave_anim);
             }
         }
+
+        //public override void OnFragmentChanged(IMvxCachedFragmentInfo fragmentInfo)
+        //{
+        //    base.OnFragmentChanged(fragmentInfo);
+        //}
 
         public void HideSoftKeyboard()
         {

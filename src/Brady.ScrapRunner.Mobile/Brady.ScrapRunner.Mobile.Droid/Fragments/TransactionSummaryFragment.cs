@@ -31,6 +31,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     [Register("brady.scraprunner.mobile.droid.fragments.TransactionSummaryFragment")]
     public class TransactionSummaryFragment : BaseFragment<TransactionSummaryViewModel>
     {
+        private const int AddReturnToYardNav = Menu.First;
+        private const int SimulateScanNav = AddReturnToYardNav + 1;
+
         private IDisposable _containersToken;
         private IDisposable _currentTransactionToken;
         private IDisposable _allowRtnAddToken;
@@ -43,7 +46,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         public override async void OnViewCreated(View view, Bundle savedInstanceState)
         {
             MobileBarcodeScanner.Initialize(Activity.Application);
-
             _scannerFragment = new ZXingScannerFragment();
 
             Activity.SupportFragmentManager.BeginTransaction()
@@ -52,42 +54,56 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             var listGrouping = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
 
-            if (ViewModel.AllowRtnAdd.HasValue)
-                HasOptionsMenu = ViewModel.AllowRtnAdd.Value;
+            HasOptionsMenu = true;
 
             if (ViewModel.Containers != null)
                 listGrouping.Adapter.ItemsSource = ViewModel.Containers;
 
-            _allowRtnAddToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnAdd, OnAllowRtnAddChanged);
+            //_allowRtnAddToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnAdd, OnAllowRtnAddChanged);
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
 
             await Task.Delay(3000);
-
-            using (var loading = UserDialogs.Instance.Loading("Loading Scanner"))
-            {
-                Scan();
-            }
+            Scan();
         }
         
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        {
-            inflater.Inflate(Resource.Menu.transactionsummary_menu, menu);
-            base.OnCreateOptionsMenu(menu, inflater);
-        }
+        //public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        //{
+        //    inflater.Inflate(Resource.Menu.transactionsummary_menu, menu);
+        //    base.OnCreateOptionsMenu(menu, inflater);
+        //}
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            var baseActivity = ((MainActivity)Activity);
+            var ignore = OnOptionsItemSelectedAsync(item);
+            return true;
+        }
+
+        private async Task OnOptionsItemSelectedAsync(IMenuItem item)
+        {
             switch (item.ItemId)
             {
-                case Resource.Id.add_rtn_nav:
-                    baseActivity.CloseOptionsMenu();
+                case AddReturnToYardNav:
                     ViewModel.AddRtnYardCommand.Execute();
-                    return true;
-                default:
-                    baseActivity.CloseOptionsMenu();
-                    return base.OnOptionsItemSelected(item);
+                    break;
+                case SimulateScanNav:
+                    var listview = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
+                    var number = await UserDialogs.Instance.PromptAsync("Enter barcode number", "Simulate", "OK");
+                    await ViewModel.TransactionScannedCommandAsync.ExecuteAsync(number.Text);
+                    ((BaseAdapter)listview.Adapter).NotifyDataSetChanged();
+                    VibrateDevice();
+                    break;
             }
+        }
+
+        public override void OnPrepareOptionsMenu(IMenu menu)
+        {
+            menu.Clear();
+            if (ViewModel.AllowRtnAdd.HasValue && (bool) ViewModel.AllowRtnAdd)
+                menu.Add(0, AddReturnToYardNav, Menu.None, "Add Return To Yard").SetShowAsAction(ShowAsAction.Never);
+
+#if DEBUG
+    menu.Add(0, SimulateScanNav, Menu.None, "Simulate Scan (DEV)").SetShowAsAction(ShowAsAction.Never);
+#endif
         }
 
         public override void OnDestroyView()
@@ -102,8 +118,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             _currentTransactionToken.Dispose();
             _currentTransactionToken = null;
 
-
-            _scannerFragment.StopScanning();
+            _scannerFragment?.StopScanning();
         }
 
         public override async void OnResume()
@@ -111,16 +126,12 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             base.OnResume();
 
             await Task.Delay(3000);
-
-            using (var loading = UserDialogs.Instance.Loading("Loading Scanner"))
-            {
-                Scan();
-            }
+            Scan();
         }
 
         public override void OnPause()
         {
-            _scannerFragment.StopScanning();
+            _scannerFragment?.StopScanning();
             base.OnPause();
         }
 
@@ -139,18 +150,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 DelayBetweenContinuousScans = 3000
             };
             
-            _scannerFragment.StartScanning(result =>
+            _scannerFragment.StartScanning(async result =>
             {
-                ViewModel.TransactionScannedCommandAsync.Execute(result?.Text);
+                await ViewModel.TransactionScannedCommandAsync.ExecuteAsync(result?.Text);
                 VibrateDevice();
-
-                var listview = View.FindViewById<BindableGroupListView>(Resource.Id.TransactionSummaryListView);
-
-                Activity.RunOnUiThread(() =>
-                {
-                    listview.InvalidateViews();
-                    listview.Invalidate();
-                });
             }, barcodeScanningOptions);
         }
 
