@@ -9,7 +9,6 @@ using BWF.DataServices.Core.Interfaces;
 using BWF.DataServices.Core.Models;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.PortableClients;
-using BWF.DataServices.Support.NHibernate.Abstract;
 using log4net;
 using Brady.ScrapRunner.Domain.Enums;
 using BWF.DataServices.Metadata.Fluent.Enums;
@@ -41,17 +40,18 @@ namespace Brady.ScrapRunner.DataService.Util
             int driverTime = 0;
             if (null != tripSegList)
             {
-                driverTime = (int)(from t in tripSegList
-                             select (t.TripSegStandardDriveMinutes + t.TripSegStandardStopMinutes)).ToList().Sum();
+                driverTime = (from t in tripSegList
+                             select (t.TripSegStandardDriveMinutes ?? 0 + t.TripSegStandardStopMinutes ?? 0)).ToList().Sum();
 
                 if (null != currentTripSegment)
                 {
-                    driverTime -= (int)currentTripSegment.TripSegStandardDriveMinutes;
-                    driverTime -= (int)currentTripSegment.TripSegStandardStopMinutes;
+                    driverTime -= currentTripSegment.TripSegStandardDriveMinutes ?? 0;
+                    driverTime -= currentTripSegment.TripSegStandardStopMinutes ?? 0;
                 }
             }
             return driverTime;
         }
+
         /// <summary>
         /// Return "LastName, FirstName" or as much as possible from the provided EmployeeMaster object.
         /// </summary>
@@ -73,6 +73,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return driverName;
         }
+
         /// <summary>
         /// Determines if container is still on the truck
         /// Based on the trip segment type and the SetInYardFlag
@@ -114,6 +115,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return onPowerId;
         }
+
         /// <summary>
         /// Returns the string containing the partial path to store a trip's picture or signature
         /// Directory will be created in a form of 0\0\0\1\2\3\4\5\6\7 '
@@ -141,7 +143,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// Otherwise if the segment is a drop full, scale, or unload, the segment is loaded
         /// </summary>
         /// <param name="tripSegment"></param>
-        /// <param name="containersOnPowerId"></param>List<ContainerMaster>
+        /// <param name="containersOnPowerId"></param>
         /// <returns>Y if loaded, N if not</returns>
         public static string GetSegmentLoadedFlag(TripSegment tripSegment, List<ContainerMaster> containersOnPowerId)
         {
@@ -150,7 +152,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var loaded = from item in containersOnPowerId
                           where item.ContainerContents == ContainerContentsConstants.Loaded
                           select item;
-            if (null != loaded && loaded.Count()>0)
+            if (loaded.Any())
             {
                 tripSegLoadedFlag = Constants.Yes;
             }
@@ -166,6 +168,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegLoadedFlag;
         }
+
         /// <summary>
         /// Log an entry into the specified logger if a fault is detected.
         /// </summary>
@@ -263,6 +266,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return errorsDetected;
         }
+
         ////////////////////////////////////////////////////////////////
         ///TABLE INSERTS
         /// <summary>
@@ -273,10 +277,11 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="settings"></param>
         /// <param name="containerMaster"></param>
         /// <param name="destCustomerMaster"></param>
-        /// <param name="prevLastActionDate"></param>
+        /// <param name="prevLastActionDateTime"></param>
         /// <param name="callCountThisTxn">Start with 1 and increment if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
+        /// <param name="log"></param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         public static bool InsertContainerHistory(IDataService dataService, ProcessChangeSetSettings settings,
@@ -290,7 +295,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the last container history record for this container id to get the last sequence number used
-            var containerHistoryMax = Common.GetContainerHistoryLast(dataService, settings, userCulture, userRoleIds,
+            var containerHistoryMax = GetContainerHistoryLast(dataService, settings, userCulture, userRoleIds,
                                   containerMaster.ContainerNumber, out fault);
             if (null != fault)
             {
@@ -311,7 +316,7 @@ namespace Brady.ScrapRunner.DataService.Util
                              containerSeqNo);
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the TerminalName in the TerminalMaster 
-            var containerTerminalMaster = Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+            var containerTerminalMaster = GetTerminal(dataService, settings, userCulture, userRoleIds,
                                           containerMaster.ContainerTerminalId, out fault);
             if (null != fault)
             {
@@ -320,7 +325,7 @@ namespace Brady.ScrapRunner.DataService.Util
             string containerTerminalName = containerTerminalMaster?.TerminalName;
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the CurrentTerminalName in the TerminalMaster 
-            var containerCurrentTerminalMaster = Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+            var containerCurrentTerminalMaster = GetTerminal(dataService, settings, userCulture, userRoleIds,
                                           containerMaster.ContainerCurrentTerminalId, out fault);
             if (null != fault)
             {
@@ -330,7 +335,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the RegionName in the RegionMaster 
-            var containerRegionMaster = Common.GetRegion(dataService, settings, userCulture, userRoleIds,
+            var containerRegionMaster = GetRegion(dataService, settings, userCulture, userRoleIds,
                                           containerMaster.ContainerRegionId, out fault);
             if (null != fault)
             {
@@ -340,7 +345,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the ContainerStatus Description in the CodeTable CONTAINERSTATUS 
-            var codeTableContainerStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+            var codeTableContainerStatus = GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                                     CodeTableNameConstants.ContainerStatus, containerMaster.ContainerStatus, out fault);
             if (null != fault)
             {
@@ -350,7 +355,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the ContainerContents Description in the CodeTable CONTENTSTATUS 
-            var codeTableContainerContents = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+            var codeTableContainerContents = GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                                     CodeTableNameConstants.ContentStatus, containerMaster.ContainerContents, out fault);
             if (null != fault)
             {
@@ -364,7 +369,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var codeTableCustomerType = new CodeTable();
             if (null != containerMaster.ContainerCustType)
             {
-                codeTableCustomerType = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                codeTableCustomerType = GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                                       CodeTableNameConstants.CustomerType, containerMaster.ContainerCustType, out fault);
                 if (null != fault)
                 {
@@ -375,7 +380,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the Basic Trip Type Description in the TripTypeBasic table 
-            var tripTypeBasic = Common.GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
+            var tripTypeBasic = GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
                                 containerMaster.ContainerCurrentTripSegType, out fault);
             if (null != fault)
             {
@@ -459,7 +464,7 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSet.AddCreate(recordRef, containerHistory, userRoleIds, userRoleIds);
             log.Debug("SRTEST:Saving ContainerHistory");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, containerHistory, log))
+            if (LogChangeSetFailure(changeSetResult, containerHistory, log))
             {
                 return false;
             }
@@ -489,12 +494,13 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSet.AddCreate(recordRef, containerHistory, userRoleIds, userRoleIds);
             log.Debug("SRTEST:Saving ContainerHistory");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, containerHistory, log))
+            if (LogChangeSetFailure(changeSetResult, containerHistory, log))
             {
                 return false;
             }
             return true;
         }
+
         ///TABLE INSERTS
         /// <summary>
         /// Insert a ContainerMaster record
@@ -505,7 +511,6 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="userCulture"></param>
         /// <param name="log"></param>
         /// <param name="containerMaster"></param>
-        /// <param name="fault"></param>
         /// <returns></returns>
         public static bool InsertContainerMaster(IDataService dataService, ProcessChangeSetSettings settings,
          IEnumerable<long> userRoleIdsEnumerable, string userCulture, ILog log,ContainerMaster containerMaster)
@@ -519,13 +524,14 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSet.AddCreate(recordRef, containerMaster, userRoleIds, userRoleIds);
             log.Debug("SRTEST:Saving ContainerMaster");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, containerMaster, log))
+            if (LogChangeSetFailure(changeSetResult, containerMaster, log))
             {
                 return false;
             }
             return true;
 
         }
+
         ///TABLE INSERTS
         /// <summary>
         /// Insert a DriverDelay record.
@@ -533,10 +539,11 @@ namespace Brady.ScrapRunner.DataService.Util
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
-        /// <param name="driverDelay"></param>
-        /// <param name="callCountThisTxn">Start with 1 and increment if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
+        /// <param name="log"></param>
+        /// <param name="driverDelay"></param>
+        /// <param name="callCountThisTxn">Start with 1 and increment if multiple inserts are desired.</param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         public static bool InsertDriverDelay(IDataService dataService, ProcessChangeSetSettings settings,
@@ -547,7 +554,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the last delay record for this driverid and trip number to get the last sequence number used
-            var driverDelayMax = Common.GetDriverDelayLast(dataService, settings, userCulture, userRoleIds,
+            var driverDelayMax = GetDriverDelayLast(dataService, settings, userCulture, userRoleIds,
                                  driverDelay.DriverId, driverDelay.TripNumber, out fault);
             if (null != fault)
             {
@@ -576,12 +583,13 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSet.AddCreate(recordRef, driverDelay, userRoleIds, userRoleIds);
             log.Debug("SRTEST:Saving DriverDelay");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, driverDelay, log))
+            if (LogChangeSetFailure(changeSetResult, driverDelay, log))
             {
                 return false;
             }
             return true;
         }
+
         ///TABLE INSERTS
         /// <summary>
         /// Insert a Driver Efficiency Record
@@ -603,7 +611,7 @@ namespace Brady.ScrapRunner.DataService.Util
             List<long> userRoleIds = userRoleIdsEnumerable.ToList();
             //////////////////////////////////////////////////////////////////////////////////////
             //Try to find a driver efficiency record for this trip. There should not be one
-            var driverEfficiency = Common.GetDriverEfficiencyForDriverTrip(dataService, settings, userCulture, userRoleIds,
+            var driverEfficiency = GetDriverEfficiencyForDriverTrip(dataService, settings, userCulture, userRoleIds,
                                    trip.TripDriverId,trip.TripNumber, out fault);
             if (null != fault)
             {
@@ -683,7 +691,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 if (tripDelay.DelayStartDateTime != null && tripDelay.DelayEndDateTime != null)
                 {
 
-                    var codeTableDelayCode = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                    var codeTableDelayCode = GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                         CodeTableNameConstants.DelayCodes, tripDelay.DelayCode, out fault);
 
                     if (codeTableDelayCode.CodeDisp2 == DelayTypeConstants.Yard)
@@ -716,7 +724,7 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSet.AddCreate(recordRef, driverEfficiency, userRoleIds, userRoleIds);
             log.Debug("SRTEST:Saving DriverEfficiency Record");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, driverEfficiency, log))
+            if (LogChangeSetFailure(changeSetResult, driverEfficiency, log))
             {
                 return false;
             }
@@ -736,6 +744,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
+        /// <param name="log"></param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         public static bool InsertDriverHistory(IDataService dataService, ProcessChangeSetSettings settings,
@@ -760,7 +769,7 @@ namespace Brady.ScrapRunner.DataService.Util
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the last driver history record for this trip and driver to get the last sequence number used
             //Pass the constructed trip number to get the last sequence number.
-            var driverHistoryMax = Common.GetDriverHistoryLast(dataService, settings, userCulture, userRoleIds,
+            var driverHistoryMax = GetDriverHistoryLast(dataService, settings, userCulture, userRoleIds,
                                     driverStatus.EmployeeId, tripNumber, out fault);
             if (null != fault)
             {
@@ -782,7 +791,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the Basic Trip Type Description in the TripTypeBasic table 
-            var tripTypeBasic = Common.GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
+            var tripTypeBasic = GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
                                 driverStatus.TripSegType, out fault);
             if (null != fault)
             {
@@ -792,7 +801,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the TripAssignStatus Description in the CodeTable TRIPASSIGNSTATUS 
-            var codeTableTripAssignStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+            var codeTableTripAssignStatus = GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                                     CodeTableNameConstants.TripAssignStatus, driverStatus.TripAssignStatus, out fault);
             if (null != fault)
             {
@@ -802,7 +811,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the TripStatus Description in the CodeTable TRIPSTATUS 
-            var codeTableTripStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+            var codeTableTripStatus = GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                                     CodeTableNameConstants.TripStatus, driverStatus.TripStatus, out fault);
             if (null != fault)
             {
@@ -812,7 +821,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the TripSegStatus Description in the CodeTable TRIPSEGSTATUS 
-            var codeTableTripSegStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+            var codeTableTripSegStatus = GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                                     CodeTableNameConstants.TripSegStatus, driverStatus.TripSegStatus, out fault);
             if (null != fault)
             {
@@ -822,7 +831,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the DriverStatus Description in the CodeTable DRIVERSTATUS 
-            var codeTableDriverStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+            var codeTableDriverStatus = GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                                     CodeTableNameConstants.DriverStatus, driverStatus.Status, out fault);
             if (null != fault)
             {
@@ -832,7 +841,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the TerminalName in the TerminalMaster 
-            var driverTerminalMaster = Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+            var driverTerminalMaster = GetTerminal(dataService, settings, userCulture, userRoleIds,
                                           driverStatus.TerminalId, out fault);
             if (null != fault)
             {
@@ -842,7 +851,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the RegionName in the RegionMaster 
-            var driverRegionMaster = Common.GetRegion(dataService, settings, userCulture, userRoleIds,
+            var driverRegionMaster = GetRegion(dataService, settings, userCulture, userRoleIds,
                                           driverStatus.RegionId, out fault);
             if (null != fault)
             {
@@ -861,7 +870,7 @@ namespace Brady.ScrapRunner.DataService.Util
             //var driverTripSegment = new TripSegment();
             //if (null != driverStatus.TripNumber && null != driverStatus.TripSegNumber)
             //{
-            //    driverTripSegment = Common.GetTripSegment(dataService, settings, userCulture, userRoleIds,
+            //    driverTripSegment = GetTripSegment(dataService, settings, userCulture, userRoleIds,
             //                                  driverStatus.TripNumber, driverStatus.TripSegNumber, out fault);
             //    if (null != fault)
             //    {
@@ -886,7 +895,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 TripSegStatusDesc = tripSegStatusDesc,
                 DriverStatus = driverStatus.Status,
                 DriverStatusDesc = driverStatusDesc,
-                DriverName = Common.GetEmployeeName(employeeMaster),
+                DriverName = GetEmployeeName(employeeMaster),
                 TerminalId = driverStatus.TerminalId,
                 TerminalName = driverTerminalName,
                 RegionId = driverStatus.RegionId,
@@ -921,12 +930,13 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSet.AddCreate(recordRef, driverHistory, userRoleIds, userRoleIds);
             log.Debug("SRTEST:Saving DriverHistory Record");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, driverHistory, log))
+            if (LogChangeSetFailure(changeSetResult, driverHistory, log))
             {
                 return false;
             }
             return true;
         }
+
         ///TABLE INSERTS
         /// <summary>
         /// Insert a Message Record
@@ -963,7 +973,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             //ToDo: add fault checking
             fault = null;
-            if (Common.LogChangeSetFailure(changeSetResult, message, log))
+            if (LogChangeSetFailure(changeSetResult, message, log))
             {
                 return false;
             }
@@ -977,10 +987,11 @@ namespace Brady.ScrapRunner.DataService.Util
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
-        /// <param name="powerFuel"></param>
-        /// <param name="callCountThisTxn">Start with 1 and increment if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
+        /// <param name="log"></param>
+        /// <param name="powerFuel"></param>
+        /// <param name="callCountThisTxn">Start with 1 and increment if multiple inserts are desired.</param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         public static bool InsertPowerFuel(IDataService dataService, ProcessChangeSetSettings settings,
@@ -991,7 +1002,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the last power record for this powerid and trip number to get the last sequence number used
-            var powerFuelMax = Common.GetPowerFuelLast(dataService, settings, userCulture, userRoleIds,
+            var powerFuelMax = GetPowerFuelLast(dataService, settings, userCulture, userRoleIds,
                                powerFuel.PowerId, powerFuel.TripNumber, out fault);
             if (null != fault)
             {
@@ -1004,7 +1015,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
               
             //For testing
-            log.DebugFormat("SRTEST:Add PowerFuel:PowerId:{0} TripNumber:{1}-{2} Date:{3} State:{4} Amt:{5} Seq#:{5}",
+            log.DebugFormat("SRTEST:Add PowerFuel:PowerId:{0} TripNumber:{1}-{2} Date:{3} State:{4} Amt:{5} Seq#:{6}",
                              powerFuel.PowerId,
                              powerFuel.TripNumber,
                              powerFuel.TripSegNumber,
@@ -1021,12 +1032,13 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSet.AddCreate(recordRef, powerFuel, userRoleIds, userRoleIds);
             log.Debug("SRTEST:Saving PowerFuel");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, powerFuel, log))
+            if (LogChangeSetFailure(changeSetResult, powerFuel, log))
             {
                 return false;
             }
             return true;
         }
+
         ///TABLE INSERTS
         /// <summary>
         /// Insert a PowerHistory record.
@@ -1036,9 +1048,11 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="settings"></param>
         /// <param name="powerMaster"></param>
         /// <param name="employeeMaster"></param>
+        /// <param name="destCustomerMaster"></param>
         /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
+        /// <param name="log"></param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         public static bool InsertPowerHistory(IDataService dataService, ProcessChangeSetSettings settings,
@@ -1052,7 +1066,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the last power history record for this power id to get the last sequence number used
-            var powerHistoryMax = Common.GetPowerHistoryLast(dataService, settings, userCulture, userRoleIds,
+            var powerHistoryMax = GetPowerHistoryLast(dataService, settings, userCulture, userRoleIds,
                                   powerMaster.PowerId, out fault);
             if (null != fault)
             {
@@ -1073,7 +1087,7 @@ namespace Brady.ScrapRunner.DataService.Util
                              powerSeqNo);
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the TerminalName in the TerminalMaster 
-            var powerTerminalMaster = Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+            var powerTerminalMaster = GetTerminal(dataService, settings, userCulture, userRoleIds,
                                           powerMaster.PowerTerminalId, out fault);
             if (null != fault)
             {
@@ -1083,7 +1097,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the RegionName in the RegionMaster 
-            var powerRegionMaster = Common.GetRegion(dataService, settings, userCulture, userRoleIds,
+            var powerRegionMaster = GetRegion(dataService, settings, userCulture, userRoleIds,
                                           powerMaster.PowerRegionId, out fault);
             if (null != fault)
             {
@@ -1093,7 +1107,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the PowerStatus Description in the CodeTable POWERUNITSTATUS 
-            var codeTablePowerStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+            var codeTablePowerStatus = GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                                     CodeTableNameConstants.PowerUnitStatus, powerMaster.PowerStatus, out fault);
             if (null != fault)
             {
@@ -1107,7 +1121,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var codeTableCustomerType = new CodeTable();
             if (null != powerMaster.PowerCustType)
             {
-                codeTableCustomerType = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
+                codeTableCustomerType = GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
                                       CodeTableNameConstants.CustomerType, powerMaster.PowerCustType, out fault);
                 if (null != fault)
                 {
@@ -1118,7 +1132,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the Basic Trip Type Description in the TripTypeBasic table 
-            var tripTypeBasic = Common.GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
+            var tripTypeBasic = GetTripTypeBasic(dataService, settings, userCulture, userRoleIds,
                                 powerMaster.PowerCurrentTripSegType, out fault);
             if (null != fault)
             {
@@ -1145,7 +1159,7 @@ namespace Brady.ScrapRunner.DataService.Util
             powerHistory.PowerDateOutOfService = powerMaster.PowerDateOutOfService;
             powerHistory.PowerDateInService = powerMaster.PowerDateInService;
             powerHistory.PowerDriverId = powerMaster.PowerDriverId;
-            powerHistory.PowerDriverName = Common.GetEmployeeName(employeeMaster);
+            powerHistory.PowerDriverName = GetEmployeeName(employeeMaster);
             powerHistory.PowerOdometer = powerMaster.PowerOdometer;
             powerHistory.PowerComments = powerMaster.PowerComments;
             powerHistory.MdtId = powerMaster.MdtId;
@@ -1177,7 +1191,7 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSet.AddCreate(recordRef, powerHistory, userRoleIds, userRoleIds);
             log.Debug("SRTEST:Saving PowerHistory");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, powerHistory, log))
+            if (LogChangeSetFailure(changeSetResult, powerHistory, log))
             {
                 return false;
             }
@@ -1195,10 +1209,10 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="log"></param>
         /// <param name="histAction"></param>
         /// <param name="trip"></param>
-        /// <param name="tripSegment"></param>
-        /// <param name="tripSegmentContainer"></param>
-        /// <param name="tripReferenceNumber"></param>
-        /// <param name="tripSegmentMileage"></param>
+        /// <param name="tripSegmentList"></param>
+        /// <param name="tripSegmentContainerList"></param>
+        /// <param name="tripReferenceNumberList"></param>
+        /// <param name="tripSegmentMileageList"></param>
         /// <param name="callCountThisTxn"></param>
         /// <param name="fault"></param>
         /// <returns></returns>
@@ -1212,7 +1226,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the last trip history trip record for this trip  to get the last sequence number used
-            var histTripMax = Common.GetHistTripLast(dataService, settings, userCulture, userRoleIds,
+            var histTripMax = GetHistTripLast(dataService, settings, userCulture, userRoleIds,
                                trip.TripNumber,  out fault);
             if (null != fault)
             {
@@ -1331,7 +1345,7 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSetHistTrip.AddCreate(recordRefHistTrip, histTrip, userRoleIds, userRoleIds);
             log.DebugFormat("SRTEST:Saving HistTrip {0}", histTrip.TripNumber);
             var changeSetResultHistTrip = recordTypeHistTrip.ProcessChangeSet(dataService, changeSetHistTrip, settings);
-            if (Common.LogChangeSetFailure(changeSetResultHistTrip, histTrip, log))
+            if (LogChangeSetFailure(changeSetResultHistTrip, histTrip, log))
             {
                 return false;
             }
@@ -1414,7 +1428,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 changeSetHistTripSegment.AddCreate(recordRefHistTripSegment, histTripSegment, userRoleIds, userRoleIds);
                 log.DebugFormat("SRTEST:Saving HistTripSegment {0}-{1}", histTripSegment.TripNumber, histTripSegment.TripSegNumber);
                 var changeSetResultHistTripSegment = recordTypeHistTripSegment.ProcessChangeSet(dataService, changeSetHistTripSegment, settings);
-                if (Common.LogChangeSetFailure(changeSetResultHistTripSegment, histTripSegment, log))
+                if (LogChangeSetFailure(changeSetResultHistTripSegment, histTripSegment, log))
                 {
                     return false;
                 }
@@ -1463,7 +1477,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 log.DebugFormat("SRTEST:Saving HistTripSegmentContainer {0}-{1} {2}", 
                     histTripSegmentContainer.TripNumber, histTripSegmentContainer.TripSegNumber,histTripSegmentContainer.TripSegContainerSeqNumber);
                 var changeSetResultHistTripSegmentContainer = recordTypeHistTripSegmentContainer.ProcessChangeSet(dataService, changeSetHistTripSegmentContainer, settings);
-                if (Common.LogChangeSetFailure(changeSetResultHistTripSegmentContainer, histTripSegmentContainer, log))
+                if (LogChangeSetFailure(changeSetResultHistTripSegmentContainer, histTripSegmentContainer, log))
                 {
                     return false;
                 }
@@ -1487,7 +1501,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 log.DebugFormat("SRTEST:Saving HistTripReferenceNumber {0} Seq:{1} Ref#{2}-{3}",
                     histTripReferenceNumber.TripNumber, histTripReferenceNumber.TripSeqNumber, histTripReferenceNumber.TripRefNumberDesc,histTripReferenceNumber.TripRefNumber);
                 var changeSetResultHistTripReferenceNumber = recordTypeHistTripReferenceNumber.ProcessChangeSet(dataService, changeSetHistTripReferenceNumber, settings);
-                if (Common.LogChangeSetFailure(changeSetResultHistTripReferenceNumber, histTripReferenceNumber, log))
+                if (LogChangeSetFailure(changeSetResultHistTripReferenceNumber, histTripReferenceNumber, log))
                 {
                     return false;
                 }
@@ -1518,7 +1532,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 log.DebugFormat("SRTEST:Saving HistTripSegmentMileage {0}-{1} {2}",
                     histTripSegmentMileage.TripNumber, histTripSegmentMileage.TripSegNumber, histTripSegmentMileage.TripSegMileageSeqNumber);
                 var changeSetResultHistTripSegmentMileage = recordTypeHistTripSegmentMileage.ProcessChangeSet(dataService, changeSetHistTripSegmentMileage, settings);
-                if (Common.LogChangeSetFailure(changeSetResultHistTripSegmentMileage, histTripSegmentMileage, log))
+                if (LogChangeSetFailure(changeSetResultHistTripSegmentMileage, histTripSegmentMileage, log))
                 {
                     return false;
                 }
@@ -1526,6 +1540,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             return true;
         }
+
         ///TABLE INSERTS
         /// <summary>
         /// Insert a TripSegmentMileage record.
@@ -1547,7 +1562,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the last trip segment mileage record for this trip and segment number to get the last sequence number used
-            var tripSegmentMileageMax = Common.GetTripSegmentMileageLast(dataService, settings, userCulture, userRoleIds,
+            var tripSegmentMileageMax = GetTripSegmentMileageLast(dataService, settings, userCulture, userRoleIds,
                                         tripSegmentMileage.TripNumber, tripSegmentMileage.TripSegNumber, out fault);
             if (null != fault)
             {
@@ -1577,7 +1592,7 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSet.AddCreate(recordRef, tripSegmentMileage, userRoleIds, userRoleIds);
             log.Debug("SRTEST:Saving TripSegmentMileage");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
+            if (LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
             {
                 return false;
             }
@@ -1592,12 +1607,13 @@ namespace Brady.ScrapRunner.DataService.Util
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
-        /// <param name="tripSegment"></param>
-        /// <param name="containersOnPowerId"></param>List<ContainerMaster>
-        /// <param name="withOdometerEnd"></param>
-        /// <param name="callCountThisTxn">Start with 1 and increment if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>
+        /// <param name="log"></param>
+        /// <param name="tripSegment"></param>
+        /// <param name="containersOnPowerId"></param>
+        /// <param name="withOdometerEnd"></param>
+        /// <param name="callCountThisTxn">Start with 1 and increment if multiple inserts are desired.</param>
         /// <param name="fault"></param>
         /// <returns>true if success</returns>
         public static bool InsertTripSegmentMileage(IDataService dataService, ProcessChangeSetSettings settings,
@@ -1609,7 +1625,7 @@ namespace Brady.ScrapRunner.DataService.Util
 
             //////////////////////////////////////////////////////////////////////////////////////
             //Lookup the last trip segment mileage record for this trip and segment number to get the last sequence number used
-            var tripSegmentMileageMax = Common.GetTripSegmentMileageLast(dataService, settings, userCulture, userRoleIds,
+            var tripSegmentMileageMax = GetTripSegmentMileageLast(dataService, settings, userCulture, userRoleIds,
                                   tripSegment.TripNumber, tripSegment.TripSegNumber, out fault);
             if (null != fault)
             {
@@ -1631,7 +1647,7 @@ namespace Brady.ScrapRunner.DataService.Util
             {
                 tripSegmentMileage.TripSegMileageOdometerEnd = tripSegment.TripSegOdometerEnd;
             }
-            tripSegmentMileage.TripSegLoadedFlag = Common.GetSegmentLoadedFlag(tripSegment, containersOnPowerId);
+            tripSegmentMileage.TripSegLoadedFlag = GetSegmentLoadedFlag(tripSegment, containersOnPowerId);
             tripSegmentMileage.TripSegMileagePowerId = tripSegment.TripSegPowerId;
             tripSegmentMileage.TripSegMileageDriverId = tripSegment.TripSegDriverId;
             tripSegmentMileage.TripSegMileageDriverName = tripSegment.TripSegDriverName;
@@ -1653,7 +1669,7 @@ namespace Brady.ScrapRunner.DataService.Util
             changeSet.AddCreate(recordRef, tripSegmentMileage, userRoleIds, userRoleIds);
             log.Debug("SRTEST:Saving TripSegmentMileage");
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
-            if (Common.LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
+            if (LogChangeSetFailure(changeSetResult, tripSegmentMileage, log))
             {
                 return false;
             }
@@ -1714,6 +1730,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         //TABLE UPDATES
         /// <summary>
         /// Update a ContainerMaster record.
@@ -1731,6 +1748,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         ///TABLE UPDATES
         /// <summary>
         /// Update a CustomerMaster record.
@@ -1748,6 +1766,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         ///TABLE UPDATES
         /// <summary>
         /// Update a DriverHistory record.
@@ -1765,6 +1784,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         ///TABLE UPDATES
         /// <summary>
         /// Updates a Messages record.
@@ -1782,6 +1802,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         /// <summary>
         /// Update a UpdatePowerFuel record.
         /// </summary>
@@ -1798,6 +1819,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         ///TABLE UPDATES
         /// <summary>
         /// Update a PowerHistory record.
@@ -1815,6 +1837,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         ///TABLE UPDATES
         /// <summary>
         /// Update a PowerMaster record.
@@ -1832,6 +1855,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         /// <summary>
         /// Update a DriverDelay record.
         /// </summary>
@@ -1865,6 +1889,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         /// <summary>
         /// Update a Trip record.
         /// </summary>
@@ -1898,6 +1923,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         /// <summary>
         /// Update a TripSegmentImage record.
         /// </summary>
@@ -1952,7 +1978,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 tripSegmentMileage.TripSegMileageCountry = tripSegment.TripSegDestCustCountry;
             if (null != containersOnPowerId && containersOnPowerId.Count() > 0)
             {
-                tripSegmentMileage.TripSegLoadedFlag = Common.GetSegmentLoadedFlag(tripSegment, containersOnPowerId);
+                tripSegmentMileage.TripSegLoadedFlag = GetSegmentLoadedFlag(tripSegment, containersOnPowerId);
             }
             tripSegmentMileage.TripSegMileagePowerId = tripSegment.TripSegPowerId;
             tripSegmentMileage.TripSegMileageDriverId = tripSegment.TripSegDriverId;
@@ -1981,6 +2007,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         //////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Delete a ContainerHistory record.
@@ -1999,7 +2026,7 @@ namespace Brady.ScrapRunner.DataService.Util
             return changeSetResult;
         }
 
-         /// <summary>
+        /// <summary>
         /// Delete a ContainerMaster record.
         /// </summary>
         /// <param name="dataService"></param>
@@ -2066,6 +2093,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         /// <summary>
         /// Delete a TripSegmentContainer record.
         /// </summary>
@@ -2082,6 +2110,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+
         /// <summary>
         /// Delete a TripSegmentMileage record.
         /// </summary>
@@ -2098,7 +2127,6 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-
 
         /// AREAMASTER Table queries
         /// <summary>
@@ -2131,14 +2159,12 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return terminals;
                 }
-                var terminalsArea = new List<AreaMaster>();
-                terminalsArea = queryResult.Records.Cast<AreaMaster>().ToList();    
+                var terminalsArea = queryResult.Records.Cast<AreaMaster>().ToList();    
                 terminals.AddRange(terminalsArea.Select
                     (terminalInstance => terminalInstance.TerminalId));
             }
             return terminals;
         }
-
 
         /// CODETABLE Table queries
         /// <summary>
@@ -2200,7 +2226,7 @@ namespace Brady.ScrapRunner.DataService.Util
                     where (entry.CodeName != CodeTableNameConstants.ContainerLevel)
                     select entry;
             }
-            return filteredcodetables.Cast<CodeTable>().ToList();
+            return filteredcodetables.ToList();
         }
 
         /// CODETABLE Table queries
@@ -2309,6 +2335,7 @@ namespace Brady.ScrapRunner.DataService.Util
             containerTypeSizes = queryResult.Records.Cast<CodeTable>().ToList();
             return containerTypeSizes;
         }
+        
         /// CODETABLE Table queries
         /// <summary>
         /// Get a list of all STATES... codetable values for a country.
@@ -2345,6 +2372,7 @@ namespace Brady.ScrapRunner.DataService.Util
             states = queryResult.Records.Cast<CodeTable>().ToList();
             return states;
         }
+        
         /// CODETABLE Table queries
         /// <summary>
         /// Get a single codetable record.
@@ -2378,6 +2406,7 @@ namespace Brady.ScrapRunner.DataService.Util
             codeTableEntry = queryResult.Records.Cast<CodeTable>().FirstOrDefault();
             return codeTableEntry;
         }
+        
         /// CODETABLE Table queries
         /// <summary>
         /// Get a single codetable record for a given state and country code
@@ -2416,7 +2445,6 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return codeTableEntry;
         }
-
 
         /// COMMODITYMASTER Table queries
         /// <summary>
@@ -2526,6 +2554,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return containers;
         }
+
         /// CONTAINERHISTORY Table queries
         /// <summary>
         ///  Get a list of container history records for a given container
@@ -2593,7 +2622,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return containerHistory;
                 }
-                containerHistory = (ContainerHistory)queryResult.Records.Cast<ContainerHistory>().FirstOrDefault();
+                containerHistory = queryResult.Records.Cast<ContainerHistory>().FirstOrDefault();
             }
             return containerHistory;
         }
@@ -2630,7 +2659,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return containerHistory;
                 }
-                containerHistory = (ContainerHistory)queryResult.Records.Cast<ContainerHistory>().FirstOrDefault();
+                containerHistory = queryResult.Records.Cast<ContainerHistory>().FirstOrDefault();
             }
             return containerHistory;
         }
@@ -2669,7 +2698,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return containerHistory;
                 }
-                containerHistory = (ContainerHistory)queryResult.Records.Cast<ContainerHistory>().FirstOrDefault();
+                containerHistory = queryResult.Records.Cast<ContainerHistory>().FirstOrDefault();
             }
             return containerHistory;
         }
@@ -2704,10 +2733,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return container;
                 }
-                container = (ContainerMaster)queryResult.Records.Cast<ContainerMaster>().FirstOrDefault();
+                container = queryResult.Records.Cast<ContainerMaster>().FirstOrDefault();
             }
             return container;
         }
+
         /// CONTAINERMASTER Table queries
         /// <summary>
         ///  Get a a container master record for a given container bar code.
@@ -2738,10 +2768,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return container;
                 }
-                container = (ContainerMaster)queryResult.Records.Cast<ContainerMaster>().FirstOrDefault();
+                container = queryResult.Records.Cast<ContainerMaster>().FirstOrDefault();
             }
             return container;
         }
+
         /// CONTAINERMASTER Table queries
         /// <summary>
         ///  Get a list of all container master records for a given region.
@@ -2777,6 +2808,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return containers;
         }
+
         /// CONTAINERMASTER Table queries
         /// <summary>
         ///  Get a list of all container master records for a given region.
@@ -2842,6 +2874,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return containers;
         }
+        
         /// CONTAINERMASTER Table queries
         /// <summary>
         ///  Get a list of containers from the container master that are on a given trip number
@@ -2913,6 +2946,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return custDirections;
         }
+       
         /// CUSTOMERCOMMODITY queries
         /// <summary>
         ///  Get a list of commodities for each destination custhostcode to be sent to a given driver.
@@ -2949,6 +2983,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return custCommodities;
         }
+        
         /// CUSTOMERLOCATION queries
         /// <summary>
         ///  Get a list of locations for each destination custhostcode to be sent to a given driver.
@@ -2985,6 +3020,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return custLocations;
         }
+        
         /// CUSTOMERMASTER Table queries
         /// <summary>
         ///  Get a customer record from the CustomerMaster
@@ -3016,10 +3052,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return customer;
                 }
-                customer = (CustomerMaster)queryResult.Records.Cast<CustomerMaster>().FirstOrDefault();
+                customer = queryResult.Records.Cast<CustomerMaster>().FirstOrDefault();
             }
             return customer;
         }
+       
         /// <summary>
         /// Get customer record from the customer master for a given terminal
         /// </summary>
@@ -3033,8 +3070,6 @@ namespace Brady.ScrapRunner.DataService.Util
         public static CustomerMaster GetCustomerForTerminal(IDataService dataService, ProcessChangeSetSettings settings,
         string userCulture, IEnumerable<long> userRoleIds, string terminalId, out DataServiceFault fault)
         {
-            fault = null;
-
             fault = null;
             var customer = new CustomerMaster();
             if (null != terminalId)
@@ -3052,7 +3087,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return customer;
                 }
-                customer = (CustomerMaster)queryResult.Records.Cast<CustomerMaster>().FirstOrDefault();
+                customer = queryResult.Records.Cast<CustomerMaster>().FirstOrDefault();
             }
             return customer;
         }
@@ -3093,6 +3128,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return driverDelays;
         }
+        
         /// <summary>
         /// Get driver delays for a given trip number
         /// </summary>
@@ -3127,6 +3163,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return driverDelays;
         }
+        
         /// DriverDelay Table queries
         /// <summary>
         /// Get the last delay record for driverid and tripnumber/driver id
@@ -3201,6 +3238,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return driverEfficiency;
         }
+        
         /// DRIVERSTATUS Table  queries
         /// <summary>
         ///  Get an driver status record from the DriverStatus
@@ -3232,10 +3270,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return driver;
                 }
-                driver = (DriverStatus)queryResult.Records.Cast<DriverStatus>().FirstOrDefault();
+                driver = queryResult.Records.Cast<DriverStatus>().FirstOrDefault();
             }
             return driver;
         }
+       
         /// DRIVERHISTORY Table queries
         /// <summary>
         ///  Get driver history records for a given trip
@@ -3308,7 +3347,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return driverHistory;
                 }
-                driverHistory = (DriverHistory)queryResult.Records.Cast<DriverHistory>().FirstOrDefault();
+                driverHistory = queryResult.Records.Cast<DriverHistory>().FirstOrDefault();
             }
             return driverHistory;
         }
@@ -3344,10 +3383,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return employee;
                 }
-                employee = (EmployeeMaster) queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
+                employee = queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
             }
             return employee;
         }
+      
         /// EMPLOYEEMASTER Table queries
         /// <summary>
         ///  Get an employee record from the EmployeeMaster for a driver
@@ -3380,10 +3420,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return employee;
                 }
-                employee = (EmployeeMaster)queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
+                employee = queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
             }
             return employee;
         }
+   
         /// EMPLOYEEMASTER Table queries
         /// <summary>
         ///  Get an employee record from the EmployeeMaster for any employee
@@ -3415,10 +3456,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return employee;
                 }
-                employee = (EmployeeMaster)queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
+                employee = queryResult.Records.Cast<EmployeeMaster>().FirstOrDefault();
             }
             return employee;
         }
+    
         /// EMPLOYEEMASTER Table queries
         /// <summary>
         ///  Get a list of users that have access to messaging for the driver's area
@@ -3432,14 +3474,14 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="fault"></param>
         /// <returns>An empty list if areaId is null or no entries are found</returns>
         public static List<EmployeeMaster> GetDispatcherListForArea(IDataService dataService, ProcessChangeSetSettings settings,
-              string userCulture, IEnumerable<long> userRoleIds, string areaId, out DataServiceFault fault)
+              string userCulture, long[] userRoleIds, string areaId, out DataServiceFault fault)
         {
             fault = null;
-            var terminalsInArea = new List<string>();
+            List<string> terminalsInArea;
             var users = new List<EmployeeMaster>();
             if (null != areaId)
             {
-                terminalsInArea = Common.GetTerminalsByArea
+                terminalsInArea = GetTerminalsByArea
                     (dataService, settings, userCulture, userRoleIds, areaId, out fault);
                 Query query = new Query
                 {
@@ -3460,6 +3502,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return users;
         }
+     
         /// EMPLOYEEMASTER Table queries
         /// <summary>
         ///  Get a list of users that have access to messaging for the driver's region
@@ -3498,6 +3541,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return users;
         }
+     
         /// <summary>
         /// Get the last history trip record
         /// </summary>
@@ -3531,7 +3575,6 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return histTrip;
         }
-
 
         /// MESSAGE Table queries
         /// <summary>
@@ -3577,6 +3620,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return messages;
         }
+    
         /// POWERFUEL Table queries
         /// <summary>
         ///  Get power fuel records for a given trip
@@ -3614,6 +3658,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return powerFuel;
         }
+    
         /// POWERFUEL Table queries
         /// <summary>
         ///  Get power fuel records for a given trip
@@ -3651,6 +3696,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return powerFuel;
         }
+ 
         /// POWERFUEL Table queries
         /// <summary>
         /// Get the last power fuel record for powerid and tripnumber/driver id
@@ -3687,6 +3733,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return powerFuel;
         }
+   
         /// POWERHISTORY Table queries
         /// <summary>
         ///  Get power history records for a given trip
@@ -3757,10 +3804,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return powerHistory;
                 }
-                powerHistory = (PowerHistory)queryResult.Records.Cast<PowerHistory>().FirstOrDefault();
+                powerHistory = queryResult.Records.Cast<PowerHistory>().FirstOrDefault();
             }
             return powerHistory;
         }
+    
         /// POWERMASTER Table queries
         /// <summary>
         ///  Get a a power master record for a given power unit.
@@ -3791,11 +3839,10 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return powerunit;
                 }
-                powerunit = (PowerMaster)queryResult.Records.Cast<PowerMaster>().FirstOrDefault();
+                powerunit = queryResult.Records.Cast<PowerMaster>().FirstOrDefault();
             }
             return powerunit;
         }
-
 
         /// POWERMASTER Table queries
         /// <summary>
@@ -3829,10 +3876,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return powerunit;
                 }
-                powerunit = (PowerMaster)queryResult.Records.Cast<PowerMaster>().FirstOrDefault();
+                powerunit = queryResult.Records.Cast<PowerMaster>().FirstOrDefault();
             }
             return powerunit;
         }
+  
         /// PREFERENCE Table queries
         /// <summary>
         ///  Get a list of all preferences for a terminalId.
@@ -3900,10 +3948,10 @@ namespace Brady.ScrapRunner.DataService.Util
                 var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
                 if (null != fault)
                 {
-                    return parametervalue;
+                    return null;
                 }
-                var preference = (Preference)queryResult.Records.Cast<Preference>().FirstOrDefault();
-
+        
+                var preference = queryResult.Records.Cast<Preference>().FirstOrDefault();
                 if (null != preference)
                 {
                     parametervalue = preference.ParameterValue;
@@ -3911,6 +3959,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return parametervalue;
         }
+   
         /// REGIONMASTER Table queries
         /// <summary>
         ///  Get a a region master record for a given region.
@@ -3942,10 +3991,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return region;
                 }
-                region = (RegionMaster)queryResult.Records.Cast<RegionMaster>().FirstOrDefault();
+                region = queryResult.Records.Cast<RegionMaster>().FirstOrDefault();
             }
             return region;
         }
+    
         /// PREFERENCE Table queries
         /// <summary>
         ///  Get the preferencse by terminal.
@@ -3982,6 +4032,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return preferences;
         }
+     
         /// TERMINALCHANGE Table queries
         /// <summary>
         ///  Get a list of all terminal master updates after a given date time for a given region.
@@ -4034,14 +4085,14 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="fault"></param>
         /// <returns>An empty list if dateTime or areaId is null or no entries are found</returns>
         public static List<TerminalChange> GetTerminalChangesForArea(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, DateTime? dateTime, string areaId, out DataServiceFault fault)
+             string userCulture, long[] userRoleIds, DateTime? dateTime, string areaId, out DataServiceFault fault)
         {
             fault = null;
-            var terminalsInArea = new List<string>();
+            List<string> terminalsInArea;
             var terminals = new List<TerminalChange>();
             if (null != dateTime && null != areaId)
             {
-                terminalsInArea = Common.GetTerminalsByArea
+                terminalsInArea = GetTerminalsByArea
                     (dataService, settings, userCulture, userRoleIds, areaId, out fault);
                 Query query = new Query
                 {
@@ -4092,10 +4143,11 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return terminal;
                 }
-                terminal = (TerminalMaster)queryResult.Records.Cast<TerminalMaster>().FirstOrDefault();
+                terminal = queryResult.Records.Cast<TerminalMaster>().FirstOrDefault();
             }
             return terminal;
         }
+  
         /// TERMINALMASTER Table queries
         /// <summary>
         /// Gets a list of terminals by area
@@ -4108,14 +4160,13 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="fault"></param>
         /// <returns></returns>
         public static List<TerminalMaster> GetTerminalMastersForArea(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, string areaId, out DataServiceFault fault)
+             string userCulture, long[] userRoleIds, string areaId, out DataServiceFault fault)
         {
             fault = null;
-            var terminalsInArea = new List<string>();
             var terminals = new List<TerminalMaster>();
             if (null != areaId)
             {
-                terminalsInArea = Common.GetTerminalsByArea
+                var terminalsInArea = GetTerminalsByArea
                     (dataService, settings, userCulture, userRoleIds, areaId, out fault);
                 Query query = new Query
                 {
@@ -4133,6 +4184,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return terminals;
         }
+     
         /// TERMINALMASTER Table queries
         /// <summary>
         /// Gets a list of terminals by region
@@ -4167,6 +4219,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return terminals;
         }
+     
         /// TRIP Table  queries
         /// <summary>
         ///  Get a list of all trips for given driver and powerid.
@@ -4207,6 +4260,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return trips;
         }
+    
         /// TRIP Table  queries
         /// <summary>
         ///  Get a list of all trips to be sent to a given driver at login time.
@@ -4245,6 +4299,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return trips;
         }
+  
         /// TRIP Table queries
         /// <summary>
         ///  Get a list of all trips to be sent to a given driver whenever a new trip is added or an existing trip is modified.
@@ -4283,6 +4338,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return trips;
         }
+ 
         /// TRIP Table  queries
         /// <summary>
         ///  Get the next trip record for a given driver id.
@@ -4323,6 +4379,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return trip;
         }
+ 
         /// TRIP Table  queries
         /// <summary>
         ///  Get the trip record for a given trip number.
@@ -4357,6 +4414,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return trip;
         }
+   
         /// <summary>
         /// Checks if the trip has already been completed.
         /// </summary>
@@ -4377,6 +4435,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return response;
         }
+    
         /// <summary>
         /// Checks if the trip segment has already been completed.
         /// </summary>
@@ -4397,6 +4456,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return response;
         }
+    
         /// TRIPPOINTS Table  queries
         /// <summary>
         ///  Get a trip points record for a orig host code and dest host code.
@@ -4411,7 +4471,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="fault"></param>
         /// <returns>An empty Trip record if tripNumber is null or no record is found</returns>
         public static TripPoints GetTripPoints(IDataService dataService, ProcessChangeSetSettings settings,
-              string userCulture, IEnumerable<long> userRoleIds, string origHostCode,string destHostCode, out DataServiceFault fault)
+              string userCulture, long[] userRoleIds, string origHostCode,string destHostCode, out DataServiceFault fault)
         {
             fault = null;
             var tripPoints = new TripPoints();
@@ -4481,6 +4541,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripRefNums;
         }
+ 
         /// TRIPSEGMENT Table  queries
         /// <summary>
         ///  Gets the trip segment record for a given trip and segment.
@@ -4517,6 +4578,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegment;
         }
+      
         /// TRIPSEGMENT Table  queries
         /// <summary>
         ///  Gets the trip segment record for a given trip and segment.
@@ -4555,6 +4617,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegment;
         }
+     
         /// TRIPSEGMENT Table  queries
         /// <summary>
         ///  Gets the next trip segment for a given trip.
@@ -4591,6 +4654,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegment;
         }
+      
         /// TRIPSEGMENT queries
         /// <summary>
         ///  Get a list of all trip segments for a given trip.
@@ -4605,7 +4669,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="fault"></param>
         /// <returns>An empty list if tripNumber is null or no entries are found</returns>
         public static List<TripSegment> GetTripSegmentsForDriverAndPowerId(IDataService dataService, ProcessChangeSetSettings settings,
-              string userCulture, IEnumerable<long> userRoleIds, List<Trip> tripList,string powerId, out DataServiceFault fault)
+              string userCulture, long[] userRoleIds, List<Trip> tripList,string powerId, out DataServiceFault fault)
         {
             fault = null;
             var tripSegments = new List<TripSegment>();
@@ -4632,6 +4696,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegments;
         }
+     
         /// TRIPSEGMENT queries
         /// <summary>
         ///  Get a list of all trip segments for a given trip.
@@ -4667,6 +4732,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegments;
         }
+   
         /// TRIPSEGMENT queries
         /// <summary>
         ///  Get a list of trip segments to be sent to a given driver for a given trip.
@@ -4703,6 +4769,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegments;
         }
+      
         /// TRIPSEGMENT queries
         /// <summary>
         ///  Get a list of incomplete trip segments for the trips assigned to a driver.
@@ -4777,6 +4844,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripContainers;
         }
+    
         /// TRIPSEGMENTCONTAINER queries
         /// <summary>
         ///  Get a list of trip segment containers for a given trip and segment.
@@ -4814,6 +4882,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentContainers;
         }
+    
         /// TRIPSEGMENTCONTAINER queries
         /// <summary>
         ///  Get a list of incomplete trip segment containers for a given trip and segment.
@@ -4853,6 +4922,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentContainers;
         }
+       
         /// TRIPSEGMENTCONTAINER Table  queries
         /// <summary>
         ///  Gets the trip segment container record for a given trip, segment, and container.
@@ -4930,6 +5000,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentContainer;
         }
+     
         /// TRIPSEGMENTIMAGE Table  queries
         /// <summary>
         ///  Gets the last trip segment image record for a given trip and segment.
@@ -4981,7 +5052,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="fault"></param>
         /// <returns>An empty list if tripNumber or tripSegNumber is null or no entries are found</returns>
         public static List<TripSegmentMileage> GetTripSegmentMileageForDriverAndPowerId(IDataService dataService, ProcessChangeSetSettings settings,
-              string userCulture, IEnumerable<long> userRoleIds, List<Trip> tripList, string powerId, out DataServiceFault fault)
+              string userCulture, long[] userRoleIds, List<Trip> tripList, string powerId, out DataServiceFault fault)
         {
             fault = null;
             var tripSegmentMileage = new List<TripSegmentMileage>();
@@ -5009,6 +5080,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentMileage;
         }
+       
         /// TRIPSEGMENTMILEAGE Table  queries
         /// <summary>
         ///  Gets the trip segment mileage records for a given trip.
@@ -5044,6 +5116,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentMileage;
         }
+      
         /// TRIPSEGMENTMILEAGE Table  queries
         /// <summary>
         ///  Gets the last open-ended trip segment mileage record for a given trip and segment.
@@ -5082,6 +5155,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentMileage;
         }
+     
         /// TRIPSEGMENTMILEAGE Table  queries
         /// <summary>
         ///  Gets the trip segment mileage records for a given trip and segment.
@@ -5119,6 +5193,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentMileage;
         }
+ 
         /// TRIPSEGMENTMILEAGE Table  queries
         /// <summary>
         ///  Gets the last open-ended trip segment mileage record for a given trip and segment.
@@ -5158,6 +5233,7 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return tripSegmentMileage;
         }
+  
         /// TRIPTYPEBASIC Table queries
         /// <summary>
         ///  Get a basic trip type record for a given basic trip type.
@@ -5188,7 +5264,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return tripTypeBasic;
                 }
-                tripTypeBasic = (TripTypeBasic)queryResult.Records.Cast<TripTypeBasic>().FirstOrDefault();
+                tripTypeBasic = queryResult.Records.Cast<TripTypeBasic>().FirstOrDefault();
             }
             return tripTypeBasic;
         }
@@ -5221,7 +5297,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     return tripTypeMasterDesc;
                 }
-                tripTypeMasterDesc = (TripTypeMasterDesc)queryResult.Records.Cast<TripTypeMasterDesc>().FirstOrDefault();
+                tripTypeMasterDesc = queryResult.Records.Cast<TripTypeMasterDesc>().FirstOrDefault();
             }
             return tripTypeMasterDesc;
         }
