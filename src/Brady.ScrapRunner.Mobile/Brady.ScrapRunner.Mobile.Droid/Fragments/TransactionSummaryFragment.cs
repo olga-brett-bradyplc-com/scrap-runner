@@ -89,7 +89,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     var listview = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
                     var number = await UserDialogs.Instance.PromptAsync("Enter barcode number", "Simulate", "OK");
                     await ViewModel.TransactionScannedCommandAsync.ExecuteAsync(number.Text);
-                    ((BaseAdapter)listview.Adapter).NotifyDataSetChanged();
+                    Activity.RunOnUiThread(() => { ((BaseAdapter) listview.Adapter).NotifyDataSetChanged(); });
                     VibrateDevice();
                     break;
             }
@@ -152,8 +152,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             
             _scannerFragment.StartScanning(async result =>
             {
-                await ViewModel.TransactionScannedCommandAsync.ExecuteAsync(result?.Text);
                 VibrateDevice();
+                var listview = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
+                await ViewModel.TransactionScannedCommandAsync.ExecuteAsync(result?.Text);
+                Activity.RunOnUiThread(() => { ((BaseAdapter)listview.Adapter).NotifyDataSetChanged(); });
             }, barcodeScanningOptions);
         }
 
