@@ -264,9 +264,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             }
                         }
                         ////////////////////////////////////////////////
-                        // Preferences:  Lookup the system preference "DEFMDTPrefix".  
+                        //Do not use the MDTId from the mobile app. Build it using the MDT Prefix (if it exists) plus the employee id.
+                        // Lookup Preference: DEFMDTPrefix
                         string prefMdtPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
-                                                       Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
+                                                        Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
                         if (FaultHandled(changeSetResult, msgKey, fault, driverLoginProcess))
                         {
                             break;
