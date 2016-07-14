@@ -70,14 +70,17 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
                 base.OnBackPressed();
         }
 
-        public override void OnBeforeFragmentChanging(IMvxCachedFragmentInfo fragmentInfo, Android.Support.V4.App.FragmentTransaction transaction)
-        {
-            if (!fragmentInfo.Tag.Contains(MenuViewModel))
-            {
-                transaction.SetCustomAnimations(Resource.Animation.custom_enter_anim,
-                    Resource.Animation.custom_leave_anim);
-            }
-        }
+        /*
+            Disabling for now until some quirks can be worked out
+        */
+        //public override void OnBeforeFragmentChanging(IMvxCachedFragmentInfo fragmentInfo, Android.Support.V4.App.FragmentTransaction transaction)
+        //{
+        //    if (!fragmentInfo.Tag.Contains(MenuViewModel))
+        //    {
+        //        transaction.SetCustomAnimations(Resource.Animation.custom_enter_anim,
+        //            Resource.Animation.custom_leave_anim);
+        //    }
+        //}
 
         //public override void OnFragmentChanged(IMvxCachedFragmentInfo fragmentInfo)
         //{
