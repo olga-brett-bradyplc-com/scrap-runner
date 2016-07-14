@@ -24,7 +24,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     public class TransactionConfirmationFragment : BaseFragment<TransactionConfirmationViewModel>
     {
         private IDisposable _containersToken;
-        private byte[] _image;
 
         protected override int FragmentId => Resource.Layout.fragment_transactionconfirmation;
         protected override bool NavMenuEnabled => true;
@@ -49,15 +48,21 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             {
                 if (signaturePad.Points.Length > 0)
                 {
-                    var bitmap = signaturePad.GetImage();
-
+                    /*
+                        Due to limitations in the dispatch image viewer, we need to make sure that signature pad image is transposed
+                        on top of an opaque background, otherwise the image is sent with a transparent background, which causes the 
+                        image to appear as a solid, black image due to the dispatch's image viewer not supporting transparency
+                    */
+                    var signatureBitmap = signaturePad.GetImage();
+                    var opaqueBitmap = Bitmap.CreateBitmap(signatureBitmap.Width, signatureBitmap.Height, signatureBitmap.GetConfig());
+                    var canvas = new Canvas(opaqueBitmap);
+                    canvas.DrawColor(Color.White);
+                    canvas.DrawBitmap(signatureBitmap, 0, 0, null);
                     using (var ms = new MemoryStream())
                     {
-                        bitmap.Compress(Bitmap.CompressFormat.Png, 80, ms);
-                        _image = ms.ToArray();
+                        opaqueBitmap.Compress(Bitmap.CompressFormat.Png, 80, ms);
+                        ViewModel.ConfirmTransactionsCommand.ExecuteAsync(ms.ToArray());
                     }
-
-                    ViewModel.ConfirmTransactionsCommand.ExecuteAsync(_image);
                 }
                 else
                 {
@@ -75,8 +80,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 _containersToken.Dispose();
                 _containersToken = null;
             }
-            
-            _image = null;
         }
 
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)

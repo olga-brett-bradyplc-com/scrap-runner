@@ -8,6 +8,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Views;
+using Android.Views.Animations;
 using Android.Widget;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
 using Brady.ScrapRunner.Mobile.Helpers;
@@ -130,6 +131,14 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                         Activity.Window.AddFlags(WindowManagerFlags.DrawsSystemBarBackgrounds);
                         Activity.Window.SetStatusBarColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
                     }
+
+                    //var move = new TranslateAnimation(Dimension.RelativeToSelf, 0, Dimension.RelativeToSelf, 500,
+                    //    Dimension.RelativeToSelf, 0, Dimension.RelativeToSelf, 300)
+                    //{
+                    //    Interpolator = new LinearInterpolator(),
+                    //    Duration = 1000
+                    //};
+                    //enrouteButton.StartAnimation(move);
 
                     enrouteButton.Visibility = ViewStates.Invisible;
                     arriveButton.Visibility = ViewStates.Visible;
