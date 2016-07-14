@@ -719,4 +719,8 @@ You will now be sent back to the login.</value>
   <data name="SelectLevel" xml:space="preserve">
     <value>Select Level</value>
   </data>
+  <data name="SelectReviewReason" xml:space="preserve">
+    <value>Select Review Reason</value>
+    <comment>ScaleDetailViewModel</comment>
+  </data>
 </root>

@@ -685,4 +685,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Select Level</value>
     <comment>NEEDS TRANSLATION; TransactionSummaryViewModel</comment>
   </data>
+  <data name="SelectReviewReason" xml:space="preserve">
+    <value>Select Review Reason</value>
+    <comment>NEEDS TRANSLATION; ScaleDetailViewModel</comment>
+  </data>
 </root>

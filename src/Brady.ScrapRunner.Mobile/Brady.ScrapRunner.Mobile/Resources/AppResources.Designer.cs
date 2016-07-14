@@ -1243,6 +1243,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Review Reason.
+        /// </summary>
+        public static string SelectReviewReason {
+            get {
+                return ResourceManager.GetString("SelectReviewReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select User To Message.
         /// </summary>
         public static string SelectUser {
