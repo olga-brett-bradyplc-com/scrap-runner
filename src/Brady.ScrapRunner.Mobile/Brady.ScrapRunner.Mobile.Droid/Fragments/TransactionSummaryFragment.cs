@@ -15,6 +15,7 @@ using Android.Support.V4.Content;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
 using Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView;
 using Brady.ScrapRunner.Mobile.Models;
+using Brady.ScrapRunner.Mobile.Resources;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Bindings;
 using MvvmCross.Binding.Droid.BindingContext;
@@ -99,7 +100,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             menu.Clear();
             if (ViewModel.AllowRtnAdd.HasValue && (bool) ViewModel.AllowRtnAdd)
-                menu.Add(0, AddReturnToYardNav, Menu.None, "Add Return To Yard").SetShowAsAction(ShowAsAction.Never);
+                menu.Add(0, AddReturnToYardNav, Menu.None, AppResources.ReturnToYardAdd).SetShowAsAction(ShowAsAction.Never);
 
 #if DEBUG
     menu.Add(0, SimulateScanNav, Menu.None, "Simulate Scan (DEV)").SetShowAsAction(ShowAsAction.Never);
