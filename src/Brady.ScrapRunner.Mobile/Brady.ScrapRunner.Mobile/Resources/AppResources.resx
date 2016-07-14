@@ -707,4 +707,20 @@ You will now be sent back to the login.</value>
     <value>Trip Unassigned</value>
     <comment>AndroidNotificationService</comment>
   </data>
+  <data name="ErrorProcessingLevels" xml:space="preserve">
+    <value>Error processing level input</value>
+  </data>
+  <data name="ErrorScanningBarcode" xml:space="preserve">
+    <value>Could not scan barcode</value>
+  </data>
+  <data name="NoContainerLevels" xml:space="preserve">
+    <value>Container level is required, and no levels were found</value>
+  </data>
+  <data name="SelectLevel" xml:space="preserve">
+    <value>Select Level</value>
+  </data>
+  <data name="SelectReviewReason" xml:space="preserve">
+    <value>Select Review Reason</value>
+    <comment>ScaleDetailViewModel</comment>
+  </data>
 </root>

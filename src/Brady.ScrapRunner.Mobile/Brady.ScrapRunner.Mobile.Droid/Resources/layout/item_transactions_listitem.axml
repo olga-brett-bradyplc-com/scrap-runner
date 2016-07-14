@@ -9,12 +9,6 @@
     android:background="#ffffff"
     android:padding="10dp">
     <TextView
-        android:id="@+id/tripContainerKey"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        local:MvxBind="Text TripNumber + TripSegNumber + TripSegContainerSeqNumber" />
-    <TextView
         android:id="@+id/tripContainerInfo"
         android:layout_width="match_parent"
         android:layout_height="15dp"

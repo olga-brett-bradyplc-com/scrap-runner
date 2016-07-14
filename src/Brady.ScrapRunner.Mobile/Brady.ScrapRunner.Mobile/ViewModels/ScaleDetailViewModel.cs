@@ -179,6 +179,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
             var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
 
+            // Show review exception dialog if gross time isn't set
+            var reasonDialogAsync = (!GrossTime.HasValue)
+                ? await
+                    UserDialogs.Instance.ActionSheetAsync(AppResources.SelectReviewReason, AppResources.Cancel, "", null,
+                        reasons.Select(ct => ct.CodeDisp1).ToArray())
+                : "";
+
+            if (reasonDialogAsync == AppResources.Cancel) return;
+
+            var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
+
             var completeMessage = tripSegmentContainers.TakeWhile(
                                        tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete) && tscm.TripSegContainerNumber != TripSegContainerNumber).Any()
                 ? confirmationMessage
@@ -191,15 +202,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
                 {
-                    // Show review exception dialog if gross time isn't set
-                    var reasonDialogAsync = (!GrossTime.HasValue)
-                        ? await
-                            UserDialogs.Instance.ActionSheetAsync(AppResources.SelectException, AppResources.Cancel, "", null,
-                                reasons.Select(ct => ct.CodeDisp1).ToArray())
-                        : "";
-
-                    var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
-
                     // Go through each container, updating both the local and remote db
                     foreach (var container in Containers.SelectMany(grouping => grouping))
                     {
