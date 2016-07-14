@@ -186,6 +186,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         reasons.Select(ct => ct.CodeDisp1).ToArray())
                 : "";
 
+            if (reasonDialogAsync == AppResources.Cancel) return;
+
             var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
 
             var completeMessage = tripSegmentContainers.TakeWhile(
@@ -200,8 +202,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
                 {
-
-
                     // Go through each container, updating both the local and remote db
                     foreach (var container in Containers.SelectMany(grouping => grouping))
                     {
