@@ -183,19 +183,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////////////
-                    //If the MDTId is not provided by the mobile app, build it using the MDT Prefix (if it exists) plus the employee id.
-                    if (driverEnrouteProcess.Mdtid == null)
+                    //Do not use the MDTId from the mobile app. Build it using the MDT Prefix (if it exists) plus the employee id.
+                    // Lookup Preference: DEFMDTPrefix
+                    string prefMdtPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                    Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
+                    if (fault != null)
                     {
-                        // Lookup Preference: DEFMDTPrefix
-                        string prefMdtPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
-                                                      Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
-                        if (fault != null)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            break;
-                        }
-                        driverEnrouteProcess.Mdtid = prefMdtPrefix + driverEnrouteProcess.EmployeeId;                        
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
                     }
+                    driverEnrouteProcess.Mdtid = prefMdtPrefix + driverEnrouteProcess.EmployeeId;
+
 
                     ////////////////////////////////////////////////
                     // If the GPS Auto flag is not provided default it to N
