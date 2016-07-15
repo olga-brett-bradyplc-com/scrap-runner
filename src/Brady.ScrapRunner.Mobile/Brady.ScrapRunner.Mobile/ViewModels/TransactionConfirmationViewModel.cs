@@ -132,7 +132,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
                 }
             }
-            
+
+            await _tripService.PropagateContainerUpdates(TripNumber, Containers);
+
             // After segment(s) have been completed, upload the signature
             var firstSegment = Containers.FirstOrDefault().Key.TripSegNumber;
             var imageProcess = await _tripService.ProcessDriverImageAsync(new DriverImageProcess
