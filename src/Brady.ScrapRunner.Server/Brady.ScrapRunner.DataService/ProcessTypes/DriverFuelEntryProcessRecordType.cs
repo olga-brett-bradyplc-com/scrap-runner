@@ -182,19 +182,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         }
                     }
                     ////////////////////////////////////////////////////////
-                    //If the MDTId is not provided by the mobile app, build it using the MDT Prefix (if it exists) plus the employee id.
-                    if (driverFuelEntryProcess.Mdtid == null)
+                    //Do not use the MDTId from the mobile app. Build it using the MDT Prefix (if it exists) plus the employee id.
+                    // Lookup Preference: DEFMDTPrefix
+                    string prefMdtPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                    Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
+                    if (fault != null)
                     {
-                        // Lookup Preference: DEFMDTPrefix
-                        string prefMdtPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
-                                                      Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
-                        if (fault != null)
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            break;
-                        }
-                        driverFuelEntryProcess.Mdtid = prefMdtPrefix + driverFuelEntryProcess.EmployeeId;
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
                     }
+                    driverFuelEntryProcess.Mdtid = prefMdtPrefix + driverFuelEntryProcess.EmployeeId;
+
                     ////////////////////////////////////////////////
                     //First validate country
                     CodeTable codeTableCountry;
