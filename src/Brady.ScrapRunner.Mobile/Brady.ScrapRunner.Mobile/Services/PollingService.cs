@@ -383,7 +383,6 @@
             if (forceLogoff.Records.Any())
             {
                 _mvxMessenger.Publish(new ForceLogoffMessage(this));
-                _notificationService.ForcedLogoff();
             }
         }
 

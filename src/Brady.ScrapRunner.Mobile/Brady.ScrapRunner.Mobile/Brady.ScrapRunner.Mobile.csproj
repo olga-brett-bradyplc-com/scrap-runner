@@ -124,6 +124,7 @@
     <Compile Include="Validators\UsernameValidator.cs" />
     <Compile Include="ViewModels\DelayViewModel.cs" />
     <Compile Include="ViewModels\FuelEntryViewModel.cs" />
+    <Compile Include="ViewModels\GpsCaptureViewModel.cs" />
     <Compile Include="ViewModels\LoadDropContainerViewModel.cs" />
     <Compile Include="ViewModels\MessagesViewModel.cs" />
     <Compile Include="ViewModels\ModifyReturnToYardViewModel.cs" />
