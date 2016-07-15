@@ -38,6 +38,7 @@
     <Compile Include="App.cs" />
     <Compile Include="AppStart.cs" />
     <Compile Include="Converters\DateTimeValueConverter.cs" />
+    <Compile Include="Converters\NullableIntValueConverter.cs" />
     <Compile Include="CustomLanguageBindingParser.cs" />
     <Compile Include="Enums\MenuFilterEnum.cs" />
     <Compile Include="Enums\TerminalChangeEnum.cs" />
@@ -61,7 +62,6 @@
     <Compile Include="Interfaces\IQueueService.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\IConnectionService.cs" />
-    <Compile Include="Interfaces\IClientSettings.cs" />
     <Compile Include="Interfaces\ISqliteDatabase.cs" />
     <Compile Include="Interfaces\ITerminalService.cs" />
     <Compile Include="Interfaces\ITripService.cs" />
@@ -105,7 +105,6 @@
     <Compile Include="Services\CustomerService.cs" />
     <Compile Include="Services\DemoDataGenerator.cs" />
     <Compile Include="Services\ConnectionService.cs" />
-    <Compile Include="Services\DemoClientSettings.cs" />
     <Compile Include="Services\DriverService.cs" />
     <Compile Include="Services\LocationOdometerService.cs" />
     <Compile Include="Services\LocationPathService.cs" />
