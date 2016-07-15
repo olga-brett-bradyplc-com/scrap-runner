@@ -7,7 +7,6 @@
         void Trip(Trip trip, TripNotificationContext context);
         void TripsResequenced();
         void Message(Messages message);
-        void ForcedLogoff();
     }
 
     public enum TripNotificationContext
