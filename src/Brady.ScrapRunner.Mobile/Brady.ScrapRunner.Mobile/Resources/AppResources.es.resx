@@ -673,4 +673,20 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Trip Unassigned</value>
     <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
   </data>
+  <data name="ErrorProcessingLevels" xml:space="preserve">
+    <value>Error processing level input</value>
+    <comment>NEEDS TRANSLATION;TransactionSummaryViewModel</comment>
+  </data>
+  <data name="ErrorScanningBarcode" xml:space="preserve">
+    <value>Could not scan barcode</value>
+    <comment>NEEDS TRANSLATION;TransactionSummaryViewModel</comment>
+  </data>
+  <data name="SelectLevel" xml:space="preserve">
+    <value>Select Level</value>
+    <comment>NEEDS TRANSLATION; TransactionSummaryViewModel</comment>
+  </data>
+  <data name="SelectReviewReason" xml:space="preserve">
+    <value>Select Review Reason</value>
+    <comment>NEEDS TRANSLATION; ScaleDetailViewModel</comment>
+  </data>
 </root>

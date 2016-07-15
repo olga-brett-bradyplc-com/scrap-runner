@@ -8,6 +8,10 @@
         Task TripAsync(Trip trip, TripNotificationContext context);
         Task TripsResequencedAsync();
         Task MessageAsync(Messages message);
+        void Trip(Trip trip, TripNotificationContext context);
+        void TripsResequenced();
+        void Message(Messages message);
+        void ForcedLogoff();
     }
 
     public enum TripNotificationContext

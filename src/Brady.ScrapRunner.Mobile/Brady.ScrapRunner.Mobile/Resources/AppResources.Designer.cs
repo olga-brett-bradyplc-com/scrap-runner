@@ -431,6 +431,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error processing level input.
+        /// </summary>
+        public static string ErrorProcessingLevels {
+            get {
+                return ResourceManager.GetString("ErrorProcessingLevels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not scan barcode.
+        /// </summary>
+        public static string ErrorScanningBarcode {
+            get {
+                return ResourceManager.GetString("ErrorScanningBarcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Finished with Scale?.
         /// </summary>
         public static string FinishedScale {
@@ -708,6 +726,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string NoCommoditySelected {
             get {
                 return ResourceManager.GetString("NoCommoditySelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Container level is required, and no levels were found.
+        /// </summary>
+        public static string NoContainerLevels {
+            get {
+                return ResourceManager.GetString("NoContainerLevels", resourceCulture);
             }
         }
         
@@ -1203,6 +1230,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string SelectLanguage {
             get {
                 return ResourceManager.GetString("SelectLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Level.
+        /// </summary>
+        public static string SelectLevel {
+            get {
+                return ResourceManager.GetString("SelectLevel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Review Reason.
+        /// </summary>
+        public static string SelectReviewReason {
+            get {
+                return ResourceManager.GetString("SelectReviewReason", resourceCulture);
             }
         }
         
