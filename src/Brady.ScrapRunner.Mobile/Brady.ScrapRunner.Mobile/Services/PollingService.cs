@@ -415,7 +415,6 @@
             if (forceLogoff.Records.Any())
             {
                 _mvxMessenger.Publish(new ForceLogoffMessage(this));
-                _notificationService.ForcedLogoff();
                 Mvx.TaggedTrace(Constants.ScrapRunner, "PollForceLogoffAsync");
             }
             Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForceLogoffAsync");

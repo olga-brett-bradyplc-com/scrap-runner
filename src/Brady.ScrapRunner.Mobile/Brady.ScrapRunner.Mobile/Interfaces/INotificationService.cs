@@ -8,7 +8,6 @@
         Task TripAsync(Trip trip, TripNotificationContext context);
         Task TripsResequencedAsync();
         Task MessageAsync(Messages message);
-        void ForcedLogoff();
     }
 
     public enum TripNotificationContext
