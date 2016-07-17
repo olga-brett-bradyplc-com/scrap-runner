@@ -69,6 +69,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 case Resource.Id.nav_changeodometer:
                     await ViewModel.ChangeOdometerCommand.ExecuteAsync();
                     break;
+                case Resource.Id.nav_gpsdiagnostics:
+                    ViewModel.GpsDiagnosticsCommand.Execute();
+                    break;
             }
         }
     }

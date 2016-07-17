@@ -279,6 +279,18 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //    }
                     //}
 
+                    ////////////////////////////////////////////////////////
+                    //Do not use the MDTId from the mobile app. Build it using the MDT Prefix (if it exists) plus the employee id.
+                    // Lookup Preference: DEFMDTPrefix
+                    string prefMdtPrefix = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                                    Constants.SystemTerminalId, PrefSystemConstants.DEFMDTPrefix, out fault);
+                    if (fault != null)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    driverSegmentDoneProcess.Mdtid = prefMdtPrefix + driverSegmentDoneProcess.EmployeeId;
+
                     ////////////////////////////////////////////////
                     //Get a list of all segments for the trip
                     var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
