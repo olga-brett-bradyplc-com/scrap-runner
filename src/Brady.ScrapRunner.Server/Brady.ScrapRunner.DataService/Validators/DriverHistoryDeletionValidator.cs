@@ -9,7 +9,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         AbstractValidator<DriverHistory>,
         IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public DriverHistoryDeletionValidator()
         {

@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         AbstractValidator<Messages>,
         IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public MessagesDeletionValidator()
         {

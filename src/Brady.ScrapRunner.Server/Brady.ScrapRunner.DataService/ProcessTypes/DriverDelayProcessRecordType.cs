@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using System;
+﻿using System.Collections.Generic;
+using AutoMapper;
 using System.Linq;
 using System.Text;
 using NHibernate;
@@ -39,6 +39,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     public class DriverDelayProcessRecordType : ChangeableRecordType
         <DriverDelayProcess, string, DriverDelayProcessValidator, DriverDelayProcessDeletionValidator>
     {
+
         /// <summary>
         /// Mandatory implementation of virtual base class method.
         /// </summary>
@@ -63,7 +64,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         }
 
         /// <summary>
-        /// Perform the driver fuel entry processing.
+        /// Perform the driver delay processing.
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="changeSet"></param>
@@ -105,7 +106,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
                 }
 
-                foreach (String key in changeSetResult.SuccessfullyUpdated)
+                foreach (string key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
@@ -238,7 +239,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         //Processing a back on duty
                         if (!ProcessBackOnDuty(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                     driverDelayProcess, employeeMaster, currentTrip, currentTripSegment,
-                                    driverDelayInsertCount, driverHistoryInsertCount))
+                                    driverHistoryInsertCount))
                         {
                             break;
                         }
@@ -478,8 +479,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 EventComment = comment,
             };
 
-            ChangeSetResult<int> eventChangeSetResult;
-            eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
+            ChangeSetResult<int> eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
             log.Debug("SRTEST:Saving EventLog Record - Driver Delay");
             //Check for EventLog failure.
             if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
@@ -495,7 +495,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         private bool ProcessBackOnDuty(IDataService dataService, ProcessChangeSetSettings settings,
                  ChangeSetResult<string> changeSetResult, string msgKey, long[] userRoleIds, string userCulture,
                  DriverDelayProcess driverDelayProcess, EmployeeMaster employeeMaster, Trip currentTrip, TripSegment currentTripSegment,
-                 int driverDelayInsertCount, int driverHistoryInsertCount)
+                 int driverHistoryInsertCount)
         {
             DataServiceFault fault;
 
@@ -511,14 +511,18 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (driverDelayList == null)
             {
                 //ToDo: On a back on duty, if there is no delay started, should we start one and end it?
+                // TODO:  fix me
+                // for now if it is null we minimally attempt not to break downstream code
+                driverDelayList = new List<DriverDelay>();
             }
+
             //List is in order of delay start date desc
             var lastDriverDelay = driverDelayList.FirstOrDefault();
 
             //Delete all but the last open ended delay. There should be none.
             foreach (var oldDriverDelay in driverDelayList)
             {
-                if (oldDriverDelay != lastDriverDelay)
+                if ( !oldDriverDelay.Equals(lastDriverDelay) )
                 {
                     //Do the delete. Deleting records with composite keys is now fixed.
                     changeSetResult = Common.DeleteDriverDelay(dataService, settings, oldDriverDelay);
@@ -535,18 +539,22 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
 
             //Set the end date/time for the delay
-            lastDriverDelay.DelayEndDateTime = driverDelayProcess.ActionDateTime;
-
-            //Do the driverDelay update
-            changeSetResult = Common.UpdateDriverDelay(dataService, settings, lastDriverDelay);
-            log.DebugFormat("SRTEST:Saving DriverDelay Record for DriverId:{0} Seq#:{1} Trip:{2} - Driver BackOnDuty.",
-                            lastDriverDelay.DriverId, lastDriverDelay.DelaySeqNumber,lastDriverDelay.TripNumber);
-            if (Common.LogChangeSetFailure(changeSetResult, lastDriverDelay, log))
+            // TODO:  fix me, if fixed upstream
+            if (lastDriverDelay != null)
             {
-                var s = string.Format("DriverDelayProcess(BackOnDuty):Could not update DriverDelay for DriverId:{0} Seq#:{1} Trip:{2}.",
-                    lastDriverDelay.DriverId, lastDriverDelay.DelaySeqNumber, lastDriverDelay.TripNumber);
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
-                return false;
+                lastDriverDelay.DelayEndDateTime = driverDelayProcess.ActionDateTime;
+
+                //Do the driverDelay update
+                changeSetResult = Common.UpdateDriverDelay(dataService, settings, lastDriverDelay);
+                log.DebugFormat("SRTEST:Saving DriverDelay Record for DriverId:{0} Seq#:{1} Trip:{2} - Driver BackOnDuty.",
+                    lastDriverDelay.DriverId, lastDriverDelay.DelaySeqNumber,lastDriverDelay.TripNumber);
+                if (Common.LogChangeSetFailure(changeSetResult, lastDriverDelay, log))
+                {
+                    var s = string.Format("DriverDelayProcess(BackOnDuty):Could not update DriverDelay for DriverId:{0} Seq#:{1} Trip:{2}.",
+                        lastDriverDelay.DriverId, lastDriverDelay.DelaySeqNumber, lastDriverDelay.TripNumber);
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                    return false;
+                }
             }
 
             ////////////////////////////////////////////////

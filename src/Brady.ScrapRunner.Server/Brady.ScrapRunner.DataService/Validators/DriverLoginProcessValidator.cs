@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using BWF.DataServices.Support.NHibernate.Interfaces;
+﻿using BWF.DataServices.Support.NHibernate.Interfaces;
 using FluentValidation;
-using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
-using NHibernate.Criterion;
-
 
 namespace Brady.ScrapRunner.DataService.Validators
 {
@@ -13,7 +9,7 @@ namespace Brady.ScrapRunner.DataService.Validators
          AbstractValidator<DriverLoginProcess>,
          IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public void SetRepository(ICrudingDataServiceRepository repository)
         {
@@ -25,6 +21,7 @@ namespace Brady.ScrapRunner.DataService.Validators
             RuleFor(x => x.EmployeeId).NotEmpty();
             RuleFor(x => x.Password).NotEmpty();
             RuleFor(x => x.PowerId).NotEmpty();
+            RuleFor(x => x.Odometer).NotEmpty();
             RuleFor(x => x.Odometer).GreaterThan(0);
             RuleFor(x => x.LoginDateTime).NotEmpty();
             // Here for now, possibly break out as separate call

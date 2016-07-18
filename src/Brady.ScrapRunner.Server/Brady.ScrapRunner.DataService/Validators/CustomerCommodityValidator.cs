@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class CustomerCommodityValidator :
         AbstractValidator<CustomerCommodity>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public CustomerCommodityValidator()
         {
