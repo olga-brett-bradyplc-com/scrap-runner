@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class PowerLimitsValidator :
         AbstractValidator<PowerLimits>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public PowerLimitsValidator()
         {

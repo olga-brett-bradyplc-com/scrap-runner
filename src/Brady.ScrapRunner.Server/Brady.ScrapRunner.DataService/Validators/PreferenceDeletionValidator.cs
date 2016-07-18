@@ -9,7 +9,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         AbstractValidator<Preference>,
         IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public PreferenceDeletionValidator()
         {

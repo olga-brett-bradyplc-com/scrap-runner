@@ -7,7 +7,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class HistTripReferenceNumberDeletionValidator :
        AbstractValidator<HistTripReferenceNumber>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public HistTripReferenceNumberDeletionValidator()
         {
