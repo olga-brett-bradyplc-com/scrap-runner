@@ -9,7 +9,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class SecurityMasterValidator :
          AbstractValidator<SecurityMaster>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public SecurityMasterValidator()
         {

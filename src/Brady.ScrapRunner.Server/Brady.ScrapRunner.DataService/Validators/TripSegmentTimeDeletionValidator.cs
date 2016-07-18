@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class TripSegmentTimeDeletionValidator :
          AbstractValidator<TripSegmentTime>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public TripSegmentTimeDeletionValidator()
         {

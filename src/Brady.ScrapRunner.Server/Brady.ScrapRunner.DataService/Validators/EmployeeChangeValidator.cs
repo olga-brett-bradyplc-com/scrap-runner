@@ -7,7 +7,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class EmployeeChangeValidator :
          AbstractValidator<EmployeeChange>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public EmployeeChangeValidator()
         {

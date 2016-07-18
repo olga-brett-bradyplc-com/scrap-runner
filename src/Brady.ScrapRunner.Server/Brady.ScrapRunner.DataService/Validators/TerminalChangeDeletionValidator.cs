@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class TerminalChangeDeletionValidator :
         AbstractValidator<TerminalChange>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public TerminalChangeDeletionValidator()
         {

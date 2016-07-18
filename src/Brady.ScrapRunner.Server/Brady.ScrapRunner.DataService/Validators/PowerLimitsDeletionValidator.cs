@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class PowerLimitsDeletionValidator :
          AbstractValidator<PowerLimits>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public PowerLimitsDeletionValidator()
         {

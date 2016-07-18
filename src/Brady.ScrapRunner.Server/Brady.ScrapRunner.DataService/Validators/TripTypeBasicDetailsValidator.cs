@@ -9,7 +9,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class TripTypeBasicDetailsValidator :
           AbstractValidator<TripTypeBasicDetails>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public TripTypeBasicDetailsValidator()
         {

@@ -41,6 +41,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     public class DriverSegmentDoneProcessRecordType : ChangeableRecordType
         <DriverSegmentDoneProcess, string, DriverSegmentDoneProcessValidator, DriverSegmentDoneProcessDeletionValidator>
     {
+
         /// <summary>
         /// Mandatory implementation of virtual base class method.
         /// </summary>
@@ -414,10 +415,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //Must remove the incomplete containers from the original list
                             foreach (var tripContainer in tempContainerList)
                             {
-                                if (tripContainer == incompleteTripSegmentContainer)
+                                if (tripContainer.Equals(incompleteTripSegmentContainer))
                                 {
                                     tripContainerList.Remove(tripContainer);
-
                                 }
                             }
                             //Do the delete. Deleting records with composite keys is now fixed.
@@ -608,8 +608,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Update the driver's cumulative time which is the sum of standard drive and stop minutes for all 
                     //incomplete trip segments.Cannot requery db because changes have not been committed.
                     //Just subtract the std stop and drive times for this completed segment from the existing cumulative time.
-                    driverStatus.DriverCumMinutes -= (int)currentTripSegment.TripSegStandardDriveMinutes;
-                    driverStatus.DriverCumMinutes -= (int)currentTripSegment.TripSegStandardStopMinutes;
+                    if (null != driverStatus.DriverCumMinutes)
+                    {
+                        driverStatus.DriverCumMinutes -= currentTripSegment.TripSegStandardDriveMinutes ?? 0;
+                        driverStatus.DriverCumMinutes -= currentTripSegment.TripSegStandardStopMinutes ?? 0;
+                    }
 
                     //Do the delete. Deleting records with composite keys is now fixed.
                     changeSetResult = Common.DeleteTripSegment(dataService, settings, tripSegment);

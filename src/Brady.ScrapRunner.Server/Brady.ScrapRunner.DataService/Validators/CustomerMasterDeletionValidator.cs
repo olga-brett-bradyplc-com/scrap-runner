@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class CustomerMasterDeletionValidator :
         AbstractValidator<CustomerMaster>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public CustomerMasterDeletionValidator()
         {

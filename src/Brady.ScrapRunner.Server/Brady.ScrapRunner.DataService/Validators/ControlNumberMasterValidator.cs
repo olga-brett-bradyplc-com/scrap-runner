@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class ControlNumberMasterValidator :
          AbstractValidator<ControlNumberMaster>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public ControlNumberMasterValidator()
         {

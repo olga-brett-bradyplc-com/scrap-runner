@@ -7,7 +7,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         public class ContainerQuantityValidator :
          AbstractValidator<ContainerQuantity>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public ContainerQuantityValidator()
         {

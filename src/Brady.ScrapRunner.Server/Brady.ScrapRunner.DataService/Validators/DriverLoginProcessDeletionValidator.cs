@@ -1,6 +1,5 @@
 ﻿using BWF.DataServices.Support.NHibernate.Interfaces;
 using FluentValidation;
-using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 
 
@@ -9,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class DriverLoginProcessDeletionValidator :
         AbstractValidator<DriverLoginProcess>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
         public void SetRepository(ICrudingDataServiceRepository repository)
         {
             _repository = repository;

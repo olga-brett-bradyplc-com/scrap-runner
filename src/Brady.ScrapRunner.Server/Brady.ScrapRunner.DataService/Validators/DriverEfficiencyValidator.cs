@@ -7,7 +7,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class DriverEfficiencyValidator :
         AbstractValidator<DriverEfficiency>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public DriverEfficiencyValidator()
         {
