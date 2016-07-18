@@ -50,22 +50,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 ShowViewModel<SignInViewModel>();
             }
         }
-        //Done on android notifications by background process (BackgroundIntentService.cs on Droid Services)
 
         //put in the appropriate spot, called on receiving logoff packet from dispatch (do we have mechanism for receiving packets yet?)
-        //private IMvxAsyncCommand _forcedLogoffCommand;
-        //public IMvxAsyncCommand ForcedLogoffCommand => _forcedLogoffCommand ?? (_forcedLogoffCommand = new MvxAsyncCommand(ExecuteForcedLogoffAsync));
+        private IMvxAsyncCommand _forcedLogoffCommand;
+        public IMvxAsyncCommand ForcedLogoffCommand => _forcedLogoffCommand ?? (_forcedLogoffCommand = new MvxAsyncCommand(ExecuteForcedLogoffAsync));
 
-       // private async Task ExecuteForcedLogoffAsync()
-        //{
-        //    await UserDialogs.Instance.AlertAsync(
-        //                    AppResources.ForcedLogoffMessage, AppResources.ForcedLogoff, AppResources.OK);
+        private async Task ExecuteForcedLogoffAsync()
+        {
+            await UserDialogs.Instance.AlertAsync(
+                            AppResources.ForcedLogoffMessage, AppResources.ForcedLogoff, AppResources.OK);
 
-       //     _backgroundScheduler.Unschedule();
-       //     _locationService.Stop();
-       //     _connection.DeleteConnection();
-       //     ShowViewModel<SignInViewModel>();
-        //}
+            _backgroundScheduler.Unschedule();
+            _locationService.Stop();
+            _connection.DeleteConnection();
+            ShowViewModel<SignInViewModel>();
+        }
         private IMvxCommand _fuelentryCommand;
         public IMvxCommand FuelEntryCommand
             => _fuelentryCommand ?? (_fuelentryCommand = new MvxCommand(ExecuteFuelEntryCommand));
@@ -179,6 +178,18 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     }
                 }
             }
+        }
+        private IMvxCommand _gpsDiagnosticsCommand;
+
+        public IMvxCommand GpsDiagnosticsCommand
+            => _gpsDiagnosticsCommand ?? (_gpsDiagnosticsCommand = new MvxCommand(ExecuteGpsDiagnosticsCommand));
+
+        private void ExecuteGpsDiagnosticsCommand()
+        {
+            string status = "GPS Available";
+            string customerInfo = "BRADY PLC 4237 Salisbury Rd Jax FL";
+
+            ShowViewModel<GpsCaptureViewModel>(new { status, customerInfo });
         }
     }
 }

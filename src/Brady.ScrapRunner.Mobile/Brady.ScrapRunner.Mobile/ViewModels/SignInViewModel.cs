@@ -164,7 +164,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             return !string.IsNullOrWhiteSpace(UserName)
                    && !string.IsNullOrWhiteSpace(Password)
-                   && !string.IsNullOrWhiteSpace(TruckId);
+                   && !string.IsNullOrWhiteSpace(TruckId)
+                   && Odometer.HasValue;
         }
 
         private async Task<bool> SignInAsync()
@@ -173,9 +174,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 // Delete/Create necesscary SQLite tables
                 await _dbService.RefreshAll();
-                IClientSettings clientSettings = new DemoClientSettings();
-                _connection.CreateConnection(MobileConstants.DefaultServiceProtocol + PhoneSettings.ServerSettings, clientSettings.UserName, clientSettings.Password, MobileConstants.DefaultServiceName);
-
+                _connection.CreateConnection(MobileConstants.DefaultServiceProtocol + PhoneSettings.ServerSettings,
+                    UserName, Password, MobileConstants.DefaultServiceName);
                 _backgroundScheduler.Unschedule();
                 _locationService.Stop();
                 _locationOdometerService.Stop();
