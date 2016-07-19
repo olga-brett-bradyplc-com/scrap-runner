@@ -1,10 +1,10 @@
 ﻿namespace Brady.ScrapRunner.Mobile.ViewModels
 {
-    using System;
     using System.Collections.ObjectModel;
     using Interfaces;
     using Models;
     using MvvmCross.Core.ViewModels;
+    using Resources;
 
     public class NotificationViewModel : BaseViewModel
     {
@@ -18,6 +18,7 @@
         public override async void Start()
         {
             base.Start();
+            Title = AppResources.Notifications;
             var notifications = await _repository.AsQueryable().ToListAsync();
             Notifications = new ObservableCollection<NotificationModel>(notifications);
         }
@@ -36,20 +37,8 @@
             set { SetProperty(ref _notificationSummary, value); }
         }
 
-        private DateTimeOffset _notificationDateTime;
-        public DateTimeOffset NotificationDateTime
-        {
-            get { return _notificationDateTime; }
-            set { SetProperty(ref _notificationDateTime, value); }
-        }
-
         private MvxCommand<NotificationModel> _selectNotificationCommand;
-        public IMvxCommand ScanContainerCommand => _selectNotificationCommand ?? (_selectNotificationCommand = new MvxCommand<NotificationModel>(SelectNotification));
-
-        private void SelectNotification(NotificationModel notification)
-        {
-            NotificationSummary = notification.Summary;
-            NotificationDateTime = notification.NotificationDateTimeOffset;
-        }
+        public IMvxCommand SelectNotificationCommand => _selectNotificationCommand ?? 
+            (_selectNotificationCommand = new MvxCommand<NotificationModel>(n => NotificationSummary = n.Summary));
     }
 }
