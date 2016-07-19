@@ -106,7 +106,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     userRoleIds = authorisation.GetRoleIdsAsync(settings.Token, settings.Username).Result;
                 }
 
-                foreach (String key in changeSetResult.SuccessfullyUpdated)
+                foreach (string key in changeSetResult.SuccessfullyUpdated)
                 {
                     DataServiceFault fault;
                     string msgKey = key;
@@ -1204,16 +1204,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                       select item).FirstOrDefault();
 
             ////////////////////////////////////////////////
-            //Get a list of all containers for the segment
-            var tripSegContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
-                                    driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber, out fault);
-            if (null != fault)
-            {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                return false;
-            }
-
-            ////////////////////////////////////////////////
             //Get Container Information
             var containerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
                                   driverContainerActionProcess.ContainerNumber, out fault);
@@ -1228,9 +1218,22 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 + driverContainerActionProcess.ContainerNumber));
                 return false;
             }
+
             ////////////////////////////////////////////////
+            //Get a list of all containers for the segment
             //Update TripSegmentContainer table.
-            if (null != tripSegContainerList && tripSegContainerList.Count() > 0)
+            var tripSegContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
+                                    driverContainerActionProcess.TripNumber, driverContainerActionProcess.TripSegNumber, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (null == tripSegContainerList)
+            {
+                tripSegContainerList = new List<TripSegmentContainer>();
+            }
+            if (tripSegContainerList.Any())
             {
                 //First, try to find a container in the list that matches the container number on the power unit.
                 //Allow for the use of the same container number multiple times on a segment.
@@ -1301,7 +1304,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             //This indicates whether the container number was scanned or manually (hand-typed) entered.
             tripSegmentContainer.TripSegContainerEntryMethod = driverContainerActionProcess.MethodOfEntry;
 
-
             //The ContainerLoaded flag is based on ContainerContents
             if (driverContainerActionProcess.ContainerContents == ContainerContentsConstants.Loaded)
             {
@@ -1311,7 +1313,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
                 tripSegmentContainer.TripSegContainerLoaded = Constants.No;
             }
-
             tripSegContainerList.Add(tripSegmentContainer);
 
             //Do the update
@@ -1330,7 +1331,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
                 ////////////////////////////////////////////////
                 //Update TripSegment Primary Container Information from first TripSegmentContainer information. 
-                if (tripSegContainerList.Count() > 0)
+                if (tripSegContainerList.Any())
                 {
                     var firstTripSegmentContainer = tripSegContainerList.First();
 

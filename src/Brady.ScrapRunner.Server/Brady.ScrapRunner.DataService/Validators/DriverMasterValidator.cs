@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.DataService.Validators
          AbstractValidator<DriverMaster>,
          IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public DriverMasterValidator()
         {

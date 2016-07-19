@@ -7,7 +7,7 @@ namespace Brady.ScrapRunner.DataService.Validators
    public class CustomerDirectionsValidator :
         AbstractValidator<CustomerDirections>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public CustomerDirectionsValidator()
         {

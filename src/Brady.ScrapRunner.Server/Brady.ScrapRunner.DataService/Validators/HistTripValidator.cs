@@ -7,7 +7,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class HistTripValidator :
           AbstractValidator<HistTrip>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public HistTripValidator()
         {

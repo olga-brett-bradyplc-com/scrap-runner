@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class CommodityMasterValidator :
         AbstractValidator<CommodityMaster>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public CommodityMasterValidator()
         {

@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class GPSLocationValidator :
         AbstractValidator<GPSLocation>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public GPSLocationValidator()
         {

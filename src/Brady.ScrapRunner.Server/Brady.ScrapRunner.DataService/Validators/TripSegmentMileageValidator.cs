@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class TripSegmentMileageValidator :
         AbstractValidator<TripSegmentMileage>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public TripSegmentMileageValidator()
         {

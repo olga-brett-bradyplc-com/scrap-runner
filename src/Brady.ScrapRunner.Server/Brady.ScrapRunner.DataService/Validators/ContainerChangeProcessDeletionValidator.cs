@@ -8,7 +8,8 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class ContainerChangeProcessDeletionValidator :
          AbstractValidator<ContainerChangeProcess>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
+
         public void SetRepository(ICrudingDataServiceRepository repository)
         {
             _repository = repository;
