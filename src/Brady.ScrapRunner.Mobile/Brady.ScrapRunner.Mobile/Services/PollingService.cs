@@ -12,6 +12,7 @@
     using Interfaces;
     using Messages;
     using Models;
+    using MvvmCross.Platform;
     using MvvmCross.Plugins.Messenger;
     using Plugin.Settings.Abstractions;
 
@@ -49,16 +50,27 @@
 
         public async Task PollForChangesAsync(string driverId, string terminalId, string regionId, string areaId)
         {
-            if (driverId == null) throw new ArgumentNullException(nameof(driverId));
-            await PollForMessagesAsync(driverId);
-            await PollForTripsAfterLoginAsync(driverId);
-            await PollForTripsCanceledAsync(driverId);
-            await PollForTripsUnassignedAsync(driverId);
-            await PollForTripsMarkedDoneAsync(driverId);
-            await PollForTripsResequencedAsync(driverId);
-            await PollForContainerChangesAsync(terminalId, regionId);
-            await PollForTerminalChangesAsync(areaId, regionId);
-            await PollForceLogoffAsync(driverId);
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForChangesAsync");
+            try
+            {
+                await PollForMessagesAsync(driverId);
+                await PollForTripsAfterLoginAsync(driverId);
+                await PollForTripsCanceledAsync(driverId);
+                await PollForTripsUnassignedAsync(driverId);
+                await PollForTripsMarkedDoneAsync(driverId);
+                await PollForTripsResequencedAsync(driverId);
+                await PollForContainerChangesAsync(terminalId, regionId);
+                await PollForTerminalChangesAsync(areaId, regionId);
+                await PollForceLogoffAsync(driverId);
+            }
+            catch (Exception e)
+            {
+                Mvx.TaggedError(Constants.ScrapRunner, $"Caught Exception inside PollForChangesAsync: {e.Message}");
+            }
+            finally
+            {
+                Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForChangesAsync");
+            }
         }
 
         private Task<QueryResult<Trip>> GetTripsAfterLoginAsync(string driverId)
@@ -75,11 +87,13 @@
 
         private async Task PollForTripsAfterLoginAsync(string driverId)
         {
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForTripsAfterLoginAsync");
             var tripsAfterLogin = await GetTripsAfterLoginAsync(driverId);
             foreach (var trip in tripsAfterLogin.Records)
             {
-                var existingTrip = _tripService.FindTripAsync(trip.TripNumber);
+                var existingTrip = await _tripService.FindTripAsync(trip.TripNumber);
                 var tripModel = Mapper.Map<Trip, TripModel>(trip);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"PollForTripsAfterLoginAsync: {tripModel.TripTypeDesc} {tripModel.TripNumber}");
                 var newTrip = existingTrip != null;
                 if (newTrip)
                 {
@@ -94,8 +108,9 @@
                     Context = newTrip ? TripNotificationContext.New : TripNotificationContext.Modified,
                     Trip = trip
                 });
-                _notificationService.Trip(trip, TripNotificationContext.New);
+                await _notificationService.TripAsync(trip, TripNotificationContext.New);
             }
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForTripsAfterLoginAsync");
         }
 
         private Task<QueryResult<Trip>> GetTripsCanceledAsync(string driverId)
@@ -112,18 +127,21 @@
 
         private async Task PollForTripsCanceledAsync(string driverId)
         {
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForTripsCanceledAsync");
             var canceledTrips = await GetTripsCanceledAsync(driverId);
             foreach (var trip in canceledTrips.Records)
             {
                 var tripModel = Mapper.Map<Trip, TripModel>(trip);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"PollForTripsCanceledAsync: {tripModel.TripTypeDesc} {tripModel.TripNumber}");
                 await _tripService.UpdateTripAsync(tripModel);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
                 {
                     Context = TripNotificationContext.Canceled,
                     Trip = trip
                 });
-                _notificationService.Trip(trip, TripNotificationContext.Canceled);
+                await _notificationService.TripAsync(trip, TripNotificationContext.Canceled);
             }
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForTripsCanceledAsync");
         }
 
         private Task<QueryResult<Trip>> GetTripsUnassignedAsync(string driverId)
@@ -139,18 +157,21 @@
 
         private async Task PollForTripsUnassignedAsync(string driverId)
         {
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForTripsUnassignedAsync");
             var unassignedTrips = await GetTripsUnassignedAsync(driverId);
             foreach (var trip in unassignedTrips.Records)
             {
                 var tripModel = Mapper.Map<Trip, TripModel>(trip);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"PollForTripsUnassignedAsync: {tripModel.TripTypeDesc} {tripModel.TripNumber}");
                 await _tripService.UpdateTripAsync(tripModel);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
                 {
                     Context = TripNotificationContext.Unassigned,
                     Trip = trip
                 });
-                _notificationService.Trip(trip, TripNotificationContext.Unassigned);
+                await _notificationService.TripAsync(trip, TripNotificationContext.Unassigned);
             }
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForTripsUnassignedAsync");
         }
 
         private Task<QueryResult<Trip>> GetTripsMarkedDoneAsync(string driverId)
@@ -165,18 +186,21 @@
 
         private async Task PollForTripsMarkedDoneAsync(string driverId)
         {
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForTripsMarkedDoneAsync");
             var doneTrips = await GetTripsMarkedDoneAsync(driverId);
             foreach (var trip in doneTrips.Records)
             {
                 var tripModel = Mapper.Map<Trip, TripModel>(trip);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"PollForTripsMarkedDoneAsync: {tripModel.TripTypeDesc} {tripModel.TripNumber}");
                 await _tripService.UpdateTripAsync(tripModel);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
                 {
                     Context = TripNotificationContext.MarkedDone,
                     Trip = trip
                 });
-                _notificationService.Trip(trip, TripNotificationContext.MarkedDone);
+                await _notificationService.TripAsync(trip, TripNotificationContext.MarkedDone);
             }
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForTripsMarkedDoneAsync");
         }
 
         private Task<QueryResult<Trip>> GetTripsResequencedAsync(string driverId)
@@ -192,17 +216,20 @@
 
         private async Task PollForTripsResequencedAsync(string driverId)
         {
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForTripsResequencedAsync");
             var doneTrips = await GetTripsResequencedAsync(driverId);
             foreach (var trip in doneTrips.Records)
             {
                 var tripModel = Mapper.Map<Trip, TripModel>(trip);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"PollForTripsResequencedAsync: {tripModel.TripTypeDesc} {tripModel.TripNumber}");
                 await _tripService.UpdateTripAsync(tripModel);
             }
             if (doneTrips.Records.Any())
             {
                 _mvxMessenger.Publish(new TripResequencedMessage(this));
-                _notificationService.TripsResequenced();
+                await _notificationService.TripsResequencedAsync();
             }
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForTripsResequencedAsync");
         }
 
         private Task<QueryResult<ContainerChange>> GetContainerChangesAsync(string terminalId, string regionId)
@@ -256,6 +283,7 @@
 
         private async Task PollForContainerChangesAsync(string terminalId, string regionId)
         {
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForContainerChangesAsync");
             var modifiedAfter = _settings.GetValueOrDefault(ContainerMasterSettingsKey, default(DateTime));
             QueryResult<ContainerChange> containerChanges;
             if (modifiedAfter == default(DateTime))
@@ -279,6 +307,7 @@
             {
                 _settings.AddOrUpdateValue(ContainerMasterSettingsKey, maxActionDate);
             }
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForContainerChangesAsync");
         }
 
         private async Task<QueryResult<TerminalChange>> GetTerminalChangesAsync(string areaId, string regionId, string defSendOnlyYardsForArea)
@@ -340,6 +369,7 @@
 
         private async Task PollForTerminalChangesAsync(string areaId, string regionId)
         {
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForTerminalChangesAsync");
             var modifiedAfter = _settings.GetValueOrDefault(TerminalMasterSettingsKey, default(DateTime));
             // @TODO: Figure out how to get "DEFSendOnlyYardsForArea" preference from here? (It's not in the preference table)
             var defSendOnlyYardsForArea = "Y";
@@ -365,6 +395,7 @@
             {
                 _settings.AddOrUpdateValue(TerminalMasterSettingsKey, maxChgDateTime);
             }
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForTerminalChangesAsync");
         }
 
         private Task<QueryResult<DriverStatus>> GetForceLogoffMessageAsync(string driverId)
@@ -379,11 +410,14 @@
 
         private async Task PollForceLogoffAsync(string driverId)
         {
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForceLogoffAsync");
             var forceLogoff = await GetForceLogoffMessageAsync(driverId);
             if (forceLogoff.Records.Any())
             {
                 _mvxMessenger.Publish(new ForceLogoffMessage(this));
+                Mvx.TaggedTrace(Constants.ScrapRunner, "PollForceLogoffAsync");
             }
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForceLogoffAsync");
         }
 
         private Task<QueryResult<Messages>> GetMessagesAsync(string driverId)
@@ -399,17 +433,20 @@
 
         private async Task PollForMessagesAsync(string driverId)
         {
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForMessagesAsync");
             var messages = await GetMessagesAsync(driverId);
             foreach (var message in messages.Records)
             {
                 var mappedMessage = Mapper.Map<Messages, MessagesModel>(message);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"PollForMessagesAsync: {message.MsgSource} {message.MsgText}");
                 await _messagesService.CreateMessageAsync(mappedMessage);
                 _mvxMessenger.Publish(new NewMessagesMessage(this)
                 {
                     Message = message
                 });
-                _notificationService.Message(message);
+                await _notificationService.MessageAsync(message);
             }
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForMessagesAsync");
         }
     }
 }

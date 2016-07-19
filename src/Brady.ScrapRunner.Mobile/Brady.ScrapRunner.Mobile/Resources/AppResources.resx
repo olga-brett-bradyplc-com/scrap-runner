@@ -723,4 +723,8 @@ You will now be sent back to the login.</value>
     <value>Select Review Reason</value>
     <comment>ScaleDetailViewModel</comment>
   </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notifications</value>
+    <comment>NotificationViewModel</comment>
+  </data>
 </root>
