@@ -689,4 +689,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Select Review Reason</value>
     <comment>NEEDS TRANSLATION; ScaleDetailViewModel</comment>
   </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notifications</value>
+    <comment>NEEDS TRANSLATION; NotificationViewModel</comment>
+  </data>
 </root>

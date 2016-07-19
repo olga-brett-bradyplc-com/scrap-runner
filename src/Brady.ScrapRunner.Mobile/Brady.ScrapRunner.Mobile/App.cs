@@ -63,6 +63,8 @@ namespace Brady.ScrapRunner.Mobile
                 SqliteRepository<TerminalChangeModel>>();
             Mvx.RegisterType<IRepository<CustomerMasterModel>,
                 SqliteRepository<CustomerMasterModel>>();
+            Mvx.RegisterType<IRepository<NotificationModel>,
+                SqliteRepository<NotificationModel>>();
 
 
             Mapper.Initialize(cfg =>
