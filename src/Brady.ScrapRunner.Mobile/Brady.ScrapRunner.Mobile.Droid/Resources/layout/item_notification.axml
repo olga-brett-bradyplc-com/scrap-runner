@@ -11,12 +11,12 @@
       android:layout_height="wrap_content"
       android:layout_alignParentLeft="true"
       android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-      local:MvxBind="Text NotificationType"/>
+      local:MvxBind="Text NotificationType(NotificationType)"/>
     <TextView
       android:id="@+id/notification_datetime"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_alignParentRight="true"
       android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-      local:MvxBind="Text NotificationDateTimeOffset"/>
+      local:MvxBind="Text DateTimeOffset(NotificationDateTimeOffset)"/>
 </RelativeLayout>
