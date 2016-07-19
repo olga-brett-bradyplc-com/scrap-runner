@@ -10,7 +10,7 @@
         public int? Id { get; set; }
         public NotificationType NotificationType { get; set; }
         public string Summary { get; set; }
-        public DateTimeOffset? NotificationDateTimeOffset { get; set; }
+        public DateTimeOffset NotificationDateTimeOffset { get; set; }
     }
 
     public enum NotificationType

@@ -50,14 +50,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                 PendingIntentFlags.UpdateCurrent);
         }
 
-        private PendingIntent GetNotficationViewModelIntent(int notificationModelId)
-        {
-            return GetIntent<NotificationViewModel>(new Dictionary<string, string>
-            {
-                {"id", notificationModelId.ToString()}
-            });
-        }
-
         public async Task TripAsync(Trip trip, TripNotificationContext context)
         {
             var title = string.Empty;
@@ -122,7 +114,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                 .SetSmallIcon(Resource.Drawable.ic_assignment_late_white_24dp);
             var notificationModelId = await InsertNotificationModelAsync(notificationType, text);
             if (notificationModelId.HasValue)
-                builder.SetContentIntent(GetNotficationViewModelIntent(notificationModelId.Value));
+                builder.SetContentIntent(GetIntent<NotificationViewModel>(null));
             var notification = builder.Build();
             NotifyUser(notification, notificationId);
         }
@@ -135,7 +127,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                 .SetSmallIcon(Resource.Drawable.ic_swap_vert_black_36dp);
             var notificationModelId = await InsertNotificationModelAsync(NotificationType.TripsResequenced, AppResources.NotificationTripResequenceText);
             if (notificationModelId.HasValue)
-                builder.SetContentIntent(GetNotficationViewModelIntent(notificationModelId.Value));
+                builder.SetContentIntent(GetIntent<NotificationViewModel>(null));
             var notification = builder.Build();
             NotifyUser(notification, ResequencedTripNotficationId);
         }
@@ -148,7 +140,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                 .SetSmallIcon(Resource.Drawable.ic_email_black_36dp);
             var notificationModelId = await InsertNotificationModelAsync(NotificationType.NewMessage, text);
             if (notificationModelId.HasValue)
-                builder.SetContentIntent(GetNotficationViewModelIntent(notificationModelId.Value));
+                builder.SetContentIntent(GetIntent<NotificationViewModel>(null));
             var notification = builder.Build();
             NotifyUser(notification, NewMessageNotificationId);
         }
