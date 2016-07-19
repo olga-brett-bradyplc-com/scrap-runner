@@ -727,4 +727,23 @@ You will now be sent back to the login.</value>
     <value>Notifications</value>
     <comment>NotificationViewModel</comment>
   </data>
+  <data name="Capture" xml:space="preserve">
+    <value>Capture</value>
+    <comment>GPS button label</comment>
+  </data>
+  <data name="GpsAvailableStatus" xml:space="preserve">
+    <value>GPS is available. Tap the Capture button to continue.</value>
+    <comment>GPS status</comment>
+  </data>
+  <data name="NoGpsAvailable" xml:space="preserve">
+    <value>GPS is not availabl</value>
+    <comment>GPS status</comment>
+  </data>
+  <data name="Skip" xml:space="preserve">
+    <value>Skip</value>
+    <comment>GPS button label</comment>
+  </data>
+  <data name="GpsCancelConfirm" xml:space="preserve">
+    <value>GPS is available. Are you sure you want to cancel?</value>
+  </data>
 </root>

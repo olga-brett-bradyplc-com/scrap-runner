@@ -300,7 +300,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                                     if (gpsCaptureDialog)
                                     {
-                                        //TODO: add saving routine to capture current log/lat
+                                        //routine to capture current log/lat
+                                        string address = yardInfo.CustAddress1.TrimEnd();
+                                        if (yardInfo.CustAddress2.TrimEnd() != "")
+                                            address += yardInfo.CustAddress2.TrimEnd();
+                                        string custInfoText = yardInfo.CustName.TrimEnd() + "\n" + address + "\n" +
+                                                              yardInfo.CustCity.TrimEnd() + " " + yardInfo.CustState.TrimEnd() + " " +
+                                                              yardInfo.CustZip.TrimEnd() + " " + yardInfo.CustCountry.TrimEnd();
+                                        ShowViewModel<GpsCaptureViewModel>(new { yardInfo.CustHostCode, custInfoText });
                                     }
                                 }
                             }
