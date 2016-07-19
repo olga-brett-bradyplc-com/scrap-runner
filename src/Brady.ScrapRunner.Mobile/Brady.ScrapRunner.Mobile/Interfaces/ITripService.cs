@@ -18,6 +18,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task UpdateTripSegments(IEnumerable<TripSegment> tripSegments);
 
+        Task UpdateTripSegments(IEnumerable<TripSegmentModel> tripSegments);
+
         Task UpdateTripSegmentContainers(IEnumerable<TripSegmentContainer> tripSegmentContainers);
 
         Task<int> CreateTripAsync(TripModel trip);
@@ -104,5 +106,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<ChangeResultWithItem<DriverTripAckProcess>> ProcessDriverTripAck(
             DriverTripAckProcess driverAck);
+        Task<List<TripSegmentModel>> FindCustomerSegments(string custHostCode);
     }
 }

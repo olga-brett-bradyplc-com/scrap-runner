@@ -152,6 +152,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Capture.
+        /// </summary>
+        public static string Capture {
+            get {
+                return ResourceManager.GetString("Capture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change Language.
         /// </summary>
         public static string ChangeLanguage {
@@ -505,6 +514,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GPS is available. Tap the Capture button to continue..
+        /// </summary>
+        public static string GpsAvailableStatus {
+            get {
+                return ResourceManager.GetString("GpsAvailableStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GPS is available. Are you sure you want to cancel?.
+        /// </summary>
+        public static string GpsCancelConfirm {
+            get {
+                return ResourceManager.GetString("GpsCancelConfirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to GPS Capture.
         /// </summary>
         public static string GPSCapture {
@@ -735,6 +762,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string NoContainerLevels {
             get {
                 return ResourceManager.GetString("NoContainerLevels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GPS is not availabl.
+        /// </summary>
+        public static string NoGpsAvailable {
+            get {
+                return ResourceManager.GetString("NoGpsAvailable", resourceCulture);
             }
         }
         
@@ -1392,6 +1428,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string SignOut {
             get {
                 return ResourceManager.GetString("SignOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip.
+        /// </summary>
+        public static string Skip {
+            get {
+                return ResourceManager.GetString("Skip", resourceCulture);
             }
         }
         

@@ -3,37 +3,51 @@
     xmlns:local="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+  <include
+      layout="@layout/toolbar" />
   <LinearLayout
       android:id="@+id/center_panel"
       android:orientation="vertical"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginLeft="@dimen/activity_horizontal_margin"
-      android:layout_marginRight="@dimen/activity_horizontal_margin"
-      android:layout_centerInParent="true">
+      android:layout_centerInParent="true"
+      android:padding="15dp"
+      android:weightSum="1.0">
     <TextView
-        android:id="@+id/GpsCustInfo"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="#ffffff"
-        android:textColor="@color/material_gray_900"
-        android:paddingLeft="10dp"
-        local:MvxLang="Text CustomerInfoText" />
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_gravity="center"
+        android:textSize="17dp"
+      local:MvxBind="Text CustomerInfoText" />
     <TextView
-        android:id="@+id/GpsCaptureStatus"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="#ffffff"
-        android:textColor="@color/material_gray_900"
-        android:paddingLeft="10dp"
-        local:MvxLang="Text GpsStatusText" />
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_gravity="center"
+        android:textSize="17dp"
+        local:MvxBind="Text GpsStatusText" />
+    <LinearLayout
+       android:layout_height="wrap_content"
+       android:layout_width="match_parent"
+       android:weightSum="1"
+       android:layout_alignParentBottom="true">
+       <Button
+         style="@style/ScrapRunnerTheme.StandardButtonStyle"
+         android:layout_weight=".5"
+         android:textColor="@color/material_gray_900"
+         local:MvxBind="Click CaptureCommand"
+         local:MvxLang="Text Capture"/>
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginTop="4dp"
+        style="@style/ScrapRunnerTheme.StandardButtonStyle"
+        android:layout_weight=".5"
+        android:textColor="@color/material_gray_900"
         local:MvxBind="Click SkipCommand"
         local:MvxLang="Text Skip"/>
+    </LinearLayout>
   </LinearLayout>
 </RelativeLayout>
+
+
 
 
