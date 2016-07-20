@@ -25,9 +25,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
         {
             var setup = Mvx.Resolve<IMvxAndroidGlobals>();
             var resourceTypeName = setup.ExecutableNamespace + ".Resource";
-            Type resourceType = setup.ExecutableAssembly.GetType(resourceTypeName);
+            var resourceType = setup.ExecutableAssembly.GetType(resourceTypeName);
             if (resourceType == null)
                 throw new Exception("Unable to find resource type - " + resourceTypeName);
+
             try
             {
                 BindableListGroupItemTemplateId =
