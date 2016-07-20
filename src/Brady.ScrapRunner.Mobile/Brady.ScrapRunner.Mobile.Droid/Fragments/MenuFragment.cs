@@ -1,15 +1,21 @@
 using System;
 using System.Threading.Tasks;
+using Acr.UserDialogs;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.Design.Widget;
 using Android.Views;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
+using Brady.ScrapRunner.Mobile.Messages;
+using Brady.ScrapRunner.Mobile.Resources;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Droid.BindingContext;
+using MvvmCross.Core.ViewModels;
 using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Droid.Support.V4;
+using MvvmCross.Platform;
 using MvvmCross.Platform.Core;
+using MvvmCross.Plugins.Messenger;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
@@ -18,6 +24,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     public class MenuFragment : MvxFragment<MenuViewModel>, NavigationView.IOnNavigationItemSelectedListener
     {
         private NavigationView _navigationView;
+        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private IMvxMessenger _mvxMessenger;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -28,13 +36,30 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(false);
 
+            _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
+            _mvxSubscriptionToken = _mvxMessenger.Subscribe<ForceLogoffMessage>(OnForcedLogoffMessage);
+
             return view;
+        }
+
+        public override void OnDestroyView()
+        {
+            base.OnDestroyView();
+
+            if (_mvxSubscriptionToken == null)
+                return;
+            _mvxMessenger.Unsubscribe<LocationModelMessage>(_mvxSubscriptionToken);
         }
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
         {
             Navigate(menuItem.ItemId);
             return true;
+        }
+
+        private void OnForcedLogoffMessage(ForceLogoffMessage obj)
+        {
+            ViewModel.ForcedLogoffCommand.Execute(obj);
         }
 
         private async Task Navigate(int itemId)
@@ -68,9 +93,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     break;
                 case Resource.Id.nav_changeodometer:
                     await ViewModel.ChangeOdometerCommand.ExecuteAsync();
-                    break;
-                case Resource.Id.nav_gpsdiagnostics:
-                    ViewModel.GpsDiagnosticsCommand.Execute();
                     break;
             }
         }

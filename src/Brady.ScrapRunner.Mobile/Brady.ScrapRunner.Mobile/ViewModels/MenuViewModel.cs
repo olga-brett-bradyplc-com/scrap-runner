@@ -179,17 +179,5 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
             }
         }
-        private IMvxCommand _gpsDiagnosticsCommand;
-
-        public IMvxCommand GpsDiagnosticsCommand
-            => _gpsDiagnosticsCommand ?? (_gpsDiagnosticsCommand = new MvxCommand(ExecuteGpsDiagnosticsCommand));
-
-        private void ExecuteGpsDiagnosticsCommand()
-        {
-            string status = "GPS Available";
-            string customerInfo = "BRADY PLC 4237 Salisbury Rd Jax FL";
-
-            ShowViewModel<GpsCaptureViewModel>(new { status, customerInfo });
-        }
     }
 }
