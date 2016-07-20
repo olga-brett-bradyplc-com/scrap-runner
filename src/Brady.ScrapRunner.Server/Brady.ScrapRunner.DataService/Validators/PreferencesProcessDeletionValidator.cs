@@ -15,7 +15,7 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public PreferencesProcessDeletionValidator()
         {
-            // TODO:  Need a simple failure, deletes not allowed.
+            // NOTE: Deletes not supported
             RuleFor(x => x.EmployeeId).NotEmpty();
         }
 

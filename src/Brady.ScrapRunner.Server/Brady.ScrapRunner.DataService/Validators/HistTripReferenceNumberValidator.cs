@@ -13,6 +13,8 @@ namespace Brady.ScrapRunner.DataService.Validators
         {
             RuleFor(x => x.HistSeqNo).GreaterThanOrEqualTo(0);
             RuleFor(x => x.TripNumber).NotEmpty();
+            RuleFor(x => x.TripSeqNumber).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.TripRefNumberDesc).NotEmpty();
             RuleFor(x => x.TripRefNumber).NotEmpty();
         }
 

@@ -12,9 +12,10 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public ErrorLogDeletionValidator()
         {
-            RuleFor(x => x.ErrorId).NotEmpty();
             //RuleFor(x => x.ErrorDateTime).NotEmpty();
             //RuleFor(x => x.ErrorSeqNo).GreaterThanOrEqualTo(0);
+            // NOTE: ErrorId is the identity(1,1) column
+            RuleFor(x => x.ErrorId).NotEmpty();
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)

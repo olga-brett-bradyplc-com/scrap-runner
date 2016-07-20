@@ -55,11 +55,8 @@ namespace Brady.ScrapRunner.Domain.Models
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = EventId.GetHashCode() ;
-                return hashCode;
-            }
+            var hashCode = EventId.GetHashCode() ;
+            return hashCode;
         }
     }
 

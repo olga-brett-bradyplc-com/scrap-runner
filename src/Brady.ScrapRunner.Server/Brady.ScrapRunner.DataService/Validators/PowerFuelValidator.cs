@@ -11,8 +11,8 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public PowerFuelValidator()
         {
-            RuleFor(x => x.PowerFuelSeqNumber).GreaterThanOrEqualTo(0);
             RuleFor(x => x.PowerId).NotEmpty();
+            RuleFor(x => x.PowerFuelSeqNumber).GreaterThanOrEqualTo(0);
             RuleFor(x => x.TripNumber).NotEmpty();
         }
 

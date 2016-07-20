@@ -12,9 +12,9 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public PowerLimitsDeletionValidator()
         {
-            RuleFor(x => x.PowerSeqNumber).GreaterThanOrEqualTo(0);
             RuleFor(x => x.PowerId).NotEmpty();
             RuleFor(x => x.ContainerType).NotEmpty();
+            RuleFor(x => x.PowerSeqNumber).GreaterThanOrEqualTo(0);
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)

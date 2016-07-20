@@ -12,10 +12,10 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public ErrorLogValidator()
         {
-            // TODO:  Does this validator need kick in?  Do I distinguish update vs insert?
-            // RuleFor(x => x.ErrorId).NotEmpty().When();
             RuleFor(x => x.ErrorDateTime).NotEmpty();
             RuleFor(x => x.ErrorSeqNo).GreaterThanOrEqualTo(0);
+            // NOTE: ErrorId is the identity(1,1) column
+            //RuleFor(x => x.ErrorId).Equals(0);
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)
