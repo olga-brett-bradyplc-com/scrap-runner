@@ -2,6 +2,7 @@
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
+using Brady.ScrapRunner.Mobile.ViewModels;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Models;
 using MvvmCross.Core.Platform;
@@ -33,8 +34,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<int> UpdateTripSegmentAsync(TripSegmentModel tripSegment);
 
         Task<int> UpdateTripSegmentContainerAsync(TripSegmentContainerModel container);
-        
 
+        Task UpdateYards(IEnumerable<TerminalMaster> yards);
 
         Task<TripModel> FindTripAsync(string tripNumber);
 

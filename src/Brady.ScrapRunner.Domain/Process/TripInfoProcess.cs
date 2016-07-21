@@ -38,6 +38,8 @@ namespace Brady.ScrapRunner.Domain.Process
 
         public virtual List<CustomerLocation> CustomerLocations { get; set; }
 
+        public virtual List<TerminalMaster> Terminals { get; set; }
+
         public virtual String Id
         {
             get
