@@ -67,6 +67,12 @@ namespace Brady.ScrapRunner.Mobile.Services
             return _tripSegmentRepository.InsertRangeAsync(tripSegments);
         }
 
+        public Task UpdateYards(IEnumerable<TerminalMaster> yards)
+        {
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<TerminalMaster>, IEnumerable<YardModel>>(yards);
+            return _yardInfoRepository.InsertRangeAsync(mapped);
+        }
+
         /// <summary>
         /// Takes a list of trip segment containers provided by the server, and inserts into local TripSegmentContainer DB
         /// </summary>

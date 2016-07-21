@@ -48,7 +48,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             if (_mvxSubscriptionToken == null)
                 return;
-            _mvxMessenger.Unsubscribe<LocationModelMessage>(_mvxSubscriptionToken);
+            _mvxMessenger.Unsubscribe<ForceLogoffMessage>(_mvxSubscriptionToken);
         }
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
