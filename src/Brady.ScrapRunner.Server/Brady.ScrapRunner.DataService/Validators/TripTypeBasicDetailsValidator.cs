@@ -11,16 +11,17 @@ namespace Brady.ScrapRunner.DataService.Validators
     {
         private ICrudingDataServiceRepository _repository;
 
-        public TripTypeBasicDetailsValidator()
-        {
-            RuleFor(x => x.ContainerType).NotEmpty();
-            //RuleFor(x => x.SeqNo).GreaterThanOrEqualTo(0);
-            RuleFor(x => x.TripTypeCode).NotEmpty();
-        }
-
         public void SetRepository(ICrudingDataServiceRepository repository)
         {
             _repository = repository;
+        }
+
+        public TripTypeBasicDetailsValidator()
+        {
+            RuleFor(x => x.ContainerType).NotEmpty();
+            RuleFor(x => x.TripTypeCode).NotEmpty();
+            // NOTE: SeqNo is the identity(1,1) column
+            //RuleFor(x => x.SeqNo).Equals(0);
         }
     }
 }

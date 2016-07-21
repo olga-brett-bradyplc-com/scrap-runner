@@ -8,6 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
          AbstractValidator<TerminalChangeProcess>, IRequireCrudingDataServiceRepository
     {
         private ICrudingDataServiceRepository _repository;
+
         public void SetRepository(ICrudingDataServiceRepository repository)
         {
             _repository = repository;

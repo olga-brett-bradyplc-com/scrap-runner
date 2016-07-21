@@ -740,7 +740,7 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="settings"></param>
         /// <param name="driverStatus"></param>
         /// <param name="employeeMaster"></param>
-        /// <param name="currentTripSegment"></param>
+        /// <param name="currentTripSegment">If not null, these details are added to Driver History entry</param>
         /// <param name="callCountThisTxn">Start with 1 and incremenet if multiple inserts are desired.</param>
         /// <param name="userRoleIdsEnumerable"></param>
         /// <param name="userCulture"></param>

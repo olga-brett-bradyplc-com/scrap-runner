@@ -12,18 +12,8 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public MessagesDeletionValidator()
         {
-            RuleFor(x => x.TerminalId).NotEmpty();
-            RuleFor(x => x.MsgId).GreaterThanOrEqualTo(0);
-            RuleFor(x => x.CreateDateTime).NotEmpty();
-            RuleFor(x => x.SenderId).NotEmpty();
-            RuleFor(x => x.ReceiverId).NotEmpty();
-            RuleFor(x => x.Ack).NotEmpty();
-            RuleFor(x => x.MsgThread).GreaterThanOrEqualTo(0);
-            RuleFor(x => x.SenderName).NotEmpty();
-            RuleFor(x => x.ReceiverName).NotEmpty();
-            RuleFor(x => x.Urgent).NotEmpty();
-            RuleFor(x => x.Processed).NotEmpty();
-            RuleFor(x => x.DeleteFlag).NotEmpty();
+            // NOTE: MsgId is the identity(1,1) column
+            RuleFor(x => x.MsgId).NotEmpty();
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)

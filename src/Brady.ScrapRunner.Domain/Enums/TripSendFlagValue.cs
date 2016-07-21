@@ -4,8 +4,8 @@ using Newtonsoft.Json;
 
 namespace Brady.ScrapRunner.Domain.Enums
 {
-    [JsonConverter(typeof(RichEnumConverter))]
 
+    [JsonConverter(typeof(RichEnumConverter))]
     public enum ForceLogoffFlagValue
     {
         /// <summary>
@@ -32,6 +32,8 @@ namespace Brady.ScrapRunner.Domain.Enums
         [RichEnum("Send Failed", "SendFailed")]
         SendFailed = 3,
     }
+
+    [JsonConverter(typeof(RichEnumConverter))]
     public enum GPSSendFlagValue
     {
         /// <summary>
@@ -58,6 +60,8 @@ namespace Brady.ScrapRunner.Domain.Enums
         [RichEnum("Send Failed", "SendFailed")]
         SendFailed = 3,
     }
+
+    [JsonConverter(typeof(RichEnumConverter))]
     //Trip Send Auto Receipt Flag Values
     public enum TripSendAutoReceiptValue
     {
@@ -85,6 +89,8 @@ namespace Brady.ScrapRunner.Domain.Enums
         [RichEnum("Receipt Not Sent", "ReceiptNotSent")]
         ReceiptNotSent = 3
     }
+
+    [JsonConverter(typeof(RichEnumConverter))]
     public enum TripSendFlagValue
     {
         /// <summary>
@@ -154,11 +160,13 @@ namespace Brady.ScrapRunner.Domain.Enums
         SentToHostError = 11,
 
         /// <summary>
-        /// <12 - Completed, not sent to host accounting system
+        /// 12 - Completed, not sent to host accounting system
         /// </summary>
         [RichEnum("Not Sent To Host", "NotSentToHost")]
         NotSentToHost = 12
     }
+
+    [JsonConverter(typeof(RichEnumConverter))]
     public enum TripSendScaleFlagValue
     {
         /// <summary>
@@ -185,4 +193,5 @@ namespace Brady.ScrapRunner.Domain.Enums
         [RichEnum("Scale Not Sent", "ScaleNotSent")]
         ScaleNotSent = 3
     }
+
 }

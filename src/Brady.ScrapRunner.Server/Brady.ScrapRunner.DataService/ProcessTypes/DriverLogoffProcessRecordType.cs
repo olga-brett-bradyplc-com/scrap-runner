@@ -18,7 +18,6 @@ using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.Util;
 using Brady.ScrapRunner.Domain.Enums;
 using System.IO;
-using System.Collections.Generic;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -220,8 +219,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //ToDo: Not sure what to do with this yet
                     //driverStatus.DriverCumMinutes;
 
-                    TripSegment currentTripSegment = new TripSegment();
-                    currentTripSegment = null;
+                    TripSegment currentTripSegment = null;
                     if (driverStatus.TripNumber != null && driverStatus.TripSegNumber != null)
                     {
                         ////////////////////////////////////////////////

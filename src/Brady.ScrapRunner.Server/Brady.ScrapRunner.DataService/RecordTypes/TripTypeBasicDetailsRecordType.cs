@@ -20,26 +20,11 @@ namespace Brady.ScrapRunner.DataService.RecordTypes
     [EditAction("TripTypeBasicDetails")]
     [DeleteAction("TripTypeBasicDetails")]
     public class TripTypeBasicDetailsRecordType :
-        ChangeableRecordType<TripTypeBasicDetails, string, TripTypeBasicDetailsValidator, TripTypeBasicDetailsDeletionValidator>
+        ChangeableRecordType<TripTypeBasicDetails, int, TripTypeBasicDetailsValidator, TripTypeBasicDetailsDeletionValidator>
     {
         public override void ConfigureMapper()
         {
             var mapping = Mapper.CreateMap<TripTypeBasicDetails, TripTypeBasicDetails>();
-        }
-
-        public override Expression<Func<TripTypeBasicDetails, bool>> GetIdentityPredicate(TripTypeBasicDetails item)
-        {
-            return x => x.ContainerType == item.ContainerType &&
-                        x.SeqNo == item.SeqNo &&
-                        x.TripTypeCode == item.TripTypeCode;
-        }
-
-        public override Expression<Func<TripTypeBasicDetails, bool>> GetIdentityPredicate(string id)
-        {
-            var identityValues = TypeMetadataInternal.GetIdentityValues(id);
-            return x => x.TripTypeCode == identityValues[0] &&
-                        x.SeqNo == int.Parse(identityValues[1]) &&
-                        x.TripTypeCode == identityValues[2];
         }
     }
 }

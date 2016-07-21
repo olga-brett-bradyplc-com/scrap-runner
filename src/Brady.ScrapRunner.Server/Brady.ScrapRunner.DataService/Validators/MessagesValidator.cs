@@ -4,7 +4,6 @@ using Brady.ScrapRunner.Domain.Models;
 
 namespace Brady.ScrapRunner.DataService.Validators
 {
- 
     public class MessagesValidator :
          AbstractValidator<Messages>, IRequireCrudingDataServiceRepository
     {
@@ -13,7 +12,8 @@ namespace Brady.ScrapRunner.DataService.Validators
         public MessagesValidator()
         {
             RuleFor(x => x.TerminalId).NotEmpty();
-            RuleFor(x => x.MsgId).GreaterThanOrEqualTo(0);
+            // NOTE: MsgId is the identity(1,1) column
+            //RuleFor(x => x.MsgId).Equals(0);
             RuleFor(x => x.CreateDateTime).NotEmpty();
             RuleFor(x => x.SenderId).NotEmpty();
             RuleFor(x => x.ReceiverId).NotEmpty();

@@ -16,9 +16,9 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public DriverArriveProcessDeletionValidator()
         {
-            // TODO:  Need a simple failure, deletes not allowed.
+            // NOTE: Deletes not supported
             RuleFor(x => x.EmployeeId).NotEmpty();
         }
-
+   
     }
 }
