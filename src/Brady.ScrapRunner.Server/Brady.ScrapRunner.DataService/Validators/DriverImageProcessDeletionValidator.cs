@@ -8,6 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
         AbstractValidator<DriverImageProcess>, IRequireCrudingDataServiceRepository
     {
         private ICrudingDataServiceRepository _repository;
+
         public void SetRepository(ICrudingDataServiceRepository repository)
         {
             _repository = repository;
@@ -15,7 +16,7 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public DriverImageProcessDeletionValidator()
         {
-            // TODO:  Need a simple failure, deletes not allowed.
+            // NOTE: Deletes not supported
             RuleFor(x => x.EmployeeId).NotEmpty();
         }
 

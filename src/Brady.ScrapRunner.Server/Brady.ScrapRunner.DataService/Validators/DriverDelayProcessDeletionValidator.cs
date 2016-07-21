@@ -17,6 +17,7 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public DriverDelayProcessDeletionValidator()
         {
+            // NOTE: Deletes not supported
             RuleFor(x => x.EmployeeId).NotEmpty();
         }
     }

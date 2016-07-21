@@ -351,10 +351,10 @@
               "text": "TripTypeBasic",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeBasic"
             },
-            //{
-            //  "text": "TripTypeBasicDetails",
-            //  "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeBasicDetails"
-            //},
+            {
+              "text": "TripTypeBasicDetails",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeBasicDetails"
+            },
             {
               "text": "TripTypeMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/TripTypeMaster"

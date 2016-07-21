@@ -2,10 +2,8 @@
 using FluentValidation;
 using Brady.ScrapRunner.Domain.Models;
 
-
 namespace Brady.ScrapRunner.DataService.Validators
 {
-   
     public class TripTypeMasterDeletionValidator :
         AbstractValidator<TripTypeMaster>, IRequireCrudingDataServiceRepository
     {
