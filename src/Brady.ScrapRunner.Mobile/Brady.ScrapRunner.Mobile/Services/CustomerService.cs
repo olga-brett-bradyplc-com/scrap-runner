@@ -84,7 +84,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<CustomerCommodityModel>> FindCustomerCommodites(string custHostCode)
+        public async Task<List<CustomerCommodityModel>> FindCustomerCommodites(string custHostCode)
         {
             var commodities = await _customerCommodityRepository.AsQueryable().Where(cc => cc.CustHostCode == custHostCode).ToListAsync();
             return commodities;
@@ -94,7 +94,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<CustomerLocationModel>> FindCustomerLocations(string custHostCode)
+        public async Task<List<CustomerLocationModel>> FindCustomerLocations(string custHostCode)
         {
             var locations = await _customerLocationRepository.AsQueryable().Where(ct => ct.CustHostCode == custHostCode).ToListAsync();
             return locations;
@@ -109,6 +109,17 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var customer = await _customerMasterRepository.FindAsync(cs => cs.CustHostCode == custHostCode);
             return customer;
-        } 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="custHostCode"></param>
+        /// <returns></returns>
+        public async Task<List<CustomerDirectionsModel>> FindCustomerDirections(string custHostCode)
+        {
+            var directions = await _customerDirectionsRepository.AsQueryable().Where(d => d.CustHostCode == custHostCode).ToListAsync();
+            return directions;
+        }
     }
 }

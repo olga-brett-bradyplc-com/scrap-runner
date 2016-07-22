@@ -36,8 +36,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     {
         private IDisposable _currentStatusToken;
         private IDisposable _allowRtnEditToken;
+        private IDisposable _tripLegToken;
+
         private string _currentStatus;
         private MvxExpandableExListView _listview;
+        private ViewPager _pager;
 
         protected override int FragmentId => Resource.Layout.fragment_routedetail;
         protected override bool NavMenuEnabled => true;
@@ -47,11 +50,23 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             if(ViewModel.AllowRtnEdit.HasValue)
                 HasOptionsMenu = ViewModel.AllowRtnEdit.Value;
 
-            _listview = View.FindViewById<MvxExpandableExListView>(Resource.Id.TempExpandListView);
+            //_listview = View.FindViewById<MvxExpandableExListView>(Resource.Id.TempExpandListView);
 
             if (_currentStatus != null)
                 OnCurrentStatusChanged(this, null);
+            
+            _pager = View.FindViewById<ViewPager>(Resource.Id.TripViewPager);
 
+            if (ViewModel.TripLegs != null)
+                OnTripLegChanged(this, null);
+
+            var directionsButton = View.FindViewById<Button>(Resource.Id.DirectionsButton);
+            directionsButton.Click += delegate
+            {
+                _pager.CurrentItem = _pager.Adapter.Count + 2;
+            };
+
+            _tripLegToken = ViewModel.WeakSubscribe(() => ViewModel.TripLegs, OnTripLegChanged);
             _allowRtnEditToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnEdit, OnAllowRtnEditChanged);
             _currentStatusToken = ViewModel.WeakSubscribe(() => ViewModel.CurrentStatus, OnCurrentStatusChanged);
         }
@@ -98,6 +113,21 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             if (ViewModel.AllowRtnEdit.HasValue)
                 HasOptionsMenu = ViewModel.AllowRtnEdit.Value;
+        }
+
+        private void OnTripLegChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (ViewModel.TripLegs != null)
+            {
+                var pagerAdapter = new TripPagerAdapter(Activity, BindingContext, ViewModel.TripLegs, ViewModel.CustomerDirections);
+                _pager.Adapter = pagerAdapter;
+            }
+
+            if (ViewModel.CustomerDirections != null)
+            {
+                var directionsButton = View.FindViewById<Button>(Resource.Id.DirectionsButton);
+                directionsButton.Visibility = ViewStates.Visible;
+            }
         }
 
         private void OnCurrentStatusChanged(object sender, PropertyChangedEventArgs args)

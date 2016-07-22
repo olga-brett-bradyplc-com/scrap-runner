@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Enums;
 using Brady.ScrapRunner.Mobile.Helpers;
@@ -21,16 +22,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ITripService _tripService;
         private readonly IDriverService _driverService;
         private readonly IPreferenceService _preferenceService;
+        private readonly ICustomerService _customerService;
 
-        private string _custHostCode;
-
-        public RouteDetailViewModel(ITripService tripService, IDriverService driverService, IPreferenceService preferenceService)
+        public RouteDetailViewModel(
+            ITripService tripService, 
+            IDriverService driverService, 
+            IPreferenceService preferenceService, 
+            ICustomerService customerService)
         {
             _tripService = tripService;
             _driverService = driverService;
             _preferenceService = preferenceService;
-
-            DirectionsCommand = new MvxCommand(ExecuteDrivingDirectionsCommand);
+            _customerService = customerService;
+            
             EnRouteCommand = new MvxAsyncCommand(ExecuteEnRouteCommandAsync);
             ArriveCommand = new MvxAsyncCommand(ExecuteArriveCommandAsync);
             NextStageCommand = new MvxAsyncCommand(ExecuteNextStageCommandAsync);
@@ -44,40 +48,60 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public override async void Start()
         {
             var trip = await _tripService.FindTripAsync(TripNumber);
+            
+            Title = trip.TripTypeDesc;
+            SubTitle = $"{AppResources.Trip} {trip.TripNumber}";
+            TripDriverInstructions = trip.TripDriverInstructions;
+            TripType = trip.TripType;
+            TripFor = trip.TripCustName;
+
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
-            if (trip != null)
-            {
-                using (var tripDataLoad = UserDialogs.Instance.Loading(AppResources.LoadingTripData, maskType: MaskType.Clear))
+            var fullTripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
+            var templist = new List<TripLegWrapper>();
+
+            var customerDirections =
+                await _customerService.FindCustomerDirections(fullTripSegments.FirstOrDefault().TripSegDestCustHostCode);
+            var customerList = customerDirections as List<CustomerDirectionsModel> ?? customerDirections.ToList();
+
+            if(customerList.Count > 0)
+                CustomerDirections = new CustomerDirectionsWrapper
                 {
-                    var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
-                    var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
+                    TripCustName = fullTripSegments.FirstOrDefault().TripSegDestCustName,
+                    TripCustAddress = fullTripSegments.FirstOrDefault().TripSegDestCustAddress1,
+                    TripCustCityStateZip = fullTripSegments.FirstOrDefault().DestCustCityStateZip,
+                    Directions = customerList
+                };
 
-                    foreach (var tsm in segments)
+            foreach (var segment in fullTripSegments.Where(sg => sg.TripSegStatus == TripSegStatusConstants.Pending || sg.TripSegStatus == TripSegStatusConstants.Missed))
+            {
+                var currentContainers = await _tripService.FindAllContainersForTripSegmentAsync(TripNumber, segment.TripSegNumber);
+                var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(segment, currentContainers);
+                if (templist.LastOrDefault()?.TripCustHostCode == segment.TripSegDestCustHostCode)
+                    templist.LastOrDefault().TripSegments.Add(grouping);
+                else
+                {
+                    templist.Add(new TripLegWrapper
                     {
-                        var containers =
-                            await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
-                        var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
-                        list.Add(grouping);
-                    }
-
-                    _custHostCode = trip.TripCustHostCode;
-                    Title = trip.TripTypeDesc;
-                    SubTitle = $"{AppResources.Trip} {trip.TripNumber}";
-                    TripType = trip.TripType;
-                    TripFor = trip.TripCustName;
-
-                    if (list.Any())
-                    {
-                        Containers = list;
-                        TripCustName = list.First().Key.TripSegDestCustName;
-                        TripDriverInstructions = trip.TripDriverInstructions;
-                        TripCustAddress = list.First().Key.TripSegDestCustAddress1 +
-                                          list.First().Key.TripSegDestCustAddress2;
-                        TripCustCityStateZip = $"{list.First().Key.TripSegDestCustCity}, {list.First().Key.TripSegDestCustState} {list.First().Key.TripSegDestCustZip}";
-                    }
+                        TripCustName = segment.TripSegDestCustName,
+                        TripCustHostCode = segment.TripSegDestCustHostCode,
+                        TripCustAddress = segment.TripSegDestCustAddress1,
+                        TripCustCityStateZip = segment.DestCustCityStateZip,
+                        Notes = trip.TripDriverInstructions,
+                        TripSegments = new List<Grouping<TripSegmentModel, TripSegmentContainerModel>>{ grouping }
+                    });
                 }
             }
+
+            TripLegs = new List<TripLegWrapper>(templist);
+
+            var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
+            TripCustName = firstSegment.TripSegDestCustName;
+            TripDriverInstructions = trip.TripDriverInstructions;
+            TripCustAddress = firstSegment.TripSegDestCustAddress1 +
+                              firstSegment.TripSegDestCustAddress2;
+            TripCustCityStateZip = $"{firstSegment.TripSegDestCustCity}, {firstSegment.TripSegDestCustState} {firstSegment.TripSegDestCustZip}";
+
 
             // Is the user allowed to edit a rty segment?
             // Rtn must already exist as a segment
@@ -92,6 +116,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             base.Start();
         }
 
+
+        #region Field/Command bindings and impls
         // Field bindings
         private string _tripNumber;
         public string TripNumber
@@ -183,11 +209,18 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _currentDriver, value); }
         }
 
-        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers; 
-        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
+        private List<TripLegWrapper> _tripLegs;
+        public List<TripLegWrapper> TripLegs
         {
-            get { return _containers; }
-            set { SetProperty(ref _containers, value); }
+            get { return _tripLegs; }
+            set { SetProperty(ref _tripLegs, value); }
+        }
+
+        private CustomerDirectionsWrapper _customerDirections;
+        public CustomerDirectionsWrapper CustomerDirections
+        {
+            get { return _customerDirections; }
+            set { SetProperty(ref _customerDirections, value); }
         }
 
         // Command bindings
@@ -202,12 +235,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             => _addReturnToYardCommand ?? (_addReturnToYardCommand = new MvxCommand(ExecuteAddReturnToYardCommand));
 
         // Command impl
-        private void ExecuteDrivingDirectionsCommand()
-        {
-            if (!string.IsNullOrEmpty(_custHostCode))
-                ShowViewModel<RouteDirectionsViewModel>(new {custHostCode = _custHostCode});
-        }
-
         private void ExecuteAddReturnToYardCommand()
         {
             ShowViewModel<ModifyReturnToYardViewModel>(new {changeType = TerminalChangeEnum.Edit, tripNumber = TripNumber});
@@ -215,6 +242,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteEnRouteCommandAsync()
         {
+            var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
             var message = string.Format(AppResources.ConfirmEnRouteMessage,
                 "\n\n",
                 "\n",
@@ -231,7 +259,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         EmployeeId = CurrentDriver.EmployeeId,
                         PowerId = CurrentDriver.PowerId,
                         TripNumber = TripNumber,
-                        TripSegNumber = Containers.FirstOrDefault().Key.TripSegNumber,
+                        TripSegNumber = firstSegment.TripSegNumber,
                         ActionDateTime = DateTime.Now,
                         Odometer = CurrentDriver.Odometer ?? default(int),
                     });
@@ -244,7 +272,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     }
 
                     CurrentDriver.TripNumber = TripNumber;
-                    CurrentDriver.TripSegNumber = Containers.FirstOrDefault().Key.TripSegNumber;
+                    CurrentDriver.TripSegNumber = firstSegment.TripSegNumber;
                     CurrentDriver.Status = DriverStatusSRConstants.Enroute;
                     await _driverService.UpdateDriver(CurrentDriver);
 
@@ -256,6 +284,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteArriveCommandAsync()
         {
+            var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
             var message = string.Format(AppResources.ConfirmArrivalMessage,
                 "\n\n",
                 "\n",
@@ -272,7 +301,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         EmployeeId = CurrentDriver.EmployeeId,
                         PowerId = CurrentDriver.PowerId,
                         TripNumber = TripNumber,
-                        TripSegNumber = Containers.FirstOrDefault().Key.TripSegNumber,
+                        TripSegNumber = firstSegment.TripSegNumber,
                         ActionDateTime = DateTime.Now,
                         Odometer = CurrentDriver.Odometer ?? default(int),
                     });
@@ -312,11 +341,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             AppResources.Error, AppResources.OK);
                     }
 
-                    if (_tripService.IsTripLegTransaction(Containers.First().Key))
+                    if (_tripService.IsTripLegTransaction(firstSegment))
                         NextActionLabel = AppResources.Transactions;
-                    else if (_tripService.IsTripLegScale(Containers.First().Key))
+                    else if (_tripService.IsTripLegScale(firstSegment))
                         NextActionLabel = AppResources.YardScaleLabel;
-                    else if (_tripService.IsTripLegNoScreen(Containers.First().Key))
+                    else if (_tripService.IsTripLegNoScreen(firstSegment))
                         NextActionLabel = AppResources.FinishTripLabel;
                 }
             }
@@ -324,21 +353,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteNextStageCommandAsync()
         {
-            if (_tripService.IsTripLegTransaction(Containers.First().Key))
+            var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
+            if (_tripService.IsTripLegTransaction(firstSegment))
             {
                 Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
-            else if (_tripService.IsTripLegScale(Containers.First().Key))
+            else if (_tripService.IsTripLegScale(firstSegment))
             {
                 Close(this);
 
-                if (_tripService.IsTripLegTypePublicScale(Containers.First().Key))
+                if (_tripService.IsTripLegTypePublicScale(firstSegment))
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
                 else
                     ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
             }
-            else if (_tripService.IsTripLegNoScreen(Containers.First().Key))
+            else if (_tripService.IsTripLegNoScreen(firstSegment))
             {
                 var message = string.Format(AppResources.PerformActionLabel, "\n\n");
                 var confirm =
@@ -348,7 +378,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (confirm)
                 {
-                    foreach (var segment in Containers)
+                    foreach (var segment in TripLegs.FirstOrDefault().TripSegments)
                     {
                         foreach (var container in segment)
                         {
@@ -395,5 +425,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
             }
         }
+
+        #endregion
+    }
+
+    public class TripLegWrapper
+    {
+        public string TripCustName { get; set; }
+        public string TripCustHostCode { get; set; }
+        public string TripCustAddress { get; set; }
+        public string TripCustCityStateZip { get; set; }
+        public string Notes { get; set; }
+        public ICollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> TripSegments { get; set; }
+    }
+
+    public class CustomerDirectionsWrapper
+    {
+        public string TripCustName { get; set; }
+        public string TripCustAddress { get; set; }
+        public string TripCustCityStateZip { get; set; }
+        public List<CustomerDirectionsModel> Directions { get; set; }
     }
 }
