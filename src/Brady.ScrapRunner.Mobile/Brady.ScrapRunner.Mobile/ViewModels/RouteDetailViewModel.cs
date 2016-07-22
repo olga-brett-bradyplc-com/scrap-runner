@@ -292,7 +292,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                             if (yardInfo != null)
                             {
-                                if (yardInfo.CustLatitude == "0" || yardInfo.CustLongitude == "0")
+                                if (yardInfo.CustLatitude == null || yardInfo.CustLongitude == null || 
+                                    yardInfo.CustLatitude == "0" || yardInfo.CustLongitude == "0")
                                 {
                                     var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
                                         AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
@@ -301,12 +302,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                     if (gpsCaptureDialog)
                                     {
                                         //routine to capture current log/lat
-                                        string address = yardInfo.CustAddress1.TrimEnd();
-                                        if (yardInfo.CustAddress2.TrimEnd() != "")
-                                            address += yardInfo.CustAddress2.TrimEnd();
-                                        string custInfoText = yardInfo.CustName.TrimEnd() + "\n" + address + "\n" +
-                                                              yardInfo.CustCity.TrimEnd() + " " + yardInfo.CustState.TrimEnd() + " " +
-                                                              yardInfo.CustZip.TrimEnd() + " " + yardInfo.CustCountry.TrimEnd();
+                                        string address = yardInfo.CustAddress1?.TrimEnd();
+                                        if (yardInfo.CustAddress2?.TrimEnd() != "")
+                                            address += yardInfo.CustAddress2?.TrimEnd();
+                                        string custInfoText = yardInfo.CustName?.TrimEnd() + "\n" + address + "\n" +
+                                                              yardInfo.CustCity?.TrimEnd() + " " + yardInfo.CustState?.TrimEnd() + " " +
+                                                              yardInfo.CustZip?.TrimEnd() + " " + yardInfo.CustCountry?.TrimEnd();
                                         ShowViewModel<GpsCaptureViewModel>(new { yardInfo.CustHostCode, custInfoText });
                                     }
                                 }
