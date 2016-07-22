@@ -31,8 +31,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
         public override void Start()
         {
-            CustomerInfoText = CustomerInfoText;
-
             GetCurrentLocation();
 
             base.Start();
@@ -93,6 +91,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             // Send to the server and update local stop database latitude/longitude.
             Segments = await _tripService.FindCustomerSegments(CustHostCode);
+
+            foreach (var segment in Segments)
+            {
+                segment.TripSegEndLatitude = (int)synergyLatitude;
+                segment.TripSegEndLongitude = (int) synergyLongitude;
+            }
+
             await _tripService.UpdateTripSegments(Segments);
             Close(this);
         }
