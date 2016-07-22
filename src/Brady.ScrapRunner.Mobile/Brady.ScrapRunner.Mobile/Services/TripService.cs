@@ -64,7 +64,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
         public Task UpdateTripSegments(IEnumerable<TripSegmentModel> tripSegments)
         {
-            return _tripSegmentRepository.InsertRangeAsync(tripSegments);
+            return _tripSegmentRepository.UpdateRangeAsync(tripSegments);
         }
 
         public Task UpdateYards(IEnumerable<TerminalMaster> yards)
