@@ -709,4 +709,27 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>We've restored your previous app session</value>
     <comment>NEEDS TRANSLATION; SignInViewModel</comment>
   </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notifications</value>
+    <comment>NEEDS TRANSLATION; NotificationViewModel</comment>
+  </data>
+  <data name="Capture" xml:space="preserve">
+    <value>Capturar</value>
+    <comment>GPS button label</comment>
+  </data>
+  <data name="GpsAvailableStatus" xml:space="preserve">
+    <value>GPS está disponible . Toque el botón de captura para continuar.</value>
+    <comment>GPS status</comment>
+  </data>
+  <data name="NoGpsAvailable" xml:space="preserve">
+    <value>GPS no está disponible</value>
+    <comment>GPS status</comment>
+  </data>
+  <data name="Skip" xml:space="preserve">
+    <value>Omitir</value>
+    <comment>GPS button label</comment>
+  </data>
+  <data name="GpsCancelConfirm" xml:space="preserve">
+    <value>GPS está disponible . ¿Estas seguro que quieres cancelar?</value>
+  </data>
 </root>
