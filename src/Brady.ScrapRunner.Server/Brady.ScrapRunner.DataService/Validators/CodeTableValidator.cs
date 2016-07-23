@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class CodeTableValidator :
         AbstractValidator<CodeTable>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public CodeTableValidator()
         {

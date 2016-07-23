@@ -147,6 +147,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     List<CustomerDirections> fullCustomerDirectionsList = new List<CustomerDirections>();
                     List<CustomerCommodity> fullCustomerCommodityList = new List<CustomerCommodity>();
                     List<CustomerLocation> fullCustomerLocationList = new List<CustomerLocation>();
+                    List<TerminalMaster> fullTerminalList = new List<TerminalMaster>();
 
                     ////////////////////////////////////////////////
                     //TripInfoProcess has been called
@@ -204,6 +205,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     fullTripList.AddRange(tripList);
 
                     var customersInTrips = new List<string>();
+                    var terminalsInTrips = new List<string>();
+
                     foreach (var tripInfo in tripList)
                     {
                         //For testing
@@ -288,6 +291,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 tripsegcontainer.TripSegContainerType,
                                 tripsegcontainer.TripSegContainerSize);
                         }
+                        ////////////////////////////////////////////////////////////////////////////////////////////////
+                        //For each trip get the terminal. 
+                        //Add it to the terminalsInTrips list, if not already in the list
+                        if (terminalsInTrips.Where(x => x.Contains(tripInfo.TripTerminalId)).FirstOrDefault() == null)
+                            terminalsInTrips.Add(tripInfo.TripTerminalId);
+                        //For testing
+                        log.DebugFormat("SRTEST:TripInfoProcess:TripNumber:{0} TerminalId:{1}",
+                            tripInfo.TripNumber,
+                            tripInfo.TripTerminalId);
                     }//end of foreach (Trip tripInfo in tripList)
 
                     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -387,6 +399,20 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                            customerLocation.CustLocation);
                         }
                     }
+                    foreach(var term in terminalsInTrips)
+                    {
+                        var terminal = Common.GetTerminal(dataService, settings, userCulture, userRoleIds,
+                                            term, out fault);
+                        if (fault != null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                            break;
+                        }
+                        //Save the list for sending to driver
+                        fullTerminalList.Add(terminal);
+
+                        log.DebugFormat("SRTEST:TripInfoProcess:Terminal:Id:{0}", term);
+                    }
                     //Set the return values
                     tripInfoProcess.Trips = fullTripList;
                     tripInfoProcess.TripSegments = fullTripSegmentList;
@@ -396,6 +422,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     tripInfoProcess.CustomerDirections = fullCustomerDirectionsList;
                     tripInfoProcess.CustomerLocations = fullCustomerLocationList;
                     tripInfoProcess.CustomerCommodities = fullCustomerCommodityList;
+                    tripInfoProcess.Terminals = fullTerminalList;
 
                     //Now that we have sent all the trips, update the TripSendFlag in the Trip table
                     //so that the trips will not be sent again.

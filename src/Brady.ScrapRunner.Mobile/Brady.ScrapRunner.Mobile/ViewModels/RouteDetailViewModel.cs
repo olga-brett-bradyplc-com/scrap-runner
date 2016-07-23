@@ -351,15 +351,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         CurrentDriver.Status = DriverStatusSRConstants.Arrive;
                         await _driverService.UpdateDriver(CurrentDriver);
 
-                        //TODO: GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
+                        //GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
+                        var currentSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber,
+                            Containers.FirstOrDefault().Key.TripSegNumber);
+
                         var tripInfo = await _tripService.FindTripAsync(TripNumber);
+
+                        if(currentSegment.TripSegEndLatitude == null || currentSegment.TripSegEndLongitude == null ||
+                            currentSegment.TripSegEndLatitude == 0 || currentSegment.TripSegEndLongitude == 0)
                         {
                             //condition to check for lat/lon
                             var yardInfo = await _tripService.FindYardInfo(tripInfo.TripTerminalId);
 
                             if (yardInfo != null)
                             {
-                                if (yardInfo.CustLatitude == "0" || yardInfo.CustLongitude == "0")
+                                if (yardInfo.Latitude == null || yardInfo.Longitude == null || 
+                                    yardInfo.Latitude == 0 || yardInfo.Longitude == 0)
                                 {
                                     var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
                                         AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
@@ -367,7 +374,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                                     if (gpsCaptureDialog)
                                     {
-                                        //TODO: add saving routine to capture current log/lat
+                                        //routine to capture current log/lat
+                                        string address = yardInfo.Address1?.TrimEnd();
+                                        if (yardInfo.Address2?.TrimEnd() != "")
+                                            address += yardInfo.Address2?.TrimEnd();
+                                        string termInfoText = yardInfo.TerminalName?.TrimEnd() + "\n" + address + "\n" +
+                                                              yardInfo.City?.TrimEnd() + " " + yardInfo.State?.TrimEnd() + " " +
+                                                              yardInfo.Zip?.TrimEnd() + " " + yardInfo.Country?.TrimEnd();
+                                        ShowViewModel<GpsCaptureViewModel>(new { custHostCode = currentSegment.TripSegDestCustHostCode, customerInfo = termInfoText });
                                     }
                                 }
                             }

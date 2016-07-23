@@ -4,14 +4,14 @@ using Brady.ScrapRunner.Domain.Models;
 
 namespace Brady.ScrapRunner.DataService.Validators
 {
-
     public class GPSLocationDeletionValidator :
         AbstractValidator<GPSLocation>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public GPSLocationDeletionValidator()
         {
+            // NOTE: GPSSeqId is the identity(1,1) column
             RuleFor(x => x.GPSSeqId).NotEmpty();
         }
 

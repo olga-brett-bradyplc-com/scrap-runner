@@ -9,14 +9,14 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class TripSegmentContainerTimeValidator :
          AbstractValidator<TripSegmentContainerTime>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public TripSegmentContainerTimeValidator()
         {
             RuleFor(x => x.TripNumber).NotEmpty();
             RuleFor(x => x.TripSegNumber).NotEmpty();
-            RuleFor(x => x.SeqNumber).GreaterThanOrEqualTo(0);
             RuleFor(x => x.TripSegContainerSeqNumber).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.SeqNumber).GreaterThanOrEqualTo(0);
             RuleFor(x => x.TimeType).NotEmpty();
             RuleFor(x => x.ContainerTime).GreaterThanOrEqualTo(0);
         }

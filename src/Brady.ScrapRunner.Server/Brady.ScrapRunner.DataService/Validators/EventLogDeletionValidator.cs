@@ -8,13 +8,14 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class EventLogDeletionValidator :
         AbstractValidator<EventLog>,  IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public EventLogDeletionValidator()
         {
-            RuleFor(x => x.EventId).NotEmpty();
             //RuleFor(x => x.EventDateTime).NotEmpty();
             //RuleFor(x => x.EventSeqNo).GreaterThanOrEqualTo(0);
+            // NOTE: EventId is the identity(1,1) column
+            RuleFor(x => x.EventId).NotEmpty();
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)

@@ -7,7 +7,8 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class TerminalChangeProcessDeletionValidator :
               AbstractValidator<TerminalChangeProcess>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
+
         public void SetRepository(ICrudingDataServiceRepository repository)
         {
             _repository = repository;
@@ -15,6 +16,7 @@ namespace Brady.ScrapRunner.DataService.Validators
 
         public TerminalChangeProcessDeletionValidator()
         {
+            // NOTE: Deletes not supported
             RuleFor(x => x.EmployeeId).NotEmpty();
         }
     }

@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class CustomerLocationValidator :
         AbstractValidator<CustomerLocation>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public CustomerLocationValidator()
         {

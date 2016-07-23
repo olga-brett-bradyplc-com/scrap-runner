@@ -8,13 +8,13 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class TripTypeAllowCustTypeDeletionValidator :
          AbstractValidator<TripTypeAllowCustType>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public TripTypeAllowCustTypeDeletionValidator()
         {
             RuleFor(x => x.TripTypeCode).NotEmpty();
-            RuleFor(x => x.TripTypeCustType).NotEmpty();
             RuleFor(x => x.TripTypeSeqNumber).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.TripTypeCustType).NotEmpty();
         }
 
         public void SetRepository(ICrudingDataServiceRepository repository)

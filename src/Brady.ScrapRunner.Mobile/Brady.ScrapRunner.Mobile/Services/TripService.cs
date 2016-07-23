@@ -62,6 +62,16 @@ namespace Brady.ScrapRunner.Mobile.Services
             var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegment>, IEnumerable<TripSegmentModel>>(tripSegments);
             return _tripSegmentRepository.InsertRangeAsync(mapped);
         }
+        public Task UpdateTripSegments(IEnumerable<TripSegmentModel> tripSegments)
+        {
+            return _tripSegmentRepository.UpdateRangeAsync(tripSegments);
+        }
+
+        public Task UpdateYards(IEnumerable<TerminalMaster> yards)
+        {
+            var mapped = AutoMapper.Mapper.Map<IEnumerable<TerminalMaster>, IEnumerable<YardModel>>(yards);
+            return _yardInfoRepository.InsertRangeAsync(mapped);
+        }
 
         /// <summary>
         /// Takes a list of trip segment containers provided by the server, and inserts into local TripSegmentContainer DB
@@ -136,6 +146,12 @@ namespace Brady.ScrapRunner.Mobile.Services
             return await _tripSegmentContainerRepository.UpdateAsync(container);
         }
 
+        public async Task<List<TripSegmentModel>> FindCustomerSegments(string custHostCode)
+        {
+            var tripSegments = await _tripSegmentRepository.AsQueryable()
+                .Where(t => t.TripSegDestCustHostCode == custHostCode).ToListAsync();
+            return tripSegments;
+        }
         #endregion
 
         #region Search methods

@@ -7,7 +7,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class PowerFuelDeletionValidator :
          AbstractValidator<PowerFuel>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public PowerFuelDeletionValidator()
         {

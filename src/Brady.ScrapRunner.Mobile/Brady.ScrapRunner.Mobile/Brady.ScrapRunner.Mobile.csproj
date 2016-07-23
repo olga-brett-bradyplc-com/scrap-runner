@@ -37,7 +37,9 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="AppStart.cs" />
+    <Compile Include="Converters\DateTimeOffsetValueConverter.cs" />
     <Compile Include="Converters\DateTimeValueConverter.cs" />
+    <Compile Include="Converters\NotificationTypeValueConverter.cs" />
     <Compile Include="Converters\NullableIntValueConverter.cs" />
     <Compile Include="CustomLanguageBindingParser.cs" />
     <Compile Include="Enums\MenuFilterEnum.cs" />
@@ -80,6 +82,7 @@
     <Compile Include="Models\DriverStatusModel.cs" />
     <Compile Include="Models\LocationModel.cs" />
     <Compile Include="Models\MessagesModel.cs" />
+    <Compile Include="Models\NotificationModel.cs" />
     <Compile Include="Models\PowerMasterModel.cs" />
     <Compile Include="Models\ContainerMasterModel.cs" />
     <Compile Include="Models\CustomerDirectionsModel.cs" />
@@ -124,6 +127,7 @@
     <Compile Include="Validators\UsernameValidator.cs" />
     <Compile Include="ViewModels\DelayViewModel.cs" />
     <Compile Include="ViewModels\FuelEntryViewModel.cs" />
+    <Compile Include="ViewModels\GpsCaptureViewModel.cs" />
     <Compile Include="ViewModels\LoadDropContainerViewModel.cs" />
     <Compile Include="ViewModels\MessagesViewModel.cs" />
     <Compile Include="ViewModels\ModifyReturnToYardViewModel.cs" />
@@ -131,6 +135,7 @@
     <Compile Include="ViewModels\NbScanViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\NotificationViewModel.cs" />
     <Compile Include="ViewModels\PhotosViewModel.cs" />
     <Compile Include="ViewModels\PublicScaleDetailViewModel.cs" />
     <Compile Include="ViewModels\PublicScaleSummaryViewModel.cs" />

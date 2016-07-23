@@ -8,7 +8,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class CodeTableHdrDeletionValidator :
         AbstractValidator<CodeTableHdr>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public CodeTableHdrDeletionValidator()
         {

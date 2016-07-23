@@ -7,15 +7,16 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class TripInfoProcessDeletionValidator :
         AbstractValidator<TripInfoProcess>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
+
         public void SetRepository(ICrudingDataServiceRepository repository)
         {
             _repository = repository;
         }
 
         public TripInfoProcessDeletionValidator()
-        {
-            // TODO:  Need a simple failure, deletes not allowed.
+        {            
+            // NOTE: Deletes not supported
             RuleFor(x => x.EmployeeId).NotEmpty();
         }
 

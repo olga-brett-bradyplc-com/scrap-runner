@@ -4,12 +4,11 @@ using Brady.ScrapRunner.Domain.Models;
 
 namespace Brady.ScrapRunner.DataService.Validators
 {
-
     public class DriverHistoryValidator :
         AbstractValidator<DriverHistory>,
         IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public DriverHistoryValidator()
         {

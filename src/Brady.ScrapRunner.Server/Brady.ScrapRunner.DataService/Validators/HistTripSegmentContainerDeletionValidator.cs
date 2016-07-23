@@ -7,7 +7,7 @@ namespace Brady.ScrapRunner.DataService.Validators
     public class HistTripSegmentContainerDeletionValidator :
         AbstractValidator<HistTripSegmentContainer>, IRequireCrudingDataServiceRepository
     {
-        ICrudingDataServiceRepository _repository;
+        private ICrudingDataServiceRepository _repository;
 
         public HistTripSegmentContainerDeletionValidator()
         {
@@ -16,6 +16,7 @@ namespace Brady.ScrapRunner.DataService.Validators
             RuleFor(x => x.TripSegNumber).NotEmpty();
             RuleFor(x => x.TripSegContainerSeqNumber).GreaterThanOrEqualTo(0);
         }
+
         public void SetRepository(ICrudingDataServiceRepository repository)
         {
             _repository = repository;

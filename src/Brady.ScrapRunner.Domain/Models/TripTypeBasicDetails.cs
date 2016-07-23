@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Domain.Models
     /// <summary>
     /// A TripTypeBasicDetails record.
     /// </summary>
-    public class TripTypeBasicDetails : IHaveCompositeId, IEquatable<TripTypeBasicDetails>
+    public class TripTypeBasicDetails : IHaveId<int>, IEquatable<TripTypeBasicDetails>
     {
         public virtual string TripTypeCode { get; set; }
         public virtual int SeqNo { get; set; }
@@ -19,12 +19,11 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual int? FirstCTRTime { get; set; }
         public virtual int? SecondCTRTime { get; set; }
   
-
-        public virtual string Id
+        public virtual int Id
         {
             get
             {
-                return string.Format("{0};{1};{2}", ContainerType, SeqNo,TripTypeCode);
+                return SeqNo;
             }
             set
             {
@@ -51,13 +50,8 @@ namespace Brady.ScrapRunner.Domain.Models
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = (ContainerType != null ? ContainerType.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ SeqNo.GetHashCode();
-                hashCode = (hashCode * 397) ^ (TripTypeCode != null ? TripTypeCode.GetHashCode() : 0);
-                return hashCode;
-            }
+            var hashCode = SeqNo.GetHashCode();
+            return hashCode;
         }
     }
 }
