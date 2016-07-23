@@ -37,6 +37,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         private IDisposable _currentStatusToken;
         private IDisposable _allowRtnEditToken;
         private IDisposable _tripLegToken;
+        private IDisposable _readOnlyToken;
 
         private string _currentStatus;
         private MvxExpandableExListView _listview;
@@ -50,9 +51,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             if(ViewModel.AllowRtnEdit.HasValue)
                 HasOptionsMenu = ViewModel.AllowRtnEdit.Value;
 
-            //_listview = View.FindViewById<MvxExpandableExListView>(Resource.Id.TempExpandListView);
-
-            if (_currentStatus != null)
+            if (_currentStatus != null || ViewModel.CurrentStatus != null)
                 OnCurrentStatusChanged(this, null);
             
             _pager = View.FindViewById<ViewPager>(Resource.Id.TripViewPager);
@@ -66,6 +65,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 _pager.CurrentItem = _pager.Adapter.Count + 2;
             };
 
+            _readOnlyToken = ViewModel.WeakSubscribe(() => ViewModel.ReadOnlyTrip, OnReadOnlyTripChanged);
             _tripLegToken = ViewModel.WeakSubscribe(() => ViewModel.TripLegs, OnTripLegChanged);
             _allowRtnEditToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnEdit, OnAllowRtnEditChanged);
             _currentStatusToken = ViewModel.WeakSubscribe(() => ViewModel.CurrentStatus, OnCurrentStatusChanged);
@@ -107,6 +107,18 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 _allowRtnEditToken.Dispose();
                 _allowRtnEditToken = null;
             }
+
+            if (_tripLegToken != null)
+            {
+                _tripLegToken.Dispose();
+                _tripLegToken = null;
+            }
+
+            if (_readOnlyToken != null)
+            {
+                _readOnlyToken.Dispose();
+                _readOnlyToken = null;
+            }
         }
 
         private void OnAllowRtnEditChanged(object sender, PropertyChangedEventArgs args)
@@ -130,6 +142,18 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             }
         }
 
+        private void OnReadOnlyTripChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (!ViewModel.ReadOnlyTrip) return;
+
+            // Hide all buttons and show warning message
+            var enrouteButton = View.FindViewById<Button>(Resource.Id.EnrouteButton);
+            var arriveButton = View.FindViewById<Button>(Resource.Id.ArriveButton);
+
+            enrouteButton.Visibility = ViewStates.Gone;
+            arriveButton.Visibility = ViewStates.Gone;
+        }
+
         private void OnCurrentStatusChanged(object sender, PropertyChangedEventArgs args)
         {
             _currentStatus = ViewModel.CurrentStatus;
@@ -146,6 +170,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             switch (_currentStatus)
             {
                 case "EN":
+                case "E":
                     layout.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
                     toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
 
@@ -168,6 +193,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     arriveButton.Visibility = ViewStates.Visible;
                     break;
                 case "AR":
+                case "A":
                     layout.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
                     toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
 

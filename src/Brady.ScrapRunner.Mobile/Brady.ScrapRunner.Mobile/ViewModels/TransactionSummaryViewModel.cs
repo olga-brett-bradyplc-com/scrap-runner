@@ -46,18 +46,18 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _driverService = driverService;
             _codeTableService = codeTableService;
             _containerService = containerService;
-            Title = AppResources.Transactions;
         }
 
-        public void Init(string tripNumber, string methodOfEntry)
+        public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
-            MethodOfEntry = methodOfEntry;
-            SubTitle = $"{AppResources.Trip} {TripNumber}";
         }
 
         public override async void Start()
         {
+            Title = AppResources.Transactions;
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
+
             FinishLabel = AppResources.FinishLabel;
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
@@ -143,13 +143,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             get { return _finishLabel; }
             set { SetProperty(ref _finishLabel, value); }
-        }
-
-        private string _methodOfEntry;
-        public string MethodOfEntry
-        {
-            get { return _methodOfEntry; }
-            set { SetProperty(ref _methodOfEntry, value); }
         }
 
         private DriverStatusModel CurrentDriver { get; set; }
@@ -284,8 +277,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 {
                     tripNumber = tripContainer.TripNumber,
                     tripSegmentNumber = tripContainer.TripSegNumber,
-                    tripSegmentSeqNo = tripContainer.TripSegContainerSeqNumber,
-                    methodOfEntry = TripMethodOfCompletionConstants.Manual
+                    tripSegmentSeqNo = tripContainer.TripSegContainerSeqNumber
                 });
         }
 
@@ -346,16 +338,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
 
             await _tripService.PropagateContainerUpdates(TripNumber, Containers);
-
             var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             Close(this);
 
             if (nextTripSegment.Any())
             {
+                await _driverService.ClearDriverStatus(CurrentDriver, false);
                 ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
             }
             else
             {
+                await _driverService.ClearDriverStatus(CurrentDriver, true);
                 await _tripService.CompleteTripAsync(TripNumber);
                 ShowViewModel<RouteSummaryViewModel>();
             }

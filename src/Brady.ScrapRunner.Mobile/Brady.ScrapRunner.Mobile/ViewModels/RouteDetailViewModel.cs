@@ -15,8 +15,7 @@ using MvvmCross.Core.ViewModels;
 using Brady.ScrapRunner.Mobile.Resources;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
-{
-    
+{ 
     public class RouteDetailViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
@@ -44,10 +43,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             TripNumber = tripNumber;
         }
+
+        public void Init(string tripNumber, string status)
+        {
+            TripNumber = tripNumber;
+            CurrentStatus = status;
+        }
  
         public override async void Start()
         {
-            var trip = await _tripService.FindTripAsync(TripNumber);
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
+            var trips = await _tripService.FindTripsAsync();
+            var trip = trips.FirstOrDefault(ts => ts.TripNumber == TripNumber);
             
             Title = trip.TripTypeDesc;
             SubTitle = $"{AppResources.Trip} {trip.TripNumber}";
@@ -55,22 +63,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripType = trip.TripType;
             TripFor = trip.TripCustName;
 
-            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
-
             var fullTripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
             var templist = new List<TripLegWrapper>();
 
             var customerDirections =
                 await _customerService.FindCustomerDirections(fullTripSegments.FirstOrDefault().TripSegDestCustHostCode);
-            var customerList = customerDirections as List<CustomerDirectionsModel> ?? customerDirections.ToList();
 
-            if(customerList.Count > 0)
+            if(customerDirections.Count > 0)
                 CustomerDirections = new CustomerDirectionsWrapper
                 {
                     TripCustName = fullTripSegments.FirstOrDefault().TripSegDestCustName,
                     TripCustAddress = fullTripSegments.FirstOrDefault().TripSegDestCustAddress1,
                     TripCustCityStateZip = fullTripSegments.FirstOrDefault().DestCustCityStateZip,
-                    Directions = customerList
+                    Directions = customerDirections
                 };
 
             foreach (var segment in fullTripSegments.Where(sg => sg.TripSegStatus == TripSegStatusConstants.Pending || sg.TripSegStatus == TripSegStatusConstants.Missed))
@@ -103,16 +108,42 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripCustCityStateZip = $"{firstSegment.TripSegDestCustCity}, {firstSegment.TripSegDestCustState} {firstSegment.TripSegDestCustZip}";
 
 
-            // Is the user allowed to edit a rty segment?
-            // Rtn must already exist as a segment
-            var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
-            var doesRtnSegExist = tripSegments.Any(sg => sg.TripSegType == BasicTripTypeConstants.ReturnYard || sg.TripSegType == BasicTripTypeConstants.ReturnYardNC);
+            // Is the user allowed to edit a rty segment?; RT/RN must already exist as a segment
+            var doesRtnSegExist = fullTripSegments.Any(sg => sg.TripSegType == BasicTripTypeConstants.ReturnYard || sg.TripSegType == BasicTripTypeConstants.ReturnYardNC);
             // User preference DEFAllowAddRT must be set to 'Y'
             var defAllowChangeRt = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAllowChangeRT);
 
             AllowRtnEdit = doesRtnSegExist && Constants.Yes.Equals(defAllowChangeRt);
 
             MenuFilter = MenuFilterEnum.NotOnTrip; // Reset for when we start a new trip segment
+
+            // If the user is already on a trip, or DEFEnforceSeqProcess = Y and they're not on their first avaliable trip, mark the trip as read-only
+            var seqEnforced = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFEnforceSeqProcess);
+            if (!string.IsNullOrEmpty(CurrentDriver.TripNumber) && 
+                CurrentDriver.Status != DriverStatusSRConstants.LoggedIn && 
+                CurrentDriver.Status != DriverStatusSRConstants.Available && 
+                TripNumber != CurrentDriver.TripNumber)
+            {
+                ReadOnlyTrip = true;
+                UserDialogs.Instance.WarnToast(AppResources.ReadOnlyTrip, AppResources.ReadOnlyTripGenMessage, 10000);
+            }
+            else if (seqEnforced == Constants.Yes && trips.FirstOrDefault().TripNumber != TripNumber)
+            {
+                ReadOnlyTrip = true;
+                UserDialogs.Instance.WarnToast(AppResources.ReadOnlyTrip, AppResources.ReadOnlyTripSeqMessage, 10000);
+            }
+
+            // If CurrentStatus isn't null, that means we're restoring a previous user session on login
+            // Otherwise, check driver status to see if they're already in the midst of a trip, and set the status appropiately if so
+            if (CurrentDriver.TripNumber == TripNumber && 
+                CurrentStatus == null && 
+                (CurrentDriver.Status != DriverStatusSRConstants.Available || CurrentDriver.Status != DriverStatusSRConstants.LoggedIn))
+            {
+                CurrentStatus = CurrentDriver.Status;
+                if( CurrentStatus == DriverStatusSRConstants.Arrive )
+                    SetNextStageLabel(fullTripSegments.FirstOrDefault(sg => sg.TripSegStatus == TripSegStatusConstants.Pending || sg.TripSegStatus == TripSegStatusConstants.Missed));
+            }
+
             base.Start();
         }
 
@@ -200,6 +231,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             get { return _allowRtnEdit; }
             set { SetProperty(ref _allowRtnEdit, value); }
+        }
+
+        private bool _readOnlyTrip;
+        public bool ReadOnlyTrip
+        {
+            get { return _readOnlyTrip; }
+            set { SetProperty(ref _readOnlyTrip, value); }
         }
 
         private DriverStatusModel _currentDriver;
@@ -341,14 +379,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             AppResources.Error, AppResources.OK);
                     }
 
-                    if (_tripService.IsTripLegTransaction(firstSegment))
-                        NextActionLabel = AppResources.Transactions;
-                    else if (_tripService.IsTripLegScale(firstSegment))
-                        NextActionLabel = AppResources.YardScaleLabel;
-                    else if (_tripService.IsTripLegNoScreen(firstSegment))
-                        NextActionLabel = AppResources.FinishTripLabel;
+                    SetNextStageLabel(firstSegment);
                 }
             }
+        }
+
+        private void SetNextStageLabel(TripSegmentModel tripSegment)
+        {
+            if (_tripService.IsTripLegTransaction(tripSegment))
+                NextActionLabel = AppResources.Transactions;
+            else if (_tripService.IsTripLegScale(tripSegment))
+                NextActionLabel = AppResources.YardScaleLabel;
+            else if (_tripService.IsTripLegNoScreen(tripSegment))
+                NextActionLabel = AppResources.FinishTripLabel;
         }
 
         private async Task ExecuteNextStageCommandAsync()
@@ -418,6 +461,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
                     }
 
+                    await _driverService.ClearDriverStatus(CurrentDriver, true);
                     await _tripService.CompleteTripAsync(TripNumber);
 
                     Close(this);

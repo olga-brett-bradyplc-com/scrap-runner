@@ -689,4 +689,24 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Select Review Reason</value>
     <comment>NEEDS TRANSLATION; ScaleDetailViewModel</comment>
   </data>
+  <data name="ReadOnlyTrip" xml:space="preserve">
+    <value>Read Only Trip</value>
+    <comment>NEEDS TRANSLATION; RouteDetailViewModel</comment>
+  </data>
+  <data name="ReadOnlyTripGenMessage" xml:space="preserve">
+    <value>You're currently already on a trip</value>
+    <comment>NEEDS TRANSLATION; RouteDetailViewModel</comment>
+  </data>
+  <data name="ReadOnlyTripSeqMessage" xml:space="preserve">
+    <value>Must complete trips in order by sequence number</value>
+    <comment>NEEDS TRANSLATION; RouteDetailViewModel</comment>
+  </data>
+  <data name="SessionRestoreHeader" xml:space="preserve">
+    <value>Restoring Session</value>
+    <comment>NEEDS TRANSLATION; SignInViewModel</comment>
+  </data>
+  <data name="SessionRestoreMessage" xml:space="preserve">
+    <value>We've restored your previous app session</value>
+    <comment>NEEDS TRANSLATION; SignInViewModel</comment>
+  </data>
 </root>

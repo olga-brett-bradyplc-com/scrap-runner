@@ -112,6 +112,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
+        private DriverStatusModel _currentDriver;
+        public DriverStatusModel CurrentDriver
+        {
+            get { return _currentDriver; }
+            set { SetProperty(ref _currentDriver, value); }
+        }
+
         public IMvxAsyncCommand SignInCommand { get; protected set; }
 
         protected async Task ExecuteSignInCommandAsync()
@@ -144,13 +151,23 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 Close(this);
 
                 var containers = await _containerService.FindPowerIdContainersAsync(TruckId);
+                var autoDrop =
+                    await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAutoDropContainers);
 
-                // @TODO : This is preferenced driven as to whether we take them to LoadDrop screen if containers are on truck
-                if (containers.Any())
-                    ShowViewModel<LoadDropContainerViewModel>(new { loginProcessed = true });
+                // Driver was in the middle of a trip during their last session, so return them to the appropiate screen
+                if (!string.IsNullOrEmpty(CurrentDriver.TripNumber) && !string.IsNullOrEmpty(CurrentDriver.TripSegNumber) && CurrentDriver.Status != DriverStatusSRConstants.LoggedIn)
+                {
+                    ShowViewModel<RouteDetailViewModel>(new { tripNumber = CurrentDriver.TripNumber, status = CurrentDriver.Status });
+                    UserDialogs.Instance.WarnToast(AppResources.SessionRestoreHeader, AppResources.SessionRestoreMessage);
+                }
+                else if (containers.Any() && autoDrop == Constants.No)
+                {
+                    ShowViewModel<LoadDropContainerViewModel>(new {loginProcessed = true});
+                }
                 else
+                {
                     ShowViewModel<RouteSummaryViewModel>();
-
+                }
             }
             catch (Exception exception)
             {
@@ -181,7 +198,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _locationOdometerService.Stop();
 
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
-                // have a need for a login service, leaving this as it is.
+                // have a need for a login service, leaving this as is.
                 var loginProcess = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(
                     new DriverLoginProcess {
                         EmployeeId = UserName,
@@ -197,21 +214,24 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (loginProcess.WasSuccessful)
                 {
                     await _messagesService.UpdateApprovedUsersForMessaging(loginProcess.Item.UsersForMessaging);
-                    await _driverService.UpdateDriverStatus(new DriverStatus
+                    CurrentDriver = new DriverStatusModel
                     {
                         EmployeeId = loginProcess.Item.EmployeeId,
-                        Status = DriverStatusSRConstants.LoggedIn,
+                        Status = loginProcess.Item.DriverStatus ?? DriverStatusSRConstants.LoggedIn,
                         TerminalId = loginProcess.Item.TermId,
                         PowerId = loginProcess.Item.PowerId,
                         RegionId = loginProcess.Item.RegionId,
                         MDTId = loginProcess.Item.Mdtid,
                         LoginDateTime = loginProcess.Item.LoginDateTime,
                         ActionDateTime = loginProcess.Item.LoginDateTime,
-                        //DriverCumMinutes = loginProcess.Item.DriverCumlMinutes @TODO Should this be sent in login process?
                         Odometer = loginProcess.Item.Odometer,
                         LoginProcessedDateTime = loginProcess.Item.LoginDateTime,
-                        DriverLCID = loginProcess.Item.LocaleCode
-                    });
+                        DriverLCID = loginProcess.Item.LocaleCode,
+                        TripNumber = loginProcess.Item.TripNumber,
+                        TripSegNumber = loginProcess.Item.TripSegNumber
+                    };
+
+                    await _driverService.CreateDriverStatus(CurrentDriver);
 
                     // Get the EmployeeMaster record for the current driver and update local DB
                     var driverEmployeeRecord =
@@ -228,7 +248,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 loginData.Title = AppResources.LoadingPreferences;
 
                 // Retrieve preferences from remote server and populate local DB
-                var preferenceObj = new PreferencesProcess { EmployeeId = UserName };
                 var preferenceProcess = await _preferenceService.FindPreferencesRemoteAsync(new PreferencesProcess { EmployeeId = UserName });
 
                 if (preferenceProcess.WasSuccessful)

@@ -1135,6 +1135,33 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Read Only Trip.
+        /// </summary>
+        public static string ReadOnlyTrip {
+            get {
+                return ResourceManager.GetString("ReadOnlyTrip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You&apos;re currently already on a trip.
+        /// </summary>
+        public static string ReadOnlyTripGenMessage {
+            get {
+                return ResourceManager.GetString("ReadOnlyTripGenMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must complete trips in order by sequence number.
+        /// </summary>
+        public static string ReadOnlyTripSeqMessage {
+            get {
+                return ResourceManager.GetString("ReadOnlyTripSeqMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reference Number.
         /// </summary>
         public static string ReferenceNumber {
@@ -1293,6 +1320,24 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string ServerLabel {
             get {
                 return ResourceManager.GetString("ServerLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restoring Session.
+        /// </summary>
+        public static string SessionRestoreHeader {
+            get {
+                return ResourceManager.GetString("SessionRestoreHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We&apos;ve restored your previous app session.
+        /// </summary>
+        public static string SessionRestoreMessage {
+            get {
+                return ResourceManager.GetString("SessionRestoreMessage", resourceCulture);
             }
         }
         

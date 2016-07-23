@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Interfaces;
@@ -36,6 +37,16 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var mapped = AutoMapper.Mapper.Map<DriverStatus, DriverStatusModel>(driverStatus);
             return _driverStatusRepository.InsertAsync(mapped);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driverStatus"></param>
+        /// <returns></returns>
+        public async Task<int> CreateDriverStatus(DriverStatusModel driverStatus)
+        {
+            return await _driverStatusRepository.InsertOrReplaceAsync(driverStatus);
         }
 
         /// <summary>
@@ -84,6 +95,24 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var driver = await _driverStatusRepository.AllAsync();
             return driver.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="driver"></param>
+        /// <param name="clearTripInfo"></param>
+        /// <returns></returns>
+        public async Task<int> ClearDriverStatus(DriverStatusModel driver, bool clearTripInfo)
+        {
+            driver.Status = DriverStatusSRConstants.Available;
+
+            if (clearTripInfo)
+            {
+                driver.TripNumber = null;
+                driver.TripSegNumber = null;
+            }
+            return await UpdateDriver(driver);
         }
 
         /// <summary>

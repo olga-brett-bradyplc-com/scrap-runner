@@ -29,22 +29,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _codeTableService = codeTableService;
             _customerService = customerService;
             _driverService = driverService;
-
-            Title = AppResources.TransactionDetail;
         }
 
         // Initialize parameters passed from transaction summary screen
-        public void Init(string tripNumber, string tripSegmentNumber, short tripSegmentSeqNo, string methodOfEntry)
+        public void Init(string tripNumber, string tripSegmentNumber, short tripSegmentSeqNo)
         {
             TripNumber = tripNumber;
             TripSegNumber = tripSegmentNumber;
             TripSegContainerSeqNumber = tripSegmentSeqNo;
-            MethodOfEntry = methodOfEntry;
-            SubTitle = $"{AppResources.Trip} {TripNumber}";
         }
 
         public override async void Start()
         {
+            Title = AppResources.TransactionDetail;
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
+
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
             Segment = await _tripService.FindTripSegmentInfoAsync(TripNumber, TripSegNumber);
             Container =

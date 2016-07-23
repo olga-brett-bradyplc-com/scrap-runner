@@ -159,10 +159,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (nextTripSegment.Any())
             {
+                await _driverService.ClearDriverStatus(CurrentDriver, false);
                 ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
             }
             else
             {
+                await _driverService.ClearDriverStatus(CurrentDriver, true);
                 await _tripService.CompleteTripAsync(TripNumber);
                 ShowViewModel<RouteSummaryViewModel>();
             }

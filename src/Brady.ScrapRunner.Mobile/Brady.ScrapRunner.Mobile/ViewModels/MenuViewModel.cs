@@ -75,6 +75,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ShowViewModel<FuelEntryViewModel>();
         }
 
+        private IMvxCommand _routeSummaryCommand;
+        public IMvxCommand RouteSummaryCommand => _routeSummaryCommand ?? (_routeSummaryCommand = new MvxCommand(ExecuteRouteSummaryCommand));
+
+        private void ExecuteRouteSummaryCommand()
+        {
+            ShowViewModel<RouteSummaryViewModel>();
+        }
+
         private IMvxCommand _messagesCommand;
         public IMvxCommand MessagesCommand
             => _messagesCommand ?? (_messagesCommand = new MvxCommand(ExecuteMessagesCommand));
