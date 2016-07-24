@@ -7,7 +7,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
     using Android.Media;
     using Android.OS;
     using Android.Support.V4.App;
-    using Domain.Models;
     using Interfaces;
     using Models;
     using MvvmCross.Core.ViewModels;
@@ -50,7 +49,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                 PendingIntentFlags.UpdateCurrent);
         }
 
-        public async Task TripAsync(Trip trip, TripNotificationContext context)
+        public async Task TripAsync(TripModel trip, TripNotificationContext context)
         {
             var title = string.Empty;
             var text = string.Empty;
