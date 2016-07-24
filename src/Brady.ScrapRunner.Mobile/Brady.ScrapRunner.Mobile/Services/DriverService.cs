@@ -166,5 +166,19 @@ namespace Brady.ScrapRunner.Mobile.Services
             driverStatus.TerminalMasterDateTime = terminalMasterDateTime;
             return await _driverStatusRepository.UpdateAsync(driverStatus);
         }
+
+        public async Task<DateTime?> GetContainerMasterDateTimeAsync()
+        {
+            var driverStatus = await _driverStatusRepository.AsQueryable().FirstOrDefaultAsync();
+            return driverStatus?.ContainerMasterDateTime;
+        }
+
+        public async Task<int> UpdateContainerMasterDateTimeAsync(DateTime? containerMasterDateTime)
+        {
+            var driverStatus = await _driverStatusRepository.AsQueryable().FirstOrDefaultAsync();
+            if (driverStatus == null) return 0;
+            driverStatus.ContainerMasterDateTime = containerMasterDateTime;
+            return await _driverStatusRepository.UpdateAsync(driverStatus);
+        }
     }
 }

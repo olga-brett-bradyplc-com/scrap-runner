@@ -38,5 +38,9 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<DateTime?> GetTerminalMasterDateTimeAsync();
 
         Task<int> UpdateTerminalMasterDateTimeAsync(DateTime? terminalMasterDateTime);
+
+        Task<DateTime?> GetContainerMasterDateTimeAsync();
+
+        Task<int> UpdateContainerMasterDateTimeAsync(DateTime? containerMasterDateTime);
     }
 }

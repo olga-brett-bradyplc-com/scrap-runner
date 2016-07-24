@@ -287,31 +287,21 @@
 
         private async Task PollForContainerChangesAsync(string terminalId, string regionId)
         {
-            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForContainerChangesAsync");
-            var modifiedAfter = _settings.GetValueOrDefault(ContainerMasterSettingsKey, default(DateTime));
+            var containerMasterDate = await _driverService.GetContainerMasterDateTimeAsync();
             QueryResult<ContainerChange> containerChanges;
-            if (modifiedAfter == default(DateTime))
-            {
+            if (!containerMasterDate.HasValue)
                 containerChanges = await GetContainerChangesAsync(terminalId, regionId);
-            }
             else
-            {
-                containerChanges = await GetContainerChangesAfterAsync(terminalId, regionId, modifiedAfter);
-            }
-            foreach (var container in containerChanges.Records)
-            {
-                _mvxMessenger.Publish(new ContainerChangeMessage(this)
-                {
-                    Change = container
-                });
-            }
+                containerChanges = await GetContainerChangesAfterAsync(terminalId, regionId, containerMasterDate.Value);
+            if (!containerChanges.Records.Any()) return;
+
             await _containerService.UpdateContainerChangeIntoMaster(containerChanges.Records);
-            var maxActionDate = containerChanges.Records.Max(c => c.ActionDate);
-            if (maxActionDate.HasValue)
+            await _driverService.UpdateContainerMasterDateTimeAsync(containerChanges.Records.Max(containerChange => containerChange.ActionDate));
+
+            foreach (var containerChange in containerChanges.Records)
             {
-                _settings.AddOrUpdateValue(ContainerMasterSettingsKey, maxActionDate);
+                _mvxMessenger.Publish(new ContainerChangeMessage(this) { Change = containerChange });
             }
-            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForContainerChangesAsync");
         }
 
         private async Task<QueryResult<TerminalChange>> GetTerminalChangesAsync(string areaId, string regionId, string defSendOnlyYardsForArea)
