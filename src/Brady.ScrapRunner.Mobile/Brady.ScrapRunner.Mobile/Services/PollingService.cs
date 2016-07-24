@@ -432,21 +432,26 @@
             return _connectionService.GetConnection(ConnectionType.Online).QueryAsync(queryBuilder);
         }
 
-        private Task AckMessageAsync(MessagesModel message)
+        private Task AckMessagesAsync(QueryResult<Messages> messages)
         {
-            var mappedMessage = Mapper.Map<MessagesModel, Messages>(message);
-            mappedMessage.Processed = Constants.Yes;
-            return _connectionService.GetConnection(ConnectionType.Online).UpdateAsync(mappedMessage);
+            var ackChangeSet = new ChangeSet<int, Messages>();
+            foreach (var message in messages.Records)
+            {
+                message.Processed = Constants.Yes;
+                ackChangeSet.AddUpdate(message.Id, message);
+            }
+            return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(ackChangeSet);
         }
 
         private async Task PollForMessagesAsync(string driverId)
         {
             var messages = await GetMessagesAsync(driverId);
+            if (messages.TotalCount == 0) return;
+            await AckMessagesAsync(messages);
             var mappedMessages = Mapper.Map<IEnumerable<Messages>, IEnumerable<MessagesModel>>(messages.Records);
             foreach (var message in mappedMessages)
             {
                 await _messagesService.UpsertMessageAsync(message);
-                await AckMessageAsync(message);
                 await _notificationService.MessageAsync(message);
                 _mvxMessenger.Publish(new NewMessagesMessage(this) { Message = message });
             }
