@@ -409,16 +409,18 @@
             return _connectionService.GetConnection(ConnectionType.Online).QueryAsync(queryBuilder);
         }
 
+        private Task AckForceLogoffAsync(DriverStatus driverStatus)
+        {
+            driverStatus.SendHHLogoffFlag = DriverForceLogoffValue.SentToDriver;
+            return _connectionService.GetConnection(ConnectionType.Online).UpdateAsync(driverStatus);
+        }
+
         private async Task PollForceLogoffAsync(string driverId)
         {
-            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForceLogoffAsync");
             var forceLogoff = await GetForceLogoffMessageAsync(driverId);
-            if (forceLogoff.Records.Any())
-            {
-                _mvxMessenger.Publish(new ForceLogoffMessage(this));
-                Mvx.TaggedTrace(Constants.ScrapRunner, "PollForceLogoffAsync");
-            }
-            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForceLogoffAsync");
+            if (!forceLogoff.Records.Any()) return;
+            await AckForceLogoffAsync(forceLogoff.Records.First());
+            _mvxMessenger.Publish(new ForceLogoffMessage(this));
         }
 
         private Task<QueryResult<Messages>> GetMessagesAsync(string driverId)
