@@ -1,6 +1,7 @@
 ﻿namespace Brady.ScrapRunner.Mobile.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
@@ -431,22 +432,24 @@
             return _connectionService.GetConnection(ConnectionType.Online).QueryAsync(queryBuilder);
         }
 
+        private Task AckMessageAsync(MessagesModel message)
+        {
+            var mappedMessage = Mapper.Map<MessagesModel, Messages>(message);
+            mappedMessage.Processed = Constants.Yes;
+            return _connectionService.GetConnection(ConnectionType.Online).UpdateAsync(mappedMessage);
+        }
+
         private async Task PollForMessagesAsync(string driverId)
         {
-            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForMessagesAsync");
             var messages = await GetMessagesAsync(driverId);
-            foreach (var message in messages.Records)
+            var mappedMessages = Mapper.Map<IEnumerable<Messages>, IEnumerable<MessagesModel>>(messages.Records);
+            foreach (var message in mappedMessages)
             {
-                var mappedMessage = Mapper.Map<Messages, MessagesModel>(message);
-                Mvx.TaggedTrace(Constants.ScrapRunner, $"PollForMessagesAsync: {message.MsgSource} {message.MsgText}");
-                await _messagesService.CreateMessageAsync(mappedMessage);
-                _mvxMessenger.Publish(new NewMessagesMessage(this)
-                {
-                    Message = message
-                });
+                await _messagesService.UpsertMessageAsync(message);
+                await AckMessageAsync(message);
                 await _notificationService.MessageAsync(message);
+                _mvxMessenger.Publish(new NewMessagesMessage(this) { Message = message });
             }
-            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForMessagesAsync");
         }
     }
 }

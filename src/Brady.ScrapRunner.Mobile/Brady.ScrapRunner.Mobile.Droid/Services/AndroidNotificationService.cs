@@ -132,7 +132,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
             NotifyUser(notification, ResequencedTripNotficationId);
         }
 
-        public async Task MessageAsync(Messages message)
+        public async Task MessageAsync(MessagesModel message)
         {
             var text = string.Format(AppResources.NotificationMessageText, message.MsgText);
             var builder = BuildNotification(string.Format(AppResources.NotificationMessageTitle, message.SenderName), text)

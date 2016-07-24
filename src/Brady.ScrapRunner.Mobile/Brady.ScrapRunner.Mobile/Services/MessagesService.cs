@@ -67,6 +67,16 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
+        /// Inserts or updates an existing message.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public Task<int> UpsertMessageAsync(MessagesModel message)
+        {
+            return _messagesRepository.InsertOrReplaceAsync(message);
+        }
+
+        /// <summary>
         /// Find a specific message with the given msgId
         /// </summary>
         /// <param name="msgId"></param>
