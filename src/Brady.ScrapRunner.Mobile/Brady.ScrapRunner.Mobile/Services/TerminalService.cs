@@ -42,5 +42,10 @@ namespace Brady.ScrapRunner.Mobile.Services
                 AutoMapper.Mapper.Map<IEnumerable<TerminalChange>, IEnumerable<TerminalChangeModel>>(terminalChanges);
             return _terminalChangeRepository.InsertRangeAsync(mapped);
         }
+
+        public Task<int> UpsertTerminalChangeAsync(IEnumerable<TerminalChangeModel> terminalChanges)
+        {
+            return _terminalChangeRepository.InsertOrReplaceRangeAsync(terminalChanges);
+        }
     }
 }

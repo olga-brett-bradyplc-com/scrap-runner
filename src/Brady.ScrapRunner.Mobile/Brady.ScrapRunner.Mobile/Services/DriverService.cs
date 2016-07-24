@@ -152,5 +152,19 @@ namespace Brady.ScrapRunner.Mobile.Services
                 await _connection.GetConnection().UpdateAsync(driverOdomUpdateProcess, requeryUpdated: false);
             return odomupdate;
         }
+
+        public async Task<DateTime?> GetTerminalMasterDateTimeAsync()
+        {
+            var driverStatus = await _driverStatusRepository.AsQueryable().FirstOrDefaultAsync();
+            return driverStatus?.TerminalMasterDateTime;
+        }
+
+        public async Task<int> UpdateTerminalMasterDateTimeAsync(DateTime? terminalMasterDateTime)
+        {
+            var driverStatus = await _driverStatusRepository.AsQueryable().FirstOrDefaultAsync();
+            if (driverStatus == null) return 0;
+            driverStatus.TerminalMasterDateTime = terminalMasterDateTime;
+            return await _driverStatusRepository.UpdateAsync(driverStatus);
+        }
     }
 }

@@ -27,6 +27,7 @@
         private readonly ITerminalService _terminalService;
         private readonly IContainerService _containerService;
         private readonly ITripService _tripService;
+        private readonly IDriverService _driverService;
         private const string TerminalMasterSettingsKey = "TerminalMasterDateTime";
         private const string ContainerMasterSettingsKey = "ContainerMasterDateTime";
 
@@ -37,7 +38,8 @@
             IMessagesService messagesService, 
             ITerminalService terminalService, 
             IContainerService containerService, 
-            ITripService tripService)
+            ITripService tripService, 
+            IDriverService driverService)
         {
             _connectionService = connectionService;
             _notificationService = notificationService;
@@ -47,6 +49,7 @@
             _terminalService = terminalService;
             _containerService = containerService;
             _tripService = tripService;
+            _driverService = driverService;
         }
 
         public async Task PollForChangesAsync(string driverId, string terminalId, string regionId, string areaId)
@@ -370,33 +373,27 @@
 
         private async Task PollForTerminalChangesAsync(string areaId, string regionId)
         {
-            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForTerminalChangesAsync");
-            var modifiedAfter = _settings.GetValueOrDefault(TerminalMasterSettingsKey, default(DateTime));
+            var terminalMasterDateTime = await _driverService.GetTerminalMasterDateTimeAsync();
             // @TODO: Figure out how to get "DEFSendOnlyYardsForArea" preference from here? (It's not in the preference table)
             var defSendOnlyYardsForArea = "Y";
             QueryResult<TerminalChange> terminalChanges;
-            if (modifiedAfter == default(DateTime))
-            {
+            if (!terminalMasterDateTime.HasValue)
                 terminalChanges = await GetTerminalChangesAsync(areaId, regionId, defSendOnlyYardsForArea);
-            }
             else
-            {
-                terminalChanges = await GetTerminalChangesAfterAsync(areaId, regionId, modifiedAfter, defSendOnlyYardsForArea);
-            }
+                terminalChanges = await GetTerminalChangesAfterAsync(areaId, regionId, terminalMasterDateTime.Value, defSendOnlyYardsForArea);
+            if (!terminalChanges.Records.Any()) return;
+
+            var mappedTerminalChanges = Mapper.Map<IEnumerable<TerminalChange>, IEnumerable<TerminalChangeModel>>(terminalChanges.Records);
+            await _terminalService.UpsertTerminalChangeAsync(mappedTerminalChanges);
+
+            await _driverService.UpdateTerminalMasterDateTimeAsync(terminalChanges.Records.Max(terminalChange => terminalChange.ChgDateTime));
+
+            // @TODO: If nothing needs to react to updated/inserted TerminalChangeMaster records then 
+            // remove this and the TerminalChangeMessage class.
             foreach (var terminalChange in terminalChanges.Records)
             {
-                _mvxMessenger.Publish(new TerminalChangeMessage(this)
-                {
-                    Change = terminalChange
-                });
+                _mvxMessenger.Publish(new TerminalChangeMessage(this) { Change = terminalChange });
             }
-            await _terminalService.UpdateTerminalChange(terminalChanges.Records);
-            var maxChgDateTime = terminalChanges.Records.Max(terminalChange => terminalChange.ChgDateTime);
-            if (maxChgDateTime.HasValue)
-            {
-                _settings.AddOrUpdateValue(TerminalMasterSettingsKey, maxChgDateTime);
-            }
-            Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForTerminalChangesAsync");
         }
 
         private Task<QueryResult<DriverStatus>> GetForceLogoffMessageAsync(string driverId)
