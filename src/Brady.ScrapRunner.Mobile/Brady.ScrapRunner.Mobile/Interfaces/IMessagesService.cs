@@ -17,6 +17,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<int> UpdateMessageAsync(MessagesModel message);
 
+        Task<int> UpsertMessageAsync(MessagesModel message);
+
         Task<MessagesModel> FindMessageAsync(int? msgId);
 
         Task<List<MessagesModel>> FindMessagesAsync(string senderId);
