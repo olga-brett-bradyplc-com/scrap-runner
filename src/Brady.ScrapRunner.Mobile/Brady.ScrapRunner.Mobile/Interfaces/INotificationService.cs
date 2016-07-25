@@ -1,13 +1,13 @@
 ﻿namespace Brady.ScrapRunner.Mobile.Interfaces
 {
     using System.Threading.Tasks;
-    using Domain.Models;
+    using Models;
 
     public interface INotificationService
     {
-        Task TripAsync(Trip trip, TripNotificationContext context);
+        Task TripAsync(TripModel trip, TripNotificationContext context);
         Task TripsResequencedAsync();
-        Task MessageAsync(Messages message);
+        Task MessageAsync(MessagesModel message);
     }
 
     public enum TripNotificationContext
