@@ -33,6 +33,7 @@
             CreateMap<CodeTable, CodeTableModel>();
             CreateMap<Domain.Models.Messages, MessagesModel>()
                 .ForMember(m => m.MessageThread, o => o.Ignore());
+            CreateMap<MessagesModel, Domain.Models.Messages>();
             // Mapping ContainerChange's into ContainerMaster
             CreateMap<ContainerChange, ContainerMasterModel>()
                 .ForSourceMember(cc => cc.ActionDate, o => o.Ignore())

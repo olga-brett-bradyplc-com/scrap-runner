@@ -6,6 +6,8 @@ using BWF.DataServices.Metadata.Models;
 
 namespace Brady.ScrapRunner.Mobile.Interfaces
 {
+    using System;
+
     /// <summary>
     /// Service for the various driver tables/processes
     /// </summary>
@@ -36,5 +38,13 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<ChangeResultWithItem<DriverMessageProcess>> ProcessDriverMessageAsync(DriverMessageProcess driverMessageEntryProcess);
 
         Task<ChangeResultWithItem<DriverOdomUpdateProcess>> ProcessDriverOdomUpdateAsync(DriverOdomUpdateProcess driverOdomUpdateProcess);
+
+        Task<DateTime?> GetTerminalMasterDateTimeAsync();
+
+        Task<int> UpdateTerminalMasterDateTimeAsync(DateTime? terminalMasterDateTime);
+
+        Task<DateTime?> GetContainerMasterDateTimeAsync();
+
+        Task<int> UpdateContainerMasterDateTimeAsync(DateTime? containerMasterDateTime);
     }
 }

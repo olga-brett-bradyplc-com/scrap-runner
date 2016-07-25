@@ -1,7 +1,7 @@
 ﻿namespace Brady.ScrapRunner.Mobile.Messages
 {
-    using Domain.Models;
     using Interfaces;
+    using Models;
     using MvvmCross.Plugins.Messenger;
 
     public class TripNotificationMessage : MvxMessage
@@ -11,6 +11,6 @@
         }
 
         public TripNotificationContext Context { get; set; }
-        public Trip Trip { get; set; }
+        public TripModel Trip { get; set; }
     }
 }

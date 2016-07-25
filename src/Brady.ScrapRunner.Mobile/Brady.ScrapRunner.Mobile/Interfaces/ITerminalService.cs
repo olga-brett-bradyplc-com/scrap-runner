@@ -16,5 +16,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
             TerminalChangeProcess terminalChangeProcess);
         Task<List<TerminalChangeModel>> FindAllTerminalChanges();
         Task UpdateTerminalChange(IEnumerable<TerminalChange> terminalChanges);
+        Task<int> UpsertTerminalChangeAsync(IEnumerable<TerminalChangeModel> terminalChanges);
     }
 }
