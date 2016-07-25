@@ -353,7 +353,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                         //GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
                         var currentSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber,
-                            Containers.FirstOrDefault().Key.TripSegNumber);
+                            TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key.TripSegNumber);
 
                         var tripInfo = await _tripService.FindTripAsync(TripNumber);
 
