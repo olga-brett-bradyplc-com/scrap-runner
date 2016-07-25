@@ -250,6 +250,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (!tripSegmentContainers.TakeWhile(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)).Any())
             {
+                await _driverService.ClearDriverStatus(CurrentDriver, true);
                 await _tripService.CompleteTripAsync(TripNumber);
 
                 foreach (var segment in Containers)
