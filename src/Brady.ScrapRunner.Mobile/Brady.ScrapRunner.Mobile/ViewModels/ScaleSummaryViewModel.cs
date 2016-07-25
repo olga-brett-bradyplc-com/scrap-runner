@@ -20,18 +20,18 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             _tripService = tripService;
 
-            Title = AppResources.YardScaleSummary;
             ContainerSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteContainerSelectedCommand);
         }
 
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
-            SubTitle = AppResources.Trip + $" {TripNumber}";
         }
 
         public override async void Start()
         {
+            Title = AppResources.YardScaleSummary;
+            SubTitle = AppResources.Trip + $" {TripNumber}";
             using (var tripDataLoad = UserDialogs.Instance.Loading(AppResources.LoadingTripData, maskType: MaskType.Clear))
             {
                 var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);

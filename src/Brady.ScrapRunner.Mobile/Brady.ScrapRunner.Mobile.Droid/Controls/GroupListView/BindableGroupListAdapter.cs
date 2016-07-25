@@ -94,9 +94,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                     yield return new FlatItem { IsGroup = false, Item = d };
         }
 
-        protected override View GetBindableView(global::Android.Views.View convertView, object source, int templateId)
+        protected override View GetBindableView(View convertView, object source, int templateId)
         {
-            FlatItem item = (FlatItem)source;
+            var item = (FlatItem)source;
             if (item.IsGroup)
                 return base.GetBindableView(convertView, item.Item, GroupTemplateId);
             else

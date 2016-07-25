@@ -25,6 +25,8 @@
                 android:id="@+id/CurrentMessageList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:divider="@null"
+                android:dividerHeight="0dp"
                 local:MvxItemTemplate="@layout/item_newmessage"
                 local:MvxBind="ItemsSource Messages" />
         </ScrollView>

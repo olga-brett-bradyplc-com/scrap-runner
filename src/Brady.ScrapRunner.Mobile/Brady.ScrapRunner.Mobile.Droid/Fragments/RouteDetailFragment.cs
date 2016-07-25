@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -7,16 +9,23 @@ using Android.Graphics;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.V4.Content;
+using Android.Support.V4.View;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Views.Animations;
 using Android.Widget;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
+using Brady.ScrapRunner.Mobile.Droid.Controls;
+using Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Droid.BindingContext;
+using MvvmCross.Binding.Droid.Views;
+using MvvmCross.Binding.ExtensionMethods;
 using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Platform.WeakSubscription;
+using Object = Java.Lang.Object;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
@@ -25,29 +34,40 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     [Register("brady.scraprunner.mobile.droid.fragments.RouteDetailFragment")]
     public class RouteDetailFragment : BaseFragment<RouteDetailViewModel>
     {
-        private IDisposable _containersToken;
         private IDisposable _currentStatusToken;
         private IDisposable _allowRtnEditToken;
+        private IDisposable _tripLegToken;
+        private IDisposable _readOnlyToken;
+
         private string _currentStatus;
+        private MvxExpandableExListView _listview;
+        private ViewPager _pager;
 
         protected override int FragmentId => Resource.Layout.fragment_routedetail;
         protected override bool NavMenuEnabled => true;
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
-            // Right now, we only have one context menu option avaliable for this view
-            // We'll have to change this if we add more options in the future
             if(ViewModel.AllowRtnEdit.HasValue)
-                HasOptionsMenu = ViewModel.AllowRtnEdit.Value; 
+                HasOptionsMenu = ViewModel.AllowRtnEdit.Value;
 
-            if (ViewModel.Containers != null)
-                LoadContainers(ViewModel.Containers);
-
-            if (_currentStatus != null)
+            if (_currentStatus != null || ViewModel.CurrentStatus != null)
                 OnCurrentStatusChanged(this, null);
+            
+            _pager = View.FindViewById<ViewPager>(Resource.Id.TripViewPager);
 
+            if (ViewModel.TripLegs != null)
+                OnTripLegChanged(this, null);
+
+            var directionsButton = View.FindViewById<Button>(Resource.Id.DirectionsButton);
+            directionsButton.Click += delegate
+            {
+                _pager.CurrentItem = _pager.Adapter.Count + 2;
+            };
+
+            _readOnlyToken = ViewModel.WeakSubscribe(() => ViewModel.ReadOnlyTrip, OnReadOnlyTripChanged);
+            _tripLegToken = ViewModel.WeakSubscribe(() => ViewModel.TripLegs, OnTripLegChanged);
             _allowRtnEditToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnEdit, OnAllowRtnEditChanged);
-            _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
             _currentStatusToken = ViewModel.WeakSubscribe(() => ViewModel.CurrentStatus, OnCurrentStatusChanged);
         }
 
@@ -76,12 +96,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             base.OnDestroyView();
 
-            if (_containersToken != null)
-            {
-                _containersToken.Dispose();
-                _containersToken = null;
-            }
-
             if (_currentStatusToken != null)
             {
                 _currentStatusToken.Dispose();
@@ -93,6 +107,18 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 _allowRtnEditToken.Dispose();
                 _allowRtnEditToken = null;
             }
+
+            if (_tripLegToken != null)
+            {
+                _tripLegToken.Dispose();
+                _tripLegToken = null;
+            }
+
+            if (_readOnlyToken != null)
+            {
+                _readOnlyToken.Dispose();
+                _readOnlyToken = null;
+            }
         }
 
         private void OnAllowRtnEditChanged(object sender, PropertyChangedEventArgs args)
@@ -101,9 +127,31 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 HasOptionsMenu = ViewModel.AllowRtnEdit.Value;
         }
 
-        private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
+        private void OnTripLegChanged(object sender, PropertyChangedEventArgs args)
         {
-            LoadContainers(ViewModel.Containers);
+            if (ViewModel.TripLegs != null)
+            {
+                var pagerAdapter = new TripPagerAdapter(Activity, BindingContext, ViewModel.TripLegs, ViewModel.CustomerDirections);
+                _pager.Adapter = pagerAdapter;
+            }
+
+            if (ViewModel.CustomerDirections != null)
+            {
+                var directionsButton = View.FindViewById<Button>(Resource.Id.DirectionsButton);
+                directionsButton.Visibility = ViewStates.Visible;
+            }
+        }
+
+        private void OnReadOnlyTripChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (!ViewModel.ReadOnlyTrip) return;
+
+            // Hide all buttons and show warning message
+            var enrouteButton = View.FindViewById<Button>(Resource.Id.EnrouteButton);
+            var arriveButton = View.FindViewById<Button>(Resource.Id.ArriveButton);
+
+            enrouteButton.Visibility = ViewStates.Gone;
+            arriveButton.Visibility = ViewStates.Gone;
         }
 
         private void OnCurrentStatusChanged(object sender, PropertyChangedEventArgs args)
@@ -122,6 +170,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             switch (_currentStatus)
             {
                 case "EN":
+                case "E":
                     layout.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
                     toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.enroute)));
 
@@ -144,6 +193,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     arriveButton.Visibility = ViewStates.Visible;
                     break;
                 case "AR":
+                case "A":
                     layout.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
                     toolbar.SetBackgroundColor(new Color(ContextCompat.GetColor(Activity, Resource.Color.arrive)));
 
@@ -159,46 +209,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     directionsButton.SetX(directionsButton.GetX() + 135);
                     buttonLayout.Visibility = ViewStates.Visible;
                     break;
-            }
-        }
-
-        private void LoadContainers(ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> data)
-        {
-            var inflatorService = (LayoutInflater)((MainActivity)Activity)?.GetSystemService(Context.LayoutInflaterService);
-            foreach (var element in data)
-            {
-                var mainLayout = View.FindViewById<LinearLayout>(Resource.Id.content_layout);
-                var tripSegmentLayout = inflatorService?.Inflate(Resource.Layout.item_tripsegment, mainLayout) as LinearLayout;
-
-                var tempTitle = tripSegmentLayout.FindViewById<TextView>(Resource.Id.cardViewTitle);
-                tempTitle.Text = element.Key.TripSegTypeDesc;
-                tempTitle.Id = 1; // Kind of a hacky way to do this.
-
-                if (element.FirstOrDefault() == null)
-                {
-                    var tempType = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerTypeText);
-                    tempType.Text = "NO CONTAINERS";
-                }
-                else
-                {
-                    // We'd use a listview for this usually, but since we're mocking our collapsable lists ( not implemented in prototype ),
-                    // only show the first TripSegmentContainer for each TripSegment
-                    var firstTripSegmentContainer = element.First();
-
-                    var tempType = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerTypeText);
-                    tempType.Text = firstTripSegmentContainer.DefaultTripSegContainerNumber +
-                        " " + firstTripSegmentContainer.TripSegContainerType +
-                        "-" + firstTripSegmentContainer.TripSegContainerSize;
-                    tempType.Id = 2;
-
-                    var tempCommodity = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContainerCommodityDescText);
-                    tempCommodity.Text = firstTripSegmentContainer.TripSegContainerCommodityDesc;
-                    tempCommodity.Id = 3;
-
-                    var tempLocation = tripSegmentLayout.FindViewById<TextView>(Resource.Id.TripSegmentContianerLocationText);
-                    tempLocation.Text = firstTripSegmentContainer.TripSegContainerLocation;
-                    tempLocation.Id = 4;
-                }
             }
         }
     }

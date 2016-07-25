@@ -70,6 +70,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             switch (itemId)
             {
+                case Resource.Id.nav_routesummary:
+                    ViewModel.RouteSummaryCommand.Execute();
+                    break;
                 case Resource.Id.nav_logout:
                     ViewModel.LogoutCommand.Execute();
                     break;
