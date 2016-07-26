@@ -19,8 +19,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task UpdateTripSegments(IEnumerable<TripSegment> tripSegments);
 
-        Task UpdateTripSegments(IEnumerable<TripSegmentModel> tripSegments);
-
         Task UpdateTripSegmentContainers(IEnumerable<TripSegmentContainer> tripSegmentContainers);
 
         Task<int> CreateTripAsync(TripModel trip);
