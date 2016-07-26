@@ -628,7 +628,7 @@ You will now be sent back to the login.</value>
     <comment>TransactionDetail</comment>
   </data>
   <data name="NotificationMessageText" xml:space="preserve">
-    <value>{0}</value>
+    <value>Message from {0}: {1}</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationMessageTitle" xml:space="preserve">
@@ -765,5 +765,9 @@ You will now be sent back to the login.</value>
   </data>
   <data name="GpsCancelConfirm" xml:space="preserve">
     <value>GPS is available. Are you sure you want to cancel?</value>
+  </data>
+  <data name="NotificationNewMessage" xml:space="preserve">
+    <value>New Message</value>
+    <comment>AndroidNotificationService</comment>
   </data>
 </root>

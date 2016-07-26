@@ -48,7 +48,6 @@
 
         public async Task PollForChangesAsync(string driverId, string terminalId, string regionId, string areaId)
         {
-            Mvx.TaggedTrace(Constants.ScrapRunner, "Entering PollForChangesAsync");
             try
             {
                 await PollForMessagesAsync(driverId);
@@ -65,18 +64,14 @@
             {
                 Mvx.TaggedError(Constants.ScrapRunner, $"Caught Exception inside PollForChangesAsync: {e.Message}");
             }
-            finally
-            {
-                Mvx.TaggedTrace(Constants.ScrapRunner, "Leaving PollForChangesAsync");
-            }
         }
 
-        private Task UpdateTripSendFlagAsync(IEnumerable<Trip>  trips)
+        private Task UpdateTripSendFlagAsync(IEnumerable<Trip>  trips, TripSendFlagValue tripSendFlagValue)
         {
             var updateChangeSet = new ChangeSet<string, Trip>();
             foreach (var trip in trips)
             {
-                trip.TripSendFlag = TripSendFlagValue.SentToDriver;
+                trip.TripSendFlag = tripSendFlagValue;
                 updateChangeSet.AddUpdate(trip.Id, trip);
             }
             return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(updateChangeSet);
@@ -98,7 +93,7 @@
         {
             var tripsAfterLogin = await GetTripsAfterLoginAsync(driverId);
             if (tripsAfterLogin.TotalCount == 0) return;
-            await UpdateTripSendFlagAsync(tripsAfterLogin.Records);
+            await UpdateTripSendFlagAsync(tripsAfterLogin.Records, TripSendFlagValue.SentToDriver);
             var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(tripsAfterLogin.Records);
             foreach (var trip in mappedTrips)
             {
@@ -134,7 +129,7 @@
         {
             var canceledTrips = await GetTripsCanceledAsync(driverId);
             if (canceledTrips.TotalCount == 0) return;
-            await UpdateTripSendFlagAsync(canceledTrips.Records);
+            await UpdateTripSendFlagAsync(canceledTrips.Records, TripSendFlagValue.CanceledSent);
             var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(canceledTrips.Records);
             foreach (var trip in mappedTrips)
             {
@@ -159,11 +154,23 @@
             return _connectionService.GetConnection(ConnectionType.Online).QueryAsync(queryBuilder);
         }
 
+        private Task ClearPrevTripAsync(QueryResult<Trip> trips)
+        {
+            var updateChangeSet = new ChangeSet<string, Trip>();
+            foreach (var trip in trips.Records)
+            {
+                trip.TripDriverIdPrev = null;
+                trip.TripStatusPrev = null;
+                updateChangeSet.AddUpdate(trip.Id, trip);
+            }
+            return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(updateChangeSet);
+        }
+
         private async Task PollForTripsUnassignedAsync(string driverId)
         {
             var unassignedTrips = await GetTripsUnassignedAsync(driverId);
             if (unassignedTrips.TotalCount == 0) return;
-            await UpdateTripSendFlagAsync(unassignedTrips.Records);
+            await ClearPrevTripAsync(unassignedTrips);
             var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(unassignedTrips.Records);
             foreach (var trip in mappedTrips)
             {
@@ -191,7 +198,7 @@
         {
             var doneTrips = await GetTripsMarkedDoneAsync(driverId);
             if (doneTrips.TotalCount == 0) return;
-            await UpdateTripSendFlagAsync(doneTrips.Records);
+            await ClearPrevTripAsync(doneTrips);
             var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(doneTrips.Records);
             foreach (var trip in mappedTrips)
             {
@@ -216,11 +223,22 @@
             return _connectionService.GetConnection(ConnectionType.Online).QueryAsync(queryBuilder);
         }
 
+        private Task AckTripResequenceAsync(QueryResult<Trip> trips)
+        {
+            var updateChangeSet = new ChangeSet<string, Trip>();
+            foreach (var trip in trips.Records)
+            {
+                trip.TripSendReseqFlag = TripSendReseqFlagValue.ReseqSent;
+                updateChangeSet.AddUpdate(trip.TripNumber, trip);
+            }
+            return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(updateChangeSet);
+        }
+
         private async Task PollForTripsResequencedAsync(string driverId)
         {
             var resequencedTrips = await GetTripsResequencedAsync(driverId);
             if (resequencedTrips.TotalCount == 0) return;
-            await UpdateTripSendFlagAsync(resequencedTrips.Records);
+            await AckTripResequenceAsync(resequencedTrips);
             var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(resequencedTrips.Records);
             foreach (var trip in mappedTrips)
             {
@@ -417,13 +435,13 @@
 
         private Task AckMessagesAsync(QueryResult<Messages> messages)
         {
-            var ackChangeSet = new ChangeSet<int, Messages>();
+            var updateChangeSet = new ChangeSet<int, Messages>();
             foreach (var message in messages.Records)
             {
                 message.Processed = Constants.Yes;
-                ackChangeSet.AddUpdate(message.Id, message);
+                updateChangeSet.AddUpdate(message.Id, message);
             }
-            return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(ackChangeSet);
+            return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(updateChangeSet);
         }
 
         private async Task PollForMessagesAsync(string driverId)
