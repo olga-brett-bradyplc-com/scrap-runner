@@ -630,7 +630,7 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
   </data>
   <data name="NotificationMessageText" xml:space="preserve">
-    <value>{0}</value>
+    <value>Message from {0}: {1}</value>
     <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
   </data>
   <data name="NotificationTripModifiedText" xml:space="preserve">
@@ -731,5 +731,9 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
   </data>
   <data name="GpsCancelConfirm" xml:space="preserve">
     <value>GPS está disponible . ¿Estas seguro que quieres cancelar?</value>
+  </data>
+  <data name="NotificationNewMessage" xml:space="preserve">
+    <value>Nuevo mensaje</value>
+    <comment>AndroidNotificationService</comment>
   </data>
 </root>
