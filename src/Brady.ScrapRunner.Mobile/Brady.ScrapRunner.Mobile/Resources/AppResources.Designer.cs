@@ -829,7 +829,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}.
+        ///   Looks up a localized string similar to Message from {0}: {1}.
         /// </summary>
         public static string NotificationMessageText {
             get {
@@ -843,6 +843,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string NotificationMessageTitle {
             get {
                 return ResourceManager.GetString("NotificationMessageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Message.
+        /// </summary>
+        public static string NotificationNewMessage {
+            get {
+                return ResourceManager.GetString("NotificationNewMessage", resourceCulture);
             }
         }
         

@@ -133,7 +133,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
 
         public async Task MessageAsync(MessagesModel message)
         {
-            var text = string.Format(AppResources.NotificationMessageText, message.MsgText);
+            var text = string.Format(AppResources.NotificationMessageText, message.SenderName, message.MsgText);
             var builder = BuildNotification(string.Format(AppResources.NotificationMessageTitle, message.SenderName), text)
                 .SetGroup(MessageNotificationGroup)
                 .SetSmallIcon(Resource.Drawable.ic_email_black_36dp);
