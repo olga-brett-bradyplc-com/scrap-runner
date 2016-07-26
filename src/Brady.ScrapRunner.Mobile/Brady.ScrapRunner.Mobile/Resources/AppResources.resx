@@ -766,4 +766,8 @@ You will now be sent back to the login.</value>
   <data name="GpsCancelConfirm" xml:space="preserve">
     <value>GPS is available. Are you sure you want to cancel?</value>
   </data>
+  <data name="SavingContainer" xml:space="preserve">
+    <value>Saving Container Information</value>
+    <comment>TransactionSummaryViewModel</comment>
+  </data>
 </root>

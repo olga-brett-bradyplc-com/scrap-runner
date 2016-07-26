@@ -732,4 +732,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
   <data name="GpsCancelConfirm" xml:space="preserve">
     <value>GPS está disponible . ¿Estas seguro que quieres cancelar?</value>
   </data>
+  <data name="SavingContainer" xml:space="preserve">
+    <value>Saving Container Information</value>
+    <comment>NEEDS TRANSLATION; TransactionSummaryViewModel</comment>
+  </data>
 </root>

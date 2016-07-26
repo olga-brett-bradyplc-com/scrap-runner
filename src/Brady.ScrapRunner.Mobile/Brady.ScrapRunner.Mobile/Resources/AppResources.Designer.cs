@@ -1252,6 +1252,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Saving Container Information.
+        /// </summary>
+        public static string SavingContainer {
+            get {
+                return ResourceManager.GetString("SavingContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Saving.
         /// </summary>
         public static string SavingData {
