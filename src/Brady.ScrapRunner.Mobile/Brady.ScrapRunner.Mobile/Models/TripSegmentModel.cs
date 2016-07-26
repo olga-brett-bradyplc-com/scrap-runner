@@ -46,10 +46,10 @@
         public string TripSegDestCustState { get; set; }
         [MaxLength(10)]
         public string TripSegDestCustZip { get; set; }
-        public int? TripSegStartLongitude { get; set; }
-        public int? TripSegEndLongitude { get; set; }
-        public int? TripSegStartLatitude { get; set; }
-        public int? TripSegEndLatitude { get; set; }
+        public double? TripSegStartLongitude { get; set; }
+        public double? TripSegEndLongitude { get; set; }
+        public double? TripSegStartLatitude { get; set; }
+        public double? TripSegEndLatitude { get; set; }
         public int? TripSegContainerQty { get; set; }
 
         [Ignore]

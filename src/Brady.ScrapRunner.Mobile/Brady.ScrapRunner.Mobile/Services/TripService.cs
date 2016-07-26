@@ -62,10 +62,6 @@ namespace Brady.ScrapRunner.Mobile.Services
             var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegment>, IEnumerable<TripSegmentModel>>(tripSegments);
             return _tripSegmentRepository.InsertRangeAsync(mapped);
         }
-        public Task UpdateTripSegments(IEnumerable<TripSegmentModel> tripSegments)
-        {
-            return _tripSegmentRepository.UpdateRangeAsync(tripSegments);
-        }
 
         public Task UpdateYards(IEnumerable<TerminalMaster> yards)
         {
