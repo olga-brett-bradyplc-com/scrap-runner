@@ -299,6 +299,7 @@
     <Compile Include="Fragments\DelayFragment.cs" />
     <Compile Include="Fragments\GpsCaptureFragment.cs" />
     <Compile Include="Fragments\FuelEntryFragment.cs" />
+    <Compile Include="Fragments\ModifyReturnToYardFragment.cs" />
     <Compile Include="Fragments\NbScanFragment.cs" />
     <Compile Include="Fragments\PhotosFragment.cs" />
     <Compile Include="Fragments\PublicScaleDetailFragment.cs" />
@@ -540,6 +541,8 @@
     <AndroidResource Include="Resources\layout\item_notification.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\fragment_modifyreturntoyard.axml" />
+    <AndroidResource Include="Resources\layout\item_terminal.axml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\icon.png" />

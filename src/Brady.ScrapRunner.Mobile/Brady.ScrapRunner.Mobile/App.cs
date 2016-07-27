@@ -57,10 +57,8 @@ namespace Brady.ScrapRunner.Mobile
                 SqliteRepository<MessagesModel>>();
             Mvx.RegisterType<IRepository<QueueItemModel>,
                 SqliteRepository<QueueItemModel>>();
-            Mvx.RegisterType<IRepository<YardModel>,
-                SqliteRepository<YardModel>>();
-            Mvx.RegisterType<IRepository<TerminalChangeModel>, 
-                SqliteRepository<TerminalChangeModel>>();
+            Mvx.RegisterType<IRepository<TerminalMasterModel>,
+                SqliteRepository<TerminalMasterModel>>();
             Mvx.RegisterType<IRepository<CustomerMasterModel>,
                 SqliteRepository<CustomerMasterModel>>();
             Mvx.RegisterType<IRepository<NotificationModel>,

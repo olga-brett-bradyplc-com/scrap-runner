@@ -90,8 +90,7 @@
     <Compile Include="Models\PreferenceModel.cs" />
     <Compile Include="Models\QueueItemModel.cs" />
     <Compile Include="Models\SqliteRepository.cs" />
-    <Compile Include="Models\TerminalChangeModel.cs" />
-    <Compile Include="Models\YardModel.cs" />
+    <Compile Include="Models\TerminalMasterModel.cs" />
     <Compile Include="Models\TripModel.cs" />
     <Compile Include="Models\TripSegmentContainerModel.cs" />
     <Compile Include="Models\TripSegmentModel.cs" />

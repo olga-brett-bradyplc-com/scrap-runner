@@ -736,4 +736,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Nuevo mensaje</value>
     <comment>AndroidNotificationService</comment>
   </data>
+  <data name="SavingContainer" xml:space="preserve">
+    <value>Saving Container Information</value>
+    <comment>NEEDS TRANSLATION; TransactionSummaryViewModel</comment>
+  </data>
 </root>

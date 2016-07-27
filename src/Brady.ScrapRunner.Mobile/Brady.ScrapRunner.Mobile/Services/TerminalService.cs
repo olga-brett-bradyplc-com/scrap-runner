@@ -14,14 +14,32 @@ namespace Brady.ScrapRunner.Mobile.Services
     public class TerminalService : ITerminalService
     {
         private readonly IConnectionService _connection;
-        private readonly IRepository<TerminalChangeModel> _terminalChangeRepository;
+        private readonly IRepository<TerminalMasterModel> _terminalMasterRepository;
 
-        public TerminalService(IConnectionService connection, IRepository<TerminalChangeModel> terminalChangeRepository)
+        public TerminalService(
+            IConnectionService connection,
+            IRepository<TerminalMasterModel> terminalMasterRepository )
         {
             _connection = connection;
-            _terminalChangeRepository = terminalChangeRepository;
+            _terminalMasterRepository = terminalMasterRepository;
         }
-         
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="terminalChanges"></param>
+        /// <returns></returns>
+        public Task UpdateTerminalChangeIntoMaster(List<TerminalChange> terminalChanges)
+        {
+            var mapped = AutoMapper.Mapper.Map<List<TerminalChange>, List<TerminalMasterModel>> (terminalChanges);
+            return _terminalMasterRepository.InsertOrReplaceRangeAsync(mapped);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="terminalChangeProcess"></param>
+        /// <returns></returns>
         public async Task<ChangeResultWithItem<TerminalChangeProcess>> FindTerminalChangesRemoteAsync(TerminalChangeProcess terminalChangeProcess)
         {
             var terminalChanges =
@@ -31,21 +49,34 @@ namespace Brady.ScrapRunner.Mobile.Services
             return terminalChanges;
         }
 
-        public async Task<List<TerminalChangeModel>> FindAllTerminalChanges()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="terminalId"></param>
+        /// <returns></returns>
+        public async Task<TerminalMasterModel> FindTerminalMasterAsync(string terminalId)
         {
-            return await _terminalChangeRepository.AllAsync();
+            var terminal = await _terminalMasterRepository.FindAsync(t => t.TerminalId == terminalId);
+            return terminal;
         }
 
-        public Task UpdateTerminalChange(IEnumerable<TerminalChange> terminalChanges)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<TerminalMasterModel>> FindAllTerminalsAsync()
         {
-            var mapped =
-                AutoMapper.Mapper.Map<IEnumerable<TerminalChange>, IEnumerable<TerminalChangeModel>>(terminalChanges);
-            return _terminalChangeRepository.InsertRangeAsync(mapped);
+            return await _terminalMasterRepository.AllAsync();
         }
 
-        public Task<int> UpsertTerminalChangeAsync(IEnumerable<TerminalChangeModel> terminalChanges)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="terminalChanges"></param>
+        /// <returns></returns>
+        public Task<int> UpsertTerminalMasterAsync(IEnumerable<TerminalMasterModel> terminalChanges)
         {
-            return _terminalChangeRepository.InsertOrReplaceRangeAsync(terminalChanges);
+            return _terminalMasterRepository.InsertOrReplaceRangeAsync(terminalChanges);
         }
     }
 }

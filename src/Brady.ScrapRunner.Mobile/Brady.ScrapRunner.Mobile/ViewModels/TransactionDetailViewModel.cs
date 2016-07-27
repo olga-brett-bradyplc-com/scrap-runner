@@ -55,7 +55,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Notes = Container?.TripSegContainerComment ?? "";
 
             var containerLevels = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerLevel);
-            LevelList = new ObservableCollection<CodeTableModel>(containerLevels);
+            LevelList = new ObservableCollection<CodeTableModel>(containerLevels.OrderBy(l => int.Parse(l.CodeValue)));
             LevelList.Insert(0, new CodeTableModel
             {
                 CodeName = null,
@@ -80,15 +80,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CustCommodityDesc = CustomerCommodityList.Count > 0 ? AppResources.NoCommoditySelected : AppResources.NoCommoditiesAval
             });
 
-            if (!string.IsNullOrEmpty(Container.TripSegContainerCommodityCode))
+            if (!string.IsNullOrEmpty(Container?.TripSegContainerCommodityCode))
                 SelectedCommodity =
                     CustomerCommodityList.FirstOrDefault(
                         cc => cc.CustCommodityCode == Container.TripSegContainerCommodityCode);
 
-            if (Container.TripSegContainerLevel.HasValue)
+            if (Container?.TripSegContainerLevel != null)
                 SelectedLevel = LevelList.FirstOrDefault(l => l.CodeValue == Container.TripSegContainerLevel.ToString());
 
-            if (!string.IsNullOrEmpty(Container.TripSegContainerLocation))
+            if (!string.IsNullOrEmpty(Container?.TripSegContainerLocation))
                 SelectedLocation =
                     CustomerLocationList.FirstOrDefault(l => string.Equals(l.CustLocation, Container.TripSegContainerLocation, StringComparison.CurrentCultureIgnoreCase));
 
