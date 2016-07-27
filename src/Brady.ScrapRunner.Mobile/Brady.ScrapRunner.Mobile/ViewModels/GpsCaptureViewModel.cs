@@ -94,8 +94,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             foreach (var segment in Segments)
             {
-                segment.TripSegEndLatitude = synergyLatitude;
-                segment.TripSegEndLongitude = synergyLongitude;
+                segment.TripSegEndLatitude = (int)synergyLatitude;
+                segment.TripSegEndLongitude = (int)synergyLongitude;
 
                 await _tripService.UpdateTripSegmentAsync(segment);
             }
