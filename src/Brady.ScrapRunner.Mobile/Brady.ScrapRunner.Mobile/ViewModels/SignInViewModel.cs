@@ -315,7 +315,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (terminalChanges.WasSuccessful)
                 {
                     if (terminalChanges.Item?.Terminals?.Count > 0)
-                        await _terminalService.UpdateTerminalChange(terminalChanges.Item.Terminals);
+                        await _terminalService.UpdateTerminalChangeIntoMaster(terminalChanges.Item.Terminals);
                 }
                 else
                 {
@@ -385,9 +385,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     if (tripProcess.Item?.CustomerMasters?.Count > 0)
                         await _customerService.UpdateCustomerMaster(tripProcess.Item.CustomerMasters);
-
-                    if (tripProcess.Item?.Terminals?.Count > 0)
-                        await _tripService.UpdateYards(tripProcess.Item.Terminals);
                 }
                 else
                 {

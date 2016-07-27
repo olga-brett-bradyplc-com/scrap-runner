@@ -22,17 +22,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
         private readonly IPreferenceService _preferenceService;
         private readonly ICustomerService _customerService;
+        private readonly ITerminalService _terminalService;
+
 
         public RouteDetailViewModel(
             ITripService tripService, 
             IDriverService driverService, 
             IPreferenceService preferenceService, 
-            ICustomerService customerService)
+            ICustomerService customerService,
+            ITerminalService terminalService)
         {
             _tripService = tripService;
             _driverService = driverService;
             _preferenceService = preferenceService;
             _customerService = customerService;
+            _terminalService = terminalService;
             
             EnRouteCommand = new MvxAsyncCommand(ExecuteEnRouteCommandAsync);
             ArriveCommand = new MvxAsyncCommand(ExecuteArriveCommandAsync);
@@ -361,12 +365,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             currentSegment.TripSegEndLatitude == 0 || currentSegment.TripSegEndLongitude == 0)
                         {
                             //condition to check for lat/lon
-                            var yardInfo = await _tripService.FindYardInfo(tripInfo.TripTerminalId);
+                            var terminal = await _terminalService.FindTerminalMasterAsync(tripInfo.TripTerminalId);
 
-                            if (yardInfo != null)
+                            if (terminal != null)
                             {
-                                if (yardInfo.Latitude == null || yardInfo.Longitude == null || 
-                                    yardInfo.Latitude == 0 || yardInfo.Longitude == 0)
+                                if (terminal.Latitude == null || terminal.Longitude == null || 
+                                    terminal.Latitude == 0 || terminal.Longitude == 0)
                                 {
                                     var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
                                         AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
@@ -375,12 +379,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                     if (gpsCaptureDialog)
                                     {
                                         //routine to capture current log/lat
-                                        string address = yardInfo.Address1?.TrimEnd();
-                                        if (yardInfo.Address2?.TrimEnd() != "")
-                                            address += yardInfo.Address2?.TrimEnd();
-                                        string termInfoText = yardInfo.TerminalName?.TrimEnd() + "\n" + address + "\n" +
-                                                              yardInfo.City?.TrimEnd() + " " + yardInfo.State?.TrimEnd() + " " +
-                                                              yardInfo.Zip?.TrimEnd() + " " + yardInfo.Country?.TrimEnd();
+                                        string address = terminal.Address1?.TrimEnd();
+                                        if (terminal.Address2?.TrimEnd() != "")
+                                            address += terminal.Address2?.TrimEnd();
+                                        string termInfoText = terminal.TerminalName?.TrimEnd() + "\n" + address + "\n" +
+                                                              terminal.City?.TrimEnd() + " " + terminal.State?.TrimEnd() + " " +
+                                                              terminal.Zip?.TrimEnd() + " " + terminal.Country?.TrimEnd();
                                         ShowViewModel<GpsCaptureViewModel>(new { custHostCode = currentSegment.TripSegDestCustHostCode, customerInfo = termInfoText });
                                     }
                                 }

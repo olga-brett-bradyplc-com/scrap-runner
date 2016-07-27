@@ -39,7 +39,7 @@
             await asyncConnection.CreateTableAsync<TripSegmentContainerModel>();
             await asyncConnection.CreateTableAsync<CustomerCommodityModel>();
             await asyncConnection.CreateTableAsync<CustomerLocationModel>();
-            await asyncConnection.CreateTableAsync<YardModel>();
+            await asyncConnection.CreateTableAsync<TerminalMasterModel>();
 
             await asyncConnection.DeleteAllAsync<ContainerMasterModel>();
             await asyncConnection.DeleteAllAsync<CustomerDirectionsModel>();
@@ -52,7 +52,7 @@
             await asyncConnection.DeleteAllAsync<TripSegmentContainerModel>();
             await asyncConnection.DeleteAllAsync<CustomerCommodityModel>();
             await asyncConnection.DeleteAllAsync<CustomerLocationModel>();
-            await asyncConnection.DeleteAllAsync<YardModel>();
+            await asyncConnection.DeleteAllAsync<TerminalMasterModel>();
             //            await GenerateDemoTripDataAsync();
         }
 

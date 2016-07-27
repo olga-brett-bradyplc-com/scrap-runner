@@ -173,8 +173,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 UserDialogs.Instance.ErrorToast(AppResources.Error, AppResources.ErrorScanningBarcode);
                 return;
             }
-
-            // Is this container 
+            
             foreach (var currentTripSeg in Containers.Select(container2 => container2.FirstOrDefault(tscm => tscm.TripSegContainerNumber == scannedNumber && string.IsNullOrEmpty(tscm.TripSegContainerComplete))))
                 CurrentTransaction = currentTripSeg ?? CurrentTransaction;
 
@@ -188,8 +187,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             var levelRequired = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel);
 
+            var currentSegment =
+                Containers.FirstOrDefault(ts => ts.Key.TripSegNumber == CurrentTransaction.TripSegNumber).Key;
+
             // If container level is required, show spinner dialog allowing them to select container level, then continue processing scan
-            if (!CurrentTransaction.TripSegContainerLevel.HasValue && levelRequired == Constants.Yes)
+            if (!CurrentTransaction.TripSegContainerLevel.HasValue && levelRequired == Constants.Yes && _tripService.IsTripLegLoaded(currentSegment, true))
             {
                 var levels = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerLevel);
 
@@ -200,7 +202,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return;
                 }
 
-                var levelSelect = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectLevel, "", "", null, levels.Select(l => l.CodeDisp1).ToArray());
+                var levelSelect = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectLevel, "", "", null, levels.OrderBy(l => int.Parse(l.CodeValue)).Select(l => l.CodeDisp1).ToArray());
                 var level = levels.First(l => l.CodeDisp1 == levelSelect);
 
                 short levelNum;
@@ -215,7 +217,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentTransaction.TripSegContainerLevel = levelNum;
             }
 
-            using ( var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
+            using ( var completeTripSegment = UserDialogs.Instance.Loading(AppResources.SavingContainer, maskType: MaskType.Black))
             {
                 var containerAction =
                     await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
@@ -335,22 +337,23 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     else
                         UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
                 }
-            }
 
-            await _tripService.PropagateContainerUpdates(TripNumber, Containers);
-            var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
-            Close(this);
+                await _tripService.PropagateContainerUpdates(TripNumber, Containers);
+                var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
 
-            if (nextTripSegment.Any())
-            {
-                await _driverService.ClearDriverStatus(CurrentDriver, false);
-                ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
-            }
-            else
-            {
-                await _driverService.ClearDriverStatus(CurrentDriver, true);
-                await _tripService.CompleteTripAsync(TripNumber);
-                ShowViewModel<RouteSummaryViewModel>();
+                if (nextTripSegment.Any())
+                {
+                    await _driverService.ClearDriverStatus(CurrentDriver, false);
+                    Close(this);
+                    ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
+                }
+                else
+                {
+                    await _driverService.ClearDriverStatus(CurrentDriver, true);
+                    await _tripService.CompleteTripAsync(TripNumber);
+                    Close(this);
+                    ShowViewModel<RouteSummaryViewModel>();
+                }
             }
         }
     }

@@ -4,7 +4,7 @@
     using SQLite.Net.Attributes;
 
     [Table("TerminalMaster")]
-    public class YardModel
+    public class TerminalMasterModel
     {
         [PrimaryKey, MaxLength(10)]
         public string TerminalId { get; set; }
@@ -39,6 +39,16 @@
 
         [MaxLength(30)]
         public string TerminalName { get; set; }
+
+        // These two fields come from the TerminalChange table, and are not currently columns on the remote TerminalMaster table
+        [MaxLength(1)]
+        public string CustType { get; set; }
+
+        [MaxLength(15)]
+        public string CustHostCode { get; set; }
+
+        [Ignore]
+        public string CityStateZipFormatted => $"{City}, {State} {Zip}";
 
     }
 }
