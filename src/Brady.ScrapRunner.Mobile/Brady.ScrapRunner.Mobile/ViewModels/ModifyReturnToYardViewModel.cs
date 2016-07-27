@@ -33,31 +33,31 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
-            var terminals = await _terminalService.FindAllTerminalChanges();
-            var terminalsGrouped = terminals.GroupBy(ts => ts.CustCity)
+            var terminals = await _terminalService.FindAllTerminalsAsync();
+            var terminalsGrouped = terminals.GroupBy(ts => ts.City)
                 .Select(g => new {Key = g.Key, Values = g});
 
-            TerminalList = new ObservableCollection<Grouping<string, TerminalChangeModel>>();
+            TerminalList = new ObservableCollection<Grouping<string, TerminalMasterModel>>();
 
-            foreach (var grouping in terminalsGrouped.Select(terminal => new Grouping<string, TerminalChangeModel>(terminal.Key, terminal.Values)))
+            foreach (var grouping in terminalsGrouped.Select(terminal => new Grouping<string, TerminalMasterModel>(terminal.Key, terminal.Values)))
                 TerminalList.Add(grouping);
         }
 
         private IMvxAsyncCommand _terminalSelectedCommand;
-        public IMvxAsyncCommand TerminalSelectedCommand => _terminalSelectedCommand ?? (_terminalSelectedCommand = new MvxAsyncCommand<Grouping<string, TerminalChangeModel>>(ExecuteTerminalSelectedCommand));
+        public IMvxAsyncCommand TerminalSelectedCommand => _terminalSelectedCommand ?? (_terminalSelectedCommand = new MvxAsyncCommand<Grouping<string, TerminalMasterModel>>(ExecuteTerminalSelectedCommand));
 
-        private async Task ExecuteTerminalSelectedCommand(Grouping<string, TerminalChangeModel> grouping)
+        private async Task ExecuteTerminalSelectedCommand(Grouping<string, TerminalMasterModel> grouping)
         {
             if (grouping.Count > 1)
             {
                 var selectYardAsync =
                 await
                     UserDialogs.Instance.ActionSheetAsync(AppResources.SelectYard, "", AppResources.Cancel, null,
-                        grouping.Select(gp => gp.CustName).ToArray());
+                        grouping.Select(gp => gp.TerminalName).ToArray());
 
                 if (selectYardAsync != AppResources.Cancel)
                 {
-                    await ConfirmReturnToYard(grouping.FirstOrDefault(gp => gp.CustName == selectYardAsync));
+                    await ConfirmReturnToYard(grouping.FirstOrDefault(gp => gp.TerminalName == selectYardAsync));
                 }
             }
             else
@@ -66,7 +66,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
-        private async Task ConfirmReturnToYard(TerminalChangeModel terminalChange)
+        private async Task ConfirmReturnToYard(TerminalMasterModel terminalChange)
         {
 
             var tripSegments = await _tripService.FindAllSegmentsForTripAsync(CurrentTripNumber);
@@ -81,20 +81,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     rty.TripSegDestCustName,
                     rty.TripSegDestCustAddress1, 
                     rty.DestCustCityStateZip, 
-                    terminalChange.CustName,
-                    terminalChange.CustAddress1, 
+                    terminalChange.TerminalName,
+                    terminalChange.Address1, 
                     terminalChange.CityStateZipFormatted);
 
                 var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes, AppResources.No);
 
                 if (confirm)
                 {
-                    rty.TripSegDestCustName = terminalChange.CustName;
-                    rty.TripSegDestCustAddress1 = terminalChange.CustAddress1;
-                    rty.TripSegDestCustAddress2 = terminalChange.CustAddress2;
-                    rty.TripSegDestCustCity = terminalChange.CustCity;
-                    rty.TripSegDestCustState = terminalChange.CustState;
-                    rty.TripSegDestCustZip = terminalChange.CustZip;
+                    rty.TripSegDestCustName = terminalChange.TerminalName;
+                    rty.TripSegDestCustAddress1 = terminalChange.Address1;
+                    rty.TripSegDestCustAddress2 = terminalChange.Address2;
+                    rty.TripSegDestCustCity = terminalChange.City;
+                    rty.TripSegDestCustState = terminalChange.State;
+                    rty.TripSegDestCustZip = terminalChange.Zip;
                     rty.TripSegDestCustHostCode = terminalChange.CustHostCode;
 
                     await _tripService.UpdateTripSegmentAsync(rty);
@@ -110,8 +110,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 var message = string.Format(AppResources.ConfirmReturnToYardAdd,
                     "\n\n",
                     "\n",
-                    terminalChange.CustName,
-                    terminalChange.CustAddress1,
+                    terminalChange.TerminalName,
+                    terminalChange.Address1,
                     terminalChange.CityStateZipFormatted);
 
                 var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes, AppResources.No);
@@ -138,13 +138,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         TripSegOrigCustName = lastSegment.TripSegOrigCustName,
                         TripSegOrigCustHostCode = lastSegment.TripSegOrigCustHostCode,
                         TripSegDestCustType = "W",
-                        TripSegDestCustName = terminalChange.CustName,
+                        TripSegDestCustName = terminalChange.TerminalName,
                         TripSegDestCustHostCode = terminalChange.CustHostCode,
-                        TripSegDestCustAddress1 = terminalChange.CustAddress1,
-                        TripSegDestCustAddress2 = terminalChange.CustAddress2,
-                        TripSegDestCustCity = terminalChange.CustCity,
-                        TripSegDestCustState = terminalChange.CustState,
-                        TripSegDestCustZip = terminalChange.CustZip
+                        TripSegDestCustAddress1 = terminalChange.Address1,
+                        TripSegDestCustAddress2 = terminalChange.Address2,
+                        TripSegDestCustCity = terminalChange.City,
+                        TripSegDestCustState = terminalChange.State,
+                        TripSegDestCustZip = terminalChange.Zip
                     };
 
                     // Create new trip segment
@@ -183,8 +183,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _changeType, value); }
         }
 
-        private ObservableCollection<Grouping<string, TerminalChangeModel>> _terminalList;
-        public ObservableCollection<Grouping<string, TerminalChangeModel>> TerminalList
+        private ObservableCollection<Grouping<string, TerminalMasterModel>> _terminalList;
+        public ObservableCollection<Grouping<string, TerminalMasterModel>> TerminalList
         {
             get { return _terminalList; }
             set { SetProperty(ref _terminalList, value); }

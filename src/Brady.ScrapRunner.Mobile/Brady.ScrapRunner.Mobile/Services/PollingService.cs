@@ -385,9 +385,10 @@
                 terminalChanges = await GetTerminalChangesAfterAsync(areaId, regionId, terminalMasterDateTime.Value, defSendOnlyYardsForArea);
             if (!terminalChanges.Records.Any()) return;
 
-            var mappedTerminalChanges = Mapper.Map<IEnumerable<TerminalChange>, IEnumerable<TerminalChangeModel>>(terminalChanges.Records);
-            await _terminalService.UpsertTerminalChangeAsync(mappedTerminalChanges);
+            //var mappedTerminalChanges = Mapper.Map<IEnumerable<TerminalChange>, IEnumerable<TerminalChangeModel>>(terminalChanges.Records);
+            //await _terminalService.UpsertTerminalChangeAsync(mappedTerminalChanges);
 
+            await _terminalService.UpdateTerminalChangeIntoMaster(terminalChanges.Records);
             await _driverService.UpdateTerminalMasterDateTimeAsync(terminalChanges.Records.Max(terminalChange => terminalChange.ChgDateTime));
 
             // @TODO: If nothing needs to react to updated/inserted TerminalChangeMaster records then 

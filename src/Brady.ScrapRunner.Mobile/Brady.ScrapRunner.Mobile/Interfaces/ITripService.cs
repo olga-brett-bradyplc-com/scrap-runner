@@ -33,8 +33,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<int> UpdateTripSegmentContainerAsync(TripSegmentContainerModel container);
 
-        Task UpdateYards(IEnumerable<TerminalMaster> yards);
-
         Task<TripModel> FindTripAsync(string tripNumber);
 
         Task<List<TripModel>> FindTripsAsync();
@@ -80,8 +78,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<int> CompleteTripSegmentAsync(TripSegmentModel tripSegment);
 
         Task<int> CompleteTripSegmentContainerAsync(TripSegmentContainerModel container);
-
-        Task<YardModel> FindYardInfo(string terminalId);
 
         Task<int> MarkExceptionTripAsync(string tripNumber);
 

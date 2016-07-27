@@ -21,7 +21,6 @@ namespace Brady.ScrapRunner.Mobile.Services
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
-        private readonly IRepository<YardModel> _yardInfoRepository;
 
         public TripService(
             IConnectionService connection,
@@ -29,14 +28,13 @@ namespace Brady.ScrapRunner.Mobile.Services
             IRepository<TripModel> tripRepository,
             IRepository<TripSegmentModel> tripSegmentRepository,
             IRepository<TripSegmentContainerModel> tripSegmentContainerRepository,
-            IRepository<YardModel> yardInfoRepository)
+            IRepository<TerminalMasterModel> yardInfoRepository)
         {
             _connection = connection;
             _preferenceRepository = preferenceRepository;
             _tripRepository = tripRepository;
             _tripSegmentRepository = tripSegmentRepository;
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
-            _yardInfoRepository = yardInfoRepository;
         }
 
         #region General purpose trip methods
@@ -61,12 +59,6 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegment>, IEnumerable<TripSegmentModel>>(tripSegments);
             return _tripSegmentRepository.InsertRangeAsync(mapped);
-        }
-
-        public Task UpdateYards(IEnumerable<TerminalMaster> yards)
-        {
-            var mapped = AutoMapper.Mapper.Map<IEnumerable<TerminalMaster>, IEnumerable<YardModel>>(yards);
-            return _yardInfoRepository.InsertRangeAsync(mapped);
         }
 
         /// <summary>
@@ -471,18 +463,6 @@ namespace Brady.ScrapRunner.Mobile.Services
             container.TripSegContainerLatitude = latitude;
 
             return await _tripSegmentContainerRepository.UpdateAsync(container);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="terminalId"></param>
-        /// <returns></returns>
-        public Task<YardModel> FindYardInfo(string terminalId)
-        {
-            var yardInfo = _yardInfoRepository.AsQueryable()
-                .Where(y => y.TerminalId == terminalId).FirstOrDefaultAsync();
-            return yardInfo;
         }
 
         /// <summary>
