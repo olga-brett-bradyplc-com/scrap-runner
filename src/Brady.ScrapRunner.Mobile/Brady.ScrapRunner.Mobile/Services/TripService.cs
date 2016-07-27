@@ -385,12 +385,18 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// 
         /// </summary>
         /// <param name="tripSegment"></param>
+        /// <param name="onlyNonEmpty"></param>
         /// <returns></returns>
-        public bool IsTripLegLoaded(TripSegmentModel tripSegment)
+        public bool IsTripLegLoaded(TripSegmentModel tripSegment, bool onlyNonEmpty = false)
         {
+            if (onlyNonEmpty)
+                return tripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
+                       tripSegment.TripSegType == BasicTripTypeConstants.Load;
+
             return tripSegment.TripSegType == BasicTripTypeConstants.PickupEmpty ||
-                   tripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
-                   tripSegment.TripSegType == BasicTripTypeConstants.Load;
+                    tripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
+                    tripSegment.TripSegType == BasicTripTypeConstants.Load;
+
         }
 
         /// <summary>

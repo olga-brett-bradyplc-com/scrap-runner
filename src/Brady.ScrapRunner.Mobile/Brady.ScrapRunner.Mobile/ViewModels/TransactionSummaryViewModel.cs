@@ -187,8 +187,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             var levelRequired = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel);
 
+            var currentSegment =
+                Containers.FirstOrDefault(ts => ts.Key.TripSegNumber == CurrentTransaction.TripSegNumber).Key;
+
             // If container level is required, show spinner dialog allowing them to select container level, then continue processing scan
-            if (!CurrentTransaction.TripSegContainerLevel.HasValue && levelRequired == Constants.Yes)
+            if (!CurrentTransaction.TripSegContainerLevel.HasValue && levelRequired == Constants.Yes && _tripService.IsTripLegLoaded(currentSegment, true))
             {
                 var levels = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerLevel);
 
@@ -199,7 +202,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     return;
                 }
 
-                var levelSelect = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectLevel, "", "", null, levels.Select(l => l.CodeDisp1).ToArray());
+                var levelSelect = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectLevel, "", "", null, levels.OrderBy(l => int.Parse(l.CodeValue)).Select(l => l.CodeDisp1).ToArray());
                 var level = levels.First(l => l.CodeDisp1 == levelSelect);
 
                 short levelNum;

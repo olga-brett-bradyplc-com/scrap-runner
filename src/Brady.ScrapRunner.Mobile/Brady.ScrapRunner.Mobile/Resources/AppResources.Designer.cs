@@ -739,7 +739,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO COMMODITIES AVALIABLE.
+        ///   Looks up a localized string similar to NO COMMODITIES AVAILABLE.
         /// </summary>
         public static string NoCommoditiesAval {
             get {
@@ -766,7 +766,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to GPS is not availabl.
+        ///   Looks up a localized string similar to GPS is not available.
         /// </summary>
         public static string NoGpsAvailable {
             get {
@@ -784,7 +784,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO LOCATIONS AVALIABLE.
+        ///   Looks up a localized string similar to NO LOCATIONS AVAILABLE.
         /// </summary>
         public static string NoLocationAval {
             get {

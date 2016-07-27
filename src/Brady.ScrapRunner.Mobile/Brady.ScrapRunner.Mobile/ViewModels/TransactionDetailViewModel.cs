@@ -55,7 +55,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Notes = Container?.TripSegContainerComment ?? "";
 
             var containerLevels = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerLevel);
-            LevelList = new ObservableCollection<CodeTableModel>(containerLevels);
+            LevelList = new ObservableCollection<CodeTableModel>(containerLevels.OrderBy(l => int.Parse(l.CodeValue)));
             LevelList.Insert(0, new CodeTableModel
             {
                 CodeName = null,

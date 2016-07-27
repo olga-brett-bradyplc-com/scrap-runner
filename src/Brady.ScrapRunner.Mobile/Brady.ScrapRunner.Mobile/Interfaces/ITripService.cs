@@ -65,7 +65,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         bool IsTripLegDropped(TripSegmentModel tripSegment);
 
-        bool IsTripLegLoaded(TripSegmentModel tripSegment);
+        bool IsTripLegLoaded(TripSegmentModel tripSegment, bool onlyNonEmpty = false);
 
         Task<bool> IsTripSequenceEnforcedAsync();
 
