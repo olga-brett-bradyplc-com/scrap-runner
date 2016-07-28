@@ -44,7 +44,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public override async void Start()
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
-            var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
             foreach (var tsm in segments) 

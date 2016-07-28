@@ -53,6 +53,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<TripSegmentContainerModel> FindTripSegmentContainer(string tripNumber, string tripSegNo,
             int? tripSegContainerSeqNumber);
 
+        Task<List<TripSegmentModel>> FindNextTripLegSegmentsAsync(string tripNumber);
+
 
 
         bool IsTripLegTransaction(TripSegmentModel tripSegment);

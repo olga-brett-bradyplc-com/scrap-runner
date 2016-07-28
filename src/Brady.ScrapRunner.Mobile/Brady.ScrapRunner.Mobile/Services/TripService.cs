@@ -254,8 +254,57 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// Find all trip segment containers for the given trip leg.
-        /// @TODO : 
+        /// This will return sequential trip segments with identical host codes and trip segment types.
+        /// 
+        /// Use this method instead of FindNextTripSegmentsAsync when you only want to process
+        /// a certain group of segments for a given leg, e.g., a trip leg could contain DE, PF and SC,
+        /// but you only want to process the DE & PF segments on the transaction screen, and the SC segment
+        /// on the Scale screen, even though these segments all share the same host code 
+        /// </summary>
+        /// <param name="tripNumber"></param>
+        /// <returns></returns>
+        public async Task<List<TripSegmentModel>> FindNextTripLegSegmentsAsync(string tripNumber)
+        {
+            var segments = await _tripSegmentRepository.AsQueryable()
+                .Where(ts =>
+                    ts.TripNumber == tripNumber
+                    &&
+                    (ts.TripSegStatus == TripSegStatusConstants.Pending ||
+                     ts.TripSegStatus == TripSegStatusConstants.Missed ||
+                     ts.TripSegStatus == TripSegStatusConstants.Exception))
+                .OrderBy(ts => ts.TripSegNumber)
+                .ToListAsync();
+
+            if (!segments.Any())
+            {
+                Mvx.TaggedError(Constants.ScrapRunner, $"Couldn't find next segments for trip {tripNumber}.");
+                return Enumerable.Empty<TripSegmentModel>().ToList();
+            }
+
+            var list = new List<TripSegmentModel> { segments.FirstOrDefault() };
+
+            // Start i at 1, since ElementAt(0) is our reference segment
+            // We're doing it this way because multiple segments could share the same hostcode, but be on a different leg
+            for (var i = 1; i < segments.Count; i++)
+            {
+                if (segments.FirstOrDefault().TripSegDestCustHostCode != segments.ElementAt(i).TripSegDestCustHostCode)
+                    break;
+
+                if (IsTripLegTransaction(segments.FirstOrDefault()) && IsTripLegTransaction(segments.ElementAt(i)))
+                    list.Add(segments.ElementAt(i));
+                else if (IsTripLegTypePublicScale(segments.FirstOrDefault()) && IsTripLegTypePublicScale(segments.ElementAt(i)))
+                    list.Add(segments.ElementAt(i));
+                else if (IsTripLegScale(segments.FirstOrDefault()) && IsTripLegScale(segments.ElementAt(i)))
+                    list.Add(segments.ElementAt(i));
+                else
+                    break;
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Find all trip segment containers for the given trip segment.
         /// </summary>
         /// <param name="tripNumber"></param>
         /// <param name="tripSegNo"></param>
@@ -291,6 +340,7 @@ namespace Brady.ScrapRunner.Mobile.Services
                     tscm =>
                         tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNo &&
                         tscm.TripSegContainerSeqNumber == tripSegContainerSeqNumber).ToListAsync();
+
             return container.FirstOrDefault();
         }
 

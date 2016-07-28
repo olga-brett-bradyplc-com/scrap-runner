@@ -62,16 +62,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             //_allowRtnAddToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnAdd, OnAllowRtnAddChanged);
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
-
-            await Task.Delay(3000);
-            Scan();
         }
-        
-        //public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        //{
-        //    inflater.Inflate(Resource.Menu.transactionsummary_menu, menu);
-        //    base.OnCreateOptionsMenu(menu, inflater);
-        //}
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {

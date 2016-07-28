@@ -69,7 +69,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
-            var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
             foreach (var tsm in segments)
@@ -180,9 +180,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         When driver selects Yes, segment is complete.*/
         private async Task ExecuteContinueCommandAsync()
         {
-            //popup "Finished with scale"
-            var result = await UserDialogs.Instance.ConfirmAsync(AppResources.FinishedScale);
-            if (result)
+            var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
+            var lastSegment = Containers.Any(ts => ts.Key.TripSegNumber == tripSegments.Last().TripSegNumber);
+            
+            var message = (lastSegment)
+                ? AppResources.PerformTripSegmentComplete + "\n\n" + AppResources.CompleteTrip
+                : AppResources.PerformTripSegmentComplete;
+
+            var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes, AppResources.No);
+            if (confirm)
             {
                 var currentUser = await _driverService.GetCurrentDriverStatusAsync();
 
@@ -219,6 +225,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 await ExecuteNextStage();
             }
         }
+
         private ObservableCollection<CodeTableModel> _reviewReasonsList;
         public ObservableCollection<CodeTableModel> ReviewReasonsList
         {
@@ -290,14 +297,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             });
 
                             if (!containerProcess.WasSuccessful)
-                                await UserDialogs.Instance.AlertAsync(containerProcess.Failure.Summary,
-                                    AppResources.Error, AppResources.OK);
+                                await UserDialogs.Instance.AlertAsync(containerProcess.Failure.Summary, AppResources.Error, AppResources.OK);
 
-                            await
-                                _tripService.MarkExceptionTripSegmentContainerAsync(container, reasonItem.CodeDisp1);
+                            await _tripService.MarkExceptionTripSegmentContainerAsync(container, reasonItem.CodeDisp1);
                         }
                     }
                 }
+
                 CantProcessLabel = AppResources.CanProcess;
             }
             else
@@ -340,9 +346,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
                 Close(this);
-                if (nextTripSegment.Any())
+
+                // We check to see if the next trip segment has the same TripSegDestCustHostCode as the current segment, and if so,
+                // send them to the transaction summary screen. Right now we're making the assumption that we would never go from the
+                // public scale screen to the yard scale screen. Please fix if that assumption is wrong
+                if (Containers.LastOrDefault().Key.TripSegDestCustHostCode == nextTripSegment.FirstOrDefault().TripSegDestCustHostCode)
                 {
-                    ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
+                    ShowViewModel<TransactionSummaryViewModel>(new {tripNumber = TripNumber});
+                }
+                else if (nextTripSegment.Any())
+                {
+                    ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
                 }
                 else
                 {
