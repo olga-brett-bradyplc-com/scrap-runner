@@ -460,3 +460,20 @@ curl --silent --insecure --request PUT \
      --header "cookie: bwftoken=6d52feb5-616e-4556-9ab4-51ebf45fe87f" \
      --data "{\"EmployeeId\":\"1000\", \"Password\":\"drv1000\", \"PowerId\":\"001\", \"Odometer\":12345, \"LocaleCode\":\"1033\", \"OverrrideFlag\":\"N\", \"PndVer\":\"001\",  \"LoginDateTime\":\"2016-03-31T15:00:00\" }" \
 "https://maunb-stm10.bradyplc.com:7776//api/scraprunner/DriverLoginProcess/001/withoutrequery"
+
+***
+*** GPS
+***
+
+curl --silent --insecure --request POST \
+     --header "Content-Type: application/json" \
+     --data "{\"username\":\"admin\", \"password\":\"mem_2014\"}" \
+"https://maunb-stm10.bradyplc.com:7776/authentication/login"
+
+curl --silent --insecure --request PUT \
+     --header "Content-Type: application/json" \
+     --header "cookie: bwftoken=77c52055-6eed-4b7e-a7a6-803a9c87b7d1" \
+     --data "{ \"EmployeeId\":\"1000\", \"GPSID\":\"1000\", \"ActionDateTime\":\"2016-07-26T17:00:00\", \"Latitude\":45000, \"Longitude\":\"89000\", \"Speed\":\"45\", \"Heading\":\"270\"  }" \
+"https://maunb-stm10.bradyplc.com:7776//api/scraprunner/DriverGPSLocationProcess/1000/withoutrequery"
+
+
