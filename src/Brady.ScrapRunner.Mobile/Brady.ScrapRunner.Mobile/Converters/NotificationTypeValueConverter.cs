@@ -31,7 +31,7 @@
                 case NotificationType.TripsResequenced:
                     return AppResources.NotificationTripResequenceTitle;
                 case NotificationType.NewMessage:
-                    return AppResources.NotificationMessageTitle;
+                    return AppResources.NotificationNewMessage;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }

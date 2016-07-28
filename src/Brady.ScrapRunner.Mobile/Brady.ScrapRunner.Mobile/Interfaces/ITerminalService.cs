@@ -14,8 +14,9 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
     {
         Task<ChangeResultWithItem<TerminalChangeProcess>> FindTerminalChangesRemoteAsync(
             TerminalChangeProcess terminalChangeProcess);
-        Task<List<TerminalChangeModel>> FindAllTerminalChanges();
-        Task UpdateTerminalChange(IEnumerable<TerminalChange> terminalChanges);
-        Task<int> UpsertTerminalChangeAsync(IEnumerable<TerminalChangeModel> terminalChanges);
+        Task UpdateTerminalChangeIntoMaster(List<TerminalChange> terminalChanges);
+        Task<List<TerminalMasterModel>> FindAllTerminalsAsync();
+        Task<TerminalMasterModel> FindTerminalMasterAsync(string terminalId);
+        Task<int> UpsertTerminalMasterAsync(IEnumerable<TerminalMasterModel> terminalChanges);
     }
 }

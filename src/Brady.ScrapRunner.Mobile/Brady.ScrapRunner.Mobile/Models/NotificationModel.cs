@@ -10,7 +10,14 @@
         public int? Id { get; set; }
         public NotificationType NotificationType { get; set; }
         public string Summary { get; set; }
+        [Ignore]
         public DateTimeOffset NotificationDateTimeOffset { get; set; }
+
+        public string NotificationDateTimeOffsetWorkaround
+        {
+            get { return NotificationDateTimeOffset.ToString("O"); }
+            set { NotificationDateTimeOffset = DateTimeOffset.Parse(value); }
+        }
     }
 
     public enum NotificationType

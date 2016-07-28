@@ -739,7 +739,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO COMMODITIES AVALIABLE.
+        ///   Looks up a localized string similar to NO COMMODITIES AVAILABLE.
         /// </summary>
         public static string NoCommoditiesAval {
             get {
@@ -766,7 +766,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to GPS is not availabl.
+        ///   Looks up a localized string similar to GPS is not available.
         /// </summary>
         public static string NoGpsAvailable {
             get {
@@ -784,7 +784,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO LOCATIONS AVALIABLE.
+        ///   Looks up a localized string similar to NO LOCATIONS AVAILABLE.
         /// </summary>
         public static string NoLocationAval {
             get {
@@ -829,7 +829,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}.
+        ///   Looks up a localized string similar to Message from {0}: {1}.
         /// </summary>
         public static string NotificationMessageText {
             get {
@@ -843,6 +843,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string NotificationMessageTitle {
             get {
                 return ResourceManager.GetString("NotificationMessageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Message.
+        /// </summary>
+        public static string NotificationNewMessage {
+            get {
+                return ResourceManager.GetString("NotificationNewMessage", resourceCulture);
             }
         }
         
@@ -1248,6 +1257,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving Container Information.
+        /// </summary>
+        public static string SavingContainer {
+            get {
+                return ResourceManager.GetString("SavingContainer", resourceCulture);
             }
         }
         

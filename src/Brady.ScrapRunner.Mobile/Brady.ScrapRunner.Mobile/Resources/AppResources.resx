@@ -608,7 +608,7 @@ You will now be sent back to the login.</value>
     <value>Are you sure you want to complete this leg of the trip?</value>
   </data>
   <data name="NoCommoditiesAval" xml:space="preserve">
-    <value>NO COMMODITIES AVALIABLE</value>
+    <value>NO COMMODITIES AVAILABLE</value>
     <comment>TransactionDetail</comment>
   </data>
   <data name="NoCommoditySelected" xml:space="preserve">
@@ -620,7 +620,7 @@ You will now be sent back to the login.</value>
     <comment>TransactionDetail</comment>
   </data>
   <data name="NoLocationAval" xml:space="preserve">
-    <value>NO LOCATIONS AVALIABLE</value>
+    <value>NO LOCATIONS AVAILABLE</value>
     <comment>TransactionDetail</comment>
   </data>
   <data name="NoLocationSelected" xml:space="preserve">
@@ -628,7 +628,7 @@ You will now be sent back to the login.</value>
     <comment>TransactionDetail</comment>
   </data>
   <data name="NotificationMessageText" xml:space="preserve">
-    <value>{0}</value>
+    <value>Message from {0}: {1}</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationMessageTitle" xml:space="preserve">
@@ -756,7 +756,7 @@ You will now be sent back to the login.</value>
     <comment>GPS status</comment>
   </data>
   <data name="NoGpsAvailable" xml:space="preserve">
-    <value>GPS is not availabl</value>
+    <value>GPS is not available</value>
     <comment>GPS status</comment>
   </data>
   <data name="Skip" xml:space="preserve">
@@ -765,5 +765,13 @@ You will now be sent back to the login.</value>
   </data>
   <data name="GpsCancelConfirm" xml:space="preserve">
     <value>GPS is available. Are you sure you want to cancel?</value>
+  </data>
+  <data name="NotificationNewMessage" xml:space="preserve">
+    <value>New Message</value>
+    <comment>AndroidNotificationService</comment>
+  </data>
+  <data name="SavingContainer" xml:space="preserve">
+    <value>Saving Container Information</value>
+    <comment>TransactionSummaryViewModel</comment>
   </data>
 </root>

@@ -19,8 +19,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task UpdateTripSegments(IEnumerable<TripSegment> tripSegments);
 
-        Task UpdateTripSegments(IEnumerable<TripSegmentModel> tripSegments);
-
         Task UpdateTripSegmentContainers(IEnumerable<TripSegmentContainer> tripSegmentContainers);
 
         Task<int> CreateTripAsync(TripModel trip);
@@ -34,8 +32,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<int> UpdateTripSegmentAsync(TripSegmentModel tripSegment);
 
         Task<int> UpdateTripSegmentContainerAsync(TripSegmentContainerModel container);
-
-        Task UpdateYards(IEnumerable<TerminalMaster> yards);
 
         Task<TripModel> FindTripAsync(string tripNumber);
 
@@ -69,7 +65,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         bool IsTripLegDropped(TripSegmentModel tripSegment);
 
-        bool IsTripLegLoaded(TripSegmentModel tripSegment);
+        bool IsTripLegLoaded(TripSegmentModel tripSegment, bool onlyNonEmpty = false);
 
         Task<bool> IsTripSequenceEnforcedAsync();
 
@@ -82,8 +78,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<int> CompleteTripSegmentAsync(TripSegmentModel tripSegment);
 
         Task<int> CompleteTripSegmentContainerAsync(TripSegmentContainerModel container);
-
-        Task<YardModel> FindYardInfo(string terminalId);
 
         Task<int> MarkExceptionTripAsync(string tripNumber);
 
