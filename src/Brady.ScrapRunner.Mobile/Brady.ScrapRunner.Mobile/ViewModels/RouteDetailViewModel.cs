@@ -367,26 +367,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             //condition to check for lat/lon
                             var terminal = await _terminalService.FindTerminalMasterAsync(tripInfo.TripTerminalId);
 
-                            if (terminal != null)
+                            if (terminal?.Latitude != null && terminal.Longitude != null)
                             {
-                                if (terminal.Latitude == null || terminal.Longitude == null || 
-                                    terminal.Latitude == 0 || terminal.Longitude == 0)
-                                {
-                                    var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
-                                        AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
-                                        AppResources.No);
+                                var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
+                                    AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
+                                    AppResources.No);
 
-                                    if (gpsCaptureDialog)
-                                    {
-                                        //routine to capture current log/lat
-                                        string address = terminal.Address1?.TrimEnd();
-                                        if (terminal.Address2?.TrimEnd() != "")
-                                            address += terminal.Address2?.TrimEnd();
-                                        string termInfoText = terminal.TerminalName?.TrimEnd() + "\n" + address + "\n" +
-                                                              terminal.City?.TrimEnd() + " " + terminal.State?.TrimEnd() + " " +
-                                                              terminal.Zip?.TrimEnd() + " " + terminal.Country?.TrimEnd();
-                                        ShowViewModel<GpsCaptureViewModel>(new { custHostCode = currentSegment.TripSegDestCustHostCode, customerInfo = termInfoText });
-                                    }
+                                if (gpsCaptureDialog)
+                                {
+                                    //routine to capture current log/lat
+                                    string address = terminal.Address1?.TrimEnd();
+                                    if (terminal.Address2?.TrimEnd() != "")
+                                        address += terminal.Address2?.TrimEnd();
+                                    string termInfoText = terminal.TerminalName?.TrimEnd() + "\n" + address + "\n" +
+                                                            terminal.City?.TrimEnd() + " " + terminal.State?.TrimEnd() + " " +
+                                                            terminal.Zip?.TrimEnd() + " " + terminal.Country?.TrimEnd();
+                                    ShowViewModel<GpsCaptureViewModel>(new { custHostCode = currentSegment.TripSegDestCustHostCode, customerInfo = termInfoText });
                                 }
                             }
                         }
