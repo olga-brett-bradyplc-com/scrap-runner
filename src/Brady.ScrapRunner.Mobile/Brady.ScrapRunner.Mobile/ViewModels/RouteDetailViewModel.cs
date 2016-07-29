@@ -338,63 +338,72 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 using (var loading = UserDialogs.Instance.Loading(AppResources.Loading, maskType: MaskType.Black))
                 {
-                    var setDriverArrived = await _driverService.ProcessDriverArrivedAsync(new DriverArriveProcess
+                    CurrentStatus = DriverStatusConstants.Arrive;
+
+                    CurrentDriver.Status = DriverStatusSRConstants.Arrive;
+                    await _driverService.UpdateDriver(CurrentDriver);
+
+                    //GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
+                    var currentSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber,
+                        TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key.TripSegNumber);
+
+                    var tripInfo = await _tripService.FindTripAsync(TripNumber);
+
+                    if(currentSegment.TripSegEndLatitude == null || currentSegment.TripSegEndLongitude == null ||
+                        currentSegment.TripSegEndLatitude == 0 || currentSegment.TripSegEndLongitude == 0)
                     {
-                        EmployeeId = CurrentDriver.EmployeeId,
-                        PowerId = CurrentDriver.PowerId,
-                        TripNumber = TripNumber,
-                        TripSegNumber = firstSegment.TripSegNumber,
-                        ActionDateTime = DateTime.Now,
-                        Odometer = CurrentDriver.Odometer ?? default(int),
-                    });
+                        //condition to check for lat/lon
+                        var terminal = await _terminalService.FindTerminalMasterAsync(tripInfo.TripTerminalId);
 
-                    if (setDriverArrived.WasSuccessful)
-                    {
-                        CurrentStatus = DriverStatusConstants.Arrive;
-
-                        CurrentDriver.Status = DriverStatusSRConstants.Arrive;
-                        await _driverService.UpdateDriver(CurrentDriver);
-
-                        //GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
-                        var currentSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber,
-                            TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key.TripSegNumber);
-
-                        var tripInfo = await _tripService.FindTripAsync(TripNumber);
-
-                        if(currentSegment.TripSegEndLatitude == null || currentSegment.TripSegEndLongitude == null ||
-                            currentSegment.TripSegEndLatitude == 0 || currentSegment.TripSegEndLongitude == 0)
+                        if (terminal?.Latitude != null && terminal.Longitude != null)
                         {
-                            //condition to check for lat/lon
-                            var terminal = await _terminalService.FindTerminalMasterAsync(tripInfo.TripTerminalId);
+                            var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
+                                AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
+                                AppResources.No);
 
-                            if (terminal?.Latitude != null && terminal.Longitude != null)
+                            if (gpsCaptureDialog)
                             {
-                                var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
-                                    AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
-                                    AppResources.No);
-
-                                if (gpsCaptureDialog)
-                                {
-                                    //routine to capture current log/lat
-                                    string address = terminal.Address1?.TrimEnd();
-                                    if (terminal.Address2?.TrimEnd() != "")
-                                        address += terminal.Address2?.TrimEnd();
-                                    string termInfoText = terminal.TerminalName?.TrimEnd() + "\n" + address + "\n" +
-                                                            terminal.City?.TrimEnd() + " " + terminal.State?.TrimEnd() + " " +
-                                                            terminal.Zip?.TrimEnd() + " " + terminal.Country?.TrimEnd();
-                                    ShowViewModel<GpsCaptureViewModel>(new { custHostCode = currentSegment.TripSegDestCustHostCode, customerInfo = termInfoText });
-                                }
+                                //routine to capture current log/lat
+                                string address = terminal.Address1?.TrimEnd();
+                                if (terminal.Address2?.TrimEnd() != "")
+                                    address += terminal.Address2?.TrimEnd();
+                                string termInfoText = terminal.TerminalName?.TrimEnd() + "\n" + address + "\n" +
+                                                        terminal.City?.TrimEnd() + " " + terminal.State?.TrimEnd() + " " +
+                                                        terminal.Zip?.TrimEnd() + " " + terminal.Country?.TrimEnd();
+                                ShowViewModel<GpsCaptureViewModel>(new { custHostCode = currentSegment.TripSegDestCustHostCode,
+                                    customerInfo = termInfoText, currentDriver = CurrentDriver });
                             }
+                            else
+                                SetDriverArrive();
                         }
+                        else
+                            SetDriverArrive();
                     }
                     else
-                    {
-                        await UserDialogs.Instance.AlertAsync(setDriverArrived.Failure.Summary,
-                            AppResources.Error, AppResources.OK);
-                    }
-
+                        SetDriverArrive();
+ 
                     SetNextStageLabel(firstSegment);
                 }
+            }
+        }
+
+        private async void SetDriverArrive()
+        {
+            var currentSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
+            var setDriverArrived = await _driverService.ProcessDriverArrivedAsync(new DriverArriveProcess
+            {
+                EmployeeId = CurrentDriver.EmployeeId,
+                PowerId = CurrentDriver.PowerId,
+                TripNumber = TripNumber,
+                TripSegNumber = currentSegment.TripSegNumber,
+                ActionDateTime = DateTime.Now,
+                Odometer = CurrentDriver.Odometer ?? default(int),
+            });
+
+            if(!setDriverArrived.WasSuccessful)
+            {
+                await UserDialogs.Instance.AlertAsync(setDriverArrived.Failure.Summary,
+                    AppResources.Error, AppResources.OK);
             }
         }
 
@@ -466,7 +475,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                 TripNumber = TripNumber,
                                 ActionType = TripSegmentActionTypeConstants.Done,
                                 ActionDateTime = DateTime.Now,
-                                PowerId = CurrentDriver.PowerId
+                                PowerId = CurrentDriver.PowerId,
+                                Latitude = firstSegment.TripSegEndLatitude,
+                                Longitude = firstSegment.TripSegEndLongitude
                             });
 
                         if (tripSegmentProcess.WasSuccessful)

@@ -102,5 +102,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<ChangeResultWithItem<DriverTripAckProcess>> ProcessDriverTripAck(
             DriverTripAckProcess driverAck);
         Task<List<TripSegmentModel>> FindCustomerSegments(string custHostCode);
+
+        Task<int> UpdateGpsCustomerSegments(string custHostCode, int lat, int lon);
+
     }
 }

@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
+using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Interfaces;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
@@ -14,12 +18,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         // This is a dependency.
         private readonly ILocationService _locationService;
         private readonly ITripService _tripService;
+        private readonly IDriverService _driverService;
 
         // Inject into ViewModel using constructor injection.  In other words, require the creator of the object to pass in the dependencies.
-        public GpsCaptureViewModel(ILocationService locationService, ITripService tripService)
+        public GpsCaptureViewModel(ILocationService locationService, ITripService tripService, IDriverService driverService)
         {
             _locationService = locationService;
             _tripService = tripService;
+            _driverService = driverService;
+
             Title = AppResources.GPSCapture;
             CaptureCommand = new MvxCommand(ExecuteCaptureCommand);
             SkipCommand = new MvxCommand(ExecuteSkipCommand);
@@ -29,9 +36,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             CustHostCode = custHostCode;
             CustomerInfoText = customerInfo;
         }
-        public override void Start()
+        public override async void Start()
         {
             GetCurrentLocation();
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
             base.Start();
         }
@@ -65,6 +73,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 SetProperty(ref _custHostCode, value);
             }
         }
+        private DriverStatusModel _currentDriver;
+        public DriverStatusModel CurrentDriver
+        {
+            get { return _currentDriver; }
+            set { SetProperty(ref _currentDriver, value); }
+        }
 
         private List<TripSegmentModel> Segments { get; set; }
         public MvxCommand CaptureCommand { get; protected set; }
@@ -86,18 +100,42 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             var currentLocation = _locationService.CurrentLocation;
             // Now we need to convert from standard decimal degrees GPS to synergy coordinates before sending to the server.
-            var synergyLatitude = currentLocation.Latitude * 600000;
-            var synergyLongitude = currentLocation.Longitude * 600000;
+            var synergyLatitude = currentLocation.Latitude*600000;
+            var synergyLongitude = currentLocation.Longitude*600000;
+
+            var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
+            var setDriverArrived = await _driverService.ProcessDriverArrivedAsync(new DriverArriveProcess
+            {
+                EmployeeId = CurrentDriver.EmployeeId,
+                PowerId = CurrentDriver.PowerId,
+                TripNumber = CurrentDriver.TripNumber,
+                TripSegNumber = CurrentDriver.TripSegNumber,
+                ActionDateTime = DateTime.Now,
+                Odometer = CurrentDriver.Odometer ?? default(int),
+                Latitude = (int) synergyLatitude,
+                Longitude = (int) synergyLongitude
+            });
 
             // Send to the server and update local stop database latitude/longitude.
-            Segments = await _tripService.FindCustomerSegments(CustHostCode);
-
-            foreach (var segment in Segments)
+            if (setDriverArrived.WasSuccessful)
             {
-                segment.TripSegEndLatitude = (int)synergyLatitude;
-                segment.TripSegEndLongitude = (int)synergyLongitude;
+                CurrentDriver.Status = DriverStatusSRConstants.Arrive;
+                await _driverService.UpdateDriver(CurrentDriver);
 
-                await _tripService.UpdateTripSegmentAsync(segment);
+                await _tripService.UpdateGpsCustomerSegments(CustHostCode, (int) synergyLatitude, (int) synergyLongitude);
+
+                var tripSegments = await _tripService.FindCustomerSegments(CustHostCode);
+
+                string oops = string.Empty;
+
+                foreach (TripSegmentModel segment in tripSegments)
+                {
+                    if (segment.TripSegEndLatitude == null)
+                        oops = "oops";
+                }
+                if(oops != "oops")
+                   UserDialogs.Instance.InfoToast(AppResources.SegmentUpdated);
             }
 
             Close(this);
@@ -111,8 +149,33 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmEnrouteTitle);
                 if (confirm)
                 {
+                    SetDriverArrive();
                     Close(this);
                 }
+            }
+        }
+        private async void SetDriverArrive()
+        {
+            var setDriverArrived = await _driverService.ProcessDriverArrivedAsync(new DriverArriveProcess
+            {
+                EmployeeId = CurrentDriver.EmployeeId,
+                PowerId = CurrentDriver.PowerId,
+                TripNumber = CurrentDriver.TripNumber,
+                TripSegNumber = CurrentDriver.TripSegNumber,
+                ActionDateTime = DateTime.Now,
+                Odometer = CurrentDriver.Odometer ?? default(int),
+            });
+
+            if (!setDriverArrived.WasSuccessful)
+            {
+                await UserDialogs.Instance.AlertAsync(setDriverArrived.Failure.Summary,
+                    AppResources.Error, AppResources.OK);
+            }
+            else
+            {
+                CurrentDriver.Status = DriverStatusSRConstants.Arrive;
+                await _driverService.UpdateDriver(CurrentDriver);
+                UserDialogs.Instance.InfoToast(AppResources.SegmentUpdated);
             }
         }
     }

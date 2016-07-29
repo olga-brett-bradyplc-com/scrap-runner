@@ -201,6 +201,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     TareActionDateTime = TareTime
                 });
 
+                TripSegmentModel segment = await _tripService.FindTripSegmentInfoAsync(TripNumber, TripSegNumber);
+
                 var doneProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
                 {
                     EmployeeId = currentUser.EmployeeId,
@@ -209,7 +211,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     ActionDateTime = DateTime.Now,
                     ActionType = TripSegmentActionTypeConstants.Done,
                     PowerId = currentUser.PowerId,
-                    DriverModified = Constants.Yes
+                    DriverModified = Constants.Yes,
+                    Latitude = segment.TripSegEndLatitude,
+                    Longitude = segment.TripSegEndLongitude
+
                 });
 
                 if (!doneProcess.WasSuccessful)
@@ -265,7 +270,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             TripSegNumber = TripSegNumber,
                             ActionDateTime = DateTime.Now,
                             PowerId = currentUser.PowerId,
-                            DriverModified = Constants.Yes
+                            DriverModified = Constants.Yes,
+                            Latitude = segment.Key.TripSegEndLatitude,
+                            Longitude = segment.Key.TripSegEndLongitude
                         });
 
                         if (!doneProcess.WasSuccessful)
@@ -327,7 +334,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         TripSegNumber = segment.Key.TripSegNumber,
                         ActionDateTime = DateTime.Now,
                         PowerId = CurrentDriver.PowerId,
-                        ActionType = TripSegStatusConstants.Done
+                        ActionType = TripSegStatusConstants.Done,
+                        Latitude = segment.Key.TripSegEndLatitude,
+                        Longitude = segment.Key.TripSegEndLongitude
                     });
 
                     if (tripSegmentProcess.WasSuccessful)
