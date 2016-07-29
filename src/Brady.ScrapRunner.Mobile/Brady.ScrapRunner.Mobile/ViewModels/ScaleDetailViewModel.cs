@@ -262,7 +262,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         TripSegNumber = segment.Key.TripSegNumber,
                         ActionDateTime = DateTime.Now,
                         PowerId = CurrentDriver.PowerId,
-                        ActionType = TripSegStatusConstants.Done
+                        ActionType = TripSegStatusConstants.Done,
+                        Latitude = segment.Key.TripSegEndLatitude,
+                        Longitude = segment.Key.TripSegEndLongitude
                     });
 
                     if (tripSegmentProcess.WasSuccessful)

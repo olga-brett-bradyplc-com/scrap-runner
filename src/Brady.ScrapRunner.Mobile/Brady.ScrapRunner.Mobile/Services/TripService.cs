@@ -140,6 +140,18 @@ namespace Brady.ScrapRunner.Mobile.Services
                 .Where(t => t.TripSegDestCustHostCode == custHostCode).ToListAsync();
             return tripSegments;
         }
+        public async Task<int> UpdateGpsCustomerSegments(string custHostCode, int lat, int lon)
+        {
+            var tripSegments = await _tripSegmentRepository.AsQueryable()
+                .Where(t => t.TripSegDestCustHostCode == custHostCode).ToListAsync();
+
+            foreach (TripSegmentModel segment in tripSegments)
+            {
+                segment.TripSegEndLatitude = lat;
+                segment.TripSegEndLongitude = lon;
+            }
+            return await _tripSegmentRepository.UpdateRangeAsync(tripSegments);
+        }
         #endregion
 
         #region Search methods
