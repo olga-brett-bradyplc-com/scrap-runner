@@ -24,7 +24,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ICustomerService _customerService;
         private readonly ITerminalService _terminalService;
 
-
         public RouteDetailViewModel(
             ITripService tripService, 
             IDriverService driverService, 

@@ -148,8 +148,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (!signInResult)
                     return;
 
-                Close(this);
-
                 var containers = await _containerService.FindPowerIdContainersAsync(TruckId);
                 var autoDrop =
                     await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAutoDropContainers);
