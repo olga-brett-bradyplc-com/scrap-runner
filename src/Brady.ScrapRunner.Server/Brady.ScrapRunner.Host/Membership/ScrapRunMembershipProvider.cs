@@ -116,8 +116,7 @@ namespace Brady.ScrapRunner.Host.Membership
                               "       '' AS EmailAddress, " +
                               "       CAST(CASE WHEN em.InactiveDate IS NULL THEN 1 ELSE 0 END AS bit) as IsApproved " +
                               "  FROM dbo.EmployeeMaster AS em " +
-                              "  JOIN dbo.DriverMaster AS dm " +
-                              "    ON em.EmployeeId = dm.EmployeeId " +
+                              " WHERE em.SecurityLevel = 'DR' " +
                               " ORDER BY em.EmployeeId ";
 
             try
