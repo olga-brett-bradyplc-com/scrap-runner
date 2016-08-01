@@ -26,6 +26,7 @@
         private readonly IContainerService _containerService;
         private readonly ITripService _tripService;
         private readonly IDriverService _driverService;
+        private readonly IPreferenceService _preferenceService;
 
         public PollingService(IConnectionService connectionService, 
             INotificationService notificationService, 
@@ -34,7 +35,8 @@
             ITerminalService terminalService, 
             IContainerService containerService, 
             ITripService tripService, 
-            IDriverService driverService)
+            IDriverService driverService, 
+            IPreferenceService preferenceService)
         {
             _connectionService = connectionService;
             _notificationService = notificationService;
@@ -44,6 +46,7 @@
             _containerService = containerService;
             _tripService = tripService;
             _driverService = driverService;
+            _preferenceService = preferenceService;
         }
 
         public async Task PollForChangesAsync(string driverId, string terminalId, string regionId, string areaId)
@@ -377,8 +380,7 @@
         private async Task PollForTerminalChangesAsync(string areaId, string regionId)
         {
             var terminalMasterDateTime = await _driverService.GetTerminalMasterDateTimeAsync();
-            // @TODO: Figure out how to get "DEFSendOnlyYardsForArea" preference from here? (It's not in the preference table)
-            var defSendOnlyYardsForArea = "Y";
+            var defSendOnlyYardsForArea = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFSendOnlyYardsForArea);
             QueryResult<TerminalChange> terminalChanges;
             if (!terminalMasterDateTime.HasValue)
                 terminalChanges = await GetTerminalChangesAsync(areaId, regionId, defSendOnlyYardsForArea);
