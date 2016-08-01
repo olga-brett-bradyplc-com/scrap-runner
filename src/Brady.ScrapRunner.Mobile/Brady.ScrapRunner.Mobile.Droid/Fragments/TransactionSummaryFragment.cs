@@ -44,7 +44,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         protected override bool NavMenuEnabled => true;
         protected override int NavColor => Resource.Color.arrive;
 
-        public override async void OnViewCreated(View view, Bundle savedInstanceState)
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             MobileBarcodeScanner.Initialize(Activity.Application);
             _scannerFragment = new ZXingScannerFragment();
