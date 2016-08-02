@@ -362,7 +362,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 // public scale screen to the yard scale screen. Please fix if that assumption is wrong
                 // We also call Close for each scenrio seperately because of the slight delay ClearDriverStatus and CompeteTripAsync cause,
                 // which causes weird UI issues to pop up if we close before we call those two methods
-                if (Containers?.LastOrDefault()?.Key?.TripSegDestCustHostCode == nextTripSegment?.FirstOrDefault()?.TripSegDestCustHostCode)
+                if (Containers.LastOrDefault().Key?.TripSegDestCustHostCode == nextTripSegment?.FirstOrDefault().TripSegDestCustHostCode)
                 {
                     Close(this);
                     ShowViewModel<TransactionSummaryViewModel>(new {tripNumber = TripNumber});
