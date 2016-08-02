@@ -24,7 +24,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ICustomerService _customerService;
         private readonly ITerminalService _terminalService;
 
-
         public RouteDetailViewModel(
             ITripService tripService, 
             IDriverService driverService, 
@@ -137,16 +136,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 UserDialogs.Instance.WarnToast(AppResources.ReadOnlyTrip, AppResources.ReadOnlyTripSeqMessage, 10000);
             }
 
-            // If CurrentStatus isn't null, that means we're restoring a previous user session on login
-            // Otherwise, check driver status to see if they're already in the midst of a trip, and set the status appropiately if so
-            if (CurrentDriver.TripNumber == TripNumber && 
-                CurrentStatus == null && 
-                (CurrentDriver.Status != DriverStatusSRConstants.Available || CurrentDriver.Status != DriverStatusSRConstants.LoggedIn))
-            {
+            // If CurrentStatus is null but they're enroute/arrived, assume they've navigated back to this screen
+            // from another, and reset CurrentStatus as appropiate
+            if (CurrentStatus == null &&
+                CurrentDriver.TripNumber == TripNumber &&
+                (CurrentDriver.Status == DriverStatusSRConstants.Arrive ||
+                 CurrentDriver.Status == DriverStatusSRConstants.Enroute))
                 CurrentStatus = CurrentDriver.Status;
-                if( CurrentStatus == DriverStatusSRConstants.Arrive )
-                    SetNextStageLabel(fullTripSegments.FirstOrDefault(sg => sg.TripSegStatus == TripSegStatusConstants.Pending || sg.TripSegStatus == TripSegStatusConstants.Missed));
-            }
+
+            // Set the appropiate button text if user is resuming a trip in "arrived" status
+            if (CurrentDriver.TripNumber == TripNumber && CurrentStatus == DriverStatusSRConstants.Arrive)
+                SetNextStageLabel(fullTripSegments.FirstOrDefault(sg => sg.TripSegStatus == TripSegStatusConstants.Pending || sg.TripSegStatus == TripSegStatusConstants.Missed));
 
             base.Start();
         }
@@ -422,13 +422,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
             if (_tripService.IsTripLegTransaction(firstSegment))
             {
-                Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
             else if (_tripService.IsTripLegScale(firstSegment))
             {
-                Close(this);
-
                 if (_tripService.IsTripLegTypePublicScale(firstSegment))
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
                 else

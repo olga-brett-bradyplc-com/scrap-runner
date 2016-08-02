@@ -1135,7 +1135,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to complete this leg of the trip?.
+        ///   Looks up a localized string similar to Are you sure you want to complete these trip segments?.
         /// </summary>
         public static string PerformTripSegmentComplete {
             get {

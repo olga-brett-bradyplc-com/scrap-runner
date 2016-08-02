@@ -9,11 +9,8 @@
     android:background="#f7f7f7">
     <TextView
         android:id="@+id/RouteContainerHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
+        style="@style/ScrapRunnerTheme.StandardHeaderStyle"
         android:layout_marginLeft="20dp"
-        android:textColor="@color/material_gray_500"
         tools:text="Header"
-        local:MvxBind="Text Key.TripSegTypeDesc" />
+        local:MvxBind="Text Format('{0} ({1})', Key.TripSegTypeDesc, Count)" />
 </LinearLayout>

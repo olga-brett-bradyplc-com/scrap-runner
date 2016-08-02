@@ -44,7 +44,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         public async Task<string> FindPreferenceValueAsync(string preferenceCode)
         {
             var currentPreference = await _preferenceRepository.FindAsync(p => p.Parameter == preferenceCode);
-            return currentPreference.ParameterValue;
+            return currentPreference?.ParameterValue;
         }
 
         /// <summary>
