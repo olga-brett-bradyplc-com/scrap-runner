@@ -203,6 +203,13 @@ namespace Brady.ScrapRunner.Mobile.Services
                 .Where(t => t.TripNumber == tripNumber)
                 .OrderBy(t => t.TripSegNumber)
                 .ToListAsync();
+
+            if (!tripSegments.Any())
+            {
+                Mvx.TaggedError(Constants.ScrapRunner, $"Couldn't find segments for trip {tripNumber}.");
+                return Enumerable.Empty<TripSegmentModel>().ToList();
+            }
+
             return tripSegments;
         }
 
@@ -219,6 +226,7 @@ namespace Brady.ScrapRunner.Mobile.Services
                 .Where(tscm => tscm.TripNumber == tripNumber && tscm.TripSegNumber == tripSegNumber)
                 .OrderBy(tscm => tscm.TripSegContainerSeqNumber)
                 .ToListAsync();
+
             return tripSegmentContainers;
         }
 
@@ -439,8 +447,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         public bool IsTripLegDropped(TripSegmentModel tripSegment)
         {
             return tripSegment.TripSegType == BasicTripTypeConstants.DropEmpty ||
-                   tripSegment.TripSegType == BasicTripTypeConstants.DropFull ||
-                   tripSegment.TripSegType == BasicTripTypeConstants.Unload;
+                   tripSegment.TripSegType == BasicTripTypeConstants.DropFull;
         }
 
         /// <summary>
@@ -456,8 +463,8 @@ namespace Brady.ScrapRunner.Mobile.Services
                        tripSegment.TripSegType == BasicTripTypeConstants.Load;
 
             return tripSegment.TripSegType == BasicTripTypeConstants.PickupEmpty ||
-                    tripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
-                    tripSegment.TripSegType == BasicTripTypeConstants.Load;
+                   tripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
+                   tripSegment.TripSegType == BasicTripTypeConstants.Load;
 
         }
 
@@ -571,45 +578,65 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// Propogate any container changes on loaded containers to RT segment. Currently this will only work if
-        /// the trip has a RT segment, as it will only copy containers updates to said RT segment.
-        /// TODO : Do we need to include more scenarios for when we copy container information to other segments?
+        /// Propogate any container changes on loaded containers to RT/SC segments.
+        /// 
+        /// Currently, this will work by propagating container updates to subsequent RT/SC segments until
+        /// it encounters a non-RT/SC segment. 
+        /// 
+        /// For example, if you have a LD->SC->UL->SC trip, then any
+        /// container changes on the LD segment will propagate to the first SC segment, and then stop. Then,
+        /// any container changes on the UL segment will propagate to the second SC segment, and stop.
+        /// 
+        /// If however you have a DE->PF->SC->RT trip, then any changes to the PF segment containers will 
+        /// propagate to both the SC and RT segments.
         /// </summary>
         /// <param name="tripNumber"></param>
         /// <param name="containers"></param>
         /// <returns></returns>
         public async Task PropagateContainerUpdates(string tripNumber, IEnumerable<Grouping<TripSegmentModel, TripSegmentContainerModel>> containers)
         {
-            // For any containers we're loading on the truck, make sure the information is proprogated to the RT segment
+            // For any containers we're loading on the truck, make sure the information is proprogated to the RT/SC segment
             var tripSegments = await FindAllSegmentsForTripAsync(tripNumber);
-            var rtSegment = tripSegments.FirstOrDefault(ts => ts.TripSegType == BasicTripTypeConstants.ReturnYard || ts.TripSegType == BasicTripTypeConstants.Scale);
+            var groupingList = containers as IList<Grouping<TripSegmentModel, TripSegmentContainerModel>> ?? containers.ToList();
+            var segmentsToProcess = new List<TripSegmentModel>();
 
-            if (rtSegment == null) return;
-
-            var rtContainers =
-                await FindAllContainersForTripSegmentAsync(rtSegment.TripNumber, rtSegment.TripSegNumber);
-
-            foreach (var container in containers.Where(segment => IsTripLegLoaded(segment.Key)).SelectMany(segment => segment))
+            for (var i = 0; i < tripSegments.Count; i++)
             {
-                var sameContainerNumber = rtContainers.FirstOrDefault(ct => ct.TripSegContainerNumber == container.TripSegContainerNumber);
-                var noContainerNumber = rtContainers.FirstOrDefault(ct => ct.TripSegContainerNumber == null);
+                if (int.Parse(tripSegments.ElementAt(i).TripSegNumber) <= int.Parse(groupingList.LastOrDefault().Key.TripSegNumber))
+                    continue;
 
-                if (sameContainerNumber != null || noContainerNumber != null)
+                if (!IsTripLegScale(tripSegments.ElementAt(i)))
+                    break;
+
+                segmentsToProcess.Add(tripSegments.ElementAt(i));
+            }
+
+            foreach (var segment in segmentsToProcess)
+            {
+                var currentContainers = await FindAllContainersForTripSegmentAsync(segment.TripNumber, segment.TripSegNumber);
+
+                foreach (var container in groupingList.Where(segment2 => !IsTripLegDropped(segment2.Key)).SelectMany(segment2 => segment2))
                 {
-                    container.TripNumber = sameContainerNumber?.TripNumber ?? noContainerNumber.TripNumber;
-                    container.TripSegNumber = sameContainerNumber?.TripSegNumber ?? noContainerNumber.TripSegNumber;
-                    container.TripSegContainerSeqNumber = sameContainerNumber?.TripSegContainerSeqNumber ?? noContainerNumber.TripSegContainerSeqNumber;
+                    var sameContainerNumber = currentContainers.FirstOrDefault(ct => ct.TripSegContainerNumber == container.TripSegContainerNumber);
+                    var noContainerNumber = currentContainers.FirstOrDefault(ct => ct.TripSegContainerNumber == null);
 
-                    await UpdateTripSegmentContainerAsync(container);
-                }
-                else // Create new trip segment container for RT or SC
-                {
-                    var newSeqNumber = rtContainers.LastOrDefault().TripSegContainerSeqNumber + 1;
-                    container.TripSegContainerSeqNumber = (short)newSeqNumber;
-                    container.TripSegNumber = rtSegment.TripSegNumber;
-                    container.TripNumber = rtSegment.TripNumber;
+                    if (sameContainerNumber != null || noContainerNumber != null)
+                    {
+                        container.TripNumber = sameContainerNumber?.TripNumber ?? noContainerNumber.TripNumber;
+                        container.TripSegNumber = sameContainerNumber?.TripSegNumber ?? noContainerNumber.TripSegNumber;
+                        container.TripSegContainerSeqNumber = sameContainerNumber?.TripSegContainerSeqNumber ?? noContainerNumber.TripSegContainerSeqNumber;
 
-                    await CreateTripSegmentContainerAsync(container);
+                        await UpdateTripSegmentContainerAsync(container);
+                    }
+                    else // Create new trip segment container for RT or SC
+                    {
+                        var newSeqNumber = currentContainers.LastOrDefault().TripSegContainerSeqNumber + 1;
+                        container.TripSegContainerSeqNumber = (short)newSeqNumber;
+                        container.TripSegNumber = segment.TripSegNumber;
+                        container.TripNumber = segment.TripNumber;
+
+                        await CreateTripSegmentContainerAsync(container);
+                    }
                 }
             }
         }

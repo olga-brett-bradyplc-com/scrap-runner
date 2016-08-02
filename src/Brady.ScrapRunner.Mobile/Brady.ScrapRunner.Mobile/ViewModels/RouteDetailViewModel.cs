@@ -422,13 +422,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
             if (_tripService.IsTripLegTransaction(firstSegment))
             {
-                Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
             else if (_tripService.IsTripLegScale(firstSegment))
             {
-                Close(this);
-
                 if (_tripService.IsTripLegTypePublicScale(firstSegment))
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
                 else

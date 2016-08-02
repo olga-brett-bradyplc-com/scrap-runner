@@ -315,8 +315,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         */
         private async Task FinishTripLeg()
         {
-            var nextTripSegmentList = await _tripService.FindNextTripSegmentsAsync(TripNumber);
-            var nextTripSegment = nextTripSegmentList.FirstOrDefault();
             var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
             var lastSegment = Containers.Any(ts => ts.Key.TripSegNumber == tripSegments.Last().TripSegNumber);
 
@@ -352,6 +350,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     }
 
                     await _tripService.PropagateContainerUpdates(TripNumber, Containers);
+
+                    var nextTripSegmentList = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+                    var nextTripSegment = nextTripSegmentList.FirstOrDefault();
 
                     if (nextTripSegment?.TripSegDestCustHostCode == Containers.FirstOrDefault().Key.TripSegDestCustHostCode && _tripService.IsTripLegScale(nextTripSegment))
                     {
