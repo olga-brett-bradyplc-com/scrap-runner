@@ -24,11 +24,14 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .DisplayName("Employee Id");
 
             StringProperty(x => x.TripNumber);
+            StringProperty(x => x.SendOnlyNewModTrips);
 
             ViewDefaults()
                 .Property(x => x.EmployeeId)
-                .Property(x => x.TripNumber);
- 
+                .Property(x => x.TripNumber)
+                .Property(x => x.SendOnlyNewModTrips)
+                .OrderBy(x => x.EmployeeId);
+
         }
     }
 }

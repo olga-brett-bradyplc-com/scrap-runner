@@ -135,9 +135,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
 
-                    //Define this or pass this in from somewhere..
-                    bool bLogin = true;
-
                     //Process will return the following lists.
                     List<Trip> fullTripList = new List<Trip>();
                     List<TripSegment> fullTripSegmentList = new List<TripSegment>();
@@ -183,17 +180,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     // Get the list of trips for driver
                     List<Trip> tripList;
-                    //ToDo: Need to be able to determine if we are sending trips because of a login request or because
-                    //a new trip has been entered or an existing one modified for a driver that is logged in.
-                    //For now bLogin is true;
-                    if (bLogin)
+                    if (tripInfoProcess.SendOnlyNewModTrips == Constants.Yes)
                     {
-                        tripList = Common.GetTripsForDriverAtLogin(dataService, settings, userCulture, userRoleIds,
+                        tripList = Common.GetTripsForDriver(dataService, settings, userCulture, userRoleIds,
                           tripInfoProcess.EmployeeId, out fault);
                     }
                     else
                     {
-                        tripList = Common.GetTripsForDriver(dataService, settings, userCulture, userRoleIds,
+                        tripList = Common.GetTripsForDriverAtLogin(dataService, settings, userCulture, userRoleIds,
                           tripInfoProcess.EmployeeId, out fault);
                     }
                     if (fault != null)
