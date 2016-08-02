@@ -111,6 +111,7 @@
     <Compile Include="Services\DemoDataGenerator.cs" />
     <Compile Include="Services\ConnectionService.cs" />
     <Compile Include="Services\DriverService.cs" />
+    <Compile Include="Services\LocationGeofenceService.cs" />
     <Compile Include="Services\LocationOdometerService.cs" />
     <Compile Include="Services\LocationPathService.cs" />
     <Compile Include="Services\LocationService.cs" />
