@@ -213,7 +213,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         PrefDriverConstants.DEFEnableImageCapture,
                         PrefDriverConstants.DEFCountry,
                         PrefDriverConstants.DEFUseLitre,
-                        PrefDriverConstants.DEFUseKM
+                        PrefDriverConstants.DEFUseKM,
+                        PrefDriverConstants.DEFSendOnlyYardsForArea
                     };
                     var keepSet = new HashSet<string>(propNamesDesired);
 
