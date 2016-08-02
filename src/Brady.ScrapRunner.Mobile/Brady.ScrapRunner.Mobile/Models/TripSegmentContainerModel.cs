@@ -88,20 +88,13 @@
 
         // Convenience methods
         [Ignore]
-        public string DefaultTripSegContainerNumber
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(TripSegContainerNumber))
-                {
-                    return "<NO NUMBER>";
-                }
-                else
-                {
-                    return TripSegContainerNumber;
-                }
-                
-            }
-        }
+        public string DefaultTripSegContainerNumber => string.IsNullOrEmpty(TripSegContainerNumber) ? "<NO NUMBER>" : TripSegContainerNumber;
+
+        [Ignore]
+        public string DefaultTripContainerTypeSize
+            =>
+                string.IsNullOrEmpty(TripSegContainerSize)
+                    ? TripSegContainerType
+                    : TripSegContainerType + "-" + TripSegContainerSize;
     }
 }
