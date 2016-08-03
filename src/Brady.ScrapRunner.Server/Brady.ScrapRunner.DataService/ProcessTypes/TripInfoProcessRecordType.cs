@@ -42,7 +42,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         /// </summary>
         public override void ConfigureMapper()
         {
-            Mapper.CreateMap<ContainerChangeProcess, ContainerChangeProcess>();
+            Mapper.CreateMap<TripInfoProcess, TripInfoProcess>();
 
             // Note should we ever need to map the nested child list too, 
             // we would need to be more explicit.  see also: 
