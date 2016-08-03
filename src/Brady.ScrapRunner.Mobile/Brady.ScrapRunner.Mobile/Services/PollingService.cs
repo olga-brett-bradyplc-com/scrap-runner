@@ -101,7 +101,7 @@
             foreach (var trip in mappedTrips)
             {
                 var existingTrip = await _tripService.FindTripAsync(trip.TripNumber);
-                var isNewTrip = existingTrip != null;
+                var isNewTrip = existingTrip == null;
                 var tripContext = isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified;
                 if (isNewTrip)
                     await _tripService.CreateTripAsync(trip);
