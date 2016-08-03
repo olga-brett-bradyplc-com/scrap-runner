@@ -17,7 +17,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls
 {
     /// <summary>
     /// I'm not fond of this implementation, but having some serious issues with trying to get a custom
-    /// ExpandableListViewAdapter to work using MvvmCross.
+    /// ExpandableListViewAdapter to work with MvvmCross.
     /// 
     /// The premise of this impl is to allow our ExpandableListView to uniformally scroll with other sibiling elements
     /// in a parent ScrollView. Since android ListViews, et. al., have their own scrolling mechanism, typically you 
@@ -29,7 +29,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls
     /// </summary>
     public class MvxExpandableExListView : MvxExpandableListView
     {
-        private bool _initialExpand = false;
         public MvxExpandableExListView(Context context, IAttributeSet attrs) : base(context, attrs)
         {
         }
@@ -58,12 +57,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls
 
         protected override void OnDraw(Canvas canvas)
         {
-            if (!_initialExpand)
-            {
-                ExpandAll();
-                _initialExpand = true;
-            }
-
             SetListViewHeight();
         }
         

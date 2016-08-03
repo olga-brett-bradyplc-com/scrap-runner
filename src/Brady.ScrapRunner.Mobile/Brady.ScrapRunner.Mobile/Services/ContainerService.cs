@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Interfaces;
@@ -38,12 +39,11 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// 
         /// </summary>
         /// <param name="containerChange"></param>
-        /// <param name="isInitialPull"></param>
         /// <returns></returns>
         public Task UpdateContainerChangeIntoMaster(List<ContainerChange> containerChange)
         {
-            var deleted = containerChange.FindAll(ct => ct.ActionFlag == "D").ToList();
-            var nonDeleted = containerChange.FindAll(ct => ct.ActionFlag != "D").ToList();
+            var deleted = containerChange.FindAll(ct => ct.ActionFlag == ContainerChangeConstants.Delete).ToList();
+            var nonDeleted = containerChange.FindAll(ct => ct.ActionFlag != ContainerChangeConstants.Delete).ToList();
 
             var deletedMapped = AutoMapper.Mapper.Map<List<ContainerChange>, List<ContainerMasterModel>>(deleted);
             foreach (var deletedItem in deletedMapped)

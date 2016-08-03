@@ -69,7 +69,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
-            var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
             foreach (var tsm in segments)
@@ -180,50 +180,60 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         When driver selects Yes, segment is complete.*/
         private async Task ExecuteContinueCommandAsync()
         {
-            //popup "Finished with scale"
-            var result = await UserDialogs.Instance.ConfirmAsync(AppResources.FinishedScale);
-            if (result)
+            var tripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
+            var lastSegment = Containers.Any(ts => ts.Key.TripSegNumber == tripSegments.Last().TripSegNumber);
+            
+            var message = (lastSegment)
+                ? AppResources.PerformTripSegmentComplete + "\n\n" + AppResources.CompleteTrip
+                : AppResources.PerformTripSegmentComplete;
+
+            var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmLabel, AppResources.Yes, AppResources.No);
+            if (confirm)
             {
-                var currentUser = await _driverService.GetCurrentDriverStatusAsync();
-
-                var containerProcess = await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
                 {
-                    EmployeeId = currentUser.EmployeeId,
-                    PowerId = currentUser.PowerId,
-                    ActionType = ContainerActionTypeConstants.Done,
-                    ActionDateTime = DateTime.Now,
-                    TripNumber = TripNumber,
-                    TripSegNumber = TripSegNumber,
-                    ContainerNumber = TripSegContainerNumber,
-                    ActionDesc = SelectedReason,
-                    Gross1ActionDateTime = GrossTime,
-                    Gross2ActionDateTime = SecondGrossTime,
-                    TareActionDateTime = TareTime
-                });
+                    var containerProcess =
+                        await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                        {
+                            EmployeeId = CurrentDriver.EmployeeId,
+                            PowerId = CurrentDriver.PowerId,
+                            ActionType = ContainerActionTypeConstants.Done,
+                            ActionDateTime = DateTime.Now,
+                            TripNumber = TripNumber,
+                            TripSegNumber = TripSegNumber,
+                            ContainerNumber = TripSegContainerNumber,
+                            ActionDesc = SelectedReason,
+                            Gross1ActionDateTime = GrossTime,
+                            Gross2ActionDateTime = SecondGrossTime,
+                            TareActionDateTime = TareTime
+                        });
 
-                TripSegmentModel segment = await _tripService.FindTripSegmentInfoAsync(TripNumber, TripSegNumber);
+                    var segment = await _tripService.FindTripSegmentInfoAsync(TripNumber, TripSegNumber);
 
-                var doneProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
-                {
-                    EmployeeId = currentUser.EmployeeId,
-                    TripNumber = TripNumber,
-                    TripSegNumber = TripSegNumber,
-                    ActionDateTime = DateTime.Now,
-                    ActionType = TripSegmentActionTypeConstants.Done,
-                    PowerId = currentUser.PowerId,
-                    DriverModified = Constants.Yes,
-                    Latitude = segment.TripSegEndLatitude,
-                    Longitude = segment.TripSegEndLongitude
+                    var doneProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                    {
+                        EmployeeId = CurrentDriver.EmployeeId,
+                        TripNumber = TripNumber,
+                        TripSegNumber = TripSegNumber,
+                        ActionDateTime = DateTime.Now,
+                        ActionType = TripSegmentActionTypeConstants.Done,
+                        PowerId = CurrentDriver.PowerId,
+                        DriverModified = Constants.Yes,
+                        Latitude = segment.TripSegEndLatitude,
+                        Longitude = segment.TripSegEndLongitude
 
-                });
+                    });
 
-                if (!doneProcess.WasSuccessful)
-                    await UserDialogs.Instance.AlertAsync(doneProcess.Failure.Summary,
-                        AppResources.Error, AppResources.OK);
+                    if (!doneProcess.WasSuccessful)
+                        await UserDialogs.Instance.AlertAsync(doneProcess.Failure.Summary,
+                            AppResources.Error, AppResources.OK);
+                }
+
 
                 await ExecuteNextStage();
             }
         }
+
         private ObservableCollection<CodeTableModel> _reviewReasonsList;
         public ObservableCollection<CodeTableModel> ReviewReasonsList
         {
@@ -250,7 +260,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 var alertAsync =
                     await
-                        UserDialogs.Instance.ActionSheetAsync("Select Reason Code", "", "Cancel", null,
+                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectReviewReason, AppResources.Cancel, "", null,
                             ReviewReasonsList.Select(cm => cm.CodeDisp1).ToArray());
 
                 var currentUser = await _driverService.GetCurrentDriverStatusAsync();
@@ -297,14 +307,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             });
 
                             if (!containerProcess.WasSuccessful)
-                                await UserDialogs.Instance.AlertAsync(containerProcess.Failure.Summary,
-                                    AppResources.Error, AppResources.OK);
+                                await UserDialogs.Instance.AlertAsync(containerProcess.Failure.Summary, AppResources.Error, AppResources.OK);
 
-                            await
-                                _tripService.MarkExceptionTripSegmentContainerAsync(container, reasonItem.CodeDisp1);
+                            await _tripService.MarkExceptionTripSegmentContainerAsync(container, reasonItem.CodeDisp1);
                         }
                     }
                 }
+
                 CantProcessLabel = AppResources.CanProcess;
             }
             else
@@ -323,8 +332,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (!tripSegmentContainers.TakeWhile(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)).Any())
             {
-                await _tripService.CompleteTripAsync(TripNumber);
-
                 foreach (var segment in Containers)
                 {
                     var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
@@ -345,21 +352,34 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
                 }
 
-                await _tripService.PropagateContainerUpdates(TripNumber, Containers);
-
                 var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
-                Close(this);
-                if (nextTripSegment.Any())
+
+                if(nextTripSegment.Any())
+                    await _tripService.PropagateContainerUpdates(TripNumber, Containers);
+
+                // We check to see if the next trip segment has the same TripSegDestCustHostCode as the current segment, and if so,
+                // send them to the transaction summary screen. Right now we're making the assumption that we would never go from the
+                // public scale screen to the yard scale screen. Please fix if that assumption is wrong
+                // We also call Close for each scenrio seperately because of the slight delay ClearDriverStatus and CompeteTripAsync cause,
+                // which causes weird UI issues to pop up if we close before we call those two methods
+                if (Containers.LastOrDefault().Key?.TripSegDestCustHostCode == nextTripSegment?.FirstOrDefault().TripSegDestCustHostCode)
                 {
-                    ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber, methodOfEntry = MethodOfEntry });
+                    Close(this);
+                    ShowViewModel<TransactionSummaryViewModel>(new {tripNumber = TripNumber});
+                }
+                else if (nextTripSegment.Any())
+                {
+                    Close(this);
+                    ShowViewModel<RouteDetailViewModel>(new { tripNumber = TripNumber });
                 }
                 else
                 {
+                    await _driverService.ClearDriverStatus(CurrentDriver, true);
                     await _tripService.CompleteTripAsync(TripNumber);
+                    Close(this);
                     ShowViewModel<RouteSummaryViewModel>();
                 }
             }
-
             else
             {
                 Close(this);

@@ -21,6 +21,7 @@
   <color name="material_red_500">#b51717</color>
   <color name="material_red_700">#7F1010</color>
 
+  <color name="material_green_100">#f0f4ed</color>
   <color name="material_green_300">#5BE326</color>
   <color name="material_green_500">#43b517</color>
   <color name="material_green_700">#2F7F10</color>
@@ -68,5 +69,7 @@
   <color name="delayed_pressed">@color/material_orange_700</color>
 
   <color name="incoming_message">@color/material_white</color>
+
+  <color name="current_transaction_background">@color/material_green_100</color>
 
 </resources>

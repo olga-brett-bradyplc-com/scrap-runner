@@ -44,7 +44,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         protected override bool NavMenuEnabled => true;
         protected override int NavColor => Resource.Color.arrive;
 
-        public override async void OnViewCreated(View view, Bundle savedInstanceState)
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             MobileBarcodeScanner.Initialize(Activity.Application);
             _scannerFragment = new ZXingScannerFragment();
@@ -62,16 +62,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             //_allowRtnAddToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnAdd, OnAllowRtnAddChanged);
             _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
-
-            await Task.Delay(3000);
-            Scan();
         }
-        
-        //public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
-        //{
-        //    inflater.Inflate(Resource.Menu.transactionsummary_menu, menu);
-        //    base.OnCreateOptionsMenu(menu, inflater);
-        //}
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
