@@ -148,14 +148,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (!signInResult)
                     return;
 
-                Close(this);
-
                 var containers = await _containerService.FindPowerIdContainersAsync(TruckId);
                 var autoDrop =
                     await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAutoDropContainers);
 
                 // Driver was in the middle of a trip during their last session, so return them to the appropiate screen
-                if (!string.IsNullOrEmpty(CurrentDriver.TripNumber) && !string.IsNullOrEmpty(CurrentDriver.TripSegNumber) && CurrentDriver.Status != DriverStatusSRConstants.LoggedIn)
+                if (!string.IsNullOrEmpty(CurrentDriver.TripNumber) && !string.IsNullOrEmpty(CurrentDriver.TripSegNumber) && CurrentDriver.Status != DriverStatusSRConstants.LoggedIn && CurrentDriver.Status != DriverStatusSRConstants.Available)
                 {
                     ShowViewModel<RouteDetailViewModel>(new { tripNumber = CurrentDriver.TripNumber, status = CurrentDriver.Status });
                     UserDialogs.Instance.WarnToast(AppResources.SessionRestoreHeader, AppResources.SessionRestoreMessage);
@@ -392,8 +390,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
-
             }
+
             _backgroundScheduler.Schedule(60000);
             _locationService.Start();
             _locationOdometerService.Start(Convert.ToDouble(Odometer));

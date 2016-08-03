@@ -34,7 +34,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             SubTitle = AppResources.Trip + $" {TripNumber}";
             using (var tripDataLoad = UserDialogs.Instance.Loading(AppResources.LoadingTripData, maskType: MaskType.Clear))
             {
-                var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+                var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
                 var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
                 foreach (var tsm in segments)

@@ -44,7 +44,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public override async void Start()
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
-            var segments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
 
             foreach (var tsm in segments) 
@@ -250,9 +250,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (!tripSegmentContainers.TakeWhile(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)).Any())
             {
-                await _driverService.ClearDriverStatus(CurrentDriver, true);
-                await _tripService.CompleteTripAsync(TripNumber);
-
                 foreach (var segment in Containers)
                 {
                     var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
@@ -272,6 +269,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     else
                         UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
                 }
+
+                await _driverService.ClearDriverStatus(CurrentDriver, true);
+                await _tripService.CompleteTripAsync(TripNumber);
 
                 Close(this);
                 ShowViewModel<RouteSummaryViewModel>();

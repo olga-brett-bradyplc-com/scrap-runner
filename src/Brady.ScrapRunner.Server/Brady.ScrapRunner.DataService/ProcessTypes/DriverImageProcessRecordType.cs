@@ -288,8 +288,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             //Create the directory if it does not already exist
                             var file = new FileInfo(imagePath);
                             file.Directory.Create();
-                            //Save the image to a file of type png
-                            signatureImage.Save(fullImagePath, ImageFormat.Png);
+                            //Save the image to a file of type jpeg
+                            signatureImage.Save(fullImagePath, ImageFormat.Jpeg);
                         }
                         catch (Exception e)
                         {
