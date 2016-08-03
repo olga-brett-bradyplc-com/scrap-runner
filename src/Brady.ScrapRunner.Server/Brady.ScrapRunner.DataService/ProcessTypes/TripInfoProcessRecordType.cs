@@ -37,19 +37,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     public class TripInfoProcessRecordType : ChangeableRecordType
             <TripInfoProcess, string, TripInfoProcessValidator, TripInfoProcessDeletionValidator>
     {
+
         /// <summary>
         /// Mandatory implementation of virtual base class method.
         /// </summary>
         public override void ConfigureMapper()
         {
-            Mapper.CreateMap<ContainerChangeProcess, ContainerChangeProcess>();
-
-            // Note should we ever need to map the nested child list too, 
-            // we would need to be more explicit.  see also: 
-            // http://stackoverflow.com/questions/9394833/automapper-with-nested-child-list
-            // Mapper.CreateMap<TripInfoProcess, TripInfoProcess>()
-            //    .ForMember(dest => dest.Trip, opts => opts.MapFrom(src => src.Trip));
-            // Mapper.CreateMap<Trip, Trip>();
+            Mapper.CreateMap<TripInfoProcess, TripInfoProcess>();
         }
 
         /// <summary>
