@@ -60,7 +60,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     canvas.DrawBitmap(signatureBitmap, 0, 0, null);
                     using (var ms = new MemoryStream())
                     {
-                        opaqueBitmap.Compress(Bitmap.CompressFormat.Png, 80, ms);
+                        opaqueBitmap.Compress(Bitmap.CompressFormat.Jpeg, 100, ms);
                         ViewModel.ConfirmTransactionsCommand.ExecuteAsync(ms.ToArray());
                     }
                 }
