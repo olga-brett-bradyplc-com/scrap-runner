@@ -18,6 +18,7 @@ namespace Brady.ScrapRunner.Domain.Process
         /// </summary>
         public virtual string EmployeeId { get; set; }
         public virtual string TripNumber { get; set; }
+        public virtual string SendOnlyNewModTrips { get; set; }
 
         /// <summary>
         /// The return values
@@ -81,6 +82,7 @@ namespace Brady.ScrapRunner.Domain.Process
         {
             StringBuilder sb = new StringBuilder("TripInfoProcess{");
             sb.Append("EmployeeId:" + EmployeeId);
+            sb.Append(", SendOnlyNewModTrips: " + SendOnlyNewModTrips);
             sb.Append("}");
             return sb.ToString();
         }
