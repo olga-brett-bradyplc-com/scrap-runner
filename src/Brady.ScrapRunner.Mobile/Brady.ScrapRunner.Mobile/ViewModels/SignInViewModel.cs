@@ -390,8 +390,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
-
             }
+
             _backgroundScheduler.Schedule(60000);
             _locationService.Start();
             _locationOdometerService.Start(Convert.ToDouble(Odometer));
