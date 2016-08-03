@@ -81,10 +81,10 @@ namespace Brady.ScrapRunner.Mobile.Droid
         protected override void InitializeLastChance()
         {
             base.InitializeLastChance();
-#if DEBUG
+//#if DEBUG
             // Ignore SSL certificate errors while debugging.
             ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-#endif
+//#endif
             // This plugin doesn't use MvvmCross Plugin Bootstrapper.
             Mvx.RegisterType<ISettings, Plugin.Settings.SettingsImplementation>();
 

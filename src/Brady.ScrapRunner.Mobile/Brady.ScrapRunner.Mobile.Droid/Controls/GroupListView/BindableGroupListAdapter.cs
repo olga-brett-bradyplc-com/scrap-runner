@@ -144,7 +144,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                 }
 
                 if (info != null)
-                    info.Text = $"{tscm.DefaultTripSegContainerNumber} {tscm.TripSegContainerType}-{tscm.TripSegContainerSize}";
+                    info.Text = $"{tscm.DefaultTripSegContainerNumber} {tscm.DefaultTripContainerTypeSize}";
             }
 
             return tempView;

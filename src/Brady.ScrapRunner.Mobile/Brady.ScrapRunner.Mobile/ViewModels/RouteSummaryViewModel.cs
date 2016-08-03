@@ -10,7 +10,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class RouteSummaryViewModel : BaseViewModel
     {
-        private readonly ITripService _tripService; 
+        private readonly ITripService _tripService;
 
         public RouteSummaryViewModel(ITripService tripService)
         {
@@ -39,13 +39,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _selectedTrip; }
             set { SetProperty(ref _selectedTrip, value); }
         }
-        
+
 
         private IMvxCommand _routeSelectedCommand;
         public IMvxCommand RouteSelectedCommand => _routeSelectedCommand ?? (_routeSelectedCommand = new MvxCommand<TripModel>(ExecuteRouteSelectedCommand));
 
-
-        // @TODO : Put in logic that makes this read-only if driver is currently on a trip
         public void ExecuteRouteSelectedCommand(TripModel selectedTrip)
         {
             ShowViewModel<RouteDetailViewModel>(new {tripNumber = selectedTrip.TripNumber});
