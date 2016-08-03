@@ -386,7 +386,7 @@
         /// <summary>Picture: jpg</summary>
         public static readonly string Picture = "jpg";
         /// <summary>Signature: png</summary>
-        public static readonly string Signature = "png";
+        public static readonly string Signature = "jpg";
     }
 
 
