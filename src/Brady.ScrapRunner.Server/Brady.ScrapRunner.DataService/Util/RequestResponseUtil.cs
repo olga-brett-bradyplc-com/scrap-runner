@@ -3,15 +3,12 @@ using System;
 using System.Text;
 using BWF.DataServices.Domain.Models;
 using BWF.DataServices.Metadata.Interfaces;
-using log4net;
 using NHibernate.Util;
 
 namespace Brady.ScrapRunner.DataService.Util
 {
-    public class RequestResponseSummarizer
+    public class RequestResponseUtil
     {
-
-        protected static readonly ILog BackupLog = LogManager.GetLogger(typeof(RequestResponseSummarizer));
 
         /// <summary>
         /// Return a string builder containing the first half a request/response.
@@ -23,26 +20,26 @@ namespace Brady.ScrapRunner.DataService.Util
         public static StringBuilder CaptureRequest<TId, TItem>(ChangeSet<TId, TItem> changeSet)
             where TItem : IHaveId<TId>
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("Request type " + typeof(TItem) + ": ");
-            //sb.Append(changeSet);
+            var type = typeof (TItem);
+            var sb = new StringBuilder();
+            sb.Append("Request " + type.Name + ":");
 
             if (changeSet.Update.Values.Any())
             {
-                sb.Append("Updates:");
-                sb.Append(String.Join(", ", changeSet.Update.Values));
+                sb.Append(" Updates:");
+                sb.Append(string.Join(", ", changeSet.Update.Values));
             }
 
             if (changeSet.Create.Values.Any())
             {
-                sb.Append("Creates:");
-                sb.Append(String.Join(", ", changeSet.Create.Values));
+                sb.Append(" Creates:");
+                sb.Append(string.Join(", ", changeSet.Create.Values));
             }
 
             if (changeSet.Delete.Any())
             {
-                sb.Append("Deletes:");
-                sb.Append(String.Join(", ", changeSet.Delete));
+                sb.Append(" Deletes:");
+                sb.Append(string.Join(", ", changeSet.Delete));
             }
 
             return sb;
@@ -55,10 +52,9 @@ namespace Brady.ScrapRunner.DataService.Util
         /// </summary>
         /// <typeparam name="TId"></typeparam>
         /// <param name="changeSetResult"></param>
-        /// <param name="sb"></param>
-        /// <param name="log"></param>
-        public static void CaptureResponse<TId>(ChangeSetResult<TId> changeSetResult,
-            StringBuilder sb, ILog log)
+        /// <param name="sb">The string builder containing the corresponding request.  If null a new one is created.</param>
+        public static string CaptureResponse<TId>(ChangeSetResult<TId> changeSetResult,
+            StringBuilder sb)
         {
             //var type = typeof (TId);
             if (sb == null)
@@ -69,17 +65,17 @@ namespace Brady.ScrapRunner.DataService.Util
 
             if (changeSetResult.FailedUpdates.Any())
             {
-                sb.Append(" Failed Updates: ");
+                sb.Append(" Failed Updates:");
                 sb.Append(String.Join(", ", changeSetResult.FailedUpdates.Values));
             }
             if (changeSetResult.FailedCreates.Any())
             {
-                sb.Append(" Failed Creates: ");
+                sb.Append(" Failed Creates:");
                 sb.Append(String.Join(", ", changeSetResult.FailedCreates.Values));
             }
             if (changeSetResult.FailedDeletions.Any())
             {
-                sb.Append(" Failed Deletions: ");
+                sb.Append(" Failed Deletions:");
                 sb.Append(String.Join(", ", changeSetResult.FailedDeletions.Values));
             }
 
@@ -99,15 +95,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 sb.Append(String.Join(", ", changeSetResult.SuccessfullyDeleted.GetEnumerator()));
             }
 
-            if (null != log)
-            {
-                log.Info(sb.ToString());
-            }
-            else
-            {
-                BackupLog.Info(sb.ToString());
-            }
-
+            return sb.ToString();
         }
     }
 }

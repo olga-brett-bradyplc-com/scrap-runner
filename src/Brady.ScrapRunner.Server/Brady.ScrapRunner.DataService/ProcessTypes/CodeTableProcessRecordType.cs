@@ -14,6 +14,7 @@ using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.Util;
+using log4net;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -33,6 +34,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     public class CodeTableProcessRecordType : ChangeableRecordType
                 <CodeTableProcess, string, CodeTableProcessValidator, CodeTableProcessDeletionValidator>
     {
+
+        // We hide the base logger deliberately. We name the logger after the domain obejct deliberately. 
+        // We want a clean logger name for sensible I/O capture.
+        protected new static readonly ILog log = LogManager.GetLogger(typeof(CodeTableProcess));
+
         /// <summary>
         /// Mandatory implementation of virtual base class method.
         /// </summary>
@@ -67,7 +73,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService,
             ChangeSet<string, CodeTableProcess> changeSet, ProcessChangeSetSettings settings)
         {
-
+            // Capture details of incoming request for logging the INFO level
+            var requestRespStrBld = RequestResponseUtil.CaptureRequest(changeSet);
             ISession session = null;
             ITransaction transaction = null;
 
@@ -185,6 +192,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             // otherwise we simply return the result.
             if (session == null)
             {
+                // Capture details of outgoing response too and log at INFO level
+                log.Info(RequestResponseUtil.CaptureResponse(changeSetResult, requestRespStrBld));
                 return changeSetResult;
             }
 
@@ -204,6 +213,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             session.Dispose();
             settings.Session = null;
 
+            // Capture details of outgoing response too and log at INFO level
+            log.Info(RequestResponseUtil.CaptureResponse(changeSetResult, requestRespStrBld));
             return changeSetResult;
         }
     }
