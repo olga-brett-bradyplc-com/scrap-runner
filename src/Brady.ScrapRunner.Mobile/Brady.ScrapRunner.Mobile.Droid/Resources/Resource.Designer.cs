@@ -4269,8 +4269,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06010a
 			public const int add_new_container_loaddrop_nav = 2131099914;
 			
-			// aapt resource value: 0x7f06011c
-			public const int add_rtn_nav = 2131099932;
+			// aapt resource value: 0x7f06011d
+			public const int add_rtn_nav = 2131099933;
 			
 			// aapt resource value: 0x7f06004c
 			public const int alertTitle = 2131099724;
@@ -4389,6 +4389,9 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060098
 			public const int content_layout = 2131099800;
 			
+			// aapt resource value: 0x7f06010e
+			public const int current_actions_nav = 2131099918;
+			
 			// aapt resource value: 0x7f0600eb
 			public const int cust_address = 2131099883;
 			
@@ -4482,8 +4485,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06005f
 			public const int edit_query = 2131099743;
 			
-			// aapt resource value: 0x7f06011b
-			public const int edit_rtn_nav = 2131099931;
+			// aapt resource value: 0x7f06011c
+			public const int edit_rtn_nav = 2131099932;
 			
 			// aapt resource value: 0x7f0600af
 			public const int employeeIdInputField = 2131099823;
@@ -4617,44 +4620,44 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600b8
 			public const int name_input_field = 2131099832;
 			
-			// aapt resource value: 0x7f060118
-			public const int nav_aboutscraprunner = 2131099928;
-			
-			// aapt resource value: 0x7f060110
-			public const int nav_adddelay = 2131099920;
-			
-			// aapt resource value: 0x7f06010f
-			public const int nav_changeodometer = 2131099919;
-			
-			// aapt resource value: 0x7f060115
-			public const int nav_composemessage = 2131099925;
+			// aapt resource value: 0x7f060119
+			public const int nav_aboutscraprunner = 2131099929;
 			
 			// aapt resource value: 0x7f060111
-			public const int nav_fuelentry = 2131099921;
+			public const int nav_adddelay = 2131099921;
+			
+			// aapt resource value: 0x7f060110
+			public const int nav_changeodometer = 2131099920;
 			
 			// aapt resource value: 0x7f060116
-			public const int nav_helpcenter = 2131099926;
+			public const int nav_composemessage = 2131099926;
 			
 			// aapt resource value: 0x7f060112
-			public const int nav_loadcontainer = 2131099922;
-			
-			// aapt resource value: 0x7f06011a
-			public const int nav_logout = 2131099930;
-			
-			// aapt resource value: 0x7f060114
-			public const int nav_messages = 2131099924;
-			
-			// aapt resource value: 0x7f060119
-			public const int nav_reportproblem = 2131099929;
-			
-			// aapt resource value: 0x7f06010e
-			public const int nav_routesummary = 2131099918;
+			public const int nav_fuelentry = 2131099922;
 			
 			// aapt resource value: 0x7f060117
-			public const int nav_setup = 2131099927;
+			public const int nav_helpcenter = 2131099927;
 			
 			// aapt resource value: 0x7f060113
-			public const int nav_takepicture = 2131099923;
+			public const int nav_loadcontainer = 2131099923;
+			
+			// aapt resource value: 0x7f06011b
+			public const int nav_logout = 2131099931;
+			
+			// aapt resource value: 0x7f060115
+			public const int nav_messages = 2131099925;
+			
+			// aapt resource value: 0x7f06011a
+			public const int nav_reportproblem = 2131099930;
+			
+			// aapt resource value: 0x7f06010f
+			public const int nav_routesummary = 2131099919;
+			
+			// aapt resource value: 0x7f060118
+			public const int nav_setup = 2131099928;
+			
+			// aapt resource value: 0x7f060114
+			public const int nav_takepicture = 2131099924;
 			
 			// aapt resource value: 0x7f06006f
 			public const int navigation_frame = 2131099759;

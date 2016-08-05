@@ -94,8 +94,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             AllowRtnAdd = doesRtnSegExistAtEnd && Constants.Yes.Equals(defAllowAddRt);
 
-            MenuFilter = MenuFilterEnum.OnTrip;
-
             base.Start();
         }
 

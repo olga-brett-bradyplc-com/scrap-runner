@@ -118,8 +118,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             AllowRtnEdit = doesRtnSegExist && Constants.Yes.Equals(defAllowChangeRt);
 
-            MenuFilter = MenuFilterEnum.NotOnTrip; // Reset for when we start a new trip segment
-
             // If the user is already on a trip, or DEFEnforceSeqProcess = Y and they're not on their first avaliable trip, mark the trip as read-only
             var seqEnforced = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFEnforceSeqProcess);
             if (!string.IsNullOrEmpty(CurrentDriver.TripNumber) && 
@@ -319,7 +317,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     await _driverService.UpdateDriver(CurrentDriver);
 
                     CurrentStatus = DriverStatusConstants.Enroute;
-                    MenuFilter = MenuFilterEnum.OnTrip;
                 }
             }
         }
@@ -422,10 +419,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
             if (_tripService.IsTripLegTransaction(firstSegment))
             {
+                Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
             else if (_tripService.IsTripLegScale(firstSegment))
             {
+                Close(this);
                 if (_tripService.IsTripLegTypePublicScale(firstSegment))
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
                 else

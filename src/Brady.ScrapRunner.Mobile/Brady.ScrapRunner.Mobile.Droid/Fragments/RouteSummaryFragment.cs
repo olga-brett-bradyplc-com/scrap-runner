@@ -3,8 +3,10 @@ using System.Linq;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
+using Brady.ScrapRunner.Mobile.Droid.Messages;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Messages;
+using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Platform;
@@ -18,14 +20,24 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     {
         private MvxSubscriptionToken _mvxSubscriptionToken;
         private IMvxMessenger _mvxMessenger;
+        private IDriverService _driverService;
 
         protected override int FragmentId => Resource.Layout.fragment_routesummary;
         protected override bool NavMenuEnabled => true;
 
-        public override void OnViewCreated(View view, Bundle savedInstanceState)
+        public override async void OnViewCreated(View view, Bundle savedInstanceState)
         {
             _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
             _mvxSubscriptionToken = _mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
+
+            _driverService = Mvx.Resolve<IDriverService>();
+
+            var driverStatus = await _driverService.GetCurrentDriverStatusAsync();
+
+            // If any of these conditions are true, then we're assuming they're previewing other trips
+            // as they would never manually be taken here if they were already in the middle of a trip
+            if (driverStatus.Status != "E" || driverStatus.Status != "A" || driverStatus.Status != "D")
+                _mvxMessenger.Publish(new MenuStateMessage(this) { Context = MenuState.Avaliable });
         }
 
         public override void OnDestroyView()
