@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Graphics;
 using Android.OS;
@@ -53,7 +54,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         protected override int FragmentId => Resource.Layout.fragment_routedetail;
         protected override bool NavMenuEnabled => true;
 
-        public override async void OnViewCreated(View view, Bundle savedInstanceState)
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
             _driverService = Mvx.Resolve<IDriverService>();
@@ -75,17 +76,22 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 _pager.CurrentItem = _pager.Adapter.Count + 2;
             };
 
+            var ignore = CheckMenuState();
+
+            _readOnlyToken = ViewModel.WeakSubscribe(() => ViewModel.ReadOnlyTrip, OnReadOnlyTripChanged);
+            _tripLegToken = ViewModel.WeakSubscribe(() => ViewModel.TripLegs, OnTripLegChanged);
+            _allowRtnEditToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnEdit, OnAllowRtnEditChanged);
+            _currentStatusToken = ViewModel.WeakSubscribe(() => ViewModel.CurrentStatus, OnCurrentStatusChanged);
+        }
+
+        private async Task CheckMenuState()
+        {
             var driverStatus = await _driverService.GetCurrentDriverStatusAsync();
 
             // If we're resuming a trip, set the menuing as "OnTrip"
             // TODO: Do we need to make this smarter? E.g., if they're on a trip, but previewing another trip should we enable/disable menu options?
             if (driverStatus.Status == "E" || driverStatus.Status == "A" || driverStatus.Status == "D")
                 _mvxMessenger.Publish(new MenuStateMessage(this) { Context = MenuState.OnTrip });
-
-            _readOnlyToken = ViewModel.WeakSubscribe(() => ViewModel.ReadOnlyTrip, OnReadOnlyTripChanged);
-            _tripLegToken = ViewModel.WeakSubscribe(() => ViewModel.TripLegs, OnTripLegChanged);
-            _allowRtnEditToken = ViewModel.WeakSubscribe(() => ViewModel.AllowRtnEdit, OnAllowRtnEditChanged);
-            _currentStatusToken = ViewModel.WeakSubscribe(() => ViewModel.CurrentStatus, OnCurrentStatusChanged);
         }
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)

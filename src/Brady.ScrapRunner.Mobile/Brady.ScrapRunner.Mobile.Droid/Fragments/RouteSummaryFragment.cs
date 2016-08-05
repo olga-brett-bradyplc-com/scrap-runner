@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
@@ -25,13 +26,18 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         protected override int FragmentId => Resource.Layout.fragment_routesummary;
         protected override bool NavMenuEnabled => true;
 
-        public override async void OnViewCreated(View view, Bundle savedInstanceState)
+        public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
             _mvxSubscriptionToken = _mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
 
             _driverService = Mvx.Resolve<IDriverService>();
 
+            var ignore = CheckMenuState();
+        }
+
+        private async Task CheckMenuState()
+        {
             var driverStatus = await _driverService.GetCurrentDriverStatusAsync();
 
             // If any of these conditions are true, then we're assuming they're previewing other trips
