@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain.Models;
 using BWF.DataServices.Metadata.Interfaces;
 
 namespace Brady.ScrapRunner.Domain.Process
-
 {
     /// <summary>
     /// A CodeTableProcess (request and response).  A pseudo-record.
@@ -18,6 +15,7 @@ namespace Brady.ScrapRunner.Domain.Process
         /// Mandatory input paramter
         /// </summary>
         public virtual string EmployeeId { get; set; }
+
         public virtual string CodeName { get; set; }
         public virtual string CodeValue { get; set; }
         public virtual string CodeDisp1 { get; set; }
@@ -28,11 +26,11 @@ namespace Brady.ScrapRunner.Domain.Process
         public virtual string CodeDisp6 { get; set; }
 
         /// <summary>
-        /// The return value
+        /// The return values
         /// </summary>
         public virtual List<CodeTable> CodeTables { get; set; }
 
-        public virtual String Id
+        public virtual string Id
         {
             get
             {
@@ -43,6 +41,7 @@ namespace Brady.ScrapRunner.Domain.Process
                 // no-op
             }
         }
+
         public virtual bool Equals(CodeTableProcess other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -60,21 +59,34 @@ namespace Brady.ScrapRunner.Domain.Process
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = (EmployeeId != null ? EmployeeId.GetHashCode() : 0);
-                return hashCode;
-            }
+            var hashCode = EmployeeId?.GetHashCode() ?? 0;
+            return hashCode;
         }
+
         /// <summary>
-        /// Relevant input values, useful for logging
+        /// Relevant input (and output) values, useful for logging
         /// </summary>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder("CodeTableProcess{");
+            var sb = new StringBuilder("CodeTableProcess{");
             sb.Append("EmployeeId:" + EmployeeId);
+            sb.Append(", CodeName:" + CodeName);
+            sb.Append(", CodeValue:" + CodeValue);
+            sb.Append(", CodeDisp1: " + CodeDisp1);
+            sb.Append(", CodeDisp2: " + CodeDisp2);
+            sb.Append(", CodeDisp3: " + CodeDisp3);
+            sb.Append(", CodeDisp4: " + CodeDisp4);
+            sb.Append(", CodeDisp5: " + CodeDisp5);
+            sb.Append(", CodeDisp6: " + CodeDisp6);
+            if (null != CodeTables)
+            {
+                sb.Append(", CodeTables: [Count: ");
+                sb.Append(CodeTables.Count);
+                sb.Append("]");
+            }
             sb.Append("}");
             return sb.ToString();
         }
+
     }
 }
