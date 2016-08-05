@@ -36,7 +36,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             // If any of these conditions are true, then we're assuming they're previewing other trips
             // as they would never manually be taken here if they were already in the middle of a trip
-            if (driverStatus.Status != "E" || driverStatus.Status != "A" || driverStatus.Status != "D")
+            if (driverStatus.Status != "E" && driverStatus.Status != "A" && driverStatus.Status != "D")
                 _mvxMessenger.Publish(new MenuStateMessage(this) { Context = MenuState.Avaliable });
         }
 

@@ -55,7 +55,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         public override async void OnViewCreated(View view, Bundle savedInstanceState)
         {
-            if(ViewModel.AllowRtnEdit.HasValue)
+            _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
+            _driverService = Mvx.Resolve<IDriverService>();
+
+            if (ViewModel.AllowRtnEdit.HasValue)
                 HasOptionsMenu = ViewModel.AllowRtnEdit.Value;
 
             if (_currentStatus != null || ViewModel.CurrentStatus != null)
@@ -72,17 +75,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 _pager.CurrentItem = _pager.Adapter.Count + 2;
             };
 
-            _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
-            _driverService = Mvx.Resolve<IDriverService>();
-
             var driverStatus = await _driverService.GetCurrentDriverStatusAsync();
 
             // If we're resuming a trip, set the menuing as "OnTrip"
-            // TODO: Do we need to make this smarter? E.g., if they're on a trip, but previewing another trip
-            // TODO: should we enable/disable menu options?
-            if ( (driverStatus.Status == "E" || driverStatus.Status == "A" || driverStatus.Status == "D") && 
-                 !string.IsNullOrEmpty(driverStatus.TripNumber) &&
-                 !string.IsNullOrEmpty(driverStatus.TripSegNumber))
+            // TODO: Do we need to make this smarter? E.g., if they're on a trip, but previewing another trip should we enable/disable menu options?
+            if (driverStatus.Status == "E" || driverStatus.Status == "A" || driverStatus.Status == "D")
                 _mvxMessenger.Publish(new MenuStateMessage(this) { Context = MenuState.OnTrip });
 
             _readOnlyToken = ViewModel.WeakSubscribe(() => ViewModel.ReadOnlyTrip, OnReadOnlyTripChanged);
