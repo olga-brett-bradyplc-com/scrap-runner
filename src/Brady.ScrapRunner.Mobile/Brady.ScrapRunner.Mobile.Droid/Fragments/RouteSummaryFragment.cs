@@ -28,11 +28,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
-            _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
-            _mvxSubscriptionToken = _mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
+            // TODO : Disabling this until polling service pulls TripSegments and TripSegmentContainers when fetching new trips
+            //_mvxMessenger = Mvx.Resolve<IMvxMessenger>();
+            //_mvxSubscriptionToken = _mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
 
             _driverService = Mvx.Resolve<IDriverService>();
-
             var ignore = CheckMenuState();
         }
 
