@@ -28,6 +28,7 @@
                 android:id="@+id/employeeIdInputField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 local:MvxBind="Text UserName"
                 local:MvxLang="Hint UserNameHint"
                 android:hint="Employee ID" />
@@ -41,6 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
+                android:singleLine="true"
                 local:MvxBind="Text Password"
                 local:MvxLang="Hint PasswordHint" />
         </android.support.design.widget.TextInputLayout>
@@ -52,6 +54,7 @@
                 android:id="@+id/powerUnitIdInputField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 local:MvxBind="Text TruckId"
                 local:MvxLang="Hint TruckIdHint" />
         </android.support.design.widget.TextInputLayout>
@@ -63,6 +66,7 @@
                 android:id="@+id/odometerInputField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 android:inputType="number"
                 local:MvxBind="Text Odometer, Converter=NullableInt"
                 local:MvxLang="Hint OdometerReadingHint" />
