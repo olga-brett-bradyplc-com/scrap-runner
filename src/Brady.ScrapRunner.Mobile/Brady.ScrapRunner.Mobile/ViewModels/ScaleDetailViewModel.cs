@@ -270,8 +270,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
                 }
 
-                await _driverService.ClearDriverStatus(CurrentDriver, true);
                 await _tripService.CompleteTripAsync(TripNumber);
+
+                var nextTrip = await _tripService.FindNextTripAsync();
+                var seg = await _tripService.FindNextTripSegmentsAsync(nextTrip?.TripNumber);
+
+                CurrentDriver.Status = nextTrip == null ? DriverStatusSRConstants.NoWork : DriverStatusSRConstants.Available;
+                CurrentDriver.TripNumber = nextTrip == null ? "" : nextTrip.TripNumber;
+                CurrentDriver.TripSegNumber = seg.Count < 1 ? "" : seg.FirstOrDefault().TripSegNumber;
+
+                await _driverService.UpdateDriver(CurrentDriver);
 
                 Close(this);
                 ShowViewModel<RouteSummaryViewModel>();

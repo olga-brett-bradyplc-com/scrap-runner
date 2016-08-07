@@ -18,6 +18,7 @@ using Brady.ScrapRunner.DataService.Interfaces;
 using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.Domain.Enums;
 using Brady.ScrapRunner.DataService.Util;
+using log4net;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -37,19 +38,16 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
     public class TripInfoProcessRecordType : ChangeableRecordType
             <TripInfoProcess, string, TripInfoProcessValidator, TripInfoProcessDeletionValidator>
     {
+        // We hide the base logger deliberately. We name the logger after the domain obejct deliberately. 
+        // We want a clean logger name for sensible I/O capture.
+        protected new static readonly ILog log = LogManager.GetLogger(typeof(TripInfoProcess));
+
         /// <summary>
         /// Mandatory implementation of virtual base class method.
         /// </summary>
         public override void ConfigureMapper()
         {
             Mapper.CreateMap<TripInfoProcess, TripInfoProcess>();
-
-            // Note should we ever need to map the nested child list too, 
-            // we would need to be more explicit.  see also: 
-            // http://stackoverflow.com/questions/9394833/automapper-with-nested-child-list
-            // Mapper.CreateMap<TripInfoProcess, TripInfoProcess>()
-            //    .ForMember(dest => dest.Trip, opts => opts.MapFrom(src => src.Trip));
-            // Mapper.CreateMap<Trip, Trip>();
         }
 
         /// <summary>
@@ -78,7 +76,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
         public override ChangeSetResult<string> ProcessChangeSet(IDataService dataService,
             ChangeSet<string, TripInfoProcess> changeSet, ProcessChangeSetSettings settings)
         {
-
+            // Capture details of incoming request for logging the INFO level
+            var requestRespStrBld = RequestResponseUtil.CaptureRequest(changeSet);
             ISession session = null;
             ITransaction transaction = null;
 
@@ -444,6 +443,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             // otherwise we simply return the result.
             if (session == null)
             {
+                // Capture details of outgoing response too and log at INFO level
+                log.Info(RequestResponseUtil.CaptureResponse(changeSetResult, requestRespStrBld));
                 return changeSetResult;
             }
 
@@ -465,6 +466,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             session.Dispose();
             settings.Session = null;
 
+            // Capture details of outgoing response too and log at INFO level
+            log.Info(RequestResponseUtil.CaptureResponse(changeSetResult, requestRespStrBld));
             return changeSetResult;
         }
     }

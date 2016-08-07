@@ -42,7 +42,6 @@
     <Compile Include="Converters\NotificationTypeValueConverter.cs" />
     <Compile Include="Converters\NullableIntValueConverter.cs" />
     <Compile Include="CustomLanguageBindingParser.cs" />
-    <Compile Include="Enums\MenuFilterEnum.cs" />
     <Compile Include="Enums\TerminalChangeEnum.cs" />
     <Compile Include="Helpers\ChangeSetExtensions.cs" />
     <Compile Include="Helpers\Grouping.cs" />

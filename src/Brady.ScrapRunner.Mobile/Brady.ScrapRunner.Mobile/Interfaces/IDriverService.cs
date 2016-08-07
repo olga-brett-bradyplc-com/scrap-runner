@@ -25,8 +25,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<EmployeeMaster> FindEmployeeMasterForDriverRemoteAsync(string employeeId);
 
-        Task<int> ClearDriverStatus(DriverStatusModel driver, bool clearTripInfo);
-
         Task<ChangeResultWithItem<DriverEnrouteProcess>> ProcessDriverEnrouteAsync(DriverEnrouteProcess driverEnrouteProcess);
 
         Task<ChangeResultWithItem<DriverArriveProcess>> ProcessDriverArrivedAsync(DriverArriveProcess driverArriveProcess);

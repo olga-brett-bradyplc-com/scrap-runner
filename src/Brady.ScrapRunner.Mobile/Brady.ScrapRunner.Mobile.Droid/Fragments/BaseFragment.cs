@@ -23,10 +23,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     {
         private Toolbar _toolbar;
         private MvxActionBarDrawerToggle _drawerToggle;
-        private NavigationView _navigationView;
         private IDisposable _titleToken;
         private IDisposable _subTitleToken;
-        private IDisposable _menuFilterToken;
 
         protected BaseFragment()
         {
@@ -77,8 +75,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     baseActivity.SupportActionBar.Subtitle = ViewModel.SubTitle;
                 _titleToken = ViewModel.WeakSubscribe(() => ViewModel.Title, OnTitleChanged);
                 _subTitleToken = ViewModel.WeakSubscribe(() => ViewModel.SubTitle, OnSubTitleChanged);
-
-                _menuFilterToken = ViewModel.WeakSubscribe(() => ViewModel.MenuFilter, OnMenuFilterChanged);
             }
 
             return view;
@@ -89,25 +85,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             var baseActivity = ((MainActivity)Activity);
             if (baseActivity.SupportActionBar == null) return;
             baseActivity.SupportActionBar.Title = ViewModel.Title;
-        }
-
-        private void OnMenuFilterChanged(object sender, PropertyChangedEventArgs args)
-        {
-            var baseActivity = ((MainActivity) Activity);
-            _navigationView = baseActivity.FindViewById<NavigationView>(Resource.Id.navigation_view);
-
-            switch (ViewModel.MenuFilter)
-            {
-                case MenuFilterEnum.OnTrip:
-                    _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(true);
-                    break;
-                default: // MenuFilterEnum.NotOnTrip
-                    _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_adddelay).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(false);
-                    break;
-            }
         }
 
         private void OnSubTitleChanged(object sender, PropertyChangedEventArgs args)

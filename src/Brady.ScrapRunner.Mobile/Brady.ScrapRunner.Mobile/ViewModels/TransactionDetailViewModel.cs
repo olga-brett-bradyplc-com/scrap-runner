@@ -91,9 +91,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (!string.IsNullOrEmpty(Container?.TripSegContainerLocation))
                 SelectedLocation =
                     CustomerLocationList.FirstOrDefault(l => string.Equals(l.CustLocation, Container.TripSegContainerLocation, StringComparison.CurrentCultureIgnoreCase));
-
-            MenuFilter = MenuFilterEnum.OnTrip;
-
+            
             base.Start();
         }
 
@@ -174,8 +172,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                     EmployeeId = CurrentDriver.EmployeeId,
                                     PowerId = CurrentDriver.PowerId,
                                     ActionType = ContainerActionTypeConstants.Exception,
-                                    ActionCode = exceptionDialogAsync,
-                                    ActionDesc = exceptionObj?.CodeDisp1,
+                                    ActionCode = exceptionObj.CodeValue,
+                                    ActionDesc = exceptionDialogAsync,
                                     ActionDateTime = DateTime.Now,
                                     MethodOfEntry = TripMethodOfCompletionConstants.Manual,
                                     TripNumber = TripNumber,
