@@ -477,7 +477,6 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <returns></returns>
         public async Task<int> CompleteTripAsync(string tripNumber)
         {
-            // @TODO : Implement remote process once it's completed
             var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
             trip.TripStatus = TripStatusConstants.Done;
             return await _tripRepository.UpdateAsync(trip);
@@ -547,7 +546,6 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <returns></returns>
         public async Task<int> MarkExceptionTripAsync(string tripNumber)
         {
-            // @TODO : Implement remote process once it's completed
             var trip = await _tripRepository.FindAsync(t => t.TripNumber == tripNumber);
             trip.TripStatus = TripStatusConstants.Exception;
             return await _tripRepository.UpdateAsync(trip);

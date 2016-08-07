@@ -36,13 +36,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _subTitle, value); }
         }
 
-        private MenuFilterEnum _menuFilter;
-        public MenuFilterEnum MenuFilter
-        {
-            get { return _menuFilter; }
-            set { SetProperty(ref _menuFilter, value); }
-        }
-
         protected ValidationResult Validate<TValidator, TType>(TType type) where TValidator : AbstractValidator<TType>, new()
         {
             var validator = new TValidator();
