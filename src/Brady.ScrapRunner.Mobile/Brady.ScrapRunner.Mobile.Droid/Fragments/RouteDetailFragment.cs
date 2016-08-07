@@ -76,7 +76,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 _pager.CurrentItem = _pager.Adapter.Count + 2;
             };
 
-            var ignore = CheckMenuState();
+            var task = CheckMenuState();
 
             _readOnlyToken = ViewModel.WeakSubscribe(() => ViewModel.ReadOnlyTrip, OnReadOnlyTripChanged);
             _tripLegToken = ViewModel.WeakSubscribe(() => ViewModel.TripLegs, OnTripLegChanged);

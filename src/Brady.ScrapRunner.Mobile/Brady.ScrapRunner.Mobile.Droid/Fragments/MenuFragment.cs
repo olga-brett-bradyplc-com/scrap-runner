@@ -72,28 +72,17 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             switch (msg.Context)
             {
                 case MenuState.Avaliable:
-                    _navigationView.Menu.FindItem(Resource.Id.nav_routesummary).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_changeodometer).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_adddelay).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_fuelentry).SetVisible(true);
+                    _navigationView.Menu.FindItem(Resource.Id.current_actions_nav).SetVisible(true);
                     _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(true);
                     _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(false);
                     break;
                 case MenuState.OnTrip:
-                    _navigationView.Menu.FindItem(Resource.Id.nav_routesummary).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_changeodometer).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_adddelay).SetVisible(true);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_fuelentry).SetVisible(true);
+                    _navigationView.Menu.FindItem(Resource.Id.current_actions_nav).SetVisible(true);
                     _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(false);
                     _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(true);
                     break;
                 case MenuState.OnDelay:
-                    _navigationView.Menu.FindItem(Resource.Id.nav_routesummary).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_changeodometer).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_adddelay).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_fuelentry).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_loadcontainer).SetVisible(false);
-                    _navigationView.Menu.FindItem(Resource.Id.nav_takepicture).SetVisible(false);
+                    _navigationView.Menu.FindItem(Resource.Id.current_actions_nav).SetVisible(false);
                     break;
             }
         }

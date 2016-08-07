@@ -28,20 +28,21 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
+            _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
+            _driverService = Mvx.Resolve<IDriverService>();
+
             // TODO : Disabling this until polling service pulls TripSegments and TripSegmentContainers when fetching new trips
-            //_mvxMessenger = Mvx.Resolve<IMvxMessenger>();
             //_mvxSubscriptionToken = _mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
 
-            _driverService = Mvx.Resolve<IDriverService>();
-            var ignore = CheckMenuState();
+            var task = CheckMenuState();
         }
 
         private async Task CheckMenuState()
         {
             var driverStatus = await _driverService.GetCurrentDriverStatusAsync();
-
-            // If any of these conditions are true, then we're assuming they're previewing other trips
-            // as they would never manually be taken here if they were already in the middle of a trip
+            
+            // If driver is in the middle of a trip, do not change the menu to MenuState.Avaliable
+            // We never set MenuState.OnTrip here because a user would never be taken here manually if on a trip
             if (driverStatus.Status != "E" && driverStatus.Status != "A" && driverStatus.Status != "D")
                 _mvxMessenger.Publish(new MenuStateMessage(this) { Context = MenuState.Avaliable });
         }

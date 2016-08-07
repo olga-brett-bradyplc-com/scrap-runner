@@ -33,7 +33,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             timer.Start();
 
             _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
-
             _mvxMessenger.Publish(new MenuStateMessage(this) { Context = MenuState.OnDelay });
         }
     }
