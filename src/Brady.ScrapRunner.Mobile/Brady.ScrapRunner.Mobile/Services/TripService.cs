@@ -21,6 +21,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
+        private readonly IRepository<CodeTableModel> _codeTableRepository; 
 
         public TripService(
             IConnectionService connection,
@@ -28,13 +29,14 @@ namespace Brady.ScrapRunner.Mobile.Services
             IRepository<TripModel> tripRepository,
             IRepository<TripSegmentModel> tripSegmentRepository,
             IRepository<TripSegmentContainerModel> tripSegmentContainerRepository,
-            IRepository<TerminalMasterModel> yardInfoRepository)
+            IRepository<CodeTableModel> codeTableRepository )
         {
             _connection = connection;
             _preferenceRepository = preferenceRepository;
             _tripRepository = tripRepository;
             _tripSegmentRepository = tripSegmentRepository;
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
+            _codeTableRepository = codeTableRepository;
         }
 
         #region General purpose trip methods
@@ -572,6 +574,14 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             container.TripSegContainerReviewFlag = TripSegStatusConstants.Exception;
             container.TripSegContainerReviewReason = reviewReason;
+
+            // @TODO : As of now, this description will not be persisted if the user logs out and logs back in
+            var desc =
+                await _codeTableRepository.FindAsync(
+                    ct => ct.CodeName == CodeTableNameConstants.ExceptionCodes && ct.CodeValue == reviewReason);
+            
+            container.TripSegContainerReivewReasonDesc = desc.CodeDisp1;
+
             return await _tripSegmentContainerRepository.UpdateAsync(container);
         }
 
