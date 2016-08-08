@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Interfaces;
@@ -31,8 +32,15 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <returns></returns>
         public Task UpdateTerminalChangeIntoMaster(List<TerminalChange> terminalChanges)
         {
-            var mapped = AutoMapper.Mapper.Map<List<TerminalChange>, List<TerminalMasterModel>> (terminalChanges);
-            return _terminalMasterRepository.InsertOrReplaceRangeAsync(mapped);
+            var deleted = terminalChanges.FindAll(tc => tc.ChgActionFlag == TerminalChangeConstants.Delete);
+            var nonDeleted = terminalChanges.FindAll(tc => tc.ChgActionFlag != TerminalChangeConstants.Delete);
+
+            var deletedMapped = AutoMapper.Mapper.Map<List<TerminalChange>, List<TerminalMasterModel>> (deleted);
+            foreach (var deletedItem in deletedMapped)
+                _terminalMasterRepository.DeleteAsync(deletedItem);
+
+            var nonDeletedMapped = AutoMapper.Mapper.Map<List<TerminalChange>, List<TerminalMasterModel>> (nonDeleted);
+            return _terminalMasterRepository.InsertOrReplaceRangeAsync(nonDeletedMapped);
         }
 
         /// <summary>

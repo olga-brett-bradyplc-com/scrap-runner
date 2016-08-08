@@ -24,7 +24,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ICustomerService _customerService;
         private readonly ITerminalService _terminalService;
 
-
         public RouteDetailViewModel(
             ITripService tripService, 
             IDriverService driverService, 
@@ -119,8 +118,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             AllowRtnEdit = doesRtnSegExist && Constants.Yes.Equals(defAllowChangeRt);
 
-            MenuFilter = MenuFilterEnum.NotOnTrip; // Reset for when we start a new trip segment
-
             // If the user is already on a trip, or DEFEnforceSeqProcess = Y and they're not on their first avaliable trip, mark the trip as read-only
             var seqEnforced = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFEnforceSeqProcess);
             if (!string.IsNullOrEmpty(CurrentDriver.TripNumber) && 
@@ -137,16 +134,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 UserDialogs.Instance.WarnToast(AppResources.ReadOnlyTrip, AppResources.ReadOnlyTripSeqMessage, 10000);
             }
 
-            // If CurrentStatus isn't null, that means we're restoring a previous user session on login
-            // Otherwise, check driver status to see if they're already in the midst of a trip, and set the status appropiately if so
-            if (CurrentDriver.TripNumber == TripNumber && 
-                CurrentStatus == null && 
-                (CurrentDriver.Status != DriverStatusSRConstants.Available || CurrentDriver.Status != DriverStatusSRConstants.LoggedIn))
-            {
+            // If CurrentStatus is null but they're enroute/arrived, assume they've navigated back to this screen
+            // from another, and reset CurrentStatus as appropiate
+            if (CurrentStatus == null &&
+                CurrentDriver.TripNumber == TripNumber &&
+                (CurrentDriver.Status == DriverStatusSRConstants.Arrive ||
+                 CurrentDriver.Status == DriverStatusSRConstants.Enroute))
                 CurrentStatus = CurrentDriver.Status;
-                if( CurrentStatus == DriverStatusSRConstants.Arrive )
-                    SetNextStageLabel(fullTripSegments.FirstOrDefault(sg => sg.TripSegStatus == TripSegStatusConstants.Pending || sg.TripSegStatus == TripSegStatusConstants.Missed));
-            }
+
+            // Set the appropiate button text if user is resuming a trip in "arrived" status
+            if (CurrentDriver.TripNumber == TripNumber && CurrentStatus == DriverStatusSRConstants.Arrive)
+                SetNextStageLabel(fullTripSegments.FirstOrDefault(sg => sg.TripSegStatus == TripSegStatusConstants.Pending || sg.TripSegStatus == TripSegStatusConstants.Missed));
 
             base.Start();
         }
@@ -319,7 +317,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     await _driverService.UpdateDriver(CurrentDriver);
 
                     CurrentStatus = DriverStatusConstants.Enroute;
-                    MenuFilter = MenuFilterEnum.OnTrip;
                 }
             }
         }
@@ -338,7 +335,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 using (var loading = UserDialogs.Instance.Loading(AppResources.Loading, maskType: MaskType.Black))
                 {
-                    CurrentStatus = DriverStatusConstants.Arrive;
+                    // Used for RouteSummary view to know what "state" it's in
+                    // TODO: Replace with messaging similiar to the menu state?
+                    CurrentStatus = DriverStatusSRConstants.Arrive;
 
                     CurrentDriver.Status = DriverStatusSRConstants.Arrive;
                     await _driverService.UpdateDriver(CurrentDriver);
@@ -422,13 +421,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
             if (_tripService.IsTripLegTransaction(firstSegment))
             {
-                Close(this);
+                //Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
             else if (_tripService.IsTripLegScale(firstSegment))
             {
-                Close(this);
-
+                //Close(this);
                 if (_tripService.IsTripLegTypePublicScale(firstSegment))
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
                 else
@@ -485,11 +483,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         else
                             UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
                     }
-
-                    await _driverService.ClearDriverStatus(CurrentDriver, true);
+                    
                     await _tripService.CompleteTripAsync(TripNumber);
 
-                    Close(this);
+                    var nextTrip = await _tripService.FindNextTripAsync();
+                    var seg = await _tripService.FindNextTripSegmentsAsync(nextTrip?.TripNumber);
+
+                    CurrentDriver.Status = nextTrip == null ? DriverStatusSRConstants.NoWork : DriverStatusSRConstants.Available;
+                    CurrentDriver.TripNumber = nextTrip == null ? "" : nextTrip.TripNumber;
+                    CurrentDriver.TripSegNumber = seg.Count < 1 ? "" : seg.FirstOrDefault().TripSegNumber;
+
+                    await _driverService.UpdateDriver(CurrentDriver);
+
+                    //Close(this);
                     ShowViewModel<RouteSummaryViewModel>();
                 }
             }

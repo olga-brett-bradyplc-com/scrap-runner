@@ -100,24 +100,6 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="driver"></param>
-        /// <param name="clearTripInfo"></param>
-        /// <returns></returns>
-        public async Task<int> ClearDriverStatus(DriverStatusModel driver, bool clearTripInfo)
-        {
-            driver.Status = DriverStatusSRConstants.Available;
-
-            if (clearTripInfo)
-            {
-                driver.TripNumber = null;
-                driver.TripSegNumber = null;
-            }
-            return await UpdateDriver(driver);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="driverArriveProcess"></param>
         /// <returns></returns>
         public async Task<ChangeResultWithItem<DriverArriveProcess>> ProcessDriverArrivedAsync(DriverArriveProcess driverArriveProcess)

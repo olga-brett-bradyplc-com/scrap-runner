@@ -26,6 +26,7 @@
         private readonly IContainerService _containerService;
         private readonly ITripService _tripService;
         private readonly IDriverService _driverService;
+        private readonly IPreferenceService _preferenceService;
 
         public PollingService(IConnectionService connectionService, 
             INotificationService notificationService, 
@@ -34,7 +35,8 @@
             ITerminalService terminalService, 
             IContainerService containerService, 
             ITripService tripService, 
-            IDriverService driverService)
+            IDriverService driverService, 
+            IPreferenceService preferenceService)
         {
             _connectionService = connectionService;
             _notificationService = notificationService;
@@ -44,6 +46,7 @@
             _containerService = containerService;
             _tripService = tripService;
             _driverService = driverService;
+            _preferenceService = preferenceService;
         }
 
         public async Task PollForChangesAsync(string driverId, string terminalId, string regionId, string areaId)
@@ -98,7 +101,7 @@
             foreach (var trip in mappedTrips)
             {
                 var existingTrip = await _tripService.FindTripAsync(trip.TripNumber);
-                var isNewTrip = existingTrip != null;
+                var isNewTrip = existingTrip == null;
                 var tripContext = isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified;
                 if (isNewTrip)
                     await _tripService.CreateTripAsync(trip);
@@ -239,13 +242,14 @@
             var resequencedTrips = await GetTripsResequencedAsync(driverId);
             if (resequencedTrips.TotalCount == 0) return;
             await AckTripResequenceAsync(resequencedTrips);
-            var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(resequencedTrips.Records);
-            foreach (var trip in mappedTrips)
+            var mappedTrips = Mapper.Map<List<Trip>, List<TripModel>>(resequencedTrips.Records);
+            for (var i = 0; i < mappedTrips.Count; i++)
             {
-                await _tripService.UpdateTripAsync(trip);
+                await _tripService.UpdateTripAsync(mappedTrips[i]);
+                if (resequencedTrips.Records[i].TripSendReseqFlag != TripSendReseqFlagValue.ManualReseq) continue;
+                await _notificationService.TripsResequencedAsync();
+                _mvxMessenger.Publish(new TripResequencedMessage(this));
             }
-            await _notificationService.TripsResequencedAsync();
-            _mvxMessenger.Publish(new TripResequencedMessage(this));
         }
 
         private Task<QueryResult<ContainerChange>> GetContainerChangesAsync(string terminalId, string regionId)
@@ -376,8 +380,7 @@
         private async Task PollForTerminalChangesAsync(string areaId, string regionId)
         {
             var terminalMasterDateTime = await _driverService.GetTerminalMasterDateTimeAsync();
-            // @TODO: Figure out how to get "DEFSendOnlyYardsForArea" preference from here? (It's not in the preference table)
-            var defSendOnlyYardsForArea = "Y";
+            var defSendOnlyYardsForArea = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFSendOnlyYardsForArea);
             QueryResult<TerminalChange> terminalChanges;
             if (!terminalMasterDateTime.HasValue)
                 terminalChanges = await GetTerminalChangesAsync(areaId, regionId, defSendOnlyYardsForArea);

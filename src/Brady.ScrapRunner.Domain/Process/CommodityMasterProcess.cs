@@ -36,6 +36,7 @@ namespace Brady.ScrapRunner.Domain.Process
                 // no-op
             }
         }
+
         public virtual bool Equals(CommodityMasterProcess other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -55,17 +56,26 @@ namespace Brady.ScrapRunner.Domain.Process
         {
             unchecked
             {
-                var hashCode = (EmployeeId != null ? EmployeeId.GetHashCode() : 0);
+                var hashCode = EmployeeId?.GetHashCode() ?? 0;
                 return hashCode;
             }
         }
+
         /// <summary>
-        /// Relevant input values, useful for logging
+        /// Relevant input (and output) values, useful for logging
         /// </summary>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder("CommodityMasterProcess{");
             sb.Append("EmployeeId:" + EmployeeId);
+            sb.Append(", CommodityCode:" + CommodityCode);
+            sb.Append(", CommodityDesc:" + CommodityDesc);
+            if (null != CommodityMasters)
+            {
+                sb.Append(", CommodityMasters: [Count: ");
+                sb.Append(CommodityMasters.Count);
+                sb.Append("]");
+            }
             sb.Append("}");
             return sb.ToString();
         }

@@ -10,6 +10,7 @@ using Android.Content;
 using Android.Graphics;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.V4.Content;
 using Android.Views;
 using Android.Widget;
 using Brady.ScrapRunner.Mobile.Models;
@@ -25,9 +26,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
     {
         private int _groupTemplateId;
         private IEnumerable _itemsSource;
+        private Context _context;
 
         public BindableGroupListAdapter(Context context) : base(context)
         {
+            _context = context;
         }
 
         public int GroupTemplateId
@@ -120,7 +123,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                 // but if we decided to use it elsewhere, we may want to move this to a custom
                 // adapter specifically just for the transactions
                 if( tscm.SelectedTransaction )
-                    parentLayout.SetBackgroundColor(Color.ParseColor("#d2e8fe"));
+                    parentLayout.SetBackgroundColor(new Color(ContextCompat.GetColor(_context, Resource.Color.current_transaction_background)));
                 else
                     parentLayout.SetBackgroundColor(Color.ParseColor("#ffffff"));
 
@@ -141,7 +144,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                 }
 
                 if (info != null)
-                    info.Text = $"{tscm.DefaultTripSegContainerNumber} {tscm.TripSegContainerType}-{tscm.TripSegContainerSize}";
+                    info.Text = $"{tscm.DefaultTripSegContainerNumber} {tscm.DefaultTripContainerTypeSize}";
             }
 
             return tempView;
