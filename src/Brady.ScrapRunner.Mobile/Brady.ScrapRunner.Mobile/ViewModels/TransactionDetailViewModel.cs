@@ -117,9 +117,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                 TripSegNumber = Container.TripSegNumber,
                                 ContainerNumber = TripSegContainerNumber,
                                 ContainerLevel = short.TryParse(SelectedLevel.CodeValue, out selectedLevel) ? selectedLevel : (short?)null,
-                                ContainerLocation = SelectedLocation?.CustLocation,
+                                ContainerLocation = string.IsNullOrEmpty(SelectedLocation.CustHostCode) ? null : SelectedLocation?.CustLocation,
                                 CommodityCode = SelectedCommodity?.CustCommodityCode,
-                                CommodityDesc = SelectedCommodity?.CustCommodityDesc
+                                CommodityDesc = string.IsNullOrEmpty(SelectedCommodity?.CustCommodityCode) ? null : SelectedCommodity?.CustCommodityDesc
                             });
 
                 if (containerAction.WasSuccessful)
@@ -180,9 +180,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                     TripSegNumber = Container.TripSegNumber,
                                     ContainerNumber = TripSegContainerNumber,
                                     ContainerLevel = short.TryParse(SelectedLevel.CodeValue, out selectedLevel) ? selectedLevel : (short?)null,
-                                    ContainerLocation = SelectedLocation?.CustLocation,
+                                    ContainerLocation = string.IsNullOrEmpty(SelectedLocation.CustHostCode) ? null : SelectedLocation?.CustLocation,
                                     CommodityCode = SelectedCommodity?.CustCommodityCode,
-                                    CommodityDesc = SelectedCommodity?.CustCommodityDesc
+                                    CommodityDesc = string.IsNullOrEmpty(SelectedCommodity?.CustCommodityCode) ? null : SelectedCommodity?.CustCommodityDesc
                                 });
 
                     if (containerAction.WasSuccessful)
