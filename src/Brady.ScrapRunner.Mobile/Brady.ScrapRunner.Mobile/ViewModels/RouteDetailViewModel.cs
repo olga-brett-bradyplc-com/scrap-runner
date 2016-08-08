@@ -57,6 +57,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
+            // We grab all the trips to validate driver is on correct trip if DEFEnforceSeqProcess = Y
             var trips = await _tripService.FindTripsAsync();
             var trip = trips.FirstOrDefault(ts => ts.TripNumber == TripNumber);
             

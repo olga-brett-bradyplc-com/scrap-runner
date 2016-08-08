@@ -175,7 +175,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         public async Task<List<TripModel>> FindTripsAsync()
         {
             var sortedTrips = await _tripRepository.AsQueryable()
-                .Where(t => t.TripStatus == TripStatusConstants.Pending || t.TripStatus == TripStatusConstants.Missed)
+                .Where(t => t.TripStatus == TripStatusConstants.Pending || t.TripStatus == TripStatusConstants.Missed || t.TripStatus == TripStatusConstants.Exception)
                 .OrderBy(t => t.TripSequenceNumber)
                 .ToListAsync();
             return sortedTrips;
