@@ -75,7 +75,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
 
                 // Find first non-completed, non-reviewed container and set it as the current transaction
-                if (CurrentTransaction == null && containers.FirstOrDefault(ct => string.IsNullOrEmpty(ct.TripSegContainerComplete)) != null)
+                if (CurrentTransaction == null && containers.FirstOrDefault(ct => string.IsNullOrEmpty(ct.TripSegContainerComplete) && string.IsNullOrEmpty(ct.TripSegContainerReviewFlag)) != null)
                 {
                     var current = containers.FirstOrDefault(ct => string.IsNullOrEmpty(ct.TripSegContainerComplete));
                     current.SelectedTransaction = true;
@@ -257,7 +257,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             foreach (var segment in Containers)
             {
-                foreach (var container in segment.Where(container => string.IsNullOrEmpty(container.TripSegContainerComplete)))
+                foreach (var container in segment.Where(container => string.IsNullOrEmpty(container.TripSegContainerComplete) && string.IsNullOrEmpty(container.TripSegContainerReviewFlag)))
                 {
                     CurrentTransaction = container;
                     CurrentTransaction.SelectedTransaction = true;
