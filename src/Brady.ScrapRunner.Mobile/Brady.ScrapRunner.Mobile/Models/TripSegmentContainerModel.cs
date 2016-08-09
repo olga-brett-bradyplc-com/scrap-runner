@@ -55,6 +55,10 @@
         [MaxLength(60)]
         public string TripSegContainerReviewReason { get; set; }
 
+        /* Since we don't have FK support in the SQLite.NET lib ... */
+        [MaxLength(60)]
+        public string TripSegContainerReivewReasonDesc { get; set; }
+
         public DateTime? WeightGrossDateTime { get; set; }
 
         public int? TripSegContainerWeightGross { get; set; }

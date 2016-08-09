@@ -75,7 +75,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
 
                 // Find first non-completed, non-reviewed container and set it as the current transaction
-                if (CurrentTransaction == null && containers.FirstOrDefault(ct => string.IsNullOrEmpty(ct.TripSegContainerComplete)) != null)
+                if (CurrentTransaction == null && containers.FirstOrDefault(ct => string.IsNullOrEmpty(ct.TripSegContainerComplete) && string.IsNullOrEmpty(ct.TripSegContainerReviewFlag)) != null)
                 {
                     var current = containers.FirstOrDefault(ct => string.IsNullOrEmpty(ct.TripSegContainerComplete));
                     current.SelectedTransaction = true;
@@ -257,7 +257,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             foreach (var segment in Containers)
             {
-                foreach (var container in segment.Where(container => string.IsNullOrEmpty(container.TripSegContainerComplete)))
+                foreach (var container in segment.Where(container => string.IsNullOrEmpty(container.TripSegContainerComplete) && string.IsNullOrEmpty(container.TripSegContainerReviewFlag)))
                 {
                     CurrentTransaction = container;
                     CurrentTransaction.SelectedTransaction = true;
@@ -352,13 +352,34 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     var nextTripSegmentList = await _tripService.FindNextTripSegmentsAsync(TripNumber);
                     var nextTripSegment = nextTripSegmentList.FirstOrDefault();
 
-                    if (nextTripSegment?.TripSegDestCustHostCode == Containers.FirstOrDefault().Key.TripSegDestCustHostCode && _tripService.IsTripLegScale(nextTripSegment))
+                    if (nextTripSegment != null && nextTripSegment?.TripSegDestCustHostCode == Containers.FirstOrDefault().Key.TripSegDestCustHostCode && _tripService.IsTripLegScale(nextTripSegment))
                     {
+                        var nextContainers = await _tripService.FindAllContainersForTripSegmentAsync(nextTripSegment.TripNumber, nextTripSegment.TripSegNumber);
+
                         Close(this);
-                        if (_tripService.IsTripLegTypePublicScale(nextTripSegment))
-                            ShowViewModel<PublicScaleSummaryViewModel>(new {tripNumber = TripNumber});
+                        if (_tripService.IsTripLegTypePublicScale(nextTripSegment) && nextContainers.Count > 1)
+                            ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                        else if (_tripService.IsTripLegTypePublicScale(nextTripSegment) && nextContainers.Count == 1)
+                            ShowViewModel<PublicScaleDetailViewModel>(
+                                new
+                                {
+                                    tripNumber = TripNumber,
+                                    tripSegNumber = nextTripSegment.TripSegNumber,
+                                    tripSegContainerSeqNumber = nextContainers.SingleOrDefault().TripSegContainerSeqNumber,
+                                    tripSegContainerNumber = nextContainers.SingleOrDefault().TripSegContainerNumber,
+                                    methodOfEntry = ContainerMethodOfEntry.Manual
+                                });
+                        else if (nextContainers.Count > 1)
+                            ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
                         else
-                            ShowViewModel<ScaleSummaryViewModel>(new {tripNumber = TripNumber});
+                            ShowViewModel<ScaleDetailViewModel>(
+                                new
+                                {
+                                    tripNumber = TripNumber,
+                                    tripSegNumber = nextTripSegment.TripSegNumber,
+                                    tripSegContainerSeqNumber = nextContainers.SingleOrDefault().TripSegContainerSeqNumber,
+                                    tripSegContainerNumber = nextContainers.SingleOrDefault().TripSegContainerNumber
+                                });
                     }
                     else if (nextTripSegmentList.Any())
                     {
