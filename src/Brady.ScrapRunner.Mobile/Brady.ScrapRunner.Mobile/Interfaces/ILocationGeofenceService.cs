@@ -5,6 +5,6 @@
         void Start();
         void Stop();
         void StartAutoArrive(string key, int synergyLatitude, int synergyLongitude, short radius);
-        void StartAutoDepart(string key);
+        void StartAutoDepart(string key, short radius);
     }
 }

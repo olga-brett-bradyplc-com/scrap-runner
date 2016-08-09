@@ -15,9 +15,10 @@
         private const short TriggerSeconds = 60;  // for this many seconds
         private const int TriggerDepart = 8;   // 8 mph triggers depart
 
+        private LocationModel _currentLocationModel;
         private int _triggerFlag;
         private GeofenceContext _geofenceContext;
-        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private MvxSubscriptionToken _mvxLocationToken;
 
         private readonly IMvxMessenger _mvxMessenger;
 
@@ -28,17 +29,19 @@
 
         public void Start()
         {
-            if (_mvxSubscriptionToken == null)
+            if (_mvxLocationToken == null)
             {
-                _mvxSubscriptionToken = _mvxMessenger.Subscribe<LocationModelMessage>(OnLocationModelMessage);
+                _mvxLocationToken = _mvxMessenger.Subscribe<LocationModelMessage>(OnLocationModelMessage);
             }
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Geofence service started");
         }
 
         public void Stop()
         {
-            if (_mvxSubscriptionToken == null) return;
-            _mvxSubscriptionToken.Dispose();
-            _mvxSubscriptionToken = null;
+            if (_mvxLocationToken == null) return;
+            _mvxLocationToken.Dispose();
+            _mvxLocationToken = null;
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Geofence service stopped");
         }
 
         public void StartAutoArrive(string key, int synergyLatitude, int synergyLongitude, short radius)
@@ -47,7 +50,8 @@
                 ((_geofenceContext.Latitude != synergyLatitude) || (_geofenceContext.Longitude != synergyLongitude)))
             {
                 Mvx.TaggedTrace(Constants.ScrapRunner, string.Format("Geofence changed from {0} {1} {2} to {3} {4}.",
-                    _geofenceContext.Latitude, _geofenceContext.Longitude, _geofenceContext.TriggerDistance, synergyLatitude, synergyLongitude));
+                    _geofenceContext.Latitude, _geofenceContext.Longitude, _geofenceContext.TriggerDistance, 
+                    synergyLatitude, synergyLongitude));
             }
             _geofenceContext = new GeofenceContext
             {
@@ -61,23 +65,26 @@
             _triggerFlag = 0;
         }
 
-        public void StartAutoDepart(string key)
+        public void StartAutoDepart(string key, short radius)
         {
+            var synergyLatitude = Convert.ToInt32(_currentLocationModel?.Latitude * 600000.0);
+            var synergyLongitude = Convert.ToInt32(_currentLocationModel?.Longitude * 600000.0);
             _geofenceContext = new GeofenceContext
             {
                 Id = key,
                 State = GeofenceState.Arrive,
-                Latitude = 0, // synergyLatitude ?
-                Longitude = 0, // synergyLongitude ?
-                ArriveLatitude = 0, // synergyLatitude ?
-                ArriveLongitude = 0, // synergyLongitude ?
-                TriggerDistance = 0,  // dist + trigger_distance
-                Distance = 0 // dist
+                Latitude = synergyLatitude, 
+                Longitude = synergyLongitude, 
+                ArriveLatitude = synergyLatitude, 
+                ArriveLongitude = synergyLongitude, 
+                TriggerDistance = radius + TriggerDistance,
+                Distance = radius
             };
         }
 
         private void OnLocationModelMessage(LocationModelMessage obj)
         {
+            _currentLocationModel = obj.Location;
             switch (_geofenceContext.State)
             {
                 case GeofenceState.Unknown:
@@ -98,8 +105,8 @@
         private void CheckForArrive(LocationModel currentLocation)
         {
             var close = true;
-            var synergyLatitude = Convert.ToInt32(currentLocation.Latitude*600000);
-            var synergyLongitude = Convert.ToInt32(currentLocation.Longitude*600000);
+            var synergyLatitude = Convert.ToInt32(currentLocation.Latitude * 600000.0);
+            var synergyLongitude = Convert.ToInt32(currentLocation.Longitude * 600000.0);
             var distanceLatitude = synergyLatitude - _geofenceContext.Latitude;
             if (distanceLatitude < 0) distanceLatitude = -distanceLatitude;
             if (distanceLatitude > _geofenceContext.TriggerDistance) close = false;
@@ -122,7 +129,7 @@
                         _geofenceContext.State = GeofenceState.Arrive;
                         _geofenceContext.ArriveLatitude = synergyLatitude;
                         _geofenceContext.ArriveLongitude = synergyLongitude;
-                        Mvx.TaggedTrace(Constants.ScrapRunner, $"Arrived in {_geofenceContext.Id} geofence.");
+                        Mvx.TaggedTrace(Constants.ScrapRunner, $"Arrived inside {_geofenceContext.Id} geofence.");
                         _mvxMessenger.Publish(new GeofenceArriveMessage(this));
                     }
                     else
@@ -141,8 +148,8 @@
 
         private void CheckForDepart(LocationModel currentLocation)
         {
-            var synergyLatitude = Convert.ToInt32(currentLocation.Latitude*600000);
-            var synergyLongitude = Convert.ToInt32(currentLocation.Longitude*600000);
+            var synergyLatitude = Convert.ToInt32(currentLocation.Latitude * 600000.0);
+            var synergyLongitude = Convert.ToInt32(currentLocation.Longitude * 600000.0);
             var distanceLatitude = synergyLatitude - _geofenceContext.ArriveLatitude;
             if (distanceLatitude < 0) distanceLatitude = -distanceLatitude;
             var distanceLongitude = synergyLongitude - _geofenceContext.ArriveLongitude;
