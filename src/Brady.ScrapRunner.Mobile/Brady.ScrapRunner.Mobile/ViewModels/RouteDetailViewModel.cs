@@ -344,7 +344,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     await _driverService.UpdateDriver(CurrentDriver);
 
                     //GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
-                    var currentSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber,
+                    //commented out temporarely for the demo by OIB 8/9/16
+                    /*var currentSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber,
                         TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key.TripSegNumber);
 
                     var tripInfo = await _tripService.FindTripAsync(TripNumber);
@@ -380,7 +381,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             SetDriverArrive();
                     }
                     else
-                        SetDriverArrive();
+                        SetDriverArrive();*/
  
                     SetNextStageLabel(firstSegment);
                 }
