@@ -57,6 +57,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
+            // We grab all the trips to validate driver is on correct trip if DEFEnforceSeqProcess = Y
             var trips = await _tripService.FindTripsAsync();
             var trip = trips.FirstOrDefault(ts => ts.TripNumber == TripNumber);
             
@@ -421,16 +422,36 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
             if (_tripService.IsTripLegTransaction(firstSegment))
             {
-                //Close(this);
+                Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
             else if (_tripService.IsTripLegScale(firstSegment))
             {
-                //Close(this);
-                if (_tripService.IsTripLegTypePublicScale(firstSegment))
+                var segmentContainers = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault();
+                Close(this);
+                if (_tripService.IsTripLegTypePublicScale(firstSegment) && segmentContainers.Count > 1)
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                else if (_tripService.IsTripLegTypePublicScale(firstSegment) && segmentContainers.Count == 1)
+                    ShowViewModel<PublicScaleDetailViewModel>(
+                        new
+                        {
+                            tripNumber = TripNumber,
+                            tripSegNumber = segmentContainers.Key.TripSegNumber,
+                            tripSegContainerSeqNumber = segmentContainers.SingleOrDefault().TripSegContainerSeqNumber,
+                            tripSegContainerNumber = segmentContainers.SingleOrDefault().TripSegContainerNumber,
+                            methodOfEntry = ContainerMethodOfEntry.Manual
+                        });
+                else if (segmentContainers.Count > 1)
+                    ShowViewModel<ScaleSummaryViewModel>(new {tripNumber = TripNumber});
                 else
-                    ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                    ShowViewModel<ScaleDetailViewModel>(
+                        new
+                        {
+                            tripNumber = TripNumber,
+                            tripSegNumber = segmentContainers.Key.TripSegNumber,
+                            tripSegContainerSeqNumber = segmentContainers.SingleOrDefault().TripSegContainerSeqNumber,
+                            tripSegContainerNumber = segmentContainers.SingleOrDefault().TripSegContainerNumber
+                        });
             }
             else if (_tripService.IsTripLegNoScreen(firstSegment))
             {

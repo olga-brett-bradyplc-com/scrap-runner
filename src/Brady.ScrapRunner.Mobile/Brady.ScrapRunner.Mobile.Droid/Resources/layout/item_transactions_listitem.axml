@@ -32,6 +32,15 @@
         android:textColor="@color/material_gray_900"
         tools:text="#2 Tin"
         local:MvxBind="Text TripSegContainerCommodityDesc" />
+    <TextView
+        android:id="@+id/tripContainerReviewReason"
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:layout_below="@id/tripContainerCommodityDesc"
+        android:textColor="@color/material_red_300"
+        android:textSize="10sp"
+        tools:text="CONTAINER NOT EMPTY"
+        local:MvxBind="Text TripSegContainerReivewReasonDesc" />
     <ImageView
         android:id="@+id/arrow_image"
         android:layout_width="wrap_content"
