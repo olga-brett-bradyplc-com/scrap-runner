@@ -67,7 +67,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _fileStore.WriteFile(path, memoryStream.ToArray());
 
             var fullPath = _fileStore.NativePath(path);
+
             Images.Add(fullPath);
+            SendPhotosCommand.RaiseCanExecuteChanged();
 
             memoryStream.Flush(); // This may be redundant
         }

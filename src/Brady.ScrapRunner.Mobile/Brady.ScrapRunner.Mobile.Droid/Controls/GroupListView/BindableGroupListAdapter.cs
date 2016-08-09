@@ -13,8 +13,10 @@ using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Views;
 using Android.Widget;
+using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Binding.Droid.Views;
+using MvvmCross.Platform;
 
 
 namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
@@ -26,7 +28,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
     {
         private int _groupTemplateId;
         private IEnumerable _itemsSource;
-        private Context _context;
+        private readonly Context _context;
 
         public BindableGroupListAdapter(Context context) : base(context)
         {
@@ -56,7 +58,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
         private void FlattenAndSetSource(IEnumerable value)
         {
             var list = value.Cast<object>();
-            var flattened = list.SelectMany((g) => FlattenHierachy(g));
+            var flattened = list.SelectMany(FlattenHierachy);
             base.SetItemsSource(flattened.ToList());
         }
 
@@ -91,7 +93,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
         private IEnumerable<object> FlattenHierachy(object group)
         {
             yield return new FlatItem { IsGroup = true, Item = group };
-            IEnumerable items = group as IEnumerable;
+            var items = group as IEnumerable;
             if (items != null)
                 foreach (object d in items)
                     yield return new FlatItem { IsGroup = false, Item = d };
@@ -100,10 +102,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
         protected override View GetBindableView(View convertView, object source, int templateId)
         {
             var item = (FlatItem)source;
-            if (item.IsGroup)
-                return base.GetBindableView(convertView, item.Item, GroupTemplateId);
-            else
-                return base.GetBindableView(convertView, item.Item, ItemTemplateId);
+            return base.GetBindableView(convertView, item.Item, item.IsGroup ? GroupTemplateId : ItemTemplateId);
         }
 
         protected override View GetView(int position, View convertView, ViewGroup parent, int templateId)
@@ -114,14 +113,15 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
             var parentLayout = tempView.FindViewById<RelativeLayout>(Resource.Id.TripLayoutParent);
             var icon = tempView.FindViewById<ImageView>(Resource.Id.arrow_image);
             var info = tempView.FindViewById<TextView>(Resource.Id.tripContainerInfo);
+            var commodity = tempView.FindViewById<TextView>(Resource.Id.tripContainerCommodityDesc);
+            var location = tempView.FindViewById<TextView>(Resource.Id.tripContainerLocation);
+            var reviewReason = tempView.FindViewById<TextView>(Resource.Id.tripContainerReviewReason);
 
             if (parentLayout != null)
             {
                 var flatItem = (FlatItem) item;
                 var tscm = (TripSegmentContainerModel) flatItem.Item;
-                // Should note that currently the grouped listview only on transaction stop screen,
-                // but if we decided to use it elsewhere, we may want to move this to a custom
-                // adapter specifically just for the transactions
+
                 if( tscm.SelectedTransaction )
                     parentLayout.SetBackgroundColor(new Color(ContextCompat.GetColor(_context, Resource.Color.current_transaction_background)));
                 else
@@ -145,6 +145,16 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
 
                 if (info != null)
                     info.Text = $"{tscm.DefaultTripSegContainerNumber} {tscm.DefaultTripContainerTypeSize}";
+
+                if (string.IsNullOrEmpty(tscm.TripSegContainerReivewReasonDesc))
+                {
+                    reviewReason.Visibility = ViewStates.Gone;
+                }
+                else
+                {
+                    reviewReason.Visibility = ViewStates.Visible;
+                    reviewReason.Text = tscm.TripSegContainerReivewReasonDesc;
+                }
             }
 
             return tempView;

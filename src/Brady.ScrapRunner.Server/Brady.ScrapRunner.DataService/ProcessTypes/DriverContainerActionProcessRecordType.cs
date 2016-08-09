@@ -912,8 +912,11 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             //If latitude/longitude not provided from driver, use the lat/lon for the destination customer.
             if (driverContainerActionProcess.Latitude == null || driverContainerActionProcess.Longitude == null)
             {
-                tripSegmentContainer.TripSegContainerLatitude = destCustomerMaster.CustLatitude;
-                tripSegmentContainer.TripSegContainerLongitude = destCustomerMaster.CustLongitude;
+                if (destCustomerMaster.CustLatitude != null && destCustomerMaster.CustLongitude != null)
+                {
+                    tripSegmentContainer.TripSegContainerLatitude = destCustomerMaster.CustLatitude;
+                    tripSegmentContainer.TripSegContainerLongitude = destCustomerMaster.CustLongitude;
+                }
             }
             else
             {
