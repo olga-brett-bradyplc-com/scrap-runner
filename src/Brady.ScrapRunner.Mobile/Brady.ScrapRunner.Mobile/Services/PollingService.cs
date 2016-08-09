@@ -438,8 +438,6 @@
             await _terminalService.UpdateTerminalChangeIntoMaster(terminalChanges.Records);
             await _driverService.UpdateTerminalMasterDateTimeAsync(terminalChanges.Records.Max(terminalChange => terminalChange.ChgDateTime));
 
-            // @TODO: If nothing needs to react to updated/inserted TerminalChangeMaster records then 
-            // remove this and the TerminalChangeMessage class.
             foreach (var terminalChange in terminalChanges.Records)
             {
                 Mvx.TaggedTrace(Constants.ScrapRunner, $"TerminalChange {terminalChange.ChgActionFlag} {terminalChange.Id} at {terminalChange.ChgDateTime}");
