@@ -80,6 +80,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     break;
                 case TripNotificationContext.Unassigned:
                     break;
+                case TripNotificationContext.Resequenced:
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -105,6 +105,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                     notificationId = MarkedDoneTripNotificationId;
                     notificationType = NotificationType.TripMarkedDone;
                     break;
+                case TripNotificationContext.Resequenced:
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(context), context, null);
             }
