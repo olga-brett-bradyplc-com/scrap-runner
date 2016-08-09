@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_marginTop="56dp">
+        android:layout_marginTop="70dp">
         <ScrollView
             android:id="@+id/scroll_content"
             android:layout_height="match_parent"
