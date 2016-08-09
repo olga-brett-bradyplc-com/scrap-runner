@@ -1080,6 +1080,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 {
                     destCustomerMaster.CustLatitude = driverSegmentDoneProcess.Latitude;
                     destCustomerMaster.CustLongitude = driverSegmentDoneProcess.Longitude;
+                    destCustomerMaster.CustGeoCoded = Constants.Yes;
 
                     //Do the update
                     changeSetResult = Common.UpdateCustomerMaster(dataService, settings, destCustomerMaster);
