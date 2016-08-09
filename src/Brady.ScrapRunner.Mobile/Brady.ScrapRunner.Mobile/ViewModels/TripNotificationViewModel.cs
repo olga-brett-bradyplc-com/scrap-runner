@@ -51,35 +51,44 @@
             var trip = await _tripService.FindTripAsync(_tripNumber);
             if (trip == null) return;
             var tripCustomerName = trip.TripCustName;
-            // @TODO: Set NotificationMessage depending on _notificationContext here:
+            // @TODO: Use Resources here
             switch (_notificationContext)
             {
                 case TripNotificationContext.New:
-                    // $"New Trip ({_tripNumber}) {tripCustomerName}"
+                    Title = "New Trip";
+                    NotificationMessage = $"New Trip ({_tripNumber}) {tripCustomerName}";
                     break;
                 case TripNotificationContext.Modified:
-                    // $"Trip Modified ({_tripNumber})"
+                    Title = "Modified Trip";
+                    NotificationMessage = $"Trip Modified ({_tripNumber})";
                     break;
                 case TripNotificationContext.Canceled:
-                    // $"Trip canceled by DISPATCH {tripCustomerName}"
+                    Title = "Canceled Trip";
+                    NotificationMessage = $"Trip canceled by DISPATCH {tripCustomerName}";
                     break;
                 case TripNotificationContext.OnHold:
-                    // $"Trip placed on hold by DISPATCH {tripCustomerName}"
+                    Title = "Trip On Hold";
+                    NotificationMessage = $"Trip placed on hold by DISPATCH {tripCustomerName}";
                     break;
                 case TripNotificationContext.Future:
-                    // $"Trip canceled by DISPATCH {tripCustomerName}"
+                    Title = "Future Trip";
+                    NotificationMessage = $"Trip canceled by DISPATCH {tripCustomerName}";
                     break;
                 case TripNotificationContext.Reassigned:
-                    // $"Trip canceled by DISPATCH {tripCustomerName}"
+                    Title = "Reassigned Trip";
+                    NotificationMessage = $"Trip canceled by DISPATCH {tripCustomerName}";
                     break;
                 case TripNotificationContext.Unassigned:
-                    // $"Trip canceled by DISPATCH {tripCustomerName}"
+                    Title = "Unassigned Trip";
+                    NotificationMessage = $"Trip canceled by DISPATCH {tripCustomerName}";
                     break;
                 case TripNotificationContext.MarkedDone:
-                    // $"Trip marked done by DISPATCH {tripCustomerName}"
+                    Title = "Done Trip";
+                    NotificationMessage = $"Trip marked done by DISPATCH {tripCustomerName}";
                     break;
                 case TripNotificationContext.Resequenced:
-                    // Trips Resequenced
+                    Title = "Trips Resequenced";
+                    NotificationMessage = "Trips Resequenced";
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

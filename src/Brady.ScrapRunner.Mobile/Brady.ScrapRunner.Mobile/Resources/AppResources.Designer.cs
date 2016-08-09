@@ -71,6 +71,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Acknowledge.
+        /// </summary>
+        public static string Acknowledge {
+            get {
+                return ResourceManager.GetString("Acknowledge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Container.
         /// </summary>
         public static string AddContainer {

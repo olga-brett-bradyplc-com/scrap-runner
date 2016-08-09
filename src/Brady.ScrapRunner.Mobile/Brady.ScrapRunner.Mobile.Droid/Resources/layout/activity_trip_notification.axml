@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
   <include
@@ -10,10 +10,18 @@
     android:id="@+id/notification_summary"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    local:MvxBind="Text NotificationSummary"/>
+    android:layout_centerInParent="true"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    tools:text="New Trip (123456) TEST CUSTOMER"
+    local:MvxBind="Text NotificationMessage"/>
   <Button
     android:id="@+id/notification_ack"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    local:MvxLang="Text Acknowledge"
     local:MvxBind="Click AckCommand"/>
-</LinearLayout>
+</RelativeLayout>

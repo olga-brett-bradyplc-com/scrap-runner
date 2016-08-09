@@ -774,4 +774,8 @@ You will now be sent back to the login.</value>
     <value>Saving Container Information</value>
     <comment>TransactionSummaryViewModel</comment>
   </data>
+  <data name="Acknowledge" xml:space="preserve">
+    <value>Acknowledge</value>
+    <comment>TripNotificationViewModel</comment>
+  </data>
 </root>

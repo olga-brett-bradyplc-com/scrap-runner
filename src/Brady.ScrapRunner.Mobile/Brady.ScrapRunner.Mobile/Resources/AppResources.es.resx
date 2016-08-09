@@ -740,4 +740,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Saving Container Information</value>
     <comment>NEEDS TRANSLATION; TransactionSummaryViewModel</comment>
   </data>
+  <data name="Acknowledge" xml:space="preserve">
+    <value>Acknowledge</value>
+    <comment>NEEDS TRANSLATION; TripNotificationViewModel</comment>
+  </data>
 </root>
