@@ -10,6 +10,7 @@
     using Domain;
     using Domain.Enums;
     using Domain.Models;
+    using Domain.Process;
     using Interfaces;
     using Messages;
     using Models;
@@ -27,6 +28,7 @@
         private readonly ITripService _tripService;
         private readonly IDriverService _driverService;
         private readonly IPreferenceService _preferenceService;
+        private readonly ICustomerService _customerService;
 
         public PollingService(IConnectionService connectionService, 
             INotificationService notificationService, 
@@ -36,7 +38,8 @@
             IContainerService containerService, 
             ITripService tripService, 
             IDriverService driverService, 
-            IPreferenceService preferenceService)
+            IPreferenceService preferenceService, 
+            ICustomerService customerService)
         {
             _connectionService = connectionService;
             _notificationService = notificationService;
@@ -47,6 +50,7 @@
             _tripService = tripService;
             _driverService = driverService;
             _preferenceService = preferenceService;
+            _customerService = customerService;
         }
 
         public async Task PollForChangesAsync(string driverId, string terminalId, string regionId, string areaId)
@@ -76,43 +80,79 @@
             {
                 trip.TripSendFlag = tripSendFlagValue;
                 updateChangeSet.AddUpdate(trip.Id, trip);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Set Trip {trip.TripNumber} TripSendFlag to {tripSendFlagValue}");
             }
             return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(updateChangeSet);
         }
 
-        private Task<QueryResult<Trip>> GetTripsAfterLoginAsync(string driverId)
+        private Task AckTripsAsync(string employeeId, IEnumerable<Trip> trips)
         {
-            if (string.IsNullOrEmpty(driverId)) throw new ArgumentException(nameof(driverId));
-            var queryBuilder = new QueryBuilder<Trip>().Filter(trip => trip
-                .Property(x => x.TripDriverId).EqualTo(driverId)
-                .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
-                .And().Property(x => x.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked)
-                .And().Property(x => x.TripSendFlag).EqualTo(TripSendFlagValue.Ready))
-                .OrderBy(x => x.TripSequenceNumber);
-            return _connectionService.GetConnection(ConnectionType.Online).QueryAsync(queryBuilder);
+            var changeSet = new ChangeSet<string, DriverTripAckProcess>();
+            foreach (var trip in trips)
+            {
+                var ackProcess = new DriverTripAckProcess
+                {
+                    EmployeeId = employeeId,
+                    TripNumber = trip.TripNumber,
+                    ActionDateTime = DateTime.Now,
+                    Mdtid = employeeId
+                };
+                changeSet.AddUpdate(ackProcess.Id, ackProcess);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Ack Trip {trip.TripNumber} at {ackProcess.ActionDateTime}");
+            }
+            return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(changeSet);
         }
 
-        private async Task PollForTripsAfterLoginAsync(string driverId)
+        private async Task PollForTripsAfterLoginAsync(string employeeId)
         {
-            var tripsAfterLogin = await GetTripsAfterLoginAsync(driverId);
-            if (tripsAfterLogin.TotalCount == 0) return;
-            await UpdateTripSendFlagAsync(tripsAfterLogin.Records, TripSendFlagValue.SentToDriver);
-            var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(tripsAfterLogin.Records);
-            foreach (var trip in mappedTrips)
+            var tripInfoProcess = new TripInfoProcess
             {
-                var existingTrip = await _tripService.FindTripAsync(trip.TripNumber);
-                var isNewTrip = existingTrip == null;
-                var tripContext = isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified;
-                if (isNewTrip)
-                    await _tripService.CreateTripAsync(trip);
-                else
-                    await _tripService.UpdateTripAsync(trip);
-                await _notificationService.TripAsync(trip, tripContext);
-                _mvxMessenger.Publish(new TripNotificationMessage(this)
+                EmployeeId = employeeId,
+                SendOnlyNewModTrips = Constants.Yes
+            };
+            var tripInfoProcessChangeSet = await _connectionService.GetConnection(ConnectionType.Online)
+                .UpdateAsync(tripInfoProcess, requeryUpdated: false);
+            if (!tripInfoProcessChangeSet.WasSuccessful)
+            {
+                Mvx.TaggedWarning(Constants.ScrapRunner, $"ProcessTripInfoAsync {employeeId} failed");
+                return;
+            }
+            if (tripInfoProcessChangeSet.Item?.Trips?.Count > 0)
+            {
+                await _tripService.UpdateTrips(tripInfoProcessChangeSet.Item.Trips);
+                await AckTripsAsync(employeeId, tripInfoProcessChangeSet.Item.Trips);
+            }
+            if (tripInfoProcessChangeSet.Item?.TripSegments?.Count > 0)
+                await _tripService.UpdateTripSegments(tripInfoProcessChangeSet.Item.TripSegments);
+            if (tripInfoProcessChangeSet.Item?.TripSegmentContainers?.Count > 0)
+                await _tripService.UpdateTripSegmentContainers(tripInfoProcessChangeSet.Item.TripSegmentContainers);
+            if (tripInfoProcessChangeSet.Item?.CustomerCommodities?.Count > 0)
+                await _customerService.UpdateCustomerCommodity(tripInfoProcessChangeSet.Item.CustomerCommodities);
+            if (tripInfoProcessChangeSet.Item?.CustomerDirections?.Count > 0)
+                await _customerService.UpdateCustomerDirections(tripInfoProcessChangeSet.Item.CustomerDirections);
+            if (tripInfoProcessChangeSet.Item?.CustomerLocations?.Count > 0)
+                await _customerService.UpdateCustomerLocation(tripInfoProcessChangeSet.Item.CustomerLocations);
+            if (tripInfoProcessChangeSet.Item?.CustomerMasters?.Count > 0)
+                await _customerService.UpdateCustomerMaster(tripInfoProcessChangeSet.Item.CustomerMasters);
+            if (tripInfoProcessChangeSet.Item?.Trips?.Count > 0)
+            {
+                var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(tripInfoProcessChangeSet.Item.Trips);
+                foreach (var trip in mappedTrips)
                 {
-                    Context = tripContext,
-                    Trip = trip
-                });
+                    var isNewTrip = await _tripService.FindTripAsync(trip.TripNumber) == null;
+                    var tripContext = isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified;
+                    if (isNewTrip)
+                        await _tripService.CreateTripAsync(trip);
+                    else
+                        await _tripService.UpdateTripAsync(trip);
+                    await _notificationService.TripAsync(trip, tripContext);
+                    Mvx.TaggedTrace(Constants.ScrapRunner, $"Found {tripContext} Trip {trip.TripNumber}");
+                    _mvxMessenger.Publish(new TripNotificationMessage(this)
+                    {
+                        Context = tripContext,
+                        Trip = trip
+                    });
+                }
             }
         }
 
@@ -136,6 +176,7 @@
             var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(canceledTrips.Records);
             foreach (var trip in mappedTrips)
             {
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {trip.TripNumber} was canceled by dispatch");
                 await _tripService.UpdateTripAsync(trip);
                 await _notificationService.TripAsync(trip, TripNotificationContext.Canceled);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
@@ -165,6 +206,7 @@
                 trip.TripDriverIdPrev = null;
                 trip.TripStatusPrev = null;
                 updateChangeSet.AddUpdate(trip.Id, trip);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {trip.TripNumber} TripDriverIdPrev, TripStatusPrev set to null");
             }
             return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(updateChangeSet);
         }
@@ -177,6 +219,7 @@
             var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(unassignedTrips.Records);
             foreach (var trip in mappedTrips)
             {
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {trip.TripNumber} was unassigned by dispatch");
                 await _tripService.UpdateTripAsync(trip);
                 await _notificationService.TripAsync(trip, TripNotificationContext.Unassigned);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
@@ -205,6 +248,7 @@
             var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(doneTrips.Records);
             foreach (var trip in mappedTrips)
             {
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {trip.TripNumber} marked done by dispatch");
                 await _tripService.UpdateTripAsync(trip);
                 await _notificationService.TripAsync(trip, TripNotificationContext.MarkedDone);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
@@ -233,6 +277,7 @@
             {
                 trip.TripSendReseqFlag = TripSendReseqFlagValue.ReseqSent;
                 updateChangeSet.AddUpdate(trip.TripNumber, trip);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {trip.TripNumber} TripSendReseqFlag set to {trip.TripSendReseqFlag}");
             }
             return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(updateChangeSet);
         }
@@ -245,6 +290,7 @@
             var mappedTrips = Mapper.Map<List<Trip>, List<TripModel>>(resequencedTrips.Records);
             for (var i = 0; i < mappedTrips.Count; i++)
             {
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {mappedTrips[i].TripNumber} resequenced {resequencedTrips.Records[i].TripSendReseqFlag}");
                 await _tripService.UpdateTripAsync(mappedTrips[i]);
                 if (resequencedTrips.Records[i].TripSendReseqFlag != TripSendReseqFlagValue.ManualReseq) continue;
                 await _notificationService.TripsResequencedAsync();
@@ -316,6 +362,7 @@
 
             foreach (var containerChange in containerChanges.Records)
             {
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"ContainerChange {containerChange.ActionFlag} {containerChange.Id} at {containerChange.ActionDate}");
                 _mvxMessenger.Publish(new ContainerChangeMessage(this) { Change = containerChange });
             }
         }
@@ -388,9 +435,6 @@
                 terminalChanges = await GetTerminalChangesAfterAsync(areaId, regionId, terminalMasterDateTime.Value, defSendOnlyYardsForArea);
             if (!terminalChanges.Records.Any()) return;
 
-            //var mappedTerminalChanges = Mapper.Map<IEnumerable<TerminalChange>, IEnumerable<TerminalChangeModel>>(terminalChanges.Records);
-            //await _terminalService.UpsertTerminalChangeAsync(mappedTerminalChanges);
-
             await _terminalService.UpdateTerminalChangeIntoMaster(terminalChanges.Records);
             await _driverService.UpdateTerminalMasterDateTimeAsync(terminalChanges.Records.Max(terminalChange => terminalChange.ChgDateTime));
 
@@ -398,6 +442,7 @@
             // remove this and the TerminalChangeMessage class.
             foreach (var terminalChange in terminalChanges.Records)
             {
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"TerminalChange {terminalChange.ChgActionFlag} {terminalChange.Id} at {terminalChange.ChgDateTime}");
                 _mvxMessenger.Publish(new TerminalChangeMessage(this) { Change = terminalChange });
             }
         }
@@ -415,6 +460,7 @@
         private Task AckForceLogoffAsync(DriverStatus driverStatus)
         {
             driverStatus.SendHHLogoffFlag = DriverForceLogoffValue.SentToDriver;
+            Mvx.TaggedTrace(Constants.ScrapRunner, $"{driverStatus.EmployeeId} DriverStatus SendHHLogoffFlag set to {driverStatus.SendHHLogoffFlag}");
             return _connectionService.GetConnection(ConnectionType.Online).UpdateAsync(driverStatus);
         }
 
@@ -443,7 +489,9 @@
             foreach (var message in messages.Records)
             {
                 message.Processed = Constants.Yes;
+                message.Ack = Constants.Yes;
                 updateChangeSet.AddUpdate(message.Id, message);
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Ack Message {message.Id}");
             }
             return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(updateChangeSet);
         }
@@ -456,6 +504,7 @@
             var mappedMessages = Mapper.Map<IEnumerable<Messages>, IEnumerable<MessagesModel>>(messages.Records);
             foreach (var message in mappedMessages)
             {
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"New Message {message.MsgId} sent by {message.SenderName}");
                 await _messagesService.UpsertMessageAsync(message);
                 await _notificationService.MessageAsync(message);
                 _mvxMessenger.Publish(new NewMessagesMessage(this) { Message = message });
