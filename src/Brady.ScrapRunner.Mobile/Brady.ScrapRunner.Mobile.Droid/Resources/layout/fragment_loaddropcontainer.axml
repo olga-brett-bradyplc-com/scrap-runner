@@ -23,7 +23,7 @@
             android:padding="10dp"
             android:layout_gravity="center"
             android:layout_below="@id/camera_fragment_loaddrop"
-            android:textSize="17dp"
+            android:textSize="17sp"
             android:text="Current Containers" />
         <ScrollView
             android:id="@+id/ContainerScrollView"
