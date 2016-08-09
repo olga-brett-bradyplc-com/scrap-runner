@@ -26,8 +26,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _driverService = driverService;
             _codeTableService = codeTableService;
 
-            Title = AppResources.YardScaleDetail;
-
             ContainerSetDownCommand = new MvxAsyncCommand(ExecuteContainerSetDownCommandAsync);
             ContainerLeftOnTruckCommand = new MvxAsyncCommand(ExecuteContainerLeftOnTruckCommandAsync);
         }
@@ -38,11 +36,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripSegNumber = tripSegNumber;
             TripSegContainerSeqNumber = tripSegContainerSeqNumber;
             TripSegContainerNumber = tripSegContainerNumber;
-            SubTitle = $"{AppResources.Trip} {TripNumber}";
         }
 
         public override async void Start()
         {
+            Title = AppResources.YardScaleDetail;
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
+
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
             var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
