@@ -60,7 +60,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         public Task UpdateTripSegments(IEnumerable<TripSegment> tripSegments)
         {
             var mapped = AutoMapper.Mapper.Map<IEnumerable<TripSegment>, IEnumerable<TripSegmentModel>>(tripSegments);
-            return _tripSegmentRepository.InsertRangeAsync(mapped);
+            return _tripSegmentRepository.InsertOrReplaceRangeAsync(mapped);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             var mapped =
                 AutoMapper.Mapper.Map<IEnumerable<TripSegmentContainer>, IEnumerable<TripSegmentContainerModel>>(
                     tripSegmentContainers);
-            return _tripSegmentContainerRepository.InsertRangeAsync(mapped);
+            return _tripSegmentContainerRepository.InsertOrReplaceRangeAsync(mapped);
         }
 
         /// <summary>
