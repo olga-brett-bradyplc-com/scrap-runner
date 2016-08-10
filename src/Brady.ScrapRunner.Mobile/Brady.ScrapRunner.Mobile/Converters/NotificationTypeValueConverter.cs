@@ -17,15 +17,12 @@
                 case NotificationType.TripModified:
                     return AppResources.NotificationTripModifiedTitle;
                 case NotificationType.TripCanceled:
+                case NotificationType.TripFuture:
+                case NotificationType.TripReassigned:
+                case NotificationType.TripUnassigned:
                     return AppResources.NotificationTripCanceledTitle;
                 case NotificationType.TripOnHold:
                     return AppResources.NotificationTripOnHoldTitle;
-                case NotificationType.TripFuture:
-                    return AppResources.NotificationTripFutureTitle;
-                case NotificationType.TripReassigned:
-                    return AppResources.NotificationTripReassignedTitle;
-                case NotificationType.TripUnassigned:
-                    return AppResources.NotificationTripUnassignedTitle;
                 case NotificationType.TripMarkedDone:
                     return AppResources.NotificationTripMarkedDoneTitle;
                 case NotificationType.TripsResequenced:

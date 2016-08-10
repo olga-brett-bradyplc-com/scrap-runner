@@ -13,6 +13,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         public BaseViewModel()
         {
+            ShouldAlwaysRaiseInpcOnUserInterfaceThread(false);
         }
 
         private bool _isBusy;

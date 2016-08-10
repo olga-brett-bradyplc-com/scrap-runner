@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  
+
   <style name="ScrapRunnerTheme" parent="ScrapRunnerTheme.Base" />
-    
+
   <style name="ScrapRunnerTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
     <item name="windowNoTitle">true</item>
     <item name="windowActionBar">false</item>
@@ -35,7 +35,7 @@
     <item name="colorAccent">@color/material_orange</item>
     <item name="android:layout_marginBottom">10dp</item>
   </style>
-  
+
   <style name="RoundedEditTextTop" parent="Base.Widget.AppCompat.EditText">
     <item name="android:background">@drawable/rounded_edittext_top_states</item>
     <item name="android:padding">4dp</item>
@@ -58,26 +58,25 @@
     <item name="android:padding">10dp</item>
     <item name="android:textColor">@color/material_gray_700</item>
   </style>
-  
+
   <style name="ScrapRunnerTheme.Label">
     <item name="android:layout_height">20dp</item>
     <item name="android:layout_width">match_parent</item>
     <item name="android:textColor">#8d8d8d</item>
-    <item name="android:textSize">12dp</item>
+    <item name="android:textSize">12sp</item>
     <item name="android:paddingLeft">10dp</item>
-    <item name="android:layout_marginTop">5dp</item>
+    <item name="android:layout_marginTop">0dp</item>
     <item name="android:gravity">center_vertical|left</item>
   </style>
 
   <style name="ScrapRunnerTheme.SpinnerBase">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">wrap_content</item>
-    <item name="android:foreground">#ffffff</item>
     <item name="android:spinnerMode">dialog</item>
     <item name="android:layout_marginBottom">1dp</item>
     <item name="android:padding">10dp</item>
     <item name="android:layout_marginRight">15dp</item>
-    <item name="android:textSize">40dp</item>
+    <item name="android:textSize">40sp</item>
   </style>
 
   <style name="ScrapRunnerTheme.SpinnerContainer">

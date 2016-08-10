@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:background="@color/material_gray_900"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textColor="@color/material_white"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
@@ -64,5 +64,4 @@
             android:background="@color/material_red_500"
             local:MvxBind="Text NextActionLabel; Click NextStageCommand" />
     </LinearLayout>
-
 </RelativeLayout>

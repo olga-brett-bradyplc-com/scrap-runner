@@ -26,6 +26,7 @@
         <TextView
             android:id="@+id/customer_location_label"
             style="@style/ScrapRunnerTheme.Label"
+            android:background="@color/material_gray_100"
             android:layout_below="@id/containerid_input_field"
             android:text="Location" />
         <LinearLayout
@@ -42,6 +43,7 @@
         <TextView
             android:id="@+id/customer_commodity_label"
             style="@style/ScrapRunnerTheme.Label"
+            android:background="@color/material_gray_100"
             android:layout_below="@id/custom_location_container"
             android:text="Commodity" />
         <LinearLayout
@@ -58,6 +60,7 @@
         <TextView
             android:id="@+id/customer_level_label"
             style="@style/ScrapRunnerTheme.Label"
+            android:background="@color/material_gray_100"
             android:layout_below="@id/custom_commodity_container"
             android:text="Level" />
         <LinearLayout

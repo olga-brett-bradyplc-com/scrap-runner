@@ -43,6 +43,10 @@
         /// <summary>
         /// An existing trip has been marked done by dispatch.
         /// </summary>
-        MarkedDone
+        MarkedDone,
+        /// <summary>
+        /// Trips were resequenced by dispatch.
+        /// </summary>
+        Resequenced
     }
 }
