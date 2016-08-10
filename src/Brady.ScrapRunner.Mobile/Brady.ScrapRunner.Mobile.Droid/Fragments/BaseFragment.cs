@@ -23,8 +23,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     {
         private Toolbar _toolbar;
         private MvxActionBarDrawerToggle _drawerToggle;
-        private IDisposable _titleToken;
-        private IDisposable _subTitleToken;
 
         protected BaseFragment()
         {
@@ -73,25 +71,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     baseActivity.SupportActionBar.Title = ViewModel.Title;
                 if (!string.IsNullOrEmpty(ViewModel.SubTitle))
                     baseActivity.SupportActionBar.Subtitle = ViewModel.SubTitle;
-                _titleToken = ViewModel.WeakSubscribe(() => ViewModel.Title, OnTitleChanged);
-                _subTitleToken = ViewModel.WeakSubscribe(() => ViewModel.SubTitle, OnSubTitleChanged);
             }
 
             return view;
-        }
-
-        private void OnTitleChanged(object sender, PropertyChangedEventArgs args)
-        {
-            var baseActivity = ((MainActivity)Activity);
-            if (baseActivity.SupportActionBar == null) return;
-            baseActivity.SupportActionBar.Title = ViewModel.Title;
-        }
-
-        private void OnSubTitleChanged(object sender, PropertyChangedEventArgs args)
-        {
-            var baseActivity = ((MainActivity)Activity);
-            if (baseActivity.SupportActionBar == null) return;
-            baseActivity.SupportActionBar.Subtitle = ViewModel.SubTitle;
         }
 
         protected abstract int FragmentId { get; }

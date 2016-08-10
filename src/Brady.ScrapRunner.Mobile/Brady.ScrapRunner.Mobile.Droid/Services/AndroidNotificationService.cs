@@ -59,51 +59,57 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
             {
                 case TripNotificationContext.New:
                     title = AppResources.NotificationNewTripTitle;
-                    text = string.Format(AppResources.NotificationNewTripText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
+                    text = string.Format(AppResources.NotificationNewTripText, trip.TripNumber, trip.TripCustName);
                     notificationId = NewTripNotificationId;
                     notificationType = NotificationType.NewTrip;
                     break;
                 case TripNotificationContext.Modified:
                     title = AppResources.NotificationTripModifiedTitle;
-                    text = string.Format(AppResources.NotificationTripModifiedText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
+                    text = string.Format(AppResources.NotificationTripModifiedText, trip.TripNumber, trip.TripCustName);
                     notificationId = ModifiedTripNotificationId;
                     notificationType = NotificationType.TripModified;
                     break;
                 case TripNotificationContext.Canceled:
                     title = AppResources.NotificationTripCanceledTitle;
-                    text = string.Format(AppResources.NotificationTripCanceledText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
+                    text = string.Format(AppResources.NotificationTripCanceledText, trip.TripCustName);
                     notificationId = CanceledTripNotificationId;
                     notificationType = NotificationType.TripCanceled;
                     break;
                 case TripNotificationContext.OnHold:
                     title = AppResources.NotificationTripOnHoldTitle;
-                    text = string.Format(AppResources.NotificationTripOnHoldText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
+                    text = string.Format(AppResources.NotificationTripOnHoldText, trip.TripCustName);
                     notificationId = OnHoldTripNotificationId;
                     notificationType = NotificationType.TripOnHold;
                     break;
                 case TripNotificationContext.Future:
-                    title = AppResources.NotificationTripFutureTitle;
-                    text = string.Format(AppResources.NotificationTripFutureText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
+                    title = AppResources.NotificationTripCanceledTitle;
+                    text = string.Format(AppResources.NotificationTripCanceledText, trip.TripCustName);
                     notificationId = FutureTripNotificationId;
                     notificationType = NotificationType.TripFuture;
                     break;
                 case TripNotificationContext.Reassigned:
-                    title = AppResources.NotificationTripReassignedTitle;
-                    text = string.Format(AppResources.NotificationTripReassignedText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
+                    title = AppResources.NotificationTripCanceledTitle;
+                    text = string.Format(AppResources.NotificationTripCanceledText, trip.TripCustName);
                     notificationId = ReassignedTripNotificationId;
                     notificationType = NotificationType.TripReassigned;
                     break;
                 case TripNotificationContext.Unassigned:
-                    title = AppResources.NotificationTripUnassignedTitle;
-                    text = string.Format(AppResources.NotificationTripUnassignedText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
+                    title = AppResources.NotificationTripCanceledTitle;
+                    text = string.Format(AppResources.NotificationTripCanceledText, trip.TripCustName);
                     notificationId = UnassignedTripNotificationId;
                     notificationType = NotificationType.TripUnassigned;
                     break;
                 case TripNotificationContext.MarkedDone:
                     title = AppResources.NotificationTripMarkedDoneTitle;
-                    text = string.Format(AppResources.NotificationTripMarkedDoneText, trip.TripTypeDesc, trip.TripCustName, trip.TripNumber);
+                    text = string.Format(AppResources.NotificationTripMarkedDoneText, trip.TripCustName);
                     notificationId = MarkedDoneTripNotificationId;
                     notificationType = NotificationType.TripMarkedDone;
+                    break;
+                case TripNotificationContext.Resequenced:
+                    title = AppResources.NotificationTripResequenceTitle;
+                    text = AppResources.NotificationTripResequenceText;
+                    notificationId = ResequencedTripNotficationId;
+                    notificationType = NotificationType.TripsResequenced;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(context), context, null);

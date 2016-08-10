@@ -38,7 +38,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             var mapped =
                 AutoMapper.Mapper.Map<IEnumerable<CustomerDirections>, IEnumerable<CustomerDirectionsModel>>(
                     customerDirections);
-            return _customerDirectionsRepository.InsertRangeAsync(mapped);
+            return _customerDirectionsRepository.InsertOrReplaceRangeAsync(mapped);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             var mapped =
                 AutoMapper.Mapper.Map<IEnumerable<CustomerLocation>, IEnumerable<CustomerLocationModel>>(
                     customerLocations);
-            return _customerLocationRepository.InsertRangeAsync(mapped);
+            return _customerLocationRepository.InsertOrReplaceRangeAsync(mapped);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             var mapped =
                 AutoMapper.Mapper.Map<IEnumerable<CustomerCommodity>, IEnumerable<CustomerCommodityModel>>(
                     customerCommodities);
-            return _customerCommodityRepository.InsertRangeAsync(mapped);
+            return _customerCommodityRepository.InsertOrReplaceRangeAsync(mapped);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             var mapped =
                 AutoMapper.Mapper.Map<IEnumerable<CustomerMaster>, IEnumerable<CustomerMasterModel>>(
                     customerMasters);
-            return _customerMasterRepository.InsertRangeAsync(mapped);
+            return _customerMasterRepository.InsertOrReplaceRangeAsync(mapped);
         }
 
         /// <summary>

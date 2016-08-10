@@ -51,6 +51,7 @@
     <Compile Include="Interfaces\ICustomerService.cs" />
     <Compile Include="Interfaces\IDbService.cs" />
     <Compile Include="Interfaces\IDriverService.cs" />
+    <Compile Include="Interfaces\ILocationGeofenceService.cs" />
     <Compile Include="Interfaces\ILocationOdometerService.cs" />
     <Compile Include="Interfaces\ILocationPathService.cs" />
     <Compile Include="Interfaces\ILocationService.cs" />
@@ -68,6 +69,8 @@
     <Compile Include="Interfaces\ITripService.cs" />
     <Compile Include="Messages\ContainerChangeMessage.cs" />
     <Compile Include="Messages\ForceLogoffMessage.cs" />
+    <Compile Include="Messages\GeofenceArriveMessage.cs" />
+    <Compile Include="Messages\GeofenceDepartMessage.cs" />
     <Compile Include="Messages\LocationModelMessage.cs" />
     <Compile Include="Messages\NewMessagesMessage.cs" />
     <Compile Include="Messages\TerminalChangeMessage.cs" />
@@ -107,6 +110,7 @@
     <Compile Include="Services\DemoDataGenerator.cs" />
     <Compile Include="Services\ConnectionService.cs" />
     <Compile Include="Services\DriverService.cs" />
+    <Compile Include="Services\LocationGeofenceService.cs" />
     <Compile Include="Services\LocationOdometerService.cs" />
     <Compile Include="Services\LocationPathService.cs" />
     <Compile Include="Services\LocationService.cs" />
@@ -127,6 +131,7 @@
     <Compile Include="ViewModels\FuelEntryViewModel.cs" />
     <Compile Include="ViewModels\GpsCaptureViewModel.cs" />
     <Compile Include="ViewModels\LoadDropContainerViewModel.cs" />
+    <Compile Include="ViewModels\MessageNotificationViewModel.cs" />
     <Compile Include="ViewModels\MessagesViewModel.cs" />
     <Compile Include="ViewModels\ModifyReturnToYardViewModel.cs" />
     <Compile Include="ViewModels\NewMessageViewModel.cs" />
@@ -150,6 +155,7 @@
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\SignInViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\TripNotificationViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\AppResources.es.resx">
