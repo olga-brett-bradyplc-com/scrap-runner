@@ -4873,7 +4873,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			public const int text_view_fullname = 2131099785;
 			
 			// aapt resource value: 0x7f06008b
-			public const int text_view_truck = 2131099787;
+			public const int text_view_vehicle = 2131099787;
 			
 			// aapt resource value: 0x7f06008a
 			public const int text_view_yard = 2131099786;

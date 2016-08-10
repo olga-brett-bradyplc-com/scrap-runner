@@ -17,6 +17,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task UpdateDriverEmployeeRecord(EmployeeMaster employee);
 
+        Task UpdatePowerMasterRecord(PowerMaster power);
+
         Task<int> UpdateDriver(DriverStatusModel driver);
 
         Task<int> CreateDriverStatus(DriverStatusModel driverStatus);
@@ -24,6 +26,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<DriverStatusModel> GetCurrentDriverStatusAsync();
 
         Task<EmployeeMaster> FindEmployeeMasterForDriverRemoteAsync(string employeeId);
+
+        Task<PowerMaster> FindEmployeePowerMasterRemoteAsync(string powerId);
 
         Task<ChangeResultWithItem<DriverEnrouteProcess>> ProcessDriverEnrouteAsync(DriverEnrouteProcess driverEnrouteProcess);
 
@@ -44,5 +48,9 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<DateTime?> GetContainerMasterDateTimeAsync();
 
         Task<int> UpdateContainerMasterDateTimeAsync(DateTime? containerMasterDateTime);
+
+        Task<EmployeeMasterModel> FindEmployeeAsync(string employeeId);
+
+        Task<PowerMasterModel> FindPowerMasterAsync(string powerId);
     }
 }
