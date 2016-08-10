@@ -374,21 +374,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                 ShowViewModel<GpsCaptureViewModel>(new { custHostCode = currentSegment.TripSegDestCustHostCode,
                                     customerInfo = termInfoText, currentDriver = CurrentDriver });
                             }
-                            else
-                                SetDriverArrive();
                         }
-                        else
-                            SetDriverArrive();
-                    }
-                    else
-                        SetDriverArrive();*/
- 
+                    }*/
+
+                    await SetDriverArrive();
+
                     SetNextStageLabel(firstSegment);
                 }
             }
         }
 
-        private async void SetDriverArrive()
+        private async Task SetDriverArrive()
         {
             var currentSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
             var setDriverArrived = await _driverService.ProcessDriverArrivedAsync(new DriverArriveProcess

@@ -95,13 +95,16 @@
                 EmployeeId = employeeId,
                 SendOnlyNewModTrips = Constants.Yes
             };
+
             var tripInfoProcessChangeSet = await _connectionService.GetConnection(ConnectionType.Online)
                 .UpdateAsync(tripInfoProcess, requeryUpdated: false);
+
             if (!tripInfoProcessChangeSet.WasSuccessful)
             {
                 Mvx.TaggedWarning(Constants.ScrapRunner, $"ProcessTripInfoAsync {employeeId} failed");
                 return;
             }
+
             if (tripInfoProcessChangeSet.Item?.Trips?.Count > 0)
                 await _tripService.UpdateTrips(tripInfoProcessChangeSet.Item.Trips);
             if (tripInfoProcessChangeSet.Item?.TripSegments?.Count > 0)
@@ -116,6 +119,7 @@
                 await _customerService.UpdateCustomerLocation(tripInfoProcessChangeSet.Item.CustomerLocations);
             if (tripInfoProcessChangeSet.Item?.CustomerMasters?.Count > 0)
                 await _customerService.UpdateCustomerMaster(tripInfoProcessChangeSet.Item.CustomerMasters);
+
             if (tripInfoProcessChangeSet.Item?.Trips?.Count > 0)
             {
                 var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(tripInfoProcessChangeSet.Item.Trips);
