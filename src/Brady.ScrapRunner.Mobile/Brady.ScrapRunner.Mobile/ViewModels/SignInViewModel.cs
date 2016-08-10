@@ -9,12 +9,14 @@ using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Messages;
 using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Plugins.Sqlite;
 using Brady.ScrapRunner.Mobile.Resources;
 using Brady.ScrapRunner.Mobile.Services;
 using Brady.ScrapRunner.Mobile.Validators;
+using MvvmCross.Plugins.Messenger;
 using Plugin.Settings.Abstractions;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
@@ -34,6 +36,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IBackgroundScheduler _backgroundScheduler;
         private readonly ILocationService _locationService;
         private readonly ILocationOdometerService _locationOdometerService;
+        private readonly IMvxMessenger _mvxMessenger;
         
         public SignInViewModel(
             IDbService dbService,
@@ -48,7 +51,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IConnectionService connection, 
             IBackgroundScheduler backgroundScheduler, 
             ILocationService locationService, 
-            ILocationOdometerService locationOdometerService)
+            ILocationOdometerService locationOdometerService,
+            IMvxMessenger mvxMessenger)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -59,6 +63,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _codeTableService = codeTableService;
             _terminalService = terminalService;
             _messagesService = messagesService;
+            _mvxMessenger = mvxMessenger;
 
             _connection = connection;
             _backgroundScheduler = backgroundScheduler;
@@ -323,6 +328,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
+
+                // The long term fix for updating the menu driver information is to have the login & settings
+                // view as their own activities, that way we don't have to worry about the menu trying to look
+                // up information it doesn't have yet on initial app load, since that info is fetched during the login
+                // The menu fragment doesn't need to be loaded on those views
+                // @TODO : Implement above
+                var employeePowerMaster = await _driverService.FindEmployeePowerMasterRemoteAsync(TruckId);
+                await _driverService.UpdatePowerMasterRecord(employeePowerMaster);
+
+                var employeeRecord = await _driverService.FindEmployeeAsync(UserName);
+                var terminal = await _terminalService.FindTerminalMasterAsync(CurrentDriver.TerminalId);
+                var power = await _driverService.FindPowerMasterAsync(TruckId);
+
+                _mvxMessenger.Publish(new DriverInfoMessage(this)
+                {
+                    DriverName = employeeRecord.FullName,
+                    DriverYard = terminal.TerminalName,
+                    DriverVehicle = $"{power.PowerDesc} {power.PowerId}"
+                });
 
                 var messagesTable = await _messagesService.ProcessDriverMessagesAsync(new DriverMessageProcess { EmployeeId = UserName });
 
