@@ -275,6 +275,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activities\BaseActivity.cs" />
+    <Compile Include="Activities\MessageNotificationActivity.cs" />
     <Compile Include="Activities\NotificationActivity.cs" />
     <Compile Include="Activities\TripNotificationActivity.cs" />
     <Compile Include="Bootstrap\ColorPluginBootstrap.cs" />
@@ -542,6 +544,9 @@
     <AndroidResource Include="Resources\layout\item_terminal.axml" />
     <AndroidResource Include="Resources\layout\SplashScreen.axml" />
     <AndroidResource Include="Resources\layout\activity_trip_notification.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\activity_message_notification.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

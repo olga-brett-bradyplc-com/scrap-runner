@@ -14,8 +14,11 @@
     using Interfaces;
     using Messages;
     using Models;
+    using MvvmCross.Core.ViewModels;
+    using MvvmCross.Core.Views;
     using MvvmCross.Platform;
     using MvvmCross.Plugins.Messenger;
+    using ViewModels;
 
     public class PollingService : IPollingService
     {
@@ -85,24 +88,6 @@
             return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(updateChangeSet);
         }
 
-        private Task AckTripsAsync(string employeeId, IEnumerable<Trip> trips)
-        {
-            var changeSet = new ChangeSet<string, DriverTripAckProcess>();
-            foreach (var trip in trips)
-            {
-                var ackProcess = new DriverTripAckProcess
-                {
-                    EmployeeId = employeeId,
-                    TripNumber = trip.TripNumber,
-                    ActionDateTime = DateTime.Now,
-                    Mdtid = employeeId
-                };
-                changeSet.AddUpdate(ackProcess.Id, ackProcess);
-                Mvx.TaggedTrace(Constants.ScrapRunner, $"Ack Trip {trip.TripNumber} at {ackProcess.ActionDateTime}");
-            }
-            return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(changeSet);
-        }
-
         private async Task PollForTripsAfterLoginAsync(string employeeId)
         {
             var tripInfoProcess = new TripInfoProcess
@@ -118,10 +103,7 @@
                 return;
             }
             if (tripInfoProcessChangeSet.Item?.Trips?.Count > 0)
-            {
                 await _tripService.UpdateTrips(tripInfoProcessChangeSet.Item.Trips);
-                await AckTripsAsync(employeeId, tripInfoProcessChangeSet.Item.Trips);
-            }
             if (tripInfoProcessChangeSet.Item?.TripSegments?.Count > 0)
                 await _tripService.UpdateTripSegments(tripInfoProcessChangeSet.Item.TripSegments);
             if (tripInfoProcessChangeSet.Item?.TripSegmentContainers?.Count > 0)
@@ -142,9 +124,15 @@
                     var isNewTrip = await _tripService.FindTripAsync(trip.TripNumber) == null;
                     var tripContext = isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified;
                     if (isNewTrip)
+                    {
                         await _tripService.CreateTripAsync(trip);
+                        ShowTripNotificationActivity(trip.TripNumber, TripNotificationContext.New);
+                    }
                     else
+                    {
                         await _tripService.UpdateTripAsync(trip);
+                        ShowTripNotificationActivity(trip.TripNumber, TripNotificationContext.Modified);
+                    }
                     await _notificationService.TripAsync(trip, tripContext);
                     Mvx.TaggedTrace(Constants.ScrapRunner, $"Found {tripContext} Trip {trip.TripNumber}");
                     _mvxMessenger.Publish(new TripNotificationMessage(this)
@@ -481,15 +469,14 @@
             return _connectionService.GetConnection(ConnectionType.Online).QueryAsync(queryBuilder);
         }
 
-        private Task AckMessagesAsync(QueryResult<Messages> messages)
+        private Task ProcessMessagesAsync(QueryResult<Messages> messages)
         {
             var updateChangeSet = new ChangeSet<int, Messages>();
             foreach (var message in messages.Records)
             {
                 message.Processed = Constants.Yes;
-                message.Ack = Constants.Yes;
                 updateChangeSet.AddUpdate(message.Id, message);
-                Mvx.TaggedTrace(Constants.ScrapRunner, $"Ack Message {message.Id}");
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Processed Message {message.Id}");
             }
             return _connectionService.GetConnection(ConnectionType.Online).ProcessChangeSetAsync(updateChangeSet);
         }
@@ -498,15 +485,41 @@
         {
             var messages = await GetMessagesAsync(driverId);
             if (messages.TotalCount == 0) return;
-            await AckMessagesAsync(messages);
+            await ProcessMessagesAsync(messages);
             var mappedMessages = Mapper.Map<IEnumerable<Messages>, IEnumerable<MessagesModel>>(messages.Records);
             foreach (var message in mappedMessages)
             {
                 Mvx.TaggedTrace(Constants.ScrapRunner, $"New Message {message.MsgId} sent by {message.SenderName}");
                 await _messagesService.UpsertMessageAsync(message);
                 await _notificationService.MessageAsync(message);
+                ShowMessageNotificationActivity(message.MsgId.Value);
                 _mvxMessenger.Publish(new NewMessagesMessage(this) { Message = message });
             }
+        }
+
+        private void ShowViewModel<TViewModel>(IDictionary<string, string> parameterValues) where TViewModel : BaseViewModel
+        {
+            var request = MvxViewModelRequest<TViewModel>.GetDefaultRequest();
+            request.ParameterValues = parameterValues;
+            var viewDispatcher = Mvx.Resolve<IMvxViewDispatcher>();
+            viewDispatcher.ShowViewModel(request);
+        }
+
+        private void ShowTripNotificationActivity(string tripNumber, TripNotificationContext context)
+        {
+            ShowViewModel<TripNotificationViewModel>(new Dictionary<string, string>
+            {
+               { "tripNumber", tripNumber },
+               { "notificationContext", context.ToString() }
+            });
+        }
+
+        private void ShowMessageNotificationActivity(int messageId)
+        {
+            ShowViewModel<MessageNotificationViewModel>(new Dictionary<string, string>
+            {
+                {"messageId", messageId.ToString()}
+            });
         }
     }
 }

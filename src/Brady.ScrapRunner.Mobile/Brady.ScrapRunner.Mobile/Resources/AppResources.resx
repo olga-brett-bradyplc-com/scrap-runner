@@ -636,7 +636,7 @@ You will now be sent back to the login.</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationNewTripText" xml:space="preserve">
-    <value>{0} trip {1} ({2}) has been dispatched.</value>
+    <value>New Trip ({0}) {1}.</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationNewTripTitle" xml:space="preserve">
@@ -644,23 +644,15 @@ You will now be sent back to the login.</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationTripCanceledText" xml:space="preserve">
-    <value>{0} trip {1} ({2}) has been canceled by dispatch.</value>
+    <value>Trip canceled by DISPATCH {0}.</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationTripCanceledTitle" xml:space="preserve">
     <value>Trip Canceled</value>
     <comment>AndroidNotificationService</comment>
   </data>
-  <data name="NotificationTripFutureText" xml:space="preserve">
-    <value>{0} trip {1} ({2}) has been moved to a future date.</value>
-    <comment>AndroidNotificationService</comment>
-  </data>
-  <data name="NotificationTripFutureTitle" xml:space="preserve">
-    <value>Future Trip</value>
-    <comment>AndroidNotificationService</comment>
-  </data>
   <data name="NotificationTripMarkedDoneText" xml:space="preserve">
-    <value>{0} trip {1} ({2}) has been marked done by dispatch.</value>
+    <value>Trip marked done by DISPATCH {0}.</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationTripMarkedDoneTitle" xml:space="preserve">
@@ -668,7 +660,7 @@ You will now be sent back to the login.</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationTripModifiedText" xml:space="preserve">
-    <value>{0} trip {1} ({2}) has been modified by dispatch.</value>
+    <value>Trip Modified ({0}) {1}</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationTripModifiedTitle" xml:space="preserve">
@@ -676,35 +668,19 @@ You will now be sent back to the login.</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationTripOnHoldText" xml:space="preserve">
-    <value>{0} trip {1} ({2}) has been placed on hold by dispatch.</value>
+    <value>Trip placed on hold by DISPATCH {0}.</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationTripOnHoldTitle" xml:space="preserve">
     <value>Trip Placed On Hold</value>
     <comment>AndroidNotificationService</comment>
   </data>
-  <data name="NotificationTripReassignedText" xml:space="preserve">
-    <value>{0} trip {1} ({2}) has been reassigned to a different driver by dispatch.</value>
-    <comment>AndroidNotificationService</comment>
-  </data>
-  <data name="NotificationTripReassignedTitle" xml:space="preserve">
-    <value>Trip Reassigned</value>
-    <comment>AndroidNotificationService</comment>
-  </data>
   <data name="NotificationTripResequenceText" xml:space="preserve">
-    <value>Dispatch has changed the trip order.</value>
+    <value>Trips Resequenced.</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="NotificationTripResequenceTitle" xml:space="preserve">
     <value>Trips Resequenced</value>
-    <comment>AndroidNotificationService</comment>
-  </data>
-  <data name="NotificationTripUnassignedText" xml:space="preserve">
-    <value>{0} trip {1} ({2}) has been unassigned by dispatch.</value>
-    <comment>AndroidNotificationService</comment>
-  </data>
-  <data name="NotificationTripUnassignedTitle" xml:space="preserve">
-    <value>Trip Unassigned</value>
     <comment>AndroidNotificationService</comment>
   </data>
   <data name="ErrorProcessingLevels" xml:space="preserve">
@@ -777,5 +753,9 @@ You will now be sent back to the login.</value>
   <data name="Acknowledge" xml:space="preserve">
     <value>Acknowledge</value>
     <comment>TripNotificationViewModel</comment>
+  </data>
+  <data name="MessageNotificationMessage" xml:space="preserve">
+    <value>New Message From {0} at {1}</value>
+    <comment>MessageNotificationViewModel</comment>
   </data>
 </root>

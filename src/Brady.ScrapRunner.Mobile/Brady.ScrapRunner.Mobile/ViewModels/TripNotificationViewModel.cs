@@ -8,16 +8,19 @@
     using Interfaces;
     using MvvmCross.Core.ViewModels;
     using MvvmCross.Platform;
+    using Resources;
 
     public class TripNotificationViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
+        private readonly IDriverService _driverService;
         private string _tripNumber;
         private TripNotificationContext _notificationContext;
 
-        public TripNotificationViewModel(ITripService tripService)
+        public TripNotificationViewModel(ITripService tripService, IDriverService driverService)
         {
             _tripService = tripService;
+            _driverService = driverService;
         }
 
         private string _notificationMessage;
@@ -35,60 +38,54 @@
 
         public override async void Start()
         {
-            base.Start();
             try
             {
+                base.Start();
                 await StartAsync();
             }
             catch (Exception e)
             {
-                Mvx.TaggedError(Constants.ScrapRunner, $"Error starting TripNotificationViewModel. {e.Message}");
+                Mvx.TaggedError(Constants.ScrapRunner, $"Error starting TripNotificationViewModel: {e.Message}");
             }
         }
 
         private async Task StartAsync()
         {
             var trip = await _tripService.FindTripAsync(_tripNumber);
-            if (trip == null) return;
+            if (trip == null)
+            {
+                Mvx.TaggedWarning(Constants.ScrapRunner, $"Failed to find trip {_tripNumber}");
+                return;
+            }
             var tripCustomerName = trip.TripCustName;
-            // @TODO: Use Resources here
             switch (_notificationContext)
             {
                 case TripNotificationContext.New:
-                    Title = "New Trip";
-                    NotificationMessage = $"New Trip ({_tripNumber}) {tripCustomerName}";
+                    Title = AppResources.NotificationNewTripTitle;
+                    NotificationMessage = string.Format(AppResources.NotificationNewTripText, _tripNumber, tripCustomerName); ;
                     break;
                 case TripNotificationContext.Modified:
-                    Title = "Modified Trip";
-                    NotificationMessage = $"Trip Modified ({_tripNumber})";
+                    Title = AppResources.NotificationTripModifiedTitle;
+                    NotificationMessage = string.Format(AppResources.NotificationTripModifiedText, _tripNumber, tripCustomerName);
                     break;
                 case TripNotificationContext.Canceled:
-                    Title = "Canceled Trip";
-                    NotificationMessage = $"Trip canceled by DISPATCH {tripCustomerName}";
+                case TripNotificationContext.Future:
+                case TripNotificationContext.Reassigned:
+                case TripNotificationContext.Unassigned:
+                    Title = AppResources.NotificationTripCanceledTitle;
+                    NotificationMessage = string.Format(AppResources.NotificationTripCanceledText, tripCustomerName);
                     break;
                 case TripNotificationContext.OnHold:
-                    Title = "Trip On Hold";
-                    NotificationMessage = $"Trip placed on hold by DISPATCH {tripCustomerName}";
-                    break;
-                case TripNotificationContext.Future:
-                    Title = "Future Trip";
-                    NotificationMessage = $"Trip canceled by DISPATCH {tripCustomerName}";
-                    break;
-                case TripNotificationContext.Reassigned:
-                    Title = "Reassigned Trip";
-                    NotificationMessage = $"Trip canceled by DISPATCH {tripCustomerName}";
-                    break;
-                case TripNotificationContext.Unassigned:
-                    Title = "Unassigned Trip";
-                    NotificationMessage = $"Trip canceled by DISPATCH {tripCustomerName}";
+                    Title = AppResources.NotificationTripOnHoldTitle;
+                    NotificationMessage = string.Format(AppResources.NotificationTripOnHoldText, tripCustomerName);
                     break;
                 case TripNotificationContext.MarkedDone:
-                    Title = "Done Trip";
-                    NotificationMessage = $"Trip marked done by DISPATCH {tripCustomerName}";
+                    Title = AppResources.NotificationTripMarkedDoneTitle;
+                    NotificationMessage = string.Format(AppResources.NotificationTripMarkedDoneText, tripCustomerName);
                     break;
                 case TripNotificationContext.Resequenced:
-                    Title = "Trips Resequenced";
-                    NotificationMessage = "Trips Resequenced";
+                    Title = AppResources.NotificationTripResequenceTitle;
+                    NotificationMessage = AppResources.NotificationTripResequenceText;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -96,22 +93,27 @@
         }
 
         private MvxAsyncCommand _ackCommand;
-        public IMvxAsyncCommand AckCommand => _ackCommand ?? (_ackCommand = new MvxAsyncCommand(ExecuteAckCommand));
+        public IMvxAsyncCommand AckCommand => _ackCommand ?? (_ackCommand = new MvxAsyncCommand(ExecuteAckCommandAsync));
 
-        private Task<ChangeResultWithItem<DriverTripAckProcess>> AckTripAsync()
+        private async Task<ChangeResultWithItem<DriverTripAckProcess>> AckTripAsync()
         {
-            // @TODO: Get the EmployeeId of the driver.
+            var driverStatusModel = await _driverService.GetCurrentDriverStatusAsync();
+            if (driverStatusModel == null)
+            {
+                Mvx.TaggedWarning(Constants.ScrapRunner, $"Failed to find DriverStatus - Can't ack trip {_tripNumber}.");
+                return null;
+            }
             var ackProcess = new DriverTripAckProcess
             {
-                //EmployeeId = employeeId,
+                EmployeeId = driverStatusModel.EmployeeId,
                 TripNumber = _tripNumber,
                 ActionDateTime = DateTime.Now,
-                //Mdtid = employeeId
+                Mdtid = driverStatusModel.EmployeeId
             };
-            return _tripService.ProcessDriverTripAck(ackProcess);
+            return await _tripService.ProcessDriverTripAck(ackProcess);
         }
 
-        private async Task ExecuteAckCommand()
+        private async Task ExecuteAckCommandAsync()
         {
             if (_notificationContext == TripNotificationContext.New ||
                 _notificationContext == TripNotificationContext.Modified)
@@ -119,7 +121,7 @@
                 var ackResult = await AckTripAsync();
                 if (!ackResult.WasSuccessful)
                 {
-                    Mvx.TaggedWarning(Constants.ScrapRunner, $"ProcessDriverTripAck failed {ackResult.Failure.Summary}");
+                    Mvx.TaggedWarning(Constants.ScrapRunner, $"ProcessDriverTripAck failed {ackResult.Failure?.Summary}");
                 }
             }
             Close(this);

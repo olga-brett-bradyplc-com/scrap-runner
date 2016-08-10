@@ -712,6 +712,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New Message From {0} at {1}.
+        /// </summary>
+        public static string MessageNotificationMessage {
+            get {
+                return ResourceManager.GetString("MessageNotificationMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Messages.
         /// </summary>
         public static string Messages {
@@ -865,7 +874,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been dispatched..
+        ///   Looks up a localized string similar to New Trip ({0}) {1}..
         /// </summary>
         public static string NotificationNewTripText {
             get {
@@ -892,7 +901,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been canceled by dispatch..
+        ///   Looks up a localized string similar to Trip canceled by DISPATCH {0}..
         /// </summary>
         public static string NotificationTripCanceledText {
             get {
@@ -910,25 +919,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been moved to a future date..
-        /// </summary>
-        public static string NotificationTripFutureText {
-            get {
-                return ResourceManager.GetString("NotificationTripFutureText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Future Trip.
-        /// </summary>
-        public static string NotificationTripFutureTitle {
-            get {
-                return ResourceManager.GetString("NotificationTripFutureTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been marked done by dispatch..
+        ///   Looks up a localized string similar to Trip marked done by DISPATCH {0}..
         /// </summary>
         public static string NotificationTripMarkedDoneText {
             get {
@@ -946,7 +937,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been modified by dispatch..
+        ///   Looks up a localized string similar to Trip Modified ({0}) {1}.
         /// </summary>
         public static string NotificationTripModifiedText {
             get {
@@ -964,7 +955,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been placed on hold by dispatch..
+        ///   Looks up a localized string similar to Trip placed on hold by DISPATCH {0}..
         /// </summary>
         public static string NotificationTripOnHoldText {
             get {
@@ -982,25 +973,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been reassigned to a different driver by dispatch..
-        /// </summary>
-        public static string NotificationTripReassignedText {
-            get {
-                return ResourceManager.GetString("NotificationTripReassignedText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Trip Reassigned.
-        /// </summary>
-        public static string NotificationTripReassignedTitle {
-            get {
-                return ResourceManager.GetString("NotificationTripReassignedTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dispatch has changed the trip order..
+        ///   Looks up a localized string similar to Trips Resequenced..
         /// </summary>
         public static string NotificationTripResequenceText {
             get {
@@ -1014,24 +987,6 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string NotificationTripResequenceTitle {
             get {
                 return ResourceManager.GetString("NotificationTripResequenceTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} trip {1} ({2}) has been unassigned by dispatch..
-        /// </summary>
-        public static string NotificationTripUnassignedText {
-            get {
-                return ResourceManager.GetString("NotificationTripUnassignedText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Trip Unassigned.
-        /// </summary>
-        public static string NotificationTripUnassignedTitle {
-            get {
-                return ResourceManager.GetString("NotificationTripUnassignedTitle", resourceCulture);
             }
         }
         

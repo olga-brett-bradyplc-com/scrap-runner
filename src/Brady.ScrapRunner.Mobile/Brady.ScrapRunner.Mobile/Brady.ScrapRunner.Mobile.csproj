@@ -131,6 +131,7 @@
     <Compile Include="ViewModels\FuelEntryViewModel.cs" />
     <Compile Include="ViewModels\GpsCaptureViewModel.cs" />
     <Compile Include="ViewModels\LoadDropContainerViewModel.cs" />
+    <Compile Include="ViewModels\MessageNotificationViewModel.cs" />
     <Compile Include="ViewModels\MessagesViewModel.cs" />
     <Compile Include="ViewModels\ModifyReturnToYardViewModel.cs" />
     <Compile Include="ViewModels\NewMessageViewModel.cs" />
