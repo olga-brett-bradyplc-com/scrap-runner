@@ -17,14 +17,17 @@ namespace Brady.ScrapRunner.Mobile.Services
     {
         private readonly IConnectionService _connection;
         private readonly IRepository<DriverStatusModel> _driverStatusRepository;
-        private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository; 
+        private readonly IRepository<EmployeeMasterModel> _employeeMasterRepository;
+        private readonly IRepository<PowerMasterModel> _powerMasterRepository;
 
         public DriverService(IRepository<DriverStatusModel> driverStatusRepository,
             IRepository<EmployeeMasterModel> employeeMasterRepository,
+            IRepository<PowerMasterModel> powerMasterRepository,
             IConnectionService connection)
         {
             _driverStatusRepository = driverStatusRepository;
             _employeeMasterRepository = employeeMasterRepository;
+            _powerMasterRepository = powerMasterRepository;
             _connection = connection;
         }
 
@@ -37,6 +40,17 @@ namespace Brady.ScrapRunner.Mobile.Services
         {
             var mapped = AutoMapper.Mapper.Map<DriverStatus, DriverStatusModel>(driverStatus);
             return _driverStatusRepository.InsertAsync(mapped);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="power"></param>
+        /// <returns></returns>
+        public Task UpdatePowerMasterRecord(PowerMaster power)
+        {
+            var mapped = AutoMapper.Mapper.Map<PowerMaster, PowerMasterModel>(power);
+            return _powerMasterRepository.InsertAsync(mapped);
         }
 
         /// <summary>
@@ -74,6 +88,21 @@ namespace Brady.ScrapRunner.Mobile.Services
                             new QueryBuilder<EmployeeMaster>().Filter(
                                 e => e.Property(f => f.EmployeeId).EqualTo(employeeId)));
             return driver.Records.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="powerId"></param>
+        /// <returns></returns>
+        public async Task<PowerMaster> FindEmployeePowerMasterRemoteAsync(string powerId)
+        {
+            var power =
+                await
+                    _connection.GetConnection(ConnectionType.Online)
+                        .QueryAsync(
+                            new QueryBuilder<PowerMaster>().Filter(e => e.Property(f => f.PowerId).EqualTo(powerId)));
+            return power.Records.FirstOrDefault();
         }
 
         /// <summary>
@@ -191,5 +220,28 @@ namespace Brady.ScrapRunner.Mobile.Services
             driverStatus.ContainerMasterDateTime = containerMasterDateTime;
             return await _driverStatusRepository.UpdateAsync(driverStatus);
         }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
+        public async Task<EmployeeMasterModel> FindEmployeeAsync(string employeeId)
+        {
+            var employee = await _employeeMasterRepository.FindAsync(e => e.EmployeeId == employeeId);
+            return employee;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="powerId"></param>
+        /// <returns></returns>
+        public async Task<PowerMasterModel> FindPowerMasterAsync(string powerId)
+        {
+            var power = await _powerMasterRepository.FindAsync(p => p.PowerId == powerId);
+            return power;
+        }
+
     }
 }

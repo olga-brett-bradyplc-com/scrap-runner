@@ -68,6 +68,7 @@
     <Compile Include="Interfaces\ITerminalService.cs" />
     <Compile Include="Interfaces\ITripService.cs" />
     <Compile Include="Messages\ContainerChangeMessage.cs" />
+    <Compile Include="Messages\DriverInfoMessage.cs" />
     <Compile Include="Messages\ForceLogoffMessage.cs" />
     <Compile Include="Messages\GeofenceArriveMessage.cs" />
     <Compile Include="Messages\GeofenceDepartMessage.cs" />

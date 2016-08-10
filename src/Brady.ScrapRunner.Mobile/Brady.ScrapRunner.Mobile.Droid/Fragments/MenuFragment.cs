@@ -5,6 +5,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Support.Design.Widget;
 using Android.Views;
+using Android.Widget;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
 using Brady.ScrapRunner.Mobile.Droid.Messages;
 using Brady.ScrapRunner.Mobile.Messages;
@@ -27,6 +28,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         private NavigationView _navigationView;
         private MvxSubscriptionToken _mvxSubscriptionToken;
         private MvxSubscriptionToken _mvxMenuStateToken;
+        private MvxSubscriptionToken _mvxDriverInfoToken;
         private IMvxMessenger _mvxMessenger;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -41,6 +43,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             _mvxSubscriptionToken = _mvxMessenger.Subscribe<ForceLogoffMessage>(OnForcedLogoffMessage);
             _mvxMenuStateToken = _mvxMessenger.Subscribe<MenuStateMessage>(OnMenuStateChanged);
+            _mvxDriverInfoToken = _mvxMessenger.Subscribe<DriverInfoMessage>(OnDriverInfoChanged);
 
             return view;
         }
@@ -54,6 +57,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             if (_mvxMenuStateToken != null)
                 _mvxMessenger.Unsubscribe<MenuStateMessage>(_mvxMenuStateToken);
+
+            if (_mvxDriverInfoToken != null)
+                _mvxMessenger.Unsubscribe<DriverInfoMessage>(_mvxDriverInfoToken);
         }
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
@@ -85,6 +91,18 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     _navigationView.Menu.FindItem(Resource.Id.current_actions_nav).SetVisible(false);
                     break;
             }
+        }
+
+        private void OnDriverInfoChanged(DriverInfoMessage msg)
+        {
+            var navigationHeaderFullName = View.FindViewById<TextView>(Resource.Id.text_view_fullname);
+            navigationHeaderFullName.Text = msg.DriverName;
+
+            var navigationHeaderYard = View.FindViewById<TextView>(Resource.Id.text_view_yard);
+            navigationHeaderYard.Text = msg.DriverYard;
+
+            var navigationHeaderVehicle = View.FindViewById<TextView>(Resource.Id.text_view_vehicle);
+            navigationHeaderVehicle.Text = msg.DriverVehicle;
         }
 
         private async Task Navigate(int itemId)

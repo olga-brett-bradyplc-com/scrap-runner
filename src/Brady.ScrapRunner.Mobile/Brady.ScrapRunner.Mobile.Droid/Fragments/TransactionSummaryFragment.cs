@@ -139,7 +139,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             var barcodeScanningOptions = new MobileBarcodeScanningOptions
             {
-                DelayBetweenContinuousScans = 3000
+                DelayBetweenContinuousScans = 5000
             };
             
             _scannerFragment.StartScanning(async result =>
