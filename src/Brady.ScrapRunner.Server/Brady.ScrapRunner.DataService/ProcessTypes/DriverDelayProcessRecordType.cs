@@ -185,6 +185,17 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     var currentTrip = new Trip();
                     var currentTripSegment = new TripSegment();
 
+                    //If TripNumber & TripSegNumber are blank, set to null
+                    //Was expecting null values.
+                    if (driverDelayProcess.TripNumber == "")
+                    {
+                        driverDelayProcess.TripNumber = null;
+                    }
+                    if (driverDelayProcess.TripSegNumber == "")
+                    {
+                        driverDelayProcess.TripSegNumber = null;
+                    }
+
                     if (driverDelayProcess.TripNumber != null &&
                         driverDelayProcess.TripSegNumber != null)
                     {
