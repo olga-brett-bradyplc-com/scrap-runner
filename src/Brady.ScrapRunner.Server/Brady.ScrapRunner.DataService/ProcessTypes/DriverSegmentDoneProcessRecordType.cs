@@ -866,6 +866,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (review != null && review.Count() > 0)
             {
                 currentTripSegment.TripSegStatus = TripSegStatusConstants.Review;
+                currentTripSegment.TripSegComments = review.FirstOrDefault().TripSegContainerReviewReason;
 
             }
             else
@@ -877,6 +878,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 if (exception != null && exception.Count() > 0)
                 {
                     currentTripSegment.TripSegStatus = TripSegStatusConstants.Exception;
+                    currentTripSegment.TripSegComments = exception.FirstOrDefault().TripSegContainerReviewReason;
 
                 }
             }
