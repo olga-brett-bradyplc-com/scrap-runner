@@ -55,7 +55,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     UserDialogs.Instance.ActionSheetAsync(AppResources.SelectYard, "", AppResources.Cancel, null,
                         grouping.Select(gp => gp.TerminalName).ToArray());
 
-                if (selectYardAsync != AppResources.Cancel)
+                if (selectYardAsync != AppResources.Cancel && !string.IsNullOrEmpty(selectYardAsync))
                 {
                     await ConfirmReturnToYard(grouping.FirstOrDefault(gp => gp.TerminalName == selectYardAsync));
                 }
@@ -99,7 +99,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     await _tripService.UpdateTripSegmentAsync(rty);
 
-                    UserDialogs.Instance.InfoToast(AppResources.SegmentUpdated);
+                    UserDialogs.Instance.Toast(AppResources.SegmentUpdated);
 
                     Close(this);
                 }
@@ -163,7 +163,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         }
                     }
 
-                    UserDialogs.Instance.InfoToast(AppResources.NewSegmentCreated);
+                    UserDialogs.Instance.Toast(AppResources.NewSegmentCreated);
                     Close(this);
                 }
             }

@@ -127,12 +127,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 TripNumber != CurrentDriver.TripNumber)
             {
                 ReadOnlyTrip = true;
-                UserDialogs.Instance.WarnToast(AppResources.ReadOnlyTrip, AppResources.ReadOnlyTripGenMessage, 10000);
+                UserDialogs.Instance.Toast(AppResources.ReadOnlyTrip);
             }
             else if (seqEnforced == Constants.Yes && trips.FirstOrDefault().TripNumber != TripNumber)
             {
                 ReadOnlyTrip = true;
-                UserDialogs.Instance.WarnToast(AppResources.ReadOnlyTrip, AppResources.ReadOnlyTripSeqMessage, 10000);
+                UserDialogs.Instance.Toast(AppResources.ReadOnlyTrip);
             }
 
             // If CurrentStatus is null but they're enroute/arrived, assume they've navigated back to this screen
@@ -338,9 +338,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 {
                     // Used for RouteSummary view to know what "state" it's in
                     // TODO: Replace with messaging similiar to the menu state?
-                    CurrentStatus = DriverStatusSRConstants.Arrive;
+                    //CurrentStatus = DriverStatusSRConstants.Arrive;
 
-                    CurrentDriver.Status = DriverStatusSRConstants.Arrive;
+                    //CurrentDriver.Status = DriverStatusSRConstants.Arrive;
                     await _driverService.UpdateDriver(CurrentDriver);
 
                     //GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
@@ -378,8 +378,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     }*/
 
                     await SetDriverArrive();
-
-                    SetNextStageLabel(firstSegment);
+                    await ExecuteNextStageCommandAsync();
+                    //SetNextStageLabel(firstSegment);
                 }
             }
         }

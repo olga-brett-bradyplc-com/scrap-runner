@@ -105,7 +105,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         UserDialogs.Instance.ActionSheetAsync(AppResources.SelectUser, "", AppResources.Cancel, null,
                             approvedUsers.Select(u => u.FullName).ToArray());
 
-                if (approvedListAsync != AppResources.Cancel)
+                if (approvedListAsync != AppResources.Cancel && !string.IsNullOrEmpty(approvedListAsync))
                 {
                     var user = approvedUsers.FirstOrDefault(u => u.FullName == approvedListAsync);
                     ShowViewModel<NewMessageViewModel>(
@@ -130,7 +130,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     UserDialogs.Instance.ActionSheetAsync(AppResources.SelectDelay, "", AppResources.Cancel, null,
                         delays.Select(ct => ct.CodeDisp1).ToArray());
             
-            if (delayAlertAsync != AppResources.Cancel)
+            if (delayAlertAsync != AppResources.Cancel && !string.IsNullOrEmpty(delayAlertAsync))
             {
                 var delayReasonObj = delays.FirstOrDefault(ct => ct.CodeDisp1 == delayAlertAsync);
                 ShowViewModel<DelayViewModel>(new {delayCode = delayReasonObj.CodeValue, delayReason = delayReasonObj.CodeValue});

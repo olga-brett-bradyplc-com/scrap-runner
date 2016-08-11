@@ -80,7 +80,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                 case SimulateScanNav:
                     var listview = View.FindViewById<MvxListView>(Resource.Id.TransactionSummaryListView);
                     var number = await UserDialogs.Instance.PromptAsync("Enter barcode number", "Simulate", "OK");
-                    await ViewModel.TransactionScannedCommandAsync.ExecuteAsync(number.Text);
+                    await ViewModel.TransactionScannedCommandAsync.ExecuteAsync(number?.Text);
                     Activity.RunOnUiThread(() => { ((BaseAdapter) listview.Adapter).NotifyDataSetChanged(); });
                     VibrateDevice();
                     break;
@@ -117,7 +117,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             base.OnResume();
 
-            await Task.Delay(3000);
+            await Task.Delay(2000);
             Scan();
         }
 

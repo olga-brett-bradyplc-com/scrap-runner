@@ -184,9 +184,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 ? await
                     UserDialogs.Instance.ActionSheetAsync(AppResources.SelectReviewReason, AppResources.Cancel, "", null,
                         reasons.Select(ct => ct.CodeDisp1).ToArray())
-                : "";
+                : "NOREASONCODE";
 
-            if (reasonDialogAsync == AppResources.Cancel) return;
+            if (reasonDialogAsync == AppResources.Cancel || string.IsNullOrEmpty(reasonDialogAsync)) return;
 
             var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
 

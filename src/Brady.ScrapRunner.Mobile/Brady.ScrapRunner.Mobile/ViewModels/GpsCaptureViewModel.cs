@@ -135,7 +135,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         oops = "oops";
                 }
                 if(oops != "oops")
-                   UserDialogs.Instance.InfoToast(AppResources.SegmentUpdated);
+                   UserDialogs.Instance.Toast(AppResources.SegmentUpdated);
             }
 
             Close(this);
@@ -175,7 +175,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 CurrentDriver.Status = DriverStatusSRConstants.Arrive;
                 await _driverService.UpdateDriver(CurrentDriver);
-                UserDialogs.Instance.InfoToast(AppResources.SegmentUpdated);
+                UserDialogs.Instance.Toast(AppResources.SegmentUpdated);
             }
         }
     }
