@@ -79,32 +79,32 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
         public override async void OnBackPressed()
         {
 
-            //UpdateBackStackValues();
+            UpdateBackStackValues();
 
-            //if (DrawerLayout != null && DrawerLayout.IsDrawerOpen(GravityCompat.Start))
-            //{
-            //    DrawerLayout.CloseDrawers();
-            //}
+            if (DrawerLayout != null && DrawerLayout.IsDrawerOpen(GravityCompat.Start))
+            {
+                DrawerLayout.CloseDrawers();
+            }
 
-            //// Assume if previous = SignIn, and current = Settings, they haven't actually logged in yet
-            //else if (_previousFragmentType == typeof(SignInViewModel) && _currentFragmentType != typeof(SettingsViewModel))
-            //{
-            //    var viewmodel = SupportFragmentManager.Fragments.Where(t => t?.Tag != null).ToList().FirstOrDefault(f => f.Tag.Contains(MenuViewModelKey)) as MvxFragment;
-            //    var command = viewmodel?.ViewModel as MenuViewModel;
-            //    var executeAsync = command?.LogoutCommand.ExecuteAsync();
-            //    if (executeAsync != null) await executeAsync;
-            //}
-            //else if (_currentFragmentType == typeof(DelayViewModel))
-            //{
-            //    var viewmodel = SupportFragmentManager.Fragments.Where(t => t?.Tag != null).ToList().FirstOrDefault(f => f.Tag.Contains(DelayViewModelKey)) as MvxFragment;
-            //    var command = viewmodel?.ViewModel as DelayViewModel;
-            //    var executeAsync = command?.BackOnDutyCommand.ExecuteAsync();
-            //    if (executeAsync != null) await executeAsync;
-            //}
-            //else
-            //{
-            //    base.OnBackPressed();
-            //}
+            // Assume if previous = SignIn, and current = Settings, they haven't actually logged in yet
+            else if (_previousFragmentType == typeof(SignInViewModel) && _currentFragmentType != typeof(SettingsViewModel))
+            {
+                var viewmodel = SupportFragmentManager.Fragments.Where(t => t?.Tag != null).ToList().FirstOrDefault(f => f.Tag.Contains(MenuViewModelKey)) as MvxFragment;
+                var command = viewmodel?.ViewModel as MenuViewModel;
+                var executeAsync = command?.LogoutCommand.ExecuteAsync();
+                if (executeAsync != null) await executeAsync;
+            }
+            else if (_currentFragmentType == typeof(DelayViewModel))
+            {
+                var viewmodel = SupportFragmentManager.Fragments.Where(t => t?.Tag != null).ToList().FirstOrDefault(f => f.Tag.Contains(DelayViewModelKey)) as MvxFragment;
+                var command = viewmodel?.ViewModel as DelayViewModel;
+                var executeAsync = command?.BackOnDutyCommand.ExecuteAsync();
+                if (executeAsync != null) await executeAsync;
+            }
+            else
+            {
+                base.OnBackPressed();
+            }
 
             base.OnBackPressed();
         }
