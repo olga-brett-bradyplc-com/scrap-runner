@@ -75,7 +75,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         UserDialogs.Instance.ActionSheetAsync(AppResources.SelectUser, "", AppResources.Cancel, null,
                             approvedUsers.Select(u => u.FullName).ToArray());
 
-                if (approvedListAsync != AppResources.Cancel)
+                if (approvedListAsync != AppResources.Cancel && !string.IsNullOrEmpty(approvedListAsync))
                 {
                     var user = approvedUsers.FirstOrDefault(u => u.FullName == approvedListAsync);
                     ShowViewModel<NewMessageViewModel>(

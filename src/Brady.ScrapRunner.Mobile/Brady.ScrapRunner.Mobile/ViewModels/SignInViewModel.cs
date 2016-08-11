@@ -130,7 +130,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             if (string.IsNullOrEmpty(PhoneSettings.ServerSettings))
             {
-                UserDialogs.Instance.ErrorToast(AppResources.NoServerEndpoint, AppResources.NoServerSummary);
+                UserDialogs.Instance.Toast(AppResources.NoServerSummary);
                 return;
             }
 
@@ -163,7 +163,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     (CurrentDriver.Status == DriverStatusSRConstants.Enroute || CurrentDriver.Status == DriverStatusSRConstants.Arrive || CurrentDriver.Status == DriverStatusSRConstants.Done))
                 {
                     ShowViewModel<RouteDetailViewModel>(new { tripNumber = CurrentDriver.TripNumber, status = CurrentDriver.Status });
-                    UserDialogs.Instance.WarnToast(AppResources.SessionRestoreHeader, AppResources.SessionRestoreMessage);
+                    UserDialogs.Instance.Toast(AppResources.SessionRestoreHeader);
                 }
                 else if (containers.Any() && autoDrop == Constants.No)
                 {

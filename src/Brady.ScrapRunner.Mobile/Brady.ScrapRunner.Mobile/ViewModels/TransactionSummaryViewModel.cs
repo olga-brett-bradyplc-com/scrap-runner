@@ -168,7 +168,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             if (string.IsNullOrEmpty(scannedNumber))
             {
-                UserDialogs.Instance.ErrorToast(AppResources.Error, AppResources.ErrorScanningBarcode);
+                UserDialogs.Instance.Toast(AppResources.ErrorScanningBarcode);
                 return;
             }
             
@@ -201,6 +201,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
 
                 var levelSelect = await UserDialogs.Instance.ActionSheetAsync(AppResources.SelectLevel, "", "", null, levels.OrderBy(l => int.Parse(l.CodeValue)).Select(l => l.CodeDisp1).ToArray());
+
+                if (string.IsNullOrEmpty(levelSelect)) return;
+
                 var level = levels.First(l => l.CodeDisp1 == levelSelect);
 
                 short levelNum;

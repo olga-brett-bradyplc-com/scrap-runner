@@ -127,12 +127,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 TripNumber != CurrentDriver.TripNumber)
             {
                 ReadOnlyTrip = true;
-                UserDialogs.Instance.WarnToast(AppResources.ReadOnlyTrip, AppResources.ReadOnlyTripGenMessage, 10000);
+                UserDialogs.Instance.Toast(AppResources.ReadOnlyTrip);
             }
             else if (seqEnforced == Constants.Yes && trips.FirstOrDefault().TripNumber != TripNumber)
             {
                 ReadOnlyTrip = true;
-                UserDialogs.Instance.WarnToast(AppResources.ReadOnlyTrip, AppResources.ReadOnlyTripSeqMessage, 10000);
+                UserDialogs.Instance.Toast(AppResources.ReadOnlyTrip);
             }
 
             // If CurrentStatus is null but they're enroute/arrived, assume they've navigated back to this screen

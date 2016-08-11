@@ -186,7 +186,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         reasons.Select(ct => ct.CodeDisp1).ToArray())
                 : "";
 
-            if (reasonDialogAsync == AppResources.Cancel) return;
+            if (reasonDialogAsync == AppResources.Cancel || string.IsNullOrEmpty(reasonDialogAsync)) return;
 
             var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
 
