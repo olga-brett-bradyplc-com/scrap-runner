@@ -166,6 +166,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionScannedCommandAsync(string scannedNumber)
         {
+            // If all the current containers have been scanned, don't scan any more
+            // @TODO : In the future, we may want the ability to add containers on the fly
+            if (CanExecuteConfirmationSelectedCommand()) return;
+
             if (string.IsNullOrEmpty(scannedNumber))
             {
                 UserDialogs.Instance.Toast(AppResources.ErrorScanningBarcode);
@@ -305,7 +309,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         /*
-            The steps for this is as follows :
+            The steps for this :
             
                 1. Complete any segments the user currently processed on this screen
                 2. Propagate any container changes to subsequent segments as necessacary
