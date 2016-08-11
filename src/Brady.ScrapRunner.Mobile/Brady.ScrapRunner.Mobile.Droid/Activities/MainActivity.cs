@@ -105,7 +105,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
             {
                 base.OnBackPressed();
             }
-
         }
 
         public override void OnBeforeFragmentChanging(IMvxCachedFragmentInfo fragmentInfo, Android.Support.V4.App.FragmentTransaction transaction)
