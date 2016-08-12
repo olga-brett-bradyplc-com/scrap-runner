@@ -103,6 +103,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             var navigationHeaderVehicle = View.FindViewById<TextView>(Resource.Id.text_view_vehicle);
             navigationHeaderVehicle.Text = msg.DriverVehicle;
+
+            _mvxMessenger.Unsubscribe<DriverInfoMessage>(_mvxDriverInfoToken);
         }
 
         private async Task Navigate(int itemId)

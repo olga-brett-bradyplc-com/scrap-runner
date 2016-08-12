@@ -169,6 +169,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 await _containerService.UpdateContainerAsync(container);
 
+                Close(this);
                 ShowViewModel<LoadDropContainerViewModel>(new {loginProcessed = LoginProcessed});
             }
         }
