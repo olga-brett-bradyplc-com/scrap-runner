@@ -58,8 +58,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (list.Any())
                 Containers = list;
 
-            GrossTime = null;
-
             base.Start();
         }
 
