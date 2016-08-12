@@ -206,12 +206,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //Exceptions may not have a ContainerNumber. Otherwise it is required
                     if (driverContainerActionProcess.ActionType != ContainerActionTypeConstants.Exception)
                     {
-                        //if (driverContainerActionProcess.ContainerNumber == null)
-                        //{
-                        //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("ContainerNumber is required for ActionType:"
-                        //                                      + driverContainerActionProcess.ActionType));
-                        //    break;
-                        //}
+                        if (driverContainerActionProcess.ContainerNumber == null)
+                        {
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("ContainerNumber is required for ActionType:"
+                                                              + driverContainerActionProcess.ActionType));
+                            break;
+                        }
                         if (driverContainerActionProcess.ActionType != ContainerActionTypeConstants.Added)
                         {
                             if (driverContainerActionProcess.ContainerContents == null)
@@ -652,21 +652,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         driverContainerActionProcess.ContainerNumber));
                     return false;
                 }
-                if (driverContainerActionProcess.ContainerNumber == null)
-                {
-                    //This is a workaround. Container Number is required, but sometimes is missing on a RT
-                    //So use the primary container number if one is there.
-                    if (currentTripSegment.TripSegPrimaryContainerNumber != null)
-                    {
-                        driverContainerActionProcess.ContainerNumber = currentTripSegment.TripSegPrimaryContainerNumber;
-                    }
-                    else
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("ContainerNumber is required for ActionType:"
-                                                          + driverContainerActionProcess.ActionType));
-                        return false;
-                    }
-                }
             }
 
             ////////////////////////////////////////////////
@@ -855,10 +840,10 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (null != tripSegContainerList && tripSegContainerList.Count() > 0)
             {
                 //First, try to find a container in the list that matches the container number on the power unit.
-                //Do Not Allow for the use of the same container number multiple times on a segment.
+                //Allow for the use of the same container number multiple times on a segment.
                 tripSegmentContainer = (from item in tripSegContainerList
                                         where item.TripSegContainerNumber == containerMaster.ContainerNumber
-                                        //&& item.TripSegContainerComplete != Constants.Yes
+                                        && item.TripSegContainerComplete != Constants.Yes
                                         select item).FirstOrDefault();
                 if (null == tripSegmentContainer)
                 {

@@ -1780,7 +1780,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (review != null && review.Count() > 0)
             {
                 currentTrip.TripStatus = TripStatusConstants.Review;
-                currentTrip.TripSpecInstructions = review.FirstOrDefault().TripSegComments;
 
             }
             else
@@ -1792,7 +1791,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 if (exception != null && exception.Count() > 0)
                 {
                     currentTrip.TripStatus = TripStatusConstants.Exception;
-                    currentTrip.TripSpecInstructions = exception.FirstOrDefault().TripSegComments;
 
                 }
             }
@@ -1874,6 +1872,16 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
             //Set the Trip Power Asset Number to the value in the PowerMaster table.
             currentTrip.TripPowerAssetNumber = powerMaster.PowerAssetNumber;
+
+            //If there is nothing in the TripSpecInstructions field, update it with the
+            //first review reason. This is for display on the View Trips screen in ScrapRunner.
+            if (currentTrip.TripSpecInstructions == null)
+            {
+                currentTrip.TripSpecInstructions = (from item in tripContainerList
+                                                   where item.TripSegContainerReviewReason !=null
+                                                   select item.TripSegContainerReviewReason).FirstOrDefault();
+
+            }
 
             ////////////////////////////////////////////////
             // Check if the TripSendFlag in the Trip table should be set to send completed trip information.
