@@ -9,7 +9,7 @@
     android:background="#f7f7f7">
     <TextView
         android:id="@+id/RouteContainerHeader"
-        style="@style/ScrapRunnerTheme.StandardHeaderStyle"
+        style="@style/ScrapRunnerTheme.ExpandableHeaderStyle"
         android:layout_marginLeft="20dp"
         tools:text="Header"
         local:MvxBind="Text Format('{0} ({1})', Key.TripSegTypeDesc, Count)" />

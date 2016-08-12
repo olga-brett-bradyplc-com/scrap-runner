@@ -6063,25 +6063,31 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			public const int ScrapRunnerTheme_Base = 2131165533;
 			
 			// aapt resource value: 0x7f070165
-			public const int ScrapRunnerTheme_Label = 2131165541;
+			public const int ScrapRunnerTheme_ExpandableHeaderStyle = 2131165541;
+			
+			// aapt resource value: 0x7f070167
+			public const int ScrapRunnerTheme_Label = 2131165543;
 			
 			// aapt resource value: 0x7f07015e
 			public const int ScrapRunnerTheme_SignIn = 2131165534;
 			
-			// aapt resource value: 0x7f070166
-			public const int ScrapRunnerTheme_SpinnerBase = 2131165542;
-			
-			// aapt resource value: 0x7f070167
-			public const int ScrapRunnerTheme_SpinnerContainer = 2131165543;
-			
 			// aapt resource value: 0x7f070168
-			public const int ScrapRunnerTheme_SpinnerSelection = 2131165544;
+			public const int ScrapRunnerTheme_SpinnerBase = 2131165544;
+			
+			// aapt resource value: 0x7f070169
+			public const int ScrapRunnerTheme_SpinnerContainer = 2131165545;
+			
+			// aapt resource value: 0x7f07016a
+			public const int ScrapRunnerTheme_SpinnerSelection = 2131165546;
 			
 			// aapt resource value: 0x7f070163
 			public const int ScrapRunnerTheme_StandardButtonStyle = 2131165539;
 			
 			// aapt resource value: 0x7f070164
 			public const int ScrapRunnerTheme_StandardHeaderStyle = 2131165540;
+			
+			// aapt resource value: 0x7f070166
+			public const int ScrapRunnerTheme_StaticHeaderStyle = 2131165542;
 			
 			// aapt resource value: 0x7f070160
 			public const int ScrapRunnerTheme_TextAppearance_Dark = 2131165536;
