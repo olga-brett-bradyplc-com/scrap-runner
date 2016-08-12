@@ -41,6 +41,8 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<ChangeResultWithItem<DriverOdomUpdateProcess>> ProcessDriverOdomUpdateAsync(DriverOdomUpdateProcess driverOdomUpdateProcess);
 
+        Task<ChangeResultWithItem<DriverLogoffProcess>> ProcessDriverLogoff(DriverLogoffProcess driverLogoffProcess);
+
         Task<DateTime?> GetTerminalMasterDateTimeAsync();
 
         Task<int> UpdateTerminalMasterDateTimeAsync(DateTime? terminalMasterDateTime);
