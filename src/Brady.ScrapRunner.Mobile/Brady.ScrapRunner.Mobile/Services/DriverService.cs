@@ -184,6 +184,17 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="driverLogoffProcess"></param>
+        /// <returns></returns>
+        public async Task<ChangeResultWithItem<DriverLogoffProcess>> ProcessDriverLogoff(DriverLogoffProcess driverLogoffProcess)
+        {
+            var message = await _connection.GetConnection().UpdateAsync(driverLogoffProcess, requeryUpdated: false);
+            return message;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="driverOdomUpdateProcess"></param>
         /// <returns></returns>
         public async Task<ChangeResultWithItem<DriverOdomUpdateProcess>> ProcessDriverOdomUpdateAsync(DriverOdomUpdateProcess driverOdomUpdateProcess)
@@ -193,12 +204,21 @@ namespace Brady.ScrapRunner.Mobile.Services
             return odomupdate;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<DateTime?> GetTerminalMasterDateTimeAsync()
         {
             var driverStatus = await _driverStatusRepository.AsQueryable().FirstOrDefaultAsync();
             return driverStatus?.TerminalMasterDateTime;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="terminalMasterDateTime"></param>
+        /// <returns></returns>
         public async Task<int> UpdateTerminalMasterDateTimeAsync(DateTime? terminalMasterDateTime)
         {
             var driverStatus = await _driverStatusRepository.AsQueryable().FirstOrDefaultAsync();
@@ -207,12 +227,21 @@ namespace Brady.ScrapRunner.Mobile.Services
             return await _driverStatusRepository.UpdateAsync(driverStatus);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<DateTime?> GetContainerMasterDateTimeAsync()
         {
             var driverStatus = await _driverStatusRepository.AsQueryable().FirstOrDefaultAsync();
             return driverStatus?.ContainerMasterDateTime;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="containerMasterDateTime"></param>
+        /// <returns></returns>
         public async Task<int> UpdateContainerMasterDateTimeAsync(DateTime? containerMasterDateTime)
         {
             var driverStatus = await _driverStatusRepository.AsQueryable().FirstOrDefaultAsync();
