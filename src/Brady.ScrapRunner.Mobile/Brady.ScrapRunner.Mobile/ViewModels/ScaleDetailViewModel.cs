@@ -58,6 +58,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (list.Any())
                 Containers = list;
 
+            GrossTime = null;
+
             base.Start();
         }
 
@@ -137,11 +139,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private void ExecuteGrossWeightSetCommand()
         {
             GrossTime = DateTime.Now;
+            TareWeightSetCommand.RaiseCanExecuteChanged();
+            SecondGrossWeightSetCommand.RaiseCanExecuteChanged();
         }
 
         private IMvxCommand _tareWeightSetCommand;
         public IMvxCommand TareWeightSetCommand
-            => _tareWeightSetCommand ?? (_tareWeightSetCommand = new MvxCommand(ExecuteTareWeightSetCommand));
+            => _tareWeightSetCommand ?? (_tareWeightSetCommand = new MvxCommand(ExecuteTareWeightSetCommand, IsGrossWeightSet));
         
         private void ExecuteTareWeightSetCommand()
         {
@@ -157,7 +161,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public IMvxCommand SecondGrossWeightSetCommand
             =>
                 _secondGrossWeightSetCommand ??
-                (_secondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand));
+                (_secondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet));
         
         private void ExecuteSecondGrossWeightSetCommand()
         {
@@ -171,7 +175,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private bool IsGrossWeightSet()
         {
-            return GrossTime != null;
+            return GrossTime.HasValue;
         }
 
         private async Task ProcessContainers(bool setDownInYard, string confirmationMessage)
