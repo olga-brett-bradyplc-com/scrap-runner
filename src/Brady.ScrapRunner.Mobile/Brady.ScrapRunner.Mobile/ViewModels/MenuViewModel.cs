@@ -42,8 +42,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var logoutDialog = await UserDialogs.Instance.ConfirmAsync(
                 AppResources.LogOutMessage, AppResources.LogOut, AppResources.Yes, AppResources.No);
 
+            var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
             if (logoutDialog)
             {
+                var logoffProcess = await _driverService.ProcessDriverLogoff(new DriverLogoffProcess
+                {
+                    EmployeeId = currentDriver.EmployeeId,
+                    PowerId = currentDriver.PowerId,
+                    Odometer = currentDriver.Odometer,
+                    ActionDateTime = DateTime.Now
+                });
+
+                // The question is, should we stop the logoff process if we encounter an error here, or continue and just present them with a dialog?
+                if (!logoffProcess.WasSuccessful)
+                    UserDialogs.Instance.Alert(logoffProcess.Failure.Summary, AppResources.Error);
+
                 _backgroundScheduler.Unschedule();
                 _locationService.Stop();
                 _connection.DeleteConnection();

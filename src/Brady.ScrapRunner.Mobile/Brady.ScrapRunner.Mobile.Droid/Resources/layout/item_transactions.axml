@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="#f7f7f7">
     <TextView
-        style="@style/ScrapRunnerTheme.StandardHeaderStyle"
+        style="@style/ScrapRunnerTheme.StaticHeaderStyle"
         tools:text="Header"
         local:MvxBind="Text Key.TripSegTypeDesc" />
 </LinearLayout>
