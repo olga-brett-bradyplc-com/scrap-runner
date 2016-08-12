@@ -196,8 +196,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 : confirmationMessage + "\n\n" + AppResources.CompleteTrip;
 
             var result = await UserDialogs.Instance.ConfirmAsync(completeMessage, AppResources.ConfirmLabel);
-
-            // If user confirms action
+            
             if (result)
             {
                 using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
