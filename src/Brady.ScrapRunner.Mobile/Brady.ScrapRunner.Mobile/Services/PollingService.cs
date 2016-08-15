@@ -106,7 +106,24 @@
             }
 
             if (tripInfoProcessChangeSet.Item?.Trips?.Count > 0)
+            {
+                var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(tripInfoProcessChangeSet.Item.Trips);
+                foreach (var trip in mappedTrips)
+                {
+                    var isNewTrip = await _tripService.FindTripAsync(trip.TripNumber) == null;
+                    var tripContext = isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified;
+                    ShowTripNotificationActivity(trip.TripNumber,
+                        isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified);
+                    await _notificationService.TripAsync(trip, tripContext);
+                    Mvx.TaggedTrace(Constants.ScrapRunner, $"Found {tripContext} Trip {trip.TripNumber}");
+                    _mvxMessenger.Publish(new TripNotificationMessage(this)
+                    {
+                        Context = tripContext,
+                        Trip = trip
+                    });
+                }
                 await _tripService.UpdateTrips(tripInfoProcessChangeSet.Item.Trips);
+            }
             if (tripInfoProcessChangeSet.Item?.TripSegments?.Count > 0)
                 await _tripService.UpdateTripSegments(tripInfoProcessChangeSet.Item.TripSegments);
             if (tripInfoProcessChangeSet.Item?.TripSegmentContainers?.Count > 0)
@@ -122,29 +139,6 @@
 
             if (tripInfoProcessChangeSet.Item?.Trips?.Count > 0)
             {
-                var mappedTrips = Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(tripInfoProcessChangeSet.Item.Trips);
-                foreach (var trip in mappedTrips)
-                {
-                    var isNewTrip = await _tripService.FindTripAsync(trip.TripNumber) == null;
-                    var tripContext = isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified;
-                    if (isNewTrip)
-                    {
-                        await _tripService.CreateTripAsync(trip);
-                        ShowTripNotificationActivity(trip.TripNumber, TripNotificationContext.New);
-                    }
-                    else
-                    {
-                        await _tripService.UpdateTripAsync(trip);
-                        ShowTripNotificationActivity(trip.TripNumber, TripNotificationContext.Modified);
-                    }
-                    await _notificationService.TripAsync(trip, tripContext);
-                    Mvx.TaggedTrace(Constants.ScrapRunner, $"Found {tripContext} Trip {trip.TripNumber}");
-                    _mvxMessenger.Publish(new TripNotificationMessage(this)
-                    {
-                        Context = tripContext,
-                        Trip = trip
-                    });
-                }
             }
         }
 

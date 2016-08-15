@@ -49,7 +49,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         public Task UpdateTrips(IEnumerable<Trip> trips)
         {
             var mapped = AutoMapper.Mapper.Map<IEnumerable<Trip>, IEnumerable<TripModel>>(trips);
-            return _tripRepository.InsertRangeAsync(mapped);
+            return _tripRepository.InsertOrReplaceRangeAsync(mapped);
         }
 
         /// <summary>
