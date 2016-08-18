@@ -71,6 +71,7 @@ namespace Brady.ScrapRunner.Domain.Process
 
         ///Method Of Entry: M=Manual, S=Scanned. 
         ///Required if Container Number was entered by driver for this transaction.
+        ///Can be null for RT/RN type segments where container number is not entered.
         public virtual string MethodOfEntry { get; set; }
 
         ///
