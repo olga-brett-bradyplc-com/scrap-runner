@@ -221,18 +221,16 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 //break;
 
                             }
-                            if (driverContainerActionProcess.MethodOfEntry == null)
+                            //Allow for null value. Container numbers are not entered on RT or RN type segments
+                            if (driverContainerActionProcess.MethodOfEntry != null)
                             {
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("MethodOfEntry is required for ActionType:"
-                                                                  + driverContainerActionProcess.ActionType));
-                                break;
-                            }
-                            if (driverContainerActionProcess.MethodOfEntry != ContainerMethodOfEntry.Manual &&
-                                driverContainerActionProcess.MethodOfEntry != ContainerMethodOfEntry.Scanned)
-                            {
-                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid MethodOfEntry:"
-                                                                  + driverContainerActionProcess.MethodOfEntry));
-                                break;
+                                if (driverContainerActionProcess.MethodOfEntry != ContainerMethodOfEntry.Manual &&
+                                    driverContainerActionProcess.MethodOfEntry != ContainerMethodOfEntry.Scanned)
+                                {
+                                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Invalid MethodOfEntry:"
+                                                                      + driverContainerActionProcess.MethodOfEntry));
+                                    break;
+                                }
                             }
                         }
                     }
@@ -762,8 +760,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 containerMaster.ContainerCustHostCode = currentTripSegment.TripSegDestCustHostCode;
                 containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
 
+                //Save the previous container last action date for historical days at site calculation in ContainerHistory
                 DateTime? prevLastActionDateTime = containerMaster.ContainerLastActionDateTime;
-                containerMaster.ContainerLastActionDateTime = driverContainerActionProcess.ActionDateTime;
+
+                //For respots do not change the last action date for the ContainerMaster.
+                if (currentTripSegment.TripSegType != BasicTripTypeConstants.Respot)
+                {
+                    containerMaster.ContainerLastActionDateTime = driverContainerActionProcess.ActionDateTime;
+                }
 
                 //Do not change when container is processed. 
                 //Although it seems like we should, if segment type is PF,PE,LD,UL,RS...
@@ -795,9 +799,12 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 //containerMaster.ContainerInboundTerminalId 
 
                 /////////////////////////////////////////////////
-                //Set the location warning flag
-                //ToDo: The location warning flag needs to be tested.
-                containerMaster.LocationWarningFlag = null;
+                //Set the location warning flag.
+                //The purpose of this flaf is to highlight the account name in blue on the Spotted Container List, if
+                // a container was dropped at a site, but on the last trip was also dropped at a customer site.
+                //It should have been picked up after the drop not just dropped again.
+                //ToDo: test Respot
+                containerMaster.LocationWarningFlag = Constants.No;
                 var types = new List<string> {BasicTripTypeConstants.DropFull,
                                               BasicTripTypeConstants.DropEmpty,
                                               BasicTripTypeConstants.Respot};
@@ -807,7 +814,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     //We need to look in the container history to find the previous trip and the last 
                     //status of the container at the end of that trip.
                     var containerLastTrip = Common.GetContainerHistoryLastTrip(dataService, settings, userCulture, userRoleIds,
-                        driverContainerActionProcess.ContainerNumber, driverContainerActionProcess.TripNumber, out fault);
+                                            driverContainerActionProcess.ContainerNumber,  out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -818,12 +825,31 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                                      ContainerStatusConstants.SpecialProject};
                     if (statuses.Contains(containerLastTrip?.ContainerStatus))
                     {
-                        containerMaster.LocationWarningFlag = Constants.Yes;
+                        //For respots, only set the location warning flag if the customer site is different
+                        //from the previous customer site
+                        if (currentTripSegment.TripSegType == BasicTripTypeConstants.Respot)
+                        {
+                            if (containerLastTrip.ContainerCustHostCode != currentTripSegment.TripSegDestCustHostCode)
+                            {
+                                containerMaster.LocationWarningFlag = Constants.Yes;
+                            }
+                        }
+                        else
+                        {
+                            containerMaster.LocationWarningFlag = Constants.Yes;
+                        }
                     }
-                    else
-                    {
-                        containerMaster.LocationWarningFlag = Constants.No;
-                    }
+                }
+                //If the container is now in review, save the review reason in the comments so that it is
+                //visible on the Yard/Inbound container screen in ScrapRunner.
+                if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Review)
+                {
+                    containerMaster.ContainerComments = driverContainerActionProcess.ActionCode + "-" +
+                                                        driverContainerActionProcess.ActionDesc;
+                }
+                else
+                {
+                    containerMaster.ContainerComments = null;
                 }
 
                 //Do the update
@@ -837,7 +863,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                     return false;
                 }
-
+                //Now that containerMaster is saved, set the ContainerLastActionDateTime to show when the
+                //respot was actually done, or any other type of action for that matter in the ContainerHistory
+                containerMaster.ContainerLastActionDateTime = driverContainerActionProcess.ActionDateTime;
                 ////////////////////////////////////////////////
                 //Add record to Container History. 
                 if (!Common.InsertContainerHistory(dataService, settings, containerMaster, destCustomerMaster, prevLastActionDateTime,
@@ -938,8 +966,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 tripSegmentContainer.TripSegContainerLatitude = driverContainerActionProcess.Latitude;
                 tripSegmentContainer.TripSegContainerLongitude = driverContainerActionProcess.Longitude;
             }
+            //Method of Entry does not apply to containers on a RT or RN segment
+            if (currentTripSegment.TripSegType != BasicTripTypeConstants.ReturnYard &&
+                currentTripSegment.TripSegType != BasicTripTypeConstants.ReturnYardNC)
+            {
             //This indicates whether the container number was scanned or manually (hand-typed) entered.
             tripSegmentContainer.TripSegContainerEntryMethod = driverContainerActionProcess.MethodOfEntry;
+            }
 
             // The Review Flag and Reason contains either R=Review and the ReviewReason
             // or E=Exception and the Exception Reason (handled in a separate routine)
@@ -1331,8 +1364,13 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 tripSegmentContainer.TripSegContainerLevel = driverContainerActionProcess.ContainerLevel;
             }
 
-            //This indicates whether the container number was scanned or manually (hand-typed) entered.
-            tripSegmentContainer.TripSegContainerEntryMethod = driverContainerActionProcess.MethodOfEntry;
+            //Method of Entry does not apply to containers on a RT or RN segment
+            if (currentTripSegment.TripSegType != BasicTripTypeConstants.ReturnYard &&
+                currentTripSegment.TripSegType != BasicTripTypeConstants.ReturnYardNC)
+            {
+                //This indicates whether the container number was scanned or manually (hand-typed) entered.
+                tripSegmentContainer.TripSegContainerEntryMethod = driverContainerActionProcess.MethodOfEntry;
+            }
 
             //The ContainerLoaded flag is based on ContainerContents
             if (driverContainerActionProcess.ContainerContents == ContainerContentsConstants.Loaded)

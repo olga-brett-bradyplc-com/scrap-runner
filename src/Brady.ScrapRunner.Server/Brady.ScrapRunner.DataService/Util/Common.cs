@@ -104,7 +104,8 @@ namespace Brady.ScrapRunner.DataService.Util
                     }
                 }
                 if (tripSegType == BasicTripTypeConstants.DropEmpty ||
-                    tripSegType == BasicTripTypeConstants.DropFull)
+                    tripSegType == BasicTripTypeConstants.DropFull ||
+                    tripSegType == BasicTripTypeConstants.Respot)
                 {
                     if (actionType != ContainerActionTypeConstants.Exception)
                     {
@@ -2669,7 +2670,7 @@ namespace Brady.ScrapRunner.DataService.Util
         }
         /// CONTAINERHISTORY Table  queries
         /// <summary>
-        ///  Get the last container history record for a given container number on a trip
+        ///  Get the last container history record for a given container number on any trip
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
         /// <param name="dataService"></param>
@@ -2677,11 +2678,10 @@ namespace Brady.ScrapRunner.DataService.Util
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
         /// <param name="containerNumber"></param>
-        /// <param name="currentTripNumber"></param>
         /// <param name="fault"></param>
         /// <returns>An empty ContainerHistory if containerNumber is null or no entry is found</returns>
         public static ContainerHistory GetContainerHistoryLastTrip(IDataService dataService, ProcessChangeSetSettings settings,
-             string userCulture, IEnumerable<long> userRoleIds, string containerNumber, string currentTripNumber, out DataServiceFault fault)
+             string userCulture, IEnumerable<long> userRoleIds, string containerNumber,  out DataServiceFault fault)
         {
             fault = null;
             var containerHistory = new ContainerHistory();
@@ -2691,8 +2691,7 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     CurrentQuery = new QueryBuilder<ContainerHistory>().Top(1)
                              .Filter(t => t.Property(p => p.ContainerNumber).EqualTo(containerNumber)
-                             .And().Property(p => p.ContainerTripNumber).IsNotNull()
-                             .And().Property(p => p.ContainerTripNumber).NotEqualTo(currentTripNumber))
+                             .And().Property(p => p.ContainerTripNumber).IsNotNull())
                              .OrderBy(p => p.ContainerSeqNumber, Direction.Descending)
                              .GetQuery()
                 };
