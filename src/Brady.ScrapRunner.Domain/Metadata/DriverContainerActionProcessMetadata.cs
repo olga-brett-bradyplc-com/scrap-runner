@@ -36,6 +36,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.ActionCode);
             StringProperty(x => x.ActionDesc);
             StringProperty(x => x.MethodOfEntry);
+            StringProperty(x => x.DriverNotes);
 
             StringProperty(x => x.ScaleReferenceNumber);
             StringProperty(x => x.SetInYardFlag);
@@ -66,6 +67,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.ActionCode)
             .Property(x => x.ActionDesc)
             .Property(x => x.MethodOfEntry)
+            .Property(x => x.DriverNotes)
 
             .Property(x => x.ScaleReferenceNumber)
             .Property(x => x.SetInYardFlag)
