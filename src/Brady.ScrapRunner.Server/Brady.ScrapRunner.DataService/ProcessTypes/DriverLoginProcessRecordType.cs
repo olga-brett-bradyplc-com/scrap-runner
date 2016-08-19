@@ -522,6 +522,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         driverStatus.LoginProcessedDateTime = DateTime.Now;
                         driverStatus.MdtVersion = driverLoginProcess.PndVer;
                         driverStatus.DriverLCID = driverLoginProcess.LocaleCode;
+                        driverStatus.ServicesFlag = Constants.Yes;
 
                         //These will be updated by different processes.
                         // driverStatus.ContainerMasterDateTime = driverLoginProcess.ContainerMasterDateTime;

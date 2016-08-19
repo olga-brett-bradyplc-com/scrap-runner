@@ -74,10 +74,12 @@ namespace Brady.ScrapRunner.Domain.Process
         ///Can be null for RT/RN type segments where container number is not entered.
         public virtual string MethodOfEntry { get; set; }
 
+        public virtual string DriverNotes { get; set; }
+
         ///
         ///Additional fields for yard/scale processing
         ///
-        
+
         ///Scale Reference Number. Optional.
         public virtual string ScaleReferenceNumber { get; set; }
 

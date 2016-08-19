@@ -991,6 +991,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             // Eventually we will remove all trip segment container records that are not complete.
             tripSegmentContainer.TripSegContainerComplete = Constants.Yes;
 
+            //New field for Driver entered notes about the container
+            tripSegmentContainer.TripSegContainerDriverNotes = driverContainerActionProcess.DriverNotes;
+
             //For return to yard processing only...
             if (currentTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard ||
                 currentTripSegment.TripSegType == BasicTripTypeConstants.Scale)

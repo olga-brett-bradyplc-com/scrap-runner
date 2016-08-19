@@ -42,7 +42,8 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual string TripSegContainerSubReason { get; set; }
         public virtual string TripSegContainerComment { get; set; }
         public virtual string TripSegContainerComplete { get; set; }
-
+        public virtual string TripSegContainerDriverNotes { get; set; }
+        
         public virtual string Id
         {
             get

@@ -57,6 +57,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.TripSegContainerSubReason);
             StringProperty(x => x.TripSegContainerComment);
             StringProperty(x => x.TripSegContainerComplete);
+            StringProperty(x => x.TripSegContainerDriverNotes);
 
             ViewDefaults()
                 .Property(x => x.TripNumber)
@@ -88,6 +89,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
                 .Property(x => x.TripSegContainerSubReason)
                 .Property(x => x.TripSegContainerComment)
                 .Property(x => x.TripSegContainerComplete)
+                .Property(x => x.TripSegContainerDriverNotes)
 
                 .OrderBy(x => x.TripNumber)
                 .OrderBy(x => x.TripSegNumber)
