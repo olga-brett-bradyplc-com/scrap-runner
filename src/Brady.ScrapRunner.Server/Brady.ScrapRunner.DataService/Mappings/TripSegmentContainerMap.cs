@@ -58,6 +58,7 @@ namespace Brady.ScrapRunner.DataService.Mappings
             Property(x => x.TripSegContainerSubReason);
             Property(x => x.TripSegContainerComment);
             Property(x => x.TripSegContainerComplete);
+            Property(x => x.TripSegContainerDriverNotes);
 
         }
     }
