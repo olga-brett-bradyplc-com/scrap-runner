@@ -76,6 +76,24 @@
         /// </summary>
         public static readonly string GPSFileExt = ".x";
 
+        /// <summary>
+        /// Exception Delay Code and description
+        /// Set when a delay on a segment has been flagged as an exception delay.
+        /// </summary>
+        public static readonly string ExceptionDelayCode = "ED#";
+        public static readonly string ExceptionDelayDesc = "EXCEPTION DELAY";
+
+    }
+    /// <summary>
+    /// Maximum Lengths
+    /// </summary>
+    public static class MaxLengthConstants
+    {
+        //Trip table
+        public static readonly int LENTripErrorDesc = 200;
+        //TripSegment table
+        public static readonly int LENTripSegErrorDesc = 200;
+
     }
     /// <summary>
     /// The Container Action Type internal codes.  Used in the processing container information.
@@ -791,7 +809,7 @@
         
     }
     /// <summary>
-    /// Driver Preference internal codes. From the Preferences table.
+    /// Yard Preference internal codes. From the Preferences table.
     /// </summary>
     public static class PrefYardConstants
     {
@@ -818,6 +836,61 @@
         /// to the host accounting system. 
         /// </summary>
         public static readonly string DEFSendExceptionTripsToHost = "DEFSendExceptionTripsToHost";
+
+        /// <summary>
+        /// DEFMarkDelayException:
+        /// Mark Trips with Flagged Delays as Exceptions? (Y/N):
+        /// When this option is set to “Y”, trips, that have any delays that are flagged as
+        /// exception delays, are marked as exceptions.
+        /// Each container is flagged with review flag of E and review reason of ED#-EXCEPTION DELAY
+        /// The segment status is set to E=Excepton. The trip status is set to E=Exception.
+        /// </summary>
+        public static readonly string DEFMarkDelayException = "DEFMarkDelayException";
+
+        /// <summary>
+        /// DEFUseErrorQ:
+        /// Use Error Queue(Y/N)
+        /// Place trips in the error queue if they have excessive time or mileage or
+        /// insufficient time or mileage.
+        /// </summary>
+        public static readonly string DEFUseErrorQ = "DEFUseErrorQ";
+
+        /// <summary>
+        /// DEFAdjustTimeByDelayErrorQ:
+        /// Adjust time by delays for Error Queue (Y/N)
+        /// If set to Y, reduce segment time by any delay times for the segment. 
+        /// </summary>
+        public static readonly string DEFAdjustTimeByDelayErrorQ = "DEFAdjustTimeByDelayErrorQ";
+
+        /// <summary>
+        /// DEFPercentExcTime:
+        /// % to indicate Excessive Trip Time (Error Q)
+        /// Percentage of the segment time to indicate excessive segment time.
+        /// </summary>
+        public static readonly string DEFPercentExcTime = "DEFPercentExcTime";
+
+        /// <summary>
+        /// DEFPercentExcMileage:
+        /// % to indicate Excessive Trip Mileage (Error Q)
+        /// Percentage of the segment mileage to indicate excessive segment mileage.
+        /// </summary>
+        public static readonly string DEFPercentExcMileage = "DEFPercentExcMileage";
+
+        /// <summary>
+        /// DEFPercentInsTime:
+        /// % to indicate Insufficient Trip Time (Error Q)
+        /// Percentage of the segment time to indicate insufficient segment time.
+        /// </summary>
+        public static readonly string DEFPercentInsTime = "DEFPercentInsTime";
+
+        /// <summary>
+        /// DEFPercentInsMileage:
+        /// % to indicate Insufficient Trip Mileage (Error Q)
+        /// Percentage of the segment mileage to indicate insufficient segment mileage.
+        /// </summary>
+        public static readonly string DEFPercentInsMileage = "DEFPercentInsMileage";
+
+
     }
 
     /// <summary>
