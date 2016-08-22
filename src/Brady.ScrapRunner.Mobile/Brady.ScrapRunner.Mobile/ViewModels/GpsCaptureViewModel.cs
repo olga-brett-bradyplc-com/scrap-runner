@@ -19,13 +19,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ILocationService _locationService;
         private readonly ITripService _tripService;
         private readonly IDriverService _driverService;
+        private readonly ICustomerService _customerService;
 
         // Inject into ViewModel using constructor injection.  In other words, require the creator of the object to pass in the dependencies.
-        public GpsCaptureViewModel(ILocationService locationService, ITripService tripService, IDriverService driverService)
+        public GpsCaptureViewModel(ILocationService locationService, ITripService tripService, IDriverService driverService, ICustomerService customerService)
         {
             _locationService = locationService;
             _tripService = tripService;
             _driverService = driverService;
+            _customerService = customerService;
 
             Title = AppResources.GPSCapture;
             CaptureCommand = new MvxCommand(ExecuteCaptureCommand);
@@ -103,8 +105,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var synergyLatitude = currentLocation.Latitude*600000;
             var synergyLongitude = currentLocation.Longitude*600000;
 
-            var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
-
             var setDriverArrived = await _driverService.ProcessDriverArrivedAsync(new DriverArriveProcess
             {
                 EmployeeId = CurrentDriver.EmployeeId,
@@ -123,7 +123,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentDriver.Status = DriverStatusSRConstants.Arrive;
                 await _driverService.UpdateDriver(CurrentDriver);
 
-                await _tripService.UpdateGpsCustomerSegments(CustHostCode, (int) synergyLatitude, (int) synergyLongitude);
+                var tripSegment = await _tripService.FindTripSegmentInfoAsync(CurrentDriver.TripNumber, CurrentDriver.TripSegNumber);
+
+                if (tripSegment != null)
+                {
+                    tripSegment.TripSegEndLatitude = (int)synergyLatitude;
+                    tripSegment.TripSegEndLongitude = (int)synergyLongitude;
+                    await _tripService.UpdateGpsCustomerSegments(tripSegment);
+                }
+                await _customerService.UpdateCustomerGpsCoordinates(CustHostCode, (int)synergyLatitude, (int)synergyLongitude);
 
                 var tripSegments = await _tripService.FindCustomerSegments(CustHostCode);
 

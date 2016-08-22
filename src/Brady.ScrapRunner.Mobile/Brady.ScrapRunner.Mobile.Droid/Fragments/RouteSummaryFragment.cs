@@ -32,7 +32,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             _driverService = Mvx.Resolve<IDriverService>();
 
             // TODO : Disabling this until polling service pulls TripSegments and TripSegmentContainers when fetching new trips
-            //_mvxSubscriptionToken = _mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
+            _mvxSubscriptionToken = _mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
 
             var task = CheckMenuState();
         }
@@ -72,7 +72,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     break;
                 case TripNotificationContext.Modified:
                     var index = ViewModel.RouteSummaryList.IndexOf(ViewModel.RouteSummaryList.SingleOrDefault(t => t.TripNumber == msg.Trip.TripNumber));
-                    ViewModel.RouteSummaryList[index] = msg.Trip;
+                    if (index > -1)
+                        ViewModel.RouteSummaryList[index] = msg.Trip;
                     break;
                 case TripNotificationContext.OnHold:
                     break;
