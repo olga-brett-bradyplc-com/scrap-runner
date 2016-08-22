@@ -338,48 +338,105 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 {
                     // Used for RouteSummary view to know what "state" it's in
                     // TODO: Replace with messaging similiar to the menu state?
-                    //CurrentStatus = DriverStatusSRConstants.Arrive;
+                    CurrentStatus = DriverStatusSRConstants.Arrive;
 
-                    //CurrentDriver.Status = DriverStatusSRConstants.Arrive;
+                    CurrentDriver.Status = CurrentStatus;
                     await _driverService.UpdateDriver(CurrentDriver);
 
                     //GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
                     //commented out temporarely for the demo by OIB 8/9/16
-                    /*var currentSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber,
+                    var currentSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber,
                         TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key.TripSegNumber);
 
                     var tripInfo = await _tripService.FindTripAsync(TripNumber);
 
-                    if(currentSegment.TripSegEndLatitude == null || currentSegment.TripSegEndLongitude == null ||
+                    if (currentSegment.TripSegEndLatitude == null || currentSegment.TripSegEndLongitude == null ||
                         currentSegment.TripSegEndLatitude == 0 || currentSegment.TripSegEndLongitude == 0)
                     {
-                        //condition to check for lat/lon
-                        var terminal = await _terminalService.FindTerminalMasterAsync(tripInfo.TripTerminalId);
+                        //first check Destination Customer record for lat/lon
+                        var customer = await _customerService.FindCustomerMaster(currentSegment.TripSegDestCustHostCode);
 
-                        if (terminal?.Latitude != null && terminal.Longitude != null)
+                        if (customer.CustLatitude != null && customer.CustLongitude != null &&
+                            customer.CustLatitude != 0 && customer.CustLongitude != 0)
                         {
-                            var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
-                                AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
-                                AppResources.No);
+                            currentSegment.TripSegEndLatitude = customer.CustLatitude;
+                            currentSegment.TripSegEndLongitude = customer.CustLongitude;
 
-                            if (gpsCaptureDialog)
+                            await _tripService.UpdateGpsCustomerSegments(currentSegment);
+                        }
+                        else
+                        {
+                            if (currentSegment.TripSegType == BasicTripTypeConstants.ReturnYard ||
+                                currentSegment.TripSegType == BasicTripTypeConstants.ReturnYardNC ||
+                                currentSegment.TripSegType == BasicTripTypeConstants.YardWork)
                             {
-                                //routine to capture current log/lat
-                                string address = terminal.Address1?.TrimEnd();
-                                if (terminal.Address2?.TrimEnd() != "")
-                                    address += terminal.Address2?.TrimEnd();
-                                string termInfoText = terminal.TerminalName?.TrimEnd() + "\n" + address + "\n" +
-                                                        terminal.City?.TrimEnd() + " " + terminal.State?.TrimEnd() + " " +
-                                                        terminal.Zip?.TrimEnd() + " " + terminal.Country?.TrimEnd();
-                                ShowViewModel<GpsCaptureViewModel>(new { custHostCode = currentSegment.TripSegDestCustHostCode,
-                                    customerInfo = termInfoText, currentDriver = CurrentDriver });
+                                //condition to check for lat/lon
+                                var terminal = await _terminalService.FindTerminalMasterAsync(tripInfo.TripTerminalId);
+
+                                if (terminal.Latitude == null || terminal.Longitude == null || terminal.Latitude == 0 ||
+                                    terminal.Longitude == 0)
+                                {
+                                    var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
+                                        AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
+                                        AppResources.No);
+
+                                    if (gpsCaptureDialog)
+                                    {
+                                        //routine to capture current log/lat
+                                        string address = terminal.Address1?.TrimEnd();
+                                        if (terminal.Address2?.TrimEnd() != "")
+                                            address += terminal.Address2?.TrimEnd();
+                                        string termInfoText = terminal.TerminalName?.TrimEnd() + "\n" + address + "\n" +
+                                                                terminal.City?.TrimEnd() + " " + terminal.State?.TrimEnd() + " " +
+                                                                terminal.Zip?.TrimEnd() + " " + terminal.Country?.TrimEnd();
+
+                                        ShowViewModel<GpsCaptureViewModel>(new
+                                        {
+                                            custHostCode = currentSegment.TripSegDestCustHostCode,
+                                            customerInfo = termInfoText,
+                                            currentDriver = CurrentDriver
+                                        });
+                                    }
+                                    else
+                                        await SetDriverArrive();
+                                }
+                                else
+                                {
+                                    currentSegment.TripSegEndLatitude = terminal.Latitude;
+                                    currentSegment.TripSegEndLongitude = terminal.Longitude;
+
+                                    await _tripService.UpdateGpsCustomerSegments(currentSegment);
+                                }
+                            }
+                            else
+                            {
+                                var gpsCaptureDialog = await UserDialogs.Instance.ConfirmAsync(
+                                    AppResources.GPSCaptureMessage, AppResources.GPSCapture, AppResources.Yes,
+                                    AppResources.No);
+
+                                if (gpsCaptureDialog)
+                                {
+                                    //routine to capture current log/lat
+                                    string address = customer.CustAddress1?.TrimEnd();
+                                    if (customer.CustAddress2?.TrimEnd() != "")
+                                        address += customer.CustAddress2?.TrimEnd();
+                                    string termInfoText = customer.CustName?.TrimEnd() + "\n" + address + "\n" +
+                                                            customer.CustCity?.TrimEnd() + " " + customer.CustState?.TrimEnd() + " " +
+                                                            customer.CustZip?.TrimEnd() + " " + customer.CustCountry?.TrimEnd();
+
+                                    ShowViewModel<GpsCaptureViewModel>(new
+                                    {
+                                        custHostCode = currentSegment.TripSegDestCustHostCode,
+                                        customerInfo = termInfoText,
+                                        currentDriver = CurrentDriver
+                                    });
+                                }
+                                else
+                                    await SetDriverArrive();
                             }
                         }
-                    }*/
-
-                    await SetDriverArrive();
-                    await ExecuteNextStageCommandAsync();
-                    //SetNextStageLabel(firstSegment);
+                        SetNextStageLabel(firstSegment);
+                    }
                 }
             }
         }

@@ -107,5 +107,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<int> UpdateGpsCustomerSegments(string custHostCode, int lat, int lon);
 
+        Task<int> UpdateGpsCustomerSegments(TripSegmentModel segment);
     }
 }

@@ -98,6 +98,8 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <returns></returns>
         public async Task<List<MessagesModel>> FindMessagesAsync(string senderId)
         {
+            senderId = senderId.PadRight(10, ' ');
+
             var messages = await _messagesRepository.AsQueryable()
                 .Where(t => t.ReceiverId == senderId || t.SenderId == senderId)
                 .OrderBy(t => t.CreateDateTime)

@@ -1,11 +1,16 @@
+using System.Linq;
 using Android.App;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Brady.ScrapRunner.Mobile.Droid.Activities;
+using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Messages;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Binding.Droid.BindingContext;
 using MvvmCross.Droid.Shared.Attributes;
+using MvvmCross.Platform;
+using MvvmCross.Plugins.Messenger;
 
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
@@ -16,9 +21,16 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     {
         protected override int FragmentId => Resource.Layout.fragment_messages;
         protected override bool NavMenuEnabled => false;
+        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private IMvxMessenger _mvxMessenger;
+        private IMessagesService _messagesService;
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
+            _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
+            _messagesService = Mvx.Resolve<IMessagesService>();
+
+            _mvxSubscriptionToken = _mvxMessenger.SubscribeOnMainThread<NewMessagesMessage>(OnMessageNotification);
             HasOptionsMenu = true;
         }
         
@@ -41,6 +53,19 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     baseActivity.CloseOptionsMenu();
                     return base.OnOptionsItemSelected(item);
             }
+        }
+        private void OnMessageNotification(NewMessagesMessage msg)
+        {
+            ViewModel.Messages.Add(msg.Message);
+        }
+        public override void OnDestroyView()
+        {
+            base.OnDestroyView();
+
+            if (_mvxSubscriptionToken == null)
+                return;
+
+            _mvxMessenger.Unsubscribe<NewMessagesMessage>(_mvxSubscriptionToken);
         }
     }
 }

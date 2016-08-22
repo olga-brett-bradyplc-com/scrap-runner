@@ -121,5 +121,22 @@ namespace Brady.ScrapRunner.Mobile.Services
             var directions = await _customerDirectionsRepository.AsQueryable().Where(d => d.CustHostCode == custHostCode).ToListAsync();
             return directions;
         }
+        /// <summary>
+        /// Update the local DB with customer masters provided by the server
+        /// </summary>
+        /// <param name="custHostCode"></param>
+        /// <param name="lat"></param>
+        /// <param name="lon"></param>
+        /// <returns></returns>
+        public Task UpdateCustomerGpsCoordinates(string custHostCode, int lat, int lon)
+        {
+            var customer = FindCustomerMaster(custHostCode);
+
+            customer.Result.CustHostCode = custHostCode;
+            customer.Result.CustLatitude = lat;
+            customer.Result.CustLongitude = lon;
+
+            return _customerMasterRepository.InsertOrReplaceAsync(customer.Result);
+        }
     }
 }
