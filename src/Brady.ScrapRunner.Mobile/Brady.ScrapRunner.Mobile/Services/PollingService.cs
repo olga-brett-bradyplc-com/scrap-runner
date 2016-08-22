@@ -111,18 +111,20 @@
                 foreach (var trip in mappedTrips)
                 {
                     var isNewTrip = await _tripService.FindTripAsync(trip.TripNumber) == null;
+                    if (isNewTrip)
+                        await _tripService.CreateTripAsync(trip);
+                    else
+                        await _tripService.UpdateTripAsync(trip);
                     var tripContext = isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified;
-                    ShowTripNotificationActivity(trip.TripNumber,
-                        isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified);
-                    await _notificationService.TripAsync(trip, tripContext);
                     Mvx.TaggedTrace(Constants.ScrapRunner, $"Found {tripContext} Trip {trip.TripNumber}");
+                    ShowTripNotificationActivity(trip.TripNumber, tripContext);
+                    await _notificationService.TripAsync(trip, tripContext);
                     _mvxMessenger.Publish(new TripNotificationMessage(this)
                     {
                         Context = tripContext,
                         Trip = trip
                     });
                 }
-                await _tripService.UpdateTrips(tripInfoProcessChangeSet.Item.Trips);
             }
             if (tripInfoProcessChangeSet.Item?.TripSegments?.Count > 0)
                 await _tripService.UpdateTripSegments(tripInfoProcessChangeSet.Item.TripSegments);
