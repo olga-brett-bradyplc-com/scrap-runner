@@ -61,8 +61,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                 await _queueService.ProcessQueueAsync();
                 var driverStatus = await _driverService.GetCurrentDriverStatusAsync();
                 if (!_networkAvailabilityService.IsNetworkConnectionAvailable()) return;
-                //await _pollingService.PollForChangesAsync(driverStatus.EmployeeId, driverStatus.TerminalId,
-                //        driverStatus.RegionId, driverStatus.DriverArea);
+                await _pollingService.PollForChangesAsync(driverStatus.EmployeeId, driverStatus.TerminalId,
+                        driverStatus.RegionId, driverStatus.DriverArea);
             }
             catch (Exception exception)
             {
