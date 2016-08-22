@@ -46,6 +46,7 @@ namespace Brady.ScrapRunner.Domain.Models
         public virtual DriverForceLogoffValue SendHHLogoffFlag { get; set; }
         public virtual DateTime? TerminalMasterDateTime { get; set; }
         public virtual int? DriverLCID { get; set; }
+        public virtual string ServicesFlag { get; set; }
 
         public virtual string Id
         {

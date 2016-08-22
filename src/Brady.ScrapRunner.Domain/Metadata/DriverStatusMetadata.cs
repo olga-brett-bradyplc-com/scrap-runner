@@ -48,6 +48,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             IntegerProperty(x => x.SendHHLogoffFlag);
             TimeProperty(x => x.TerminalMasterDateTime);
             IntegerProperty(x => x.DriverLCID);
+            StringProperty(x => x.ServicesFlag);
 
         ViewDefaults()
             .Property(x => x.EmployeeId)
@@ -80,6 +81,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             .Property(x => x.SendHHLogoffFlag)
             .Property(x => x.TerminalMasterDateTime)
             .Property(x => x.DriverLCID)
+            .Property(x => x.ServicesFlag)
             .OrderBy(x => x.EmployeeId);
         }
     }

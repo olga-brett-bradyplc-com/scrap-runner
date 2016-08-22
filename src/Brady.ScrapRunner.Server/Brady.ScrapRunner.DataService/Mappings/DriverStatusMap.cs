@@ -60,6 +60,7 @@ namespace Brady.ScrapRunner.DataService.Mappings
             Property(x => x.SendHHLogoffFlag);
             Property(x => x.TerminalMasterDateTime);
             Property(x => x.DriverLCID);
+            Property(x => x.ServicesFlag);
         }
     }
 }

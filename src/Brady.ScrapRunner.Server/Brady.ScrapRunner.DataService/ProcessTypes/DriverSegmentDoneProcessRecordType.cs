@@ -415,17 +415,9 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     {
                         foreach (var incompleteTripSegmentContainer in incompleteTripSegContainerList)
                         {
-                            var tempContainerList = new List<TripSegmentContainer>();
-                            tempContainerList.AddRange(tripContainerList);
 
-                            //Must remove the incomplete containers from the original list
-                            foreach (var tripContainer in tempContainerList)
-                            {
-                                if (tripContainer.Equals(incompleteTripSegmentContainer))
-                                {
-                                    tripContainerList.Remove(tripContainer);
-                                }
-                            }
+                            tripContainerList.Remove(incompleteTripSegmentContainer);
+
                             //Do the delete. Deleting records with composite keys is now fixed.
                             changeSetResult = Common.DeleteTripSegmentContainer(dataService, settings, incompleteTripSegmentContainer);
                             log.DebugFormat("SRTEST:Deleting TripSegmentContainer Record for Trip:{0}-{1} Container:{2}- Segment Done.",
@@ -1750,7 +1742,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
            List<TripSegmentMileage> tripMileageList, List<DriverDelay> tripDelayList)
         {
             DataServiceFault fault = null;
-            int containerHistoryInsertCount = 0;
+            //int containerHistoryInsertCount = 0;
             int tripHistoryInsertCount = 0;
 
             ////////////////////////////////////////////////
@@ -2043,15 +2035,15 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             return false;
                         }
                         ////////////////////////////////////////////////
-                        //Add record to Container History. 
-                        if (!Common.InsertContainerHistory(dataService, settings, containerMaster, destCustomerMaster, null,
-                            ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
-                        {
-                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                            log.ErrorFormat("Trip Done:InsertContainerHistory failed: {0} during segment done request: {1}",
-                                             fault.Message, driverSegmentDoneProcess);
-                            return false;
-                        }
+                        //Do not add record to Container History. This adds an extra entry that is not done in the current ScrapRunner.               
+                        //if (!Common.InsertContainerHistory(dataService, settings, containerMaster, destCustomerMaster, null,
+                        //    ++containerHistoryInsertCount, userRoleIds, userCulture, log, out fault))
+                        //{
+                        //    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        //    log.ErrorFormat("Trip Done:InsertContainerHistory failed: {0} during segment done request: {1}",
+                        //                     fault.Message, driverSegmentDoneProcess);
+                        //    return false;
+                        //}
                     }//foreach (var containerMaster in containersOnTrip)
                 }// if (null != containersOnTrip)
             }//if (distinctTripContainerList != null)
