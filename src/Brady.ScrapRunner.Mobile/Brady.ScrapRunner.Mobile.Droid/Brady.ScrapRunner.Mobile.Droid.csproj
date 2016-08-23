@@ -308,6 +308,7 @@
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AndroidNotificationService.cs" />
+    <Compile Include="Services\AndroidScrapRunnerNotificationService.cs" />
     <Compile Include="Services\AndroidNetworkAvailabilityService.cs" />
     <Compile Include="Services\BackgroundIntentBroadcastReceiver.cs" />
     <Compile Include="Services\BackgroundIntentService.cs" />

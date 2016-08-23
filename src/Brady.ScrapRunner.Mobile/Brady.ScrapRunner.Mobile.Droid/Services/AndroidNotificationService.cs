@@ -1,190 +1,124 @@
 namespace Brady.ScrapRunner.Mobile.Droid.Services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    using System.Threading;
     using Android.App;
     using Android.Media;
     using Android.OS;
     using Android.Support.V4.App;
     using Interfaces;
-    using Models;
-    using MvvmCross.Core.ViewModels;
-    using MvvmCross.Droid.Views;
     using MvvmCross.Platform;
-    using Resources;
-    using ViewModels;
 
     public class AndroidNotificationService : INotificationService
     {
-        public const int NewTripNotificationId = 1;
-        public const int ModifiedTripNotificationId = 2;
-        public const int CanceledTripNotificationId = 3;
-        public const int OnHoldTripNotificationId = 4;
-        public const int FutureTripNotificationId = 5;
-        public const int ReassignedTripNotificationId = 6;
-        public const int UnassignedTripNotificationId = 7;
-        public const int MarkedDoneTripNotificationId = 8;
-        public const int NewMessageNotificationId = 9;
-        public const int ResequencedTripNotficationId = 10;
+        private int _notificationId;
 
-        public const string TripNotificationGroup = "TripNotificationGroup";
-        public const string TripResequenceNotificationGroup = "TripResequenceNotificationGroup";
-        public const string MessageNotificationGroup = "MessageNotificationGroup";
-
-        private readonly IRepository<NotificationModel> _notificationModelRepository;
-
-        public AndroidNotificationService()
+        public INotification Create(object id, object icon, string title, string text)
         {
-            _notificationModelRepository = Mvx.Resolve<IRepository<NotificationModel>>();
+            var newNotification = Mvx.Resolve<INotification>();
+            newNotification.Id = id ?? GetNextNotificationId();
+            newNotification.Icon = icon;
+            newNotification.Title = title;
+            newNotification.Text = text;
+            return newNotification;
         }
 
-        private PendingIntent GetIntent<TViewModel>(IDictionary<string, string> navigationParameters) where TViewModel : IMvxViewModel
+        public void Notify(INotification notification)
         {
-            var request = MvxViewModelRequest<TViewModel>.GetDefaultRequest();
-            if (navigationParameters != null) request.ParameterValues = navigationParameters;
-            var translator = Mvx.Resolve<IMvxAndroidViewModelRequestTranslator>();
-            var intent = translator.GetIntentFor(request);
-            return PendingIntent.GetActivity(Application.Context, 0, intent,
-                PendingIntentFlags.UpdateCurrent);
-        }
-
-        public async Task TripAsync(TripModel trip, TripNotificationContext context)
-        {
-            var title = string.Empty;
-            var text = string.Empty;
-            var notificationId = 0;
-            var notificationType = NotificationType.NewTrip;
-            switch (context)
-            {
-                case TripNotificationContext.New:
-                    title = AppResources.NotificationNewTripTitle;
-                    text = string.Format(AppResources.NotificationNewTripText, trip.TripNumber, trip.TripCustName);
-                    notificationId = NewTripNotificationId;
-                    notificationType = NotificationType.NewTrip;
-                    break;
-                case TripNotificationContext.Modified:
-                    title = AppResources.NotificationTripModifiedTitle;
-                    text = string.Format(AppResources.NotificationTripModifiedText, trip.TripNumber, trip.TripCustName);
-                    notificationId = ModifiedTripNotificationId;
-                    notificationType = NotificationType.TripModified;
-                    break;
-                case TripNotificationContext.Canceled:
-                    title = AppResources.NotificationTripCanceledTitle;
-                    text = string.Format(AppResources.NotificationTripCanceledText, trip.TripCustName);
-                    notificationId = CanceledTripNotificationId;
-                    notificationType = NotificationType.TripCanceled;
-                    break;
-                case TripNotificationContext.OnHold:
-                    title = AppResources.NotificationTripOnHoldTitle;
-                    text = string.Format(AppResources.NotificationTripOnHoldText, trip.TripCustName);
-                    notificationId = OnHoldTripNotificationId;
-                    notificationType = NotificationType.TripOnHold;
-                    break;
-                case TripNotificationContext.Future:
-                    title = AppResources.NotificationTripCanceledTitle;
-                    text = string.Format(AppResources.NotificationTripCanceledText, trip.TripCustName);
-                    notificationId = FutureTripNotificationId;
-                    notificationType = NotificationType.TripFuture;
-                    break;
-                case TripNotificationContext.Reassigned:
-                    title = AppResources.NotificationTripCanceledTitle;
-                    text = string.Format(AppResources.NotificationTripCanceledText, trip.TripCustName);
-                    notificationId = ReassignedTripNotificationId;
-                    notificationType = NotificationType.TripReassigned;
-                    break;
-                case TripNotificationContext.Unassigned:
-                    title = AppResources.NotificationTripCanceledTitle;
-                    text = string.Format(AppResources.NotificationTripCanceledText, trip.TripCustName);
-                    notificationId = UnassignedTripNotificationId;
-                    notificationType = NotificationType.TripUnassigned;
-                    break;
-                case TripNotificationContext.MarkedDone:
-                    title = AppResources.NotificationTripMarkedDoneTitle;
-                    text = string.Format(AppResources.NotificationTripMarkedDoneText, trip.TripCustName);
-                    notificationId = MarkedDoneTripNotificationId;
-                    notificationType = NotificationType.TripMarkedDone;
-                    break;
-                case TripNotificationContext.Resequenced:
-                    title = AppResources.NotificationTripResequenceTitle;
-                    text = AppResources.NotificationTripResequenceText;
-                    notificationId = ResequencedTripNotficationId;
-                    notificationType = NotificationType.TripsResequenced;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(context), context, null);
-            }
-            var builder = BuildNotification(title, text)
-                .SetGroup(TripNotificationGroup)
-                .SetSmallIcon(Resource.Drawable.ic_assignment_late_white_24dp);
-            var notificationModelId = await InsertNotificationModelAsync(notificationType, text);
-            if (notificationModelId.HasValue)
-                builder.SetContentIntent(GetIntent<NotificationViewModel>(null));
-            var notification = builder.Build();
-            NotifyUser(notification, notificationId);
-        }
-
-        public async Task TripsResequencedAsync()
-        {
-            var builder = BuildNotification(AppResources.NotificationTripResequenceTitle, 
-                    AppResources.NotificationTripResequenceText)
-                .SetGroup(TripResequenceNotificationGroup)
-                .SetSmallIcon(Resource.Drawable.ic_swap_vert_black_36dp);
-            var notificationModelId = await InsertNotificationModelAsync(NotificationType.TripsResequenced, AppResources.NotificationTripResequenceText);
-            if (notificationModelId.HasValue)
-                builder.SetContentIntent(GetIntent<NotificationViewModel>(null));
-            var notification = builder.Build();
-            NotifyUser(notification, ResequencedTripNotficationId);
-        }
-
-        public async Task MessageAsync(MessagesModel message)
-        {
-            var text = string.Format(AppResources.NotificationMessageText, message.SenderName, message.MsgText);
-            var builder = BuildNotification(string.Format(AppResources.NotificationMessageTitle, message.SenderName), text)
-                .SetGroup(MessageNotificationGroup)
-                .SetSmallIcon(Resource.Drawable.ic_email_black_36dp);
-            var notificationModelId = await InsertNotificationModelAsync(NotificationType.NewMessage, text);
-            if (notificationModelId.HasValue)
-                builder.SetContentIntent(GetIntent<NotificationViewModel>(null));
-            var notification = builder.Build();
-            NotifyUser(notification, NewMessageNotificationId);
-        }
-
-        private NotificationManagerCompat NotificationManager => NotificationManagerCompat.From(Application.Context);
-
-        private NotificationCompat.Builder BuildNotification(string title, string text)
-        {
-            return new NotificationCompat.Builder(Application.Context)
-                .SetDefaults(NotificationCompat.DefaultAll)
-                .SetAutoCancel(true)
-                .SetCategory(NotificationCompat.CategoryStatus)
-                .SetColor(Resource.Color.colorPrimary)
-                .SetPriority(NotificationCompat.PriorityHigh)
-                .SetVibrate(new[] {1000L, 1000L, 1000L, 1000L, 1000L})
-                .SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification))
-                .SetContentTitle(title)
-                .SetContentText(text);
-        }
-
-        private void NotifyUser(Notification notification, int notificationId)
-        {
-            if (notification == null) throw new ArgumentNullException(nameof(notification));
             new Handler(Looper.MainLooper).Post(() =>
             {
-                NotificationManager.Notify(notificationId, notification);
+                GetNotificationManager()
+                    .Notify((int)notification.Id, BuildNativeNotification((AndroidNotification)notification));
             });
         }
 
-        private async Task<int?> InsertNotificationModelAsync(NotificationType type, string summary)
+        public void Cancel(object notificationId)
         {
-            var notificationModel = new NotificationModel
-            {
-                NotificationDateTimeOffset = DateTimeOffset.Now,
-                NotificationType = type,
-                Summary = summary
-            };
-            await _notificationModelRepository.InsertAsync(notificationModel);
-            return notificationModel.Id;
+            GetNotificationManager()
+                .Cancel((int)notificationId);
         }
+
+        public void CancelAll()
+        {
+            GetNotificationManager()
+                .CancelAll();
+        }
+
+        private NotificationManagerCompat GetNotificationManager()
+        {
+            return NotificationManagerCompat.From(Application.Context);
+        }
+
+        private int GetNextNotificationId()
+        {
+            return Interlocked.Increment(ref _notificationId);
+        }
+
+        private Notification BuildNativeNotification(AndroidNotification notification)
+        {
+            var builder = (NotificationCompat.Builder) notification.Context;
+            var builtNotification = builder.Build();
+            // You can also specify other Android specific options here such as NoClear, Ongoing, etc.
+            return builtNotification;
+        }
+    }
+
+    public class AndroidNotification : INotification
+    {
+        private readonly NotificationCompat.Builder _builder;
+
+        public AndroidNotification()
+        {
+            _builder = new NotificationCompat.Builder(Application.Context)
+                .SetDefaults(NotificationCompat.DefaultAll)
+                .SetColor(Resource.Color.colorPrimary)
+                .SetAutoCancel(true)
+                .SetPriority(NotificationCompat.PriorityHigh)
+                .SetVibrate(new[] {1000L, 1000L, 1000L, 1000L, 1000L})
+                .SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
+            Context = _builder;
+        }
+
+        public object Id { get; set; }
+
+        private int? _drawableId;
+        public object Icon
+        {
+            get
+            {
+                return _drawableId;
+            }
+            set
+            {
+                _drawableId = (int?)value;
+                if (_drawableId.HasValue)
+                {
+                    _builder.SetSmallIcon(_drawableId.Value);
+                }
+            }
+        }
+
+        private string _title;
+        public string Title
+        {
+            get { return _title; }
+            set
+            {
+                _title = value;
+                _builder.SetContentTitle(_title);
+            }
+        }
+
+        private string _text;
+        public string Text
+        {
+            get { return _text; }
+            set
+            {
+                _text = value;
+                _builder.SetContentText(_text);
+            }
+        }
+
+        public object Context { get; set; }
     }
 }
