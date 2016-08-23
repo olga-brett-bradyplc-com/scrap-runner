@@ -128,15 +128,15 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <param name="lat"></param>
         /// <param name="lon"></param>
         /// <returns></returns>
-        public Task UpdateCustomerGpsCoordinates(string custHostCode, int lat, int lon)
+        public async Task<int> UpdateCustomerGpsCoordinates(string custHostCode, int lat, int lon)
         {
-            var customer = FindCustomerMaster(custHostCode);
+            var customer = await FindCustomerMaster(custHostCode);
 
-            customer.Result.CustHostCode = custHostCode;
-            customer.Result.CustLatitude = lat;
-            customer.Result.CustLongitude = lon;
+            customer.CustHostCode = custHostCode;
+            customer.CustLatitude = lat;
+            customer.CustLongitude = lon;
 
-            return _customerMasterRepository.InsertOrReplaceAsync(customer.Result);
+            return await _customerMasterRepository.InsertOrReplaceAsync(customer);
         }
     }
 }

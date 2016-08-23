@@ -28,14 +28,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ICodeTableService _codeTableService;
         private readonly IPreferenceService _preferenceService;
         private readonly IDriverService _driverService;
+        private readonly ITripService _tripService;
+        private readonly ITerminalService _terminalService;
 
         public FuelEntryViewModel(IDriverService driverService,
                                   IPreferenceService preferenceService,
-                                  ICodeTableService codeTableService)
+                                  ICodeTableService codeTableService,
+                                  ITripService tripService,
+                                  ITerminalService terminalService)
         {
             _driverService = driverService;
             _codeTableService = codeTableService;
             _preferenceService = preferenceService;
+            _tripService = tripService;
+            _terminalService = terminalService;
 
             Title = AppResources.FuelEntry;
         }
@@ -55,6 +61,51 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var states = await _codeTableService.FindCountryStatesAsync(currentStateList);
             StatesList = new ObservableCollection<CodeTableModel>(states);
 
+            /* default selected state to:  the destination state of the last segment of his last trip. 
+             * If that is not possible (first trip of day) then, the origin state of the first segment of the first trip that he has. 
+             * If that is not known, (no trips) then perhaps the state for the driver's terminal.*/
+
+            var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
+            var currentSegment = await _tripService.FindTripSegmentInfoAsync(currentDriver.TripNumber, currentDriver.TripSegNumber);
+
+            if (currentSegment != null)
+            {
+                string state;
+
+                if (currentDriver.Status == "E" || currentDriver.Status == "A")
+                    state = currentSegment.TripSegDestCustState;
+                else
+                    state = currentSegment.TripSegOrigCustState;
+            
+                if (currentCountryPreference == "CAN")
+                    SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesCanada,
+                        state);
+                else if (currentCountryPreference == "MEX")
+                    SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesMexico,
+                        state);
+                else
+                    SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesUSA,
+                        state);
+            }
+            else
+            {
+                var drvrTerminal = await _terminalService.FindTerminalMasterAsync(currentDriver.TerminalId);
+
+                if (drvrTerminal != null)
+                {
+                    if (currentCountryPreference == "CAN")
+                        SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesCanada,
+                            drvrTerminal.State);
+                    else if (currentCountryPreference == "MEX")
+                        SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesMexico,
+                            drvrTerminal.State);
+                    else
+                        SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesUSA,
+                           drvrTerminal.State);
+                }
+            }
+            
             base.Start();
         }
 

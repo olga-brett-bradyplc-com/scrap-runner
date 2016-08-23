@@ -18,6 +18,6 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
         Task<List<CustomerLocationModel>> FindCustomerLocations(string custHostCode);
         Task<CustomerMasterModel> FindCustomerMaster(string custHostCode);
         Task<List<CustomerDirectionsModel>> FindCustomerDirections(string custHostCode);
-        Task UpdateCustomerGpsCoordinates(string custHostCode, int lat, int lon);
+        Task<int> UpdateCustomerGpsCoordinates(string custHostCode, int lat, int lon);
     }
 }
