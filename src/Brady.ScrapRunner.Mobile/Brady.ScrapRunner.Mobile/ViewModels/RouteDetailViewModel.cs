@@ -363,6 +363,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                             currentSegment.TripSegEndLongitude = customer.CustLongitude;
 
                             await _tripService.UpdateGpsCustomerSegments(currentSegment);
+                            await SetDriverArrive();
                         }
                         else
                         {
@@ -406,6 +407,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                     currentSegment.TripSegEndLongitude = terminal.Longitude;
 
                                     await _tripService.UpdateGpsCustomerSegments(currentSegment);
+                                    await SetDriverArrive();
                                 }
                             }
                             else
@@ -437,6 +439,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         }
                         SetNextStageLabel(firstSegment);
                     }
+                    else
+                        await SetDriverArrive();
                 }
             }
         }
