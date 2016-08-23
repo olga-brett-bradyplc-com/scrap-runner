@@ -57,6 +57,7 @@
     <Compile Include="Interfaces\ILocationService.cs" />
     <Compile Include="Interfaces\IMessagesService.cs" />
     <Compile Include="Interfaces\INetworkAvailabilityService.cs" />
+    <Compile Include="Interfaces\INotificationService.cs" />
     <Compile Include="Interfaces\IScrapRunnerNotificationService.cs" />
     <Compile Include="Interfaces\IPollingService.cs" />
     <Compile Include="Interfaces\IPreferenceService.cs" />
