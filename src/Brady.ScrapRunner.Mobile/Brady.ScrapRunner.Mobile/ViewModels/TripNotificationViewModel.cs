@@ -14,13 +14,19 @@
     {
         private readonly ITripService _tripService;
         private readonly IDriverService _driverService;
+        private readonly INotificationService _notificationService;
         private string _tripNumber;
         private TripNotificationContext _notificationContext;
+        private int _notificationId;
 
-        public TripNotificationViewModel(ITripService tripService, IDriverService driverService)
+        public TripNotificationViewModel(
+            ITripService tripService, 
+            IDriverService driverService, 
+            INotificationService notificationService)
         {
             _tripService = tripService;
             _driverService = driverService;
+            _notificationService = notificationService;
         }
 
         private string _notificationMessage;
@@ -30,10 +36,11 @@
             set { SetProperty(ref _notificationMessage, value); }
         }
 
-        public void Init(string tripNumber, TripNotificationContext notificationContext)
+        public void Init(string tripNumber, TripNotificationContext notificationContext, int notificationId)
         {
             _tripNumber = tripNumber;
             _notificationContext = notificationContext;
+            _notificationId = notificationId;
         }
 
         public override async void Start()
@@ -124,6 +131,12 @@
                     Mvx.TaggedWarning(Constants.ScrapRunner, $"ProcessDriverTripAck failed {ackResult.Failure?.Summary}");
                 }
             }
+            Close();
+        }
+
+        private void Close()
+        {
+            _notificationService.Cancel(_notificationId);
             Close(this);
         }
     }
