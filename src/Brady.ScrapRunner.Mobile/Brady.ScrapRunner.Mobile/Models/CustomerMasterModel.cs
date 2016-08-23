@@ -37,6 +37,9 @@ namespace Brady.ScrapRunner.Mobile.Models
         [MaxLength(10)]
         public string CustZip { get; set; }
 
+        [MaxLength(3)]
+        public string CustCountry { get; set; }
+
         public int? CustLatitude { get; set; }
 
         public int? CustLongitude { get; set; }

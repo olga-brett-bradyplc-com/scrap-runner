@@ -26,12 +26,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         public override async void Start()
         {
+            base.Start();
+        }
+        public async void Init()
+        {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
             var messages = await _messagesService.FindMessagesAsync(CurrentDriver.EmployeeId);
             var messagegroupedby = messages.GroupBy(m => m.RemoteUserId).Select(grp => grp.First()).ToList();
-
             Messages = new ObservableCollection<MessagesModel>(messagegroupedby);
-            base.Start();
+
         }
 
         private ObservableCollection<MessagesModel> _messages;

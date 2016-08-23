@@ -14,16 +14,13 @@
     using Interfaces;
     using Messages;
     using Models;
-    using MvvmCross.Core.ViewModels;
-    using MvvmCross.Core.Views;
     using MvvmCross.Platform;
     using MvvmCross.Plugins.Messenger;
-    using ViewModels;
 
     public class PollingService : IPollingService
     {
         private readonly IConnectionService _connectionService;
-        private readonly INotificationService _notificationService;
+        private readonly IScrapRunnerNotificationService _scrapRunnerNotificationService;
         private readonly IMvxMessenger _mvxMessenger;
         private readonly IMessagesService _messagesService;
         private readonly ITerminalService _terminalService;
@@ -34,7 +31,7 @@
         private readonly ICustomerService _customerService;
 
         public PollingService(IConnectionService connectionService, 
-            INotificationService notificationService, 
+            IScrapRunnerNotificationService scrapRunnerNotificationService, 
             IMvxMessenger mvxMessenger, 
             IMessagesService messagesService, 
             ITerminalService terminalService, 
@@ -45,7 +42,7 @@
             ICustomerService customerService)
         {
             _connectionService = connectionService;
-            _notificationService = notificationService;
+            _scrapRunnerNotificationService = scrapRunnerNotificationService;
             _mvxMessenger = mvxMessenger;
             _messagesService = messagesService;
             _terminalService = terminalService;
@@ -117,8 +114,7 @@
                         await _tripService.UpdateTripAsync(trip);
                     var tripContext = isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified;
                     Mvx.TaggedTrace(Constants.ScrapRunner, $"Found {tripContext} Trip {trip.TripNumber}");
-                    ShowTripNotificationActivity(trip.TripNumber, tripContext);
-                    await _notificationService.TripAsync(trip, tripContext);
+                    await _scrapRunnerNotificationService.TripAsync(trip, tripContext);
                     _mvxMessenger.Publish(new TripNotificationMessage(this)
                     {
                         Context = tripContext,
@@ -138,10 +134,6 @@
                 await _customerService.UpdateCustomerLocation(tripInfoProcessChangeSet.Item.CustomerLocations);
             if (tripInfoProcessChangeSet.Item?.CustomerMasters?.Count > 0)
                 await _customerService.UpdateCustomerMaster(tripInfoProcessChangeSet.Item.CustomerMasters);
-
-            if (tripInfoProcessChangeSet.Item?.Trips?.Count > 0)
-            {
-            }
         }
 
         private Task<QueryResult<Trip>> GetTripsCanceledAsync(string driverId)
@@ -166,7 +158,7 @@
             {
                 Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {trip.TripNumber} was canceled by dispatch");
                 await _tripService.UpdateTripAsync(trip);
-                await _notificationService.TripAsync(trip, TripNotificationContext.Canceled);
+                await _scrapRunnerNotificationService.TripAsync(trip, TripNotificationContext.Canceled);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
                 {
                     Context = TripNotificationContext.Canceled,
@@ -209,7 +201,7 @@
             {
                 Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {trip.TripNumber} was unassigned by dispatch");
                 await _tripService.UpdateTripAsync(trip);
-                await _notificationService.TripAsync(trip, TripNotificationContext.Unassigned);
+                await _scrapRunnerNotificationService.TripAsync(trip, TripNotificationContext.Unassigned);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
                 {
                     Context = TripNotificationContext.Unassigned,
@@ -238,7 +230,7 @@
             {
                 Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {trip.TripNumber} marked done by dispatch");
                 await _tripService.UpdateTripAsync(trip);
-                await _notificationService.TripAsync(trip, TripNotificationContext.MarkedDone);
+                await _scrapRunnerNotificationService.TripAsync(trip, TripNotificationContext.MarkedDone);
                 _mvxMessenger.Publish(new TripNotificationMessage(this)
                 {
                     Context = TripNotificationContext.MarkedDone,
@@ -281,7 +273,7 @@
                 Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {mappedTrips[i].TripNumber} resequenced {resequencedTrips.Records[i].TripSendReseqFlag}");
                 await _tripService.UpdateTripAsync(mappedTrips[i]);
                 if (resequencedTrips.Records[i].TripSendReseqFlag != TripSendReseqFlagValue.ManualReseq) continue;
-                await _notificationService.TripsResequencedAsync();
+                await _scrapRunnerNotificationService.TripsResequencedAsync();
                 _mvxMessenger.Publish(new TripResequencedMessage(this));
             }
         }
@@ -491,35 +483,9 @@
             {
                 Mvx.TaggedTrace(Constants.ScrapRunner, $"New Message {message.MsgId} sent by {message.SenderName}");
                 await _messagesService.UpsertMessageAsync(message);
-                await _notificationService.MessageAsync(message);
-                ShowMessageNotificationActivity(message.MsgId.Value);
+                await _scrapRunnerNotificationService.MessageAsync(message);
                 _mvxMessenger.Publish(new NewMessagesMessage(this) { Message = message });
             }
-        }
-
-        private void ShowViewModel<TViewModel>(IDictionary<string, string> parameterValues) where TViewModel : BaseViewModel
-        {
-            var request = MvxViewModelRequest<TViewModel>.GetDefaultRequest();
-            request.ParameterValues = parameterValues;
-            var viewDispatcher = Mvx.Resolve<IMvxViewDispatcher>();
-            viewDispatcher.ShowViewModel(request);
-        }
-
-        private void ShowTripNotificationActivity(string tripNumber, TripNotificationContext context)
-        {
-            ShowViewModel<TripNotificationViewModel>(new Dictionary<string, string>
-            {
-               { "tripNumber", tripNumber },
-               { "notificationContext", context.ToString() }
-            });
-        }
-
-        private void ShowMessageNotificationActivity(int messageId)
-        {
-            ShowViewModel<MessageNotificationViewModel>(new Dictionary<string, string>
-            {
-                {"messageId", messageId.ToString()}
-            });
         }
     }
 }
