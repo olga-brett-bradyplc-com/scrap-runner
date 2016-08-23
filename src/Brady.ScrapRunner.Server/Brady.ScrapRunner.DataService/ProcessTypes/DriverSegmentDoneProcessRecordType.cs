@@ -811,6 +811,76 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             ////////////////////////////////////////////////
             //Start Updating...
             ////////////////////////////////////////////////
+
+            ////////////////////////////////////////////////
+            //Exception Delay Processing begins here
+            // Check for any delays for the segment that have been flagged as exceptions 
+            //(Y in CodeDisp4 field of the DELAYCODE code table entry). 
+            ////////////////////////////////////////////////
+            //Only applies to segments that are not RT or RN types.
+            if (currentTripSegment.TripSegType != BasicTripTypeConstants.ReturnYard &&
+                currentTripSegment.TripSegType != BasicTripTypeConstants.ReturnYardNC)
+            {
+                // Preferences:  Lookup the yard preference "DEFMarkDelayException".  
+                string prefDefMarkDelayException = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                       currentTrip.TripTerminalId, PrefYardConstants.DEFMarkDelayException, out fault);
+                if (null != fault)
+                {
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                    return false;
+                }
+                //DEFMarkExceptionDelay Preference must be set to Y
+                if (prefDefMarkDelayException == Constants.Yes)
+                {
+                    //Get a list of codes from the DELAYCODE code table that are flagged as exception delays.
+                    var exceptionDelayCodes = Common.GetDelayExceptionCodes(dataService, settings, userCulture,
+                                              userRoleIds, out fault);
+                    if (null != fault)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        return false;
+                    }
+                    //At least one delay code that was flagged an an exception type delay has to be found in the code table
+                    if (exceptionDelayCodes != null && exceptionDelayCodes.Count() > 0)
+                    {
+                        //Look in the list of delays from the trip for the current segment to see 
+                        //if any are of the type of delays that are flagged as exception delays
+                        var exceptionTripDelay = from delay in tripDelayList
+                                                 where delay.TripSegNumber == currentTripSegment.TripSegNumber &&
+                                                 exceptionDelayCodes.Contains(delay.DelayCode)
+                                                 select delay;
+
+                        //If any delay was an exception type, change the status of the segment to E=Exception
+                        if (exceptionTripDelay != null && exceptionTripDelay.Count() > 0)
+                        {
+                            // Each container is flagged with review flag of E and review reason of ED#-EXCEPTION DELAY
+                            foreach (var tripSegmentContainer in tripSegContainerList)
+                            {
+                                tripSegmentContainer.TripSegContainerReviewFlag = ContainerActionTypeConstants.Exception;
+                                tripSegmentContainer.TripSegContainerReviewReason = Constants.ExceptionDelayCode + "=" +
+                                                                                    Constants.ExceptionDelayDesc;
+                                //Do the update
+                                changeSetResult = Common.UpdateTripSegmentContainer(dataService, settings, tripSegmentContainer);
+                                log.DebugFormat("SRTEST:Saving TripSegmentContainer for ContainerNumber:{0} - Segment Done.",
+                                                tripSegmentContainer.TripSegContainerNumber);
+                                if (Common.LogChangeSetFailure(changeSetResult, tripSegmentContainer, log))
+                                {
+                                    var s = string.Format("Could not update TripSegmentContainer for ContainerNumber:{0}.",
+                                                tripSegmentContainer.TripSegContainerNumber);
+                                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                    return false;
+                                }
+                            }
+                            // The segment status is set to E=Excepton. 
+                            currentTripSegment.TripSegStatus = TripSegStatusConstants.Exception;
+                            currentTripSegment.TripSegComments = Constants.ExceptionDelayCode + "=" +
+                                                                 Constants.ExceptionDelayDesc;
+                        }//if (exceptionTripDelay != null && exceptionTripDelay.Count() > 0)
+                    }//if (exceptionDelayCodes != null && exceptionDelayCodes.Count() > 0)
+                }//if (prefDefMarkExceptionDelay == Constants.Yes)
+            }//if (currentTripSegment.TripSegType != BasicTripTypeConstants.ReturnYard &&
+
+            ////////////////////////////////////////////////
             //Update the current TripSegment record.
             currentTripSegment.TripSegPowerId = driverSegmentDoneProcess.PowerId;
             currentTripSegment.TripSegPowerAssetNumber = powerMaster.PowerAssetNumber;
@@ -874,6 +944,38 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                 }
             }
+            //TODO: Check if the trip should be placed in the Error Queue
+            //If so,  set the Trip.TripStatus to TS_ERRQ (Q)
+            //Set the Trip.TripErrorDesc to EXCESS TIME, EXCESS MILEAGE, INSUFFICIENT TIME, INSUFFICIENT MILEAGE
+            ////////////////////////////////////////////////
+            // Preferences:  Lookup the yard preference "DEFUseErrorQ".  
+            string DEFUseErrorQ = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                   currentTrip.TripTerminalId, PrefYardConstants.DEFUseErrorQ, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            // If preference DEFUseErrorQ set to Y then use the error queue.
+            if (DEFUseErrorQ == Constants.Yes)
+            {
+                string reasonInErrorQueue;
+                string reasonInErrorQueueDetails;
+
+                if (Common.CheckForErrorQueue(dataService,settings,userCulture, userRoleIds, 
+                                  currentTrip,currentTripSegment,tripDelayList, 
+                                  out reasonInErrorQueue, out reasonInErrorQueueDetails, out fault))
+                {
+                    currentTripSegment.TripSegErrorDesc = reasonInErrorQueueDetails;
+                    if (currentTripSegment.TripSegErrorDesc.Length > MaxLengthConstants.LENTripSegErrorDesc)
+                        currentTripSegment.TripSegErrorDesc = currentTripSegment.TripSegErrorDesc.Substring(0, MaxLengthConstants.LENTripSegErrorDesc);
+                    currentTripSegment.TripSegStatus = TripSegStatusConstants.ErrorQueue;
+
+                    currentTrip.TripErrorDesc = reasonInErrorQueue;
+                    if (currentTrip.TripErrorDesc.Length > MaxLengthConstants.LENTripErrorDesc)
+                        currentTrip.TripErrorDesc = currentTrip.TripErrorDesc.Substring(0, MaxLengthConstants.LENTripErrorDesc);
+                  }
+                }
 
             //Lookup the TripSegStatus Description in the CodeTable TRIPSEGSTATUS 
             var codeTableTripSegStatus = Common.GetCodeTableEntry(dataService, settings, userCulture, userRoleIds,
@@ -956,7 +1058,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                 }
             }
-
             //Do the TripSegment table update
             changeSetResult = Common.UpdateTripSegment(dataService, settings, currentTripSegment);
             log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Segment Done.",
@@ -1746,17 +1847,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             int tripHistoryInsertCount = 0;
 
             ////////////////////////////////////////////////
-            //TODO: Check for exception type delays
-            //If any delay was an exception type, change the status of the segment to E=Exception
-            //var driverDelays = Common.GetDriverDelaysException(dataService, settings, userCulture, userRoleIds,
-            //                                driverSegmentDoneProcess.EmployeeId, out fault);
-            if (null != fault)
-            {
-                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
-                return false;
-            }
-
-            ////////////////////////////////////////////////
             //Update TripTable
 
             //////////////////////////////////////////////////////
@@ -1987,20 +2077,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 }//end of if (currentTrip.TripCommodityScaleMsg == Constants.Yes)
             }//end of if (preDEFTHScale == Constants.Yes)
 
-
-            //TODO: Check if the trip should be placed in the Error Queue
-            //If so,  set the Trip.TripStatus to TS_ERRQ (Q)
-            //Set the Trip.TripErrorDesc to EXCESS TIME, EXCESS MILEAGE, INSUFFICIENT TIME, INSUFFICIENT MILEAGE
-
-
             ////////////////////////////////////////////////
             //Update ContainerMaster for each container in the TripSegmentContainer records,
             //remove the current trip information.      
 
             // From the list of containers used on the trip, pull out a list of distinct container numbers. 
             var distinctTripContainerList = (from item in tripContainerList
-                                 where item.TripSegContainerNumber != null
-                                 select item.TripSegContainerNumber).Distinct().ToList();
+                                where item.TripSegContainerNumber != null
+                                select item.TripSegContainerNumber).Distinct().ToList();
             if (distinctTripContainerList != null && distinctTripContainerList.Count > 0)
             {
                 // Get the Container records from the ContainerMaster

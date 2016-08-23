@@ -30,6 +30,183 @@ namespace Brady.ScrapRunner.DataService.Util
         }
 
         /// <summary>
+        /// Determines if a trip should be placed in the error queue and specifies why
+        /// </summary>
+        /// <param name="currentTrip"></param>
+        /// <param name="currentTripSegment"></param>
+        /// <param name="tripDelayList"></param>
+        /// <out param name="reasonInErrorQueue"></param>
+        /// <out param name="reasonInErrorQueueDetails"></param>
+        /// <returns>true if trip should be placed in error queue </returns>
+        public static bool CheckForErrorQueue(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, Trip currentTrip, TripSegment currentTripSegment,
+              List <DriverDelay> tripDelayList, out string reasonInErrorQueue, out string reasonInErrorQueueDetails, out DataServiceFault fault)
+        {
+            fault = null;
+            reasonInErrorQueue = "";
+            reasonInErrorQueueDetails = "";
+
+            // If preference DEFAdjustTimeByDelayErrorQ  = Y, Adjust time by delays for Error Queue.
+            string DEFAdjustTimeByDelayErrorQ = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                   currentTrip.TripTerminalId, PrefYardConstants.DEFAdjustTimeByDelayErrorQ, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            // DEFPercentExcTime = Percentage preference for excessive time
+            string DEFPercentExcTime = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                   currentTrip.TripTerminalId, PrefYardConstants.DEFPercentExcTime, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            // DEFPercentExcMileage = Percentage preference for excessive mileage
+            string DEFPercentExcMileage = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                   currentTrip.TripTerminalId, PrefYardConstants.DEFPercentExcMileage, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            // DEFPercentInsTime = Percentage preference for insufficient time
+            string DEFPercentInsTime = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                   currentTrip.TripTerminalId, PrefYardConstants.DEFPercentInsTime, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+            // DEFPercentInsMileage = Percentage preference for insufficient mileage
+            string DEFPercentInsMileage = Common.GetPreferenceByParameter(dataService, settings, userCulture, userRoleIds,
+                                   currentTrip.TripTerminalId, PrefYardConstants.DEFPercentInsMileage, out fault);
+            if (null != fault)
+            {
+                return false;
+            }
+
+            //Check if the trip should be placed in the Error Queue
+            bool placeinErrorQueue = false;
+            bool excessiveTime = false;
+            bool excessiveDistance = false;
+
+            //Check if the delay minutes should be used in the calculation
+            int? tripSegmentDelayMin = 0;
+            if (DEFAdjustTimeByDelayErrorQ == Constants.Yes)
+            {
+                //Calculate delay minutes for segment
+                tripSegmentDelayMin = (from item in tripDelayList
+                                       select (int)(item.DelayEndDateTime.Value.Subtract
+                                       (item.DelayStartDateTime.Value).TotalMinutes)).Sum();
+            }
+
+            //Calculate actual segment minutes
+            int? tripActualSegmentMin = currentTripSegment.TripSegActualStopMinutes
+                                + currentTripSegment.TripSegActualDriveMinutes
+                                - tripSegmentDelayMin;
+            //Calculate standard segment minutes
+            int? tripStandardSegmentMin = currentTripSegment.TripSegStandardDriveMinutes
+                                + currentTripSegment.TripSegStandardStopMinutes;
+            //Calculate actual segment mileage
+            int? tripActualSegmentMileage = currentTripSegment.TripSegOdometerEnd -
+                               +currentTripSegment.TripSegOdometerStart;
+            //Calculate standard segment mileage
+            float? tripStandardSegmentMileage = (float)(currentTripSegment.TripSegStandardMiles / 100.0);
+
+            //Actual segment minutes must be >= 0 and standard segment minutes must be > 0
+            if (tripActualSegmentMin >= 0 && tripStandardSegmentMin > 0)
+            {
+                //Calculate excessive minutes
+                float? excessiveMin = (float)((100.0 + float.Parse(DEFPercentExcTime)) / 100.0 * tripStandardSegmentMin);
+                //Check for excessive segment time
+                if (tripActualSegmentMin > excessiveMin)
+                {
+                    placeinErrorQueue = true;
+                    excessiveTime = true;
+                    reasonInErrorQueue = "EXCESSIVE TIME";
+                    reasonInErrorQueueDetails = "SEG " + currentTripSegment.TripSegNumber + " "
+                                       + tripActualSegmentMin.ToString() + " MIN vs "
+                                       + tripStandardSegmentMin.ToString() + " STD";
+                }
+            }
+            //Actual segment mileage must be >= 0 and standard segment mileage must be > 0
+            if (tripActualSegmentMileage >= 0 && tripStandardSegmentMileage > 0)
+            {
+                //Calculate excessive mileage
+                float? excessiveMileage = (float)((100.0 + float.Parse(DEFPercentExcMileage)) / 100.0 * tripStandardSegmentMileage);
+                //Check for excessive segment mileage
+                if (tripActualSegmentMileage > excessiveMileage)
+                {
+                    placeinErrorQueue = true;
+                    excessiveDistance = true;
+                    if (reasonInErrorQueue != "")
+                    {
+                        reasonInErrorQueue += "/";
+                    }
+                    reasonInErrorQueue += "EXCESSIVE DISTANCE";
+                    if (reasonInErrorQueueDetails != "")
+                    {
+                        reasonInErrorQueueDetails += "|";
+                    }
+                    reasonInErrorQueueDetails += "SEG " + currentTripSegment.TripSegNumber + " "
+                                       + tripActualSegmentMileage.ToString() + " MILES vs "
+                                       + tripStandardSegmentMileage.ToString() + " STD";
+                }
+            }
+
+            if (!excessiveTime)
+            {
+                //Actual segment minutes must be >= 0 and standard segment minutes must be > 0
+                if (tripActualSegmentMin >= 0 && tripStandardSegmentMin > 0)
+                {
+                    //Calculate insufficient minutes
+                    float? insufficientMin = (float)((100.0 - float.Parse(DEFPercentInsTime)) / 100.0 * tripStandardSegmentMin);
+                    //Check for insufficient segment time
+                    if (tripActualSegmentMin < insufficientMin)
+                    {
+                        placeinErrorQueue = true;
+                        if (reasonInErrorQueue != "")
+                        {
+                            reasonInErrorQueue += "/";
+                        }
+                        reasonInErrorQueue = "INSUFFICIENT TIME";
+                        if (reasonInErrorQueueDetails != "")
+                        {
+                            reasonInErrorQueueDetails += "|";
+                        }
+                        reasonInErrorQueueDetails += "SEG " + currentTripSegment.TripSegNumber + " "
+                                           + tripActualSegmentMin.ToString() + " MIN vs "
+                                           + tripStandardSegmentMin.ToString() + " STD";
+                    }
+                }
+            }
+            if (!excessiveDistance)
+            {
+                //Actual segment mileage must be >= 0 and standard segment mileage must be > 0
+                if (tripActualSegmentMileage >= 0 && tripStandardSegmentMileage > 0)
+                {
+                    //Calculate insufficient mileage
+                    float? insufficientMileage = (float)((100.0 - float.Parse(DEFPercentInsMileage)) / 100.0 * tripStandardSegmentMileage);
+                    //Check for insufficient segment mileage
+                    if (tripActualSegmentMileage < insufficientMileage)
+                    {
+                        placeinErrorQueue = true;
+                        if (reasonInErrorQueue != "")
+                        {
+                            reasonInErrorQueue += "/";
+                        }
+                        reasonInErrorQueue += "INSUFFICIENT DISTANCE";
+                        if (reasonInErrorQueueDetails != "")
+                        {
+                            reasonInErrorQueueDetails += "|";
+                        }
+                        reasonInErrorQueueDetails += "SEG " + currentTripSegment.TripSegNumber + " "
+                                           + tripActualSegmentMileage.ToString() + " MILES vs "
+                                           + tripStandardSegmentMileage.ToString() + " STD";
+                    }
+                }
+            }
+            return placeinErrorQueue;
+        }
+
+        /// <summary>
         /// Return driver's cumulative time in minutes.
         /// </summary>
         /// <param name="tripSegList"></param>
@@ -2342,7 +2519,42 @@ namespace Brady.ScrapRunner.DataService.Util
             containerTypeSizes = queryResult.Records.Cast<CodeTable>().ToList();
             return containerTypeSizes;
         }
-        
+        /// <summary>
+        /// Get a list of delay codes that are flagged as exception delays
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static List<string> GetDelayExceptionCodes(IDataService dataService, ProcessChangeSetSettings settings,
+            string userCulture, IEnumerable<long> userRoleIds, out DataServiceFault fault)
+        {
+            fault = null;
+            var exceptiondelays = new List<CodeTable>();
+            var exceptiondelaycodes = new List<string>();
+            Query query = new Query
+            {
+                CurrentQuery = new QueryBuilder<CodeTable>()
+                    .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.DelayCodes)
+                    .And(x => x.CodeDisp4).EqualTo(Constants.Yes))
+                    .OrderBy(x => x.CodeValue)
+                    .GetQuery()
+            };
+            var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+            if (null != fault)
+            {
+                return exceptiondelaycodes;
+            }
+            exceptiondelays = queryResult.Records.Cast<CodeTable>().ToList();
+            foreach (var item in exceptiondelays)
+            {
+                exceptiondelaycodes.Add(item.CodeValue);
+            }
+            return exceptiondelaycodes;
+        }
+
         /// CODETABLE Table queries
         /// <summary>
         /// Get a list of all STATES... codetable values for a country.
