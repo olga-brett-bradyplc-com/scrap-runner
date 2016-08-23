@@ -91,7 +91,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
             Mvx.RegisterType<IMvxLanguageBindingParser, CustomLanguageBindingParser>();
             Mvx.LazyConstructAndRegisterSingleton<INetworkAvailabilityService>(() => new AndroidNetworkAvailabilityService());
             Mvx.LazyConstructAndRegisterSingleton<IBackgroundScheduler>(() => new AndroidBackgroundScheduler());
-            Mvx.LazyConstructAndRegisterSingleton<INotificationService>(() => new AndroidNotificationService());
+            Mvx.LazyConstructAndRegisterSingleton<IScrapRunnerNotificationService>(() => new AndroidScrapRunnerNotificationService());
         }
     }
 }

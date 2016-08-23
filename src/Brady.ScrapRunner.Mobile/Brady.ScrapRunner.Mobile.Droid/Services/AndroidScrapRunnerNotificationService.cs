@@ -15,7 +15,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
     using Resources;
     using ViewModels;
 
-    public class AndroidNotificationService : INotificationService
+    public class AndroidScrapRunnerNotificationService : IScrapRunnerNotificationService
     {
         public const int NewTripNotificationId = 1;
         public const int ModifiedTripNotificationId = 2;
@@ -34,7 +34,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
 
         private readonly IRepository<NotificationModel> _notificationModelRepository;
 
-        public AndroidNotificationService()
+        public AndroidScrapRunnerNotificationService()
         {
             _notificationModelRepository = Mvx.Resolve<IRepository<NotificationModel>>();
         }

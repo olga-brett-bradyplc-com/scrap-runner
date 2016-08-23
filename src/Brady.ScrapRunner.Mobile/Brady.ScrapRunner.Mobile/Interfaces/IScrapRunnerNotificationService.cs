@@ -3,7 +3,7 @@
     using System.Threading.Tasks;
     using Models;
 
-    public interface INotificationService
+    public interface IScrapRunnerNotificationService
     {
         Task TripAsync(TripModel trip, TripNotificationContext context);
         Task TripsResequencedAsync();
