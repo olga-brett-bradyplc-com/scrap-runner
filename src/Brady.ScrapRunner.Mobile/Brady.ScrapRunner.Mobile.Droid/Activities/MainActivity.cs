@@ -40,9 +40,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
 
             SetContentView(Resource.Layout.activity_main);
             DrawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
-
-            if (bundle == null)
-                ViewModel.ShowMenu();
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -84,19 +81,16 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
                 DrawerLayout.CloseDrawers();
 
             // Assume if previous = SignIn, and current = Settings, they haven't actually logged in yet
-            else if (_previousFragmentType == typeof(SignInViewModel) && _currentFragmentType != typeof(SettingsViewModel))
-            {
-                var viewmodel = FindViewModelOnBackStack(MenuViewModelKey);
-                var command = viewmodel?.ViewModel as MenuViewModel;
-                var executeAsync = command?.LogoutCommand.ExecuteAsync();
-                if (executeAsync != null) await executeAsync;
-            }
-            else if (_currentFragmentType == typeof(DelayViewModel))
+            if (_currentFragmentType == typeof(DelayViewModel))
             {
                 var viewmodel = FindViewModelOnBackStack(DelayViewModelKey);
                 var command = viewmodel?.ViewModel as DelayViewModel;
                 var executeAsync = command?.BackOnDutyCommand.ExecuteAsync();
                 if (executeAsync != null) await executeAsync;
+            }
+            else if (_previousFragmentType == null)
+            {
+                MoveTaskToBack(true);
             }
             else
             {

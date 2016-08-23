@@ -21,7 +21,7 @@ using MvvmCross.Plugins.Messenger;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 {
-    [MvxFragment(typeof(MainViewModel), Resource.Id.navigation_frame)]
+    [MvxFragment(typeof(MainViewModel), Resource.Id.navigation_frame, true)]
     [Register("brady.scraprunner.mobile.droid.fragments.MenuFragment")]
     public class MenuFragment : MvxFragment<MenuViewModel>, NavigationView.IOnNavigationItemSelectedListener
     {
@@ -43,7 +43,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             _mvxSubscriptionToken = _mvxMessenger.Subscribe<ForceLogoffMessage>(OnForcedLogoffMessage);
             _mvxMenuStateToken = _mvxMessenger.Subscribe<MenuStateMessage>(OnMenuStateChanged);
-            _mvxDriverInfoToken = _mvxMessenger.Subscribe<DriverInfoMessage>(OnDriverInfoChanged);
+            //_mvxDriverInfoToken = _mvxMessenger.Subscribe<DriverInfoMessage>(OnDriverInfoChanged);
 
             return view;
         }
