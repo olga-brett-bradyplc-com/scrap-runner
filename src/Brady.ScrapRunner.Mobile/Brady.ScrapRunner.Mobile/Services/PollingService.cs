@@ -14,11 +14,8 @@
     using Interfaces;
     using Messages;
     using Models;
-    using MvvmCross.Core.ViewModels;
-    using MvvmCross.Core.Views;
     using MvvmCross.Platform;
     using MvvmCross.Plugins.Messenger;
-    using ViewModels;
 
     public class PollingService : IPollingService
     {
@@ -117,7 +114,6 @@
                         await _tripService.UpdateTripAsync(trip);
                     var tripContext = isNewTrip ? TripNotificationContext.New : TripNotificationContext.Modified;
                     Mvx.TaggedTrace(Constants.ScrapRunner, $"Found {tripContext} Trip {trip.TripNumber}");
-                    ShowTripNotificationActivity(trip.TripNumber, tripContext);
                     await _scrapRunnerNotificationService.TripAsync(trip, tripContext);
                     _mvxMessenger.Publish(new TripNotificationMessage(this)
                     {
@@ -488,34 +484,8 @@
                 Mvx.TaggedTrace(Constants.ScrapRunner, $"New Message {message.MsgId} sent by {message.SenderName}");
                 await _messagesService.UpsertMessageAsync(message);
                 await _scrapRunnerNotificationService.MessageAsync(message);
-                ShowMessageNotificationActivity(message.MsgId.Value);
                 _mvxMessenger.Publish(new NewMessagesMessage(this) { Message = message });
             }
-        }
-
-        private void ShowViewModel<TViewModel>(IDictionary<string, string> parameterValues) where TViewModel : BaseViewModel
-        {
-            var request = MvxViewModelRequest<TViewModel>.GetDefaultRequest();
-            request.ParameterValues = parameterValues;
-            var viewDispatcher = Mvx.Resolve<IMvxViewDispatcher>();
-            viewDispatcher.ShowViewModel(request);
-        }
-
-        private void ShowTripNotificationActivity(string tripNumber, TripNotificationContext context)
-        {
-            ShowViewModel<TripNotificationViewModel>(new Dictionary<string, string>
-            {
-               { "tripNumber", tripNumber },
-               { "notificationContext", context.ToString() }
-            });
-        }
-
-        private void ShowMessageNotificationActivity(int messageId)
-        {
-            ShowViewModel<MessageNotificationViewModel>(new Dictionary<string, string>
-            {
-                {"messageId", messageId.ToString()}
-            });
         }
     }
 }

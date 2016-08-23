@@ -94,7 +94,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
             Mvx.LazyConstructAndRegisterSingleton<INetworkAvailabilityService>(() => new AndroidNetworkAvailabilityService());
             Mvx.LazyConstructAndRegisterSingleton<IBackgroundScheduler>(() => new AndroidBackgroundScheduler());
             Mvx.LazyConstructAndRegisterSingleton<INotificationService>(() => new AndroidNotificationService());
-            Mvx.LazyConstructAndRegisterSingleton<IScrapRunnerNotificationService>(() => new AndroidScrapRunnerNotificationService());
+            Mvx.LazyConstructAndRegisterSingleton<IScrapRunnerNotificationService, AndroidScrapRunnerNotificationService>();
         }
     }
 }

@@ -2,8 +2,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
 {
     using System.Threading;
     using Android.App;
-    using Android.Content;
     using Android.Media;
+    using Android.OS;
     using Android.Support.V4.App;
     using Interfaces;
     using MvvmCross.Platform;
@@ -24,8 +24,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
 
         public void Notify(INotification notification)
         {
-            GetNotificationManager()
-                .Notify((int)notification.Id, BuildNativeNotification((AndroidNotification)notification));
+            new Handler(Looper.MainLooper).Post(() =>
+            {
+                GetNotificationManager()
+                    .Notify((int)notification.Id, BuildNativeNotification((AndroidNotification)notification));
+            });
         }
 
         public void Cancel(object notificationId)
@@ -63,9 +66,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
     {
         private readonly NotificationCompat.Builder _builder;
 
-        public AndroidNotification(Context context)
+        public AndroidNotification()
         {
-            _builder = new NotificationCompat.Builder(context)
+            _builder = new NotificationCompat.Builder(Application.Context)
                 .SetDefaults(NotificationCompat.DefaultAll)
                 .SetColor(Resource.Color.colorPrimary)
                 .SetAutoCancel(true)
