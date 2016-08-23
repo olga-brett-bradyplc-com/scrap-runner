@@ -138,10 +138,6 @@
                 await _customerService.UpdateCustomerLocation(tripInfoProcessChangeSet.Item.CustomerLocations);
             if (tripInfoProcessChangeSet.Item?.CustomerMasters?.Count > 0)
                 await _customerService.UpdateCustomerMaster(tripInfoProcessChangeSet.Item.CustomerMasters);
-
-            if (tripInfoProcessChangeSet.Item?.Trips?.Count > 0)
-            {
-            }
         }
 
         private Task<QueryResult<Trip>> GetTripsCanceledAsync(string driverId)
