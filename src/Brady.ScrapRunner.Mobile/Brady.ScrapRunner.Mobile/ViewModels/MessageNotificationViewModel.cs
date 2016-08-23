@@ -16,12 +16,18 @@
     {
         private readonly IMessagesService _messagesService;
         private readonly IConnectionService _connectionService;
+        private readonly INotificationService _notificationService;
         private int _messageId;
+        private int _notificationId;
 
-        public MessageNotificationViewModel(IMessagesService messagesService, IConnectionService connectionService)
+        public MessageNotificationViewModel(
+            IMessagesService messagesService, 
+            IConnectionService connectionService, 
+            INotificationService notificationService)
         {
             _messagesService = messagesService;
             _connectionService = connectionService;
+            _notificationService = notificationService;
         }
 
         private string _notificationMessage;
@@ -38,9 +44,10 @@
             set { SetProperty(ref _messageText, value); }
         }
 
-        public void Init(int messageId)
+        public void Init(int messageId, int notificationId)
         {
             _messageId = messageId;
+            _notificationId = notificationId;
         }
 
         public override async void Start()
@@ -101,6 +108,12 @@
         private async Task ExecuteAckCommandAsync()
         {
             await AckMessageAsync();
+            Close();
+        }
+
+        private void Close()
+        {
+            _notificationService.Cancel(_notificationId);
             Close(this);
         }
     }
