@@ -46,7 +46,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Title = AppResources.FuelEntry;
         }
 
-        public override async void Start()
+        private async Task StartAsync()
         {
             var currentCountryPreference = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCountry);
 
@@ -57,36 +57,34 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     : currentCountryPreference == "MEX"
                         ? CodeTableNameConstants.StatesMexico
                         : CodeTableNameConstants.StatesUSA;
-            
+
             var states = await _codeTableService.FindCountryStatesAsync(currentStateList);
             StatesList = new ObservableCollection<CodeTableModel>(states);
 
             /* default selected state to:  the destination state of the last segment of his last trip. 
              * If that is not possible (first trip of day) then, the origin state of the first segment of the first trip that he has. 
              * If that is not known, (no trips) then perhaps the state for the driver's terminal.*/
-
             var currentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
             var currentSegment = await _tripService.FindTripSegmentInfoAsync(currentDriver.TripNumber, currentDriver.TripSegNumber);
 
+            string state = string.Empty, codename = string.Empty;
+
             if (currentSegment != null)
             {
-                string state;
-
-                if (currentDriver.Status == "E" || currentDriver.Status == "A")
+                if (currentDriver.Status == DriverStatusSRConstants.Enroute)
+                    state = currentSegment.TripSegOrigCustState;
+                else if (currentDriver.Status == DriverStatusSRConstants.Arrive || currentDriver.Status == DriverStatusSRConstants.Done)
                     state = currentSegment.TripSegDestCustState;
                 else
                     state = currentSegment.TripSegOrigCustState;
-            
+
                 if (currentCountryPreference == "CAN")
-                    SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesCanada,
-                        state);
+                    codename = CodeTableNameConstants.StatesCanada;
                 else if (currentCountryPreference == "MEX")
-                    SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesMexico,
-                        state);
+                    codename = CodeTableNameConstants.StatesMexico;
                 else
-                    SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesUSA,
-                        state);
+                    codename = CodeTableNameConstants.StatesUSA;
             }
             else
             {
@@ -94,18 +92,31 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (drvrTerminal != null)
                 {
+                    state = drvrTerminal.State;
+
                     if (currentCountryPreference == "CAN")
-                        SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesCanada,
-                            drvrTerminal.State);
+                        codename = CodeTableNameConstants.StatesCanada;
                     else if (currentCountryPreference == "MEX")
-                        SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesMexico,
-                            drvrTerminal.State);
+                        codename = CodeTableNameConstants.StatesMexico;
                     else
-                        SelectedState = await _codeTableService.FindCodeTableObject(CodeTableNameConstants.StatesUSA,
-                           drvrTerminal.State);
+                        codename = CodeTableNameConstants.StatesUSA;
                 }
             }
-            
+
+            if(codename != string.Empty && state != string.Empty)
+                SelectedState = StatesList.Single(s=>s.CodeName == codename && s.CodeValue == state);
+        }
+        public override async void Start()
+        {
+            try
+            {
+                await StartAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
             base.Start();
         }
 

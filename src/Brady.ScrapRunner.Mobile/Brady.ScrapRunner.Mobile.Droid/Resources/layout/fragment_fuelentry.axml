@@ -43,7 +43,7 @@
             android:id="@+id/MvxStateSpinner"
             local:MvxItemTemplate="@layout/item_codetable"
             local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
-            local:MvxBind="ItemsSource StatesList;SelectedItem SelectedState" 
+            local:MvxBind="ItemsSource StatesList;SelectedItem SelectedState, Mode=TwoWay" 
             android:layout_marginTop="15dp"/>
         <Button
             local:MvxBind="Click SaveFuelEntryCommand"
