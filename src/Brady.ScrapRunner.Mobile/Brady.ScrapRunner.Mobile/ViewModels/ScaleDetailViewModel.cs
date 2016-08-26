@@ -19,12 +19,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ITripService _tripService;
         private readonly IDriverService _driverService;
         private readonly ICodeTableService _codeTableService;
+        private readonly IPreferenceService _preferenceService;
 
-        public ScaleDetailViewModel(ITripService tripService, IDriverService driverService, ICodeTableService codeTableService)
+        private static readonly int tarePressed = 2;
+        private static readonly int secondGrossPressed = 1;
+        private static readonly int grossPressed = 0;
+
+        public ScaleDetailViewModel(ITripService tripService, IDriverService driverService, ICodeTableService codeTableService,
+            IPreferenceService preferenceService)
         {
             _tripService = tripService;
             _driverService = driverService;
             _codeTableService = codeTableService;
+            _preferenceService = preferenceService;
 
             ContainerSetDownCommand = new MvxAsyncCommand(ExecuteContainerSetDownCommandAsync);
             ContainerLeftOnTruckCommand = new MvxAsyncCommand(ExecuteContainerLeftOnTruckCommandAsync);
@@ -134,8 +141,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public IMvxCommand GrossWeightSetCommand
             => _grossWeightSetCommand ?? (_grossWeightSetCommand = new MvxCommand(ExecuteGrossWeightSetCommand));
         
-        private void ExecuteGrossWeightSetCommand()
+        private async void ExecuteGrossWeightSetCommand()
         {
+            await CheckWeights(grossPressed);
             GrossTime = DateTime.Now;
             TareWeightSetCommand.RaiseCanExecuteChanged();
             SecondGrossWeightSetCommand.RaiseCanExecuteChanged();
@@ -145,8 +153,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public IMvxCommand TareWeightSetCommand
             => _tareWeightSetCommand ?? (_tareWeightSetCommand = new MvxCommand(ExecuteTareWeightSetCommand, IsGrossWeightSet));
         
-        private void ExecuteTareWeightSetCommand()
+        private async void ExecuteTareWeightSetCommand()
         {
+            await CheckWeights(tarePressed);
+
             TareTime = DateTime.Now;
         }
         
@@ -161,8 +171,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _secondGrossWeightSetCommand ??
                 (_secondGrossWeightSetCommand = new MvxCommand(ExecuteSecondGrossWeightSetCommand, IsGrossWeightSet));
         
-        private void ExecuteSecondGrossWeightSetCommand()
+        private async void ExecuteSecondGrossWeightSetCommand()
         {
+            await CheckWeights(secondGrossPressed);
             SecondGrossTime = DateTime.Now;
         }
 
@@ -176,13 +187,83 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             return GrossTime.HasValue;
         }
 
+        private int _grossWeight;
+
+        public int GrossWeight
+        {
+            get { return _grossWeight;  }
+            set { SetProperty(ref _grossWeight, value); }
+        }
+        private int _secondGrossWeight;
+
+        public int SecondGrossWeight
+        {
+            get { return _secondGrossWeight; }
+            set { SetProperty(ref _secondGrossWeight, value); }
+        }
+        private int _tareWeight;
+        public int TareWeight
+        {
+            get { return _tareWeight; }
+            set { SetProperty(ref _tareWeight, value); }
+        }
+
+        private async Task CheckWeights(int weightSelected)
+        {
+            var reqDrvrEnterWeights = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFDriverWeights);
+
+            if (reqDrvrEnterWeights != Constants.Yes)
+                return;
+
+            string title;
+
+            switch (weightSelected)
+            {
+                case 0:
+                title = AppResources.GrossWeight;
+                    break;
+                case 1:
+                title = AppResources.SecondGrossWeight;
+                    break;
+                case 2:
+                title = AppResources.TareWeight;
+                    break;
+                default:
+                    return;
+            }
+
+            var weightPrompt = await UserDialogs.Instance.PromptAsync(title, AppResources.WeightHint,
+                AppResources.Save, AppResources.Cancel, "", InputType.Number);
+
+            if (!string.IsNullOrEmpty(weightPrompt.Text))
+            {
+                using (var loginData = UserDialogs.Instance.Loading(AppResources.Loading, maskType: MaskType.Black))
+                {
+                    switch (weightSelected)
+                    {
+                        case 0:
+                            GrossWeight = int.Parse(weightPrompt.Text);
+                            break;
+                        case 1:
+                            SecondGrossWeight = int.Parse(weightPrompt.Text);
+                            break;
+                        case 2:
+                            TareWeight = int.Parse(weightPrompt.Text);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
         private async Task ProcessContainers(bool setDownInYard, string confirmationMessage)
         {
             var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
             var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
 
-            // Show review exception dialog if gross time isn't set
-            var reasonDialogAsync = (!GrossTime.HasValue)
+            // Show review exception dialog if gross time isn't set.
+            var reasonDialogAsync = (!GrossTime.HasValue || !TareTime.HasValue)
                 ? await
                     UserDialogs.Instance.ActionSheetAsync(AppResources.SelectReviewReason, AppResources.Cancel, "", null,
                         reasons.Select(ct => ct.CodeDisp1).ToArray())
@@ -227,7 +308,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                 SetInYardFlag = setDownInYard ? Constants.Yes : Constants.No,
                                 MethodOfEntry = ContainerMethodOfEntry.Manual,
                                 ActionCode = reason?.CodeValue,
-                                ActionDesc = reason?.CodeDisp1
+                                ActionDesc = reason?.CodeDisp1,
+                                Gross1Weight = GrossWeight,
+                                Gross2Weight = SecondGrossWeight,
+                                TareWeight = TareWeight
                             });
 
                         if (containerAction.WasSuccessful) continue;

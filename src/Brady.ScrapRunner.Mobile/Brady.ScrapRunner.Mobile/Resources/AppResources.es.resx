@@ -724,4 +724,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Trips Resequenced</value>
     <comment>NEEDS TRANSLATION; AndroidNotificationService</comment>
   </data>
+  <data name="WeightHint" xml:space="preserve">
+    <value>Introduzca Peso</value>
+    <comment>Weights</comment>
+  </data>
 </root>

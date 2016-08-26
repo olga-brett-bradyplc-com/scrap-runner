@@ -758,4 +758,8 @@ You will now be sent back to the login.</value>
     <value>New Message From {0} at {1}</value>
     <comment>MessageNotificationViewModel</comment>
   </data>
+  <data name="WeightHint" xml:space="preserve">
+    <value>Enter Weight</value>
+    <comment>Weights</comment>
+  </data>
 </root>
