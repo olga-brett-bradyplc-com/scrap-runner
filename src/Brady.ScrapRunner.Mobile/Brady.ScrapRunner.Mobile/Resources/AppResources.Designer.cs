@@ -1594,6 +1594,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter Weight.
+        /// </summary>
+        public static string WeightHint {
+            get {
+                return ResourceManager.GetString("WeightHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Yard/Scale Detail.
         /// </summary>
         public static string YardScaleDetail {
