@@ -354,7 +354,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     //Update PowerMaster to set trip and segment number
                     //Update the following:
-                    powerMaster.PowerDriverId = driverFuelEntryProcess.PowerId;
+                    powerMaster.PowerDriverId = driverFuelEntryProcess.EmployeeId;
                     powerMaster.PowerOdometer = driverFuelEntryProcess.Odometer;
                     powerMaster.PowerLastActionDateTime = driverFuelEntryProcess.ActionDateTime;
                     if (driverFuelEntryProcess.TripNumber != null)
