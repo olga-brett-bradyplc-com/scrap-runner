@@ -18,6 +18,7 @@ using Brady.ScrapRunner.DataService.Validators;
 using Brady.ScrapRunner.DataService.Util;
 using Brady.ScrapRunner.Domain.Enums;
 using log4net;
+using System.Collections.Generic;
 
 namespace Brady.ScrapRunner.DataService.ProcessTypes
 {
@@ -188,6 +189,19 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         driverEnrouteProcess.TripNumber);
                         break;
                     }
+                    ////////////////////////////////////////////////
+                    // Check if trip is out of order. 
+                    // If trip is out or order, resequence his trips.
+                    // TODO: Normally we would then send a resequence trips message to driver. 
+                    // Perhaps we no longer have to send a resequence trips message to driver. 
+                    if (driverEnrouteProcess.TripSegNumber == Constants.FirstSegment)
+                    {
+                        if (!CheckForTripOutOfOrder(dataService, settings, changeSetResult, msgKey, userRoleIds,
+                                               userCulture, employeeMaster, driverEnrouteProcess, currentTrip))
+                        {
+                            break;
+                        }
+                    }//if (driverEnrouteProcess.TripSegNumber == Constants.FirstSegment)
 
                     ////////////////////////////////////////////////////////
                     //Do not use the MDTId from the mobile app. Build it using the MDT Prefix (if it exists) plus the employee id.
@@ -240,7 +254,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     ////////////////////////////////////////////////
                     //Get a list of all  segments for the trip
                     var tripSegList = Common.GetTripSegmentsForTrip(dataService, settings, userCulture, userRoleIds,
-                                        driverEnrouteProcess.TripNumber, out fault);
+                                                        driverEnrouteProcess.TripNumber, out fault);
                     if (null != fault)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -284,7 +298,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         + currentTripSegment.TripSegDestCustHostCode));
                         break;
                     }
-
                     ////////////////////////////////////////////////
                     //Define the TripSegmentContainer for use later
                     TripSegmentContainer tripSegmentContainer = new TripSegmentContainer();
@@ -869,12 +882,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
 
-                    ////////////////////////////////////////////////
-                    // TODO: Check if trip is out of order. 
-                    // If trip is out or order, resequence his trips.
-                    // Normally we would then send a resequence trips message to  driver.
-
-
                 } //end of foreach...
             }//end of if (!changeSetResult.Failed...
 
@@ -909,5 +916,95 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             log.Info(RequestResponseUtil.CaptureResponse(changeSetResult, requestRespStrBld));
             return changeSetResult;
         }
+        public bool CheckForTripOutOfOrder(IDataService dataService, ProcessChangeSetSettings settings,
+          ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
+          EmployeeMaster employeeMaster, DriverEnrouteProcess driverEnrouteProcess, Trip currentTrip)
+        {
+            DataServiceFault fault;
+
+            var allTripList = Common.GetAllTripsForDriver(dataService, settings, userCulture, userRoleIds,
+                              employeeMaster.EmployeeId, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (allTripList != null && allTripList.Count() > 0)
+            {
+                if (allTripList.First().TripNumber != currentTrip.TripNumber)
+                {
+                    //Must resequence
+                    //Remove the current trip for the list
+                    allTripList.Remove(currentTrip);
+                    //Insert it at the top
+                    allTripList.Insert(0, currentTrip);
+                    //Call the resequence method
+                    changeSetResult = Common.ResequenceTripsForDriver(dataService, settings,allTripList);
+
+                    //Get the last trip that was completed by the driver
+                    var lastCompletedTrip = Common.GetLastTripCompletedForDriver(dataService, settings, userCulture, userRoleIds,
+                                            employeeMaster.EmployeeId, out fault);
+                    if (lastCompletedTrip != null)
+                    {
+                        //TODO: Adding this to the list so that the first segment origin can be set
+                        //causes an exception. 
+                        //allTripList.Insert(0, lastCompletedTrip);
+                    }
+
+                    //TODO: Need to Set Origins at the TripSegment level.
+                    var allTripSegmentList = Common.GetAllTripSegmentsForTripList(dataService, settings, userCulture, 
+                                             userRoleIds,  allTripList, out fault);
+                    changeSetResult = Common.SetTripSegmentOrigins(dataService, settings, allTripSegmentList);
+
+
+                    ////////////////////////////////////////////////
+                    //Add entry to Event Log – "DRIVER OUT OF ORDER". 
+                    StringBuilder sbComment = new StringBuilder();
+                    sbComment.Append(EventCommentConstants.DriverOutOfOrder);
+                    sbComment.Append(" HH:");
+                    sbComment.Append(driverEnrouteProcess.ActionDateTime);
+                    sbComment.Append(" Trip:");
+                    sbComment.Append(driverEnrouteProcess.TripNumber);
+                    sbComment.Append("-");
+                    sbComment.Append(driverEnrouteProcess.TripSegNumber);
+                    sbComment.Append(" Drv:");
+                    sbComment.Append(driverEnrouteProcess.EmployeeId);
+                    sbComment.Append(" Pwr:");
+                    sbComment.Append(driverEnrouteProcess.PowerId);
+                    string comment = sbComment.ToString().Trim();
+
+                    var eventLog = new EventLog()
+                    {
+                        EventDateTime = driverEnrouteProcess.ActionDateTime,
+                        EventSeqNo = 0,
+                        EventTerminalId = employeeMaster.TerminalId,
+                        EventRegionId = employeeMaster.RegionId,
+                        //These are not populated in the current system.
+                        // EventEmployeeId = driverStatus.EmployeeId,
+                        // EventEmployeeName = Common.GetEmployeeName(employeeMaster),
+                        EventTripNumber = driverEnrouteProcess.TripNumber,
+                        EventProgram = EventProgramConstants.Services,
+                        //These are not populated in the current system.
+                        //EventScreen = null,
+                        //EventAction = null,
+                        EventComment = comment,
+                    };
+
+                    ChangeSetResult<int> eventChangeSetResult;
+                    eventChangeSetResult = Common.UpdateEventLog(dataService, settings, eventLog);
+                    log.Debug("SRTEST:DriverEnrouteProcess:Saving EventLog Record - Driver Out Of Order");
+                    //Check for EventLog failure.
+                    if (Common.LogChangeSetFailure(eventChangeSetResult, eventLog, log))
+                    {
+                        var s = string.Format("DriverEnrouteProcess:Could not update EventLog for Driver {0} {1}.",
+                                driverEnrouteProcess.EmployeeId, EventCommentConstants.DriverOutOfOrder);
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                        return false;
+                    }
+                }//if (allTripList.First().TripNumber != driverEnrouteProcess.TripNumber)
+            }//if (allTripList != null && allTripList.Count() > 0)
+            return true;
+        }
+
     }
 }
