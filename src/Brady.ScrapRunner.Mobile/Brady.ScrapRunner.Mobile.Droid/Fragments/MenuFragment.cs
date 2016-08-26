@@ -57,9 +57,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
             if (_mvxMenuStateToken != null)
                 _mvxMessenger.Unsubscribe<MenuStateMessage>(_mvxMenuStateToken);
-
-            if (_mvxDriverInfoToken != null)
-                _mvxMessenger.Unsubscribe<DriverInfoMessage>(_mvxDriverInfoToken);
         }
 
         public bool OnNavigationItemSelected(IMenuItem menuItem)
@@ -91,20 +88,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
                     _navigationView.Menu.FindItem(Resource.Id.current_actions_nav).SetVisible(false);
                     break;
             }
-        }
-
-        private void OnDriverInfoChanged(DriverInfoMessage msg)
-        {
-            var navigationHeaderFullName = View.FindViewById<TextView>(Resource.Id.text_view_fullname);
-            navigationHeaderFullName.Text = msg.DriverName;
-
-            var navigationHeaderYard = View.FindViewById<TextView>(Resource.Id.text_view_yard);
-            navigationHeaderYard.Text = msg.DriverYard;
-
-            var navigationHeaderVehicle = View.FindViewById<TextView>(Resource.Id.text_view_vehicle);
-            navigationHeaderVehicle.Text = msg.DriverVehicle;
-
-            _mvxMessenger.Unsubscribe<DriverInfoMessage>(_mvxDriverInfoToken);
         }
 
         private async Task Navigate(int itemId)

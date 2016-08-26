@@ -476,7 +476,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
             if (_tripService.IsTripLegTransaction(firstSegment))
             {
-                //Close(this);
+                Close(this);
                 ShowViewModel<TransactionSummaryViewModel>(new { tripNumber = TripNumber });
             }
             else if (_tripService.IsTripLegScale(firstSegment))
@@ -570,7 +570,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     await _driverService.UpdateDriver(CurrentDriver);
 
-                    Close(this);
+                    //Close(this);
                     ShowViewModel<RouteSummaryViewModel>();
                 }
             }

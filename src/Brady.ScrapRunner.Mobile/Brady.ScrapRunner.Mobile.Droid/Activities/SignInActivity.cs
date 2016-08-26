@@ -21,5 +21,16 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
     public class SignInActivity : BaseActivity<SignInViewModel>
     {
         protected override int ActivityId => Resource.Layout.activity_signin;
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            // Make sure MainActivity has been cleared
+            if (MainActivity.GetInstance() == null) return;
+
+            MainActivity.GetInstance().Finish();
+            MainActivity.ResetInstance();
+        }
     }
 }
