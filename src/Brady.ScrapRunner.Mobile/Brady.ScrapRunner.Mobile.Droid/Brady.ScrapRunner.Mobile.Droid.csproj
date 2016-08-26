@@ -278,6 +278,8 @@
     <Compile Include="Activities\BaseActivity.cs" />
     <Compile Include="Activities\MessageNotificationActivity.cs" />
     <Compile Include="Activities\NotificationActivity.cs" />
+    <Compile Include="Activities\SettingsActivity.cs" />
+    <Compile Include="Activities\SignInActivity.cs" />
     <Compile Include="Activities\TripNotificationActivity.cs" />
     <Compile Include="Bootstrap\ColorPluginBootstrap.cs" />
     <Compile Include="Bootstrap\FilePluginBootstrap.cs" />
@@ -324,8 +326,6 @@
     <Compile Include="Fragments\RouteSummaryFragment.cs" />
     <Compile Include="Fragments\ScaleDetailFragment.cs" />
     <Compile Include="Fragments\ScaleSummaryFragment.cs" />
-    <Compile Include="Fragments\SettingsFragment.cs" />
-    <Compile Include="Fragments\SignInFragment.cs" />
     <Compile Include="Fragments\TransactionConfirmationFragment.cs" />
     <Compile Include="Fragments\TransactionDetailFragment.cs" />
     <Compile Include="Fragments\TransactionSummaryFragment.cs" />
@@ -344,9 +344,6 @@
     <None Include="Assets\AboutAssets.txt" />
     <AndroidResource Include="Resources\layout\activity_splash.axml">
       <SubType>AndroidResource</SubType>
-    </AndroidResource>
-    <AndroidResource Include="Resources\layout\fragment_signin.axml">
-      <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\toolbar.axml">
       <SubType>AndroidResource</SubType>
@@ -548,6 +545,9 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\activity_message_notification.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\activity_signin.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

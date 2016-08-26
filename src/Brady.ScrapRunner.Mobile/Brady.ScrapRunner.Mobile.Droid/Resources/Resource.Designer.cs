@@ -4083,11 +4083,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f0600a7
-			public const int ArriveButton = 2131099815;
+			// aapt resource value: 0x7f0600ab
+			public const int ArriveButton = 2131099819;
 			
-			// aapt resource value: 0x7f060084
-			public const int ContainerCurrentLabel = 2131099780;
+			// aapt resource value: 0x7f060088
+			public const int ContainerCurrentLabel = 2131099784;
 			
 			// aapt resource value: 0x7f0600cd
 			public const int ContainerImageButtonDrop = 2131099853;
@@ -4098,35 +4098,35 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600c9
 			public const int ContainerItemInfo = 2131099849;
 			
-			// aapt resource value: 0x7f060085
-			public const int ContainerScrollView = 2131099781;
+			// aapt resource value: 0x7f060089
+			public const int ContainerScrollView = 2131099785;
 			
-			// aapt resource value: 0x7f060086
-			public const int CurrentContainerList = 2131099782;
+			// aapt resource value: 0x7f06008a
+			public const int CurrentContainerList = 2131099786;
 			
-			// aapt resource value: 0x7f060099
-			public const int CurrentMessageList = 2131099801;
+			// aapt resource value: 0x7f06009d
+			public const int CurrentMessageList = 2131099805;
 			
 			// aapt resource value: 0x7f0600d0
 			public const int CurrentTripLegAddress = 2131099856;
 			
-			// aapt resource value: 0x7f0600a5
-			public const int DirectionsButton = 2131099813;
+			// aapt resource value: 0x7f0600a9
+			public const int DirectionsButton = 2131099817;
 			
-			// aapt resource value: 0x7f0600a6
-			public const int EnrouteButton = 2131099814;
+			// aapt resource value: 0x7f0600aa
+			public const int EnrouteButton = 2131099818;
 			
 			// aapt resource value: 0x7f0600d5
 			public const int GridViewImage = 2131099861;
 			
-			// aapt resource value: 0x7f06007e
-			public const int LanguageListView = 2131099774;
+			// aapt resource value: 0x7f060083
+			public const int LanguageListView = 2131099779;
 			
-			// aapt resource value: 0x7f0600ac
-			public const int LanguageSettingsImage = 2131099820;
+			// aapt resource value: 0x7f0600b0
+			public const int LanguageSettingsImage = 2131099824;
 			
-			// aapt resource value: 0x7f0600ad
-			public const int LanguageSettingsLabel = 2131099821;
+			// aapt resource value: 0x7f0600b1
+			public const int LanguageSettingsLabel = 2131099825;
 			
 			// aapt resource value: 0x7f06000b
 			public const int MvvmCrossTagId = 2131099659;
@@ -4137,17 +4137,17 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06000c
 			public const int MvxBindingTagUnique = 2131099660;
 			
-			// aapt resource value: 0x7f060082
-			public const int MvxStateSpinner = 2131099778;
+			// aapt resource value: 0x7f060086
+			public const int MvxStateSpinner = 2131099782;
 			
-			// aapt resource value: 0x7f06009d
-			public const int PhotosGridView = 2131099805;
+			// aapt resource value: 0x7f0600a1
+			public const int PhotosGridView = 2131099809;
 			
-			// aapt resource value: 0x7f06009e
-			public const int PublicScaleDetailListView = 2131099806;
+			// aapt resource value: 0x7f0600a2
+			public const int PublicScaleDetailListView = 2131099810;
 			
-			// aapt resource value: 0x7f0600a3
-			public const int PublicScaleSummaryListView = 2131099811;
+			// aapt resource value: 0x7f0600a7
+			public const int PublicScaleSummaryListView = 2131099815;
 			
 			// aapt resource value: 0x7f0600e2
 			public const int RouteContainerHeader = 2131099874;
@@ -4155,17 +4155,17 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600e3
 			public const int RouteContainerNotes = 2131099875;
 			
-			// aapt resource value: 0x7f0600aa
-			public const int ScaleDetailListView = 2131099818;
-			
-			// aapt resource value: 0x7f0600ab
-			public const int ScaleSummaryListView = 2131099819;
-			
 			// aapt resource value: 0x7f0600ae
-			public const int ServerSettingsImage = 2131099822;
+			public const int ScaleDetailListView = 2131099822;
 			
 			// aapt resource value: 0x7f0600af
-			public const int ServerSettingsLabel = 2131099823;
+			public const int ScaleSummaryListView = 2131099823;
+			
+			// aapt resource value: 0x7f0600b2
+			public const int ServerSettingsImage = 2131099826;
+			
+			// aapt resource value: 0x7f0600b3
+			public const int ServerSettingsLabel = 2131099827;
 			
 			// aapt resource value: 0x7f0600e6
 			public const int SettingsImage = 2131099878;
@@ -4179,8 +4179,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600b9
 			public const int SignatureView = 2131099833;
 			
-			// aapt resource value: 0x7f060097
-			public const int SubNavigationPanel = 2131099799;
+			// aapt resource value: 0x7f06009b
+			public const int SubNavigationPanel = 2131099803;
 			
 			// aapt resource value: 0x7f0600b4
 			public const int TransactionConfirmationListView = 2131099828;
@@ -4188,8 +4188,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600c7
 			public const int TransactionSummaryListView = 2131099847;
 			
-			// aapt resource value: 0x7f0600a4
-			public const int TripCompanyName = 2131099812;
+			// aapt resource value: 0x7f0600a8
+			public const int TripCompanyName = 2131099816;
 			
 			// aapt resource value: 0x7f0600d4
 			public const int TripDirections = 2131099860;
@@ -4212,8 +4212,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600fa
 			public const int TripSegmentContianerLocationText = 2131099898;
 			
-			// aapt resource value: 0x7f0600a8
-			public const int TripViewPager = 2131099816;
+			// aapt resource value: 0x7f0600ac
+			public const int TripViewPager = 2131099820;
 			
 			// aapt resource value: 0x7f0600f2
 			public const int accepted_image = 2131099890;
@@ -4293,14 +4293,14 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060047
 			public const int buttonPanel = 2131099719;
 			
-			// aapt resource value: 0x7f06009f
-			public const int buttonTitle = 2131099807;
+			// aapt resource value: 0x7f0600a3
+			public const int buttonTitle = 2131099811;
 			
 			// aapt resource value: 0x7f0600c6
 			public const int camera_fragment = 2131099846;
 			
-			// aapt resource value: 0x7f060083
-			public const int camera_fragment_loaddrop = 2131099779;
+			// aapt resource value: 0x7f060087
+			public const int camera_fragment_loaddrop = 2131099783;
 			
 			// aapt resource value: 0x7f060100
 			public const int cancel_action = 2131099904;
@@ -4326,8 +4326,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060055
 			public const int checkbox = 2131099733;
 			
-			// aapt resource value: 0x7f06007f
-			public const int chronometer = 2131099775;
+			// aapt resource value: 0x7f060084
+			public const int chronometer = 2131099780;
 			
 			// aapt resource value: 0x7f060036
 			public const int clip_horizontal = 2131099702;
@@ -4353,32 +4353,32 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600cb
 			public const int container_item_type = 2131099851;
 			
-			// aapt resource value: 0x7f060095
-			public const int container_level_container_nbscan = 2131099797;
+			// aapt resource value: 0x7f060099
+			public const int container_level_container_nbscan = 2131099801;
+			
+			// aapt resource value: 0x7f06009a
+			public const int container_level_spinner_nbscan = 2131099802;
 			
 			// aapt resource value: 0x7f060096
-			public const int container_level_spinner_nbscan = 2131099798;
+			public const int container_size_container_nbscan = 2131099798;
 			
-			// aapt resource value: 0x7f060092
-			public const int container_size_container_nbscan = 2131099794;
+			// aapt resource value: 0x7f060097
+			public const int container_size_spinner_nbscan = 2131099799;
 			
 			// aapt resource value: 0x7f060093
-			public const int container_size_spinner_nbscan = 2131099795;
+			public const int container_type_container_nbscan = 2131099795;
 			
-			// aapt resource value: 0x7f06008f
-			public const int container_type_container_nbscan = 2131099791;
+			// aapt resource value: 0x7f060094
+			public const int container_type_spinner = 2131099796;
 			
-			// aapt resource value: 0x7f060090
-			public const int container_type_spinner = 2131099792;
-			
-			// aapt resource value: 0x7f06008d
-			public const int containerbarcode_input_field_nbscan = 2131099789;
+			// aapt resource value: 0x7f060091
+			public const int containerbarcode_input_field_nbscan = 2131099793;
 			
 			// aapt resource value: 0x7f0600bb
 			public const int containerid_input_field = 2131099835;
 			
-			// aapt resource value: 0x7f06008c
-			public const int containerid_input_field_nbscan = 2131099788;
+			// aapt resource value: 0x7f060090
+			public const int containerid_input_field_nbscan = 2131099792;
 			
 			// aapt resource value: 0x7f06010c
 			public const int contentFrame = 2131099916;
@@ -4389,8 +4389,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06006e
 			public const int content_frame = 2131099758;
 			
-			// aapt resource value: 0x7f06009a
-			public const int content_layout = 2131099802;
+			// aapt resource value: 0x7f06009e
+			public const int content_layout = 2131099806;
 			
 			// aapt resource value: 0x7f060112
 			public const int current_actions_nav = 2131099922;
@@ -4434,8 +4434,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600c2
 			public const int customer_level_label = 2131099842;
 			
-			// aapt resource value: 0x7f060094
-			public const int customer_level_label_nbscan = 2131099796;
+			// aapt resource value: 0x7f060098
+			public const int customer_level_label_nbscan = 2131099800;
 			
 			// aapt resource value: 0x7f0600bc
 			public const int customer_location_label = 2131099836;
@@ -4443,11 +4443,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600be
 			public const int customer_location_spinner = 2131099838;
 			
-			// aapt resource value: 0x7f060091
-			public const int customer_size_label_nbscan = 2131099793;
+			// aapt resource value: 0x7f060095
+			public const int customer_size_label_nbscan = 2131099797;
 			
-			// aapt resource value: 0x7f06008e
-			public const int customer_type_label_nbscan = 2131099790;
+			// aapt resource value: 0x7f060092
+			public const int customer_type_label_nbscan = 2131099794;
 			
 			// aapt resource value: 0x7f06005b
 			public const int decor_content_parent = 2131099739;
@@ -4455,20 +4455,20 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060043
 			public const int default_activity_button = 2131099715;
 			
-			// aapt resource value: 0x7f060076
-			public const int design_bottom_sheet = 2131099766;
-			
-			// aapt resource value: 0x7f06007d
-			public const int design_menu_item_action_area = 2131099773;
-			
-			// aapt resource value: 0x7f06007c
-			public const int design_menu_item_action_area_stub = 2131099772;
-			
 			// aapt resource value: 0x7f06007b
-			public const int design_menu_item_text = 2131099771;
+			public const int design_bottom_sheet = 2131099771;
 			
-			// aapt resource value: 0x7f06007a
-			public const int design_navigation_view = 2131099770;
+			// aapt resource value: 0x7f060082
+			public const int design_menu_item_action_area = 2131099778;
+			
+			// aapt resource value: 0x7f060081
+			public const int design_menu_item_action_area_stub = 2131099777;
+			
+			// aapt resource value: 0x7f060080
+			public const int design_menu_item_text = 2131099776;
+			
+			// aapt resource value: 0x7f06007f
+			public const int design_navigation_view = 2131099775;
 			
 			// aapt resource value: 0x7f0600f5
 			public const int detail_notes_content = 2131099893;
@@ -4491,8 +4491,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060120
 			public const int edit_rtn_nav = 2131099936;
 			
-			// aapt resource value: 0x7f0600b1
-			public const int employeeIdInputField = 2131099825;
+			// aapt resource value: 0x7f060076
+			public const int employeeIdInputField = 2131099766;
 			
 			// aapt resource value: 0x7f06001f
 			public const int end = 2131099679;
@@ -4527,11 +4527,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06003b
 			public const int @fixed = 2131099707;
 			
-			// aapt resource value: 0x7f060080
-			public const int fuelAmountInputField = 2131099776;
+			// aapt resource value: 0x7f060085
+			public const int fuelAmountInputField = 2131099781;
 			
-			// aapt resource value: 0x7f0600a0
-			public const int grossButton = 2131099808;
+			// aapt resource value: 0x7f0600a4
+			public const int grossButton = 2131099812;
 			
 			// aapt resource value: 0x7f060005
 			public const int home = 2131099653;
@@ -4587,8 +4587,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600cf
 			public const int location_spinner_value = 2131099855;
 			
-			// aapt resource value: 0x7f0600b0
-			public const int loginImageView = 2131099824;
+			// aapt resource value: 0x7f060075
+			public const int loginImageView = 2131099765;
 			
 			// aapt resource value: 0x7f06006d
 			public const int main_frame = 2131099757;
@@ -4596,8 +4596,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060102
 			public const int media_actions = 2131099906;
 			
-			// aapt resource value: 0x7f06009b
-			public const int messageInputField = 2131099803;
+			// aapt resource value: 0x7f06009f
+			public const int messageInputField = 2131099807;
 			
 			// aapt resource value: 0x7f060071
 			public const int message_text = 2131099761;
@@ -4668,14 +4668,14 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06006f
 			public const int navigation_frame = 2131099759;
 			
-			// aapt resource value: 0x7f060079
-			public const int navigation_header_container = 2131099769;
+			// aapt resource value: 0x7f06007e
+			public const int navigation_header_container = 2131099774;
 			
-			// aapt resource value: 0x7f060088
-			public const int navigation_user_text_text_container = 2131099784;
+			// aapt resource value: 0x7f06008c
+			public const int navigation_user_text_text_container = 2131099788;
 			
-			// aapt resource value: 0x7f060087
-			public const int navigation_view = 2131099783;
+			// aapt resource value: 0x7f06008b
+			public const int navigation_view = 2131099787;
 			
 			// aapt resource value: 0x7f060024
 			public const int never = 2131099684;
@@ -4704,8 +4704,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600db
 			public const int notification_type = 2131099867;
 			
-			// aapt resource value: 0x7f060081
-			public const int odometerInputField = 2131099777;
+			// aapt resource value: 0x7f060079
+			public const int odometerInputField = 2131099769;
 			
 			// aapt resource value: 0x7f06002b
 			public const int parallax = 2131099691;
@@ -4713,14 +4713,14 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060049
 			public const int parentPanel = 2131099721;
 			
-			// aapt resource value: 0x7f0600b2
-			public const int passwordInputField = 2131099826;
+			// aapt resource value: 0x7f060077
+			public const int passwordInputField = 2131099767;
 			
 			// aapt resource value: 0x7f06002c
 			public const int pin = 2131099692;
 			
-			// aapt resource value: 0x7f0600b3
-			public const int powerUnitIdInputField = 2131099827;
+			// aapt resource value: 0x7f060078
+			public const int powerUnitIdInputField = 2131099768;
 			
 			// aapt resource value: 0x7f060006
 			public const int progress_circular = 2131099654;
@@ -4749,8 +4749,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06004f
 			public const int scrollView = 2131099727;
 			
-			// aapt resource value: 0x7f060098
-			public const int scroll_content = 2131099800;
+			// aapt resource value: 0x7f06009c
+			public const int scroll_content = 2131099804;
 			
 			// aapt resource value: 0x7f06003c
 			public const int scrollable = 2131099708;
@@ -4785,8 +4785,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06006a
 			public const int search_voice_btn = 2131099754;
 			
-			// aapt resource value: 0x7f0600a1
-			public const int secondGrossButton = 2131099809;
+			// aapt resource value: 0x7f0600a5
+			public const int secondGrossButton = 2131099813;
 			
 			// aapt resource value: 0x7f06006b
 			public const int select_dialog_listview = 2131099755;
@@ -4794,8 +4794,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600d6
 			public const int selected_language_image = 2131099862;
 			
-			// aapt resource value: 0x7f06009c
-			public const int sendMessageButton = 2131099804;
+			// aapt resource value: 0x7f0600a0
+			public const int sendMessageButton = 2131099808;
 			
 			// aapt resource value: 0x7f060111
 			public const int send_new_message_nav = 2131099921;
@@ -4818,11 +4818,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600b8
 			public const int signature_label = 2131099832;
 			
-			// aapt resource value: 0x7f060078
-			public const int snackbar_action = 2131099768;
+			// aapt resource value: 0x7f06007d
+			public const int snackbar_action = 2131099773;
 			
-			// aapt resource value: 0x7f060077
-			public const int snackbar_text = 2131099767;
+			// aapt resource value: 0x7f06007c
+			public const int snackbar_text = 2131099772;
 			
 			// aapt resource value: 0x7f06002a
 			public const int snap = 2131099690;
@@ -4857,8 +4857,8 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f060010
 			public const int tabMode = 2131099664;
 			
-			// aapt resource value: 0x7f0600a2
-			public const int tareButton = 2131099810;
+			// aapt resource value: 0x7f0600a6
+			public const int tareButton = 2131099814;
 			
 			// aapt resource value: 0x7f060108
 			public const int text = 2131099912;
@@ -4872,14 +4872,14 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f0600fc
 			public const int textViewStatus = 2131099900;
 			
-			// aapt resource value: 0x7f060089
-			public const int text_view_fullname = 2131099785;
+			// aapt resource value: 0x7f06008d
+			public const int text_view_fullname = 2131099789;
 			
-			// aapt resource value: 0x7f06008b
-			public const int text_view_vehicle = 2131099787;
+			// aapt resource value: 0x7f06008f
+			public const int text_view_vehicle = 2131099791;
 			
-			// aapt resource value: 0x7f06008a
-			public const int text_view_yard = 2131099786;
+			// aapt resource value: 0x7f06008e
+			public const int text_view_yard = 2131099790;
 			
 			// aapt resource value: 0x7f060105
 			public const int time = 2131099909;
@@ -4899,11 +4899,11 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			// aapt resource value: 0x7f06004a
 			public const int topPanel = 2131099722;
 			
-			// aapt resource value: 0x7f060075
-			public const int touch_outside = 2131099765;
+			// aapt resource value: 0x7f06007a
+			public const int touch_outside = 2131099770;
 			
-			// aapt resource value: 0x7f0600a9
-			public const int transactionButtonLayout = 2131099817;
+			// aapt resource value: 0x7f0600ad
+			public const int transactionButtonLayout = 2131099821;
 			
 			// aapt resource value: 0x7f0600df
 			public const int tripCommodityDesc = 2131099871;
@@ -5088,106 +5088,106 @@ namespace Brady.ScrapRunner.Mobile.Droid
 			public const int activity_powerunit = 2130903068;
 			
 			// aapt resource value: 0x7f03001d
-			public const int activity_splash = 2130903069;
+			public const int activity_signin = 2130903069;
 			
 			// aapt resource value: 0x7f03001e
-			public const int activity_trip_notification = 2130903070;
+			public const int activity_splash = 2130903070;
 			
 			// aapt resource value: 0x7f03001f
-			public const int design_bottom_sheet_dialog = 2130903071;
+			public const int activity_trip_notification = 2130903071;
 			
 			// aapt resource value: 0x7f030020
-			public const int design_layout_snackbar = 2130903072;
+			public const int design_bottom_sheet_dialog = 2130903072;
 			
 			// aapt resource value: 0x7f030021
-			public const int design_layout_snackbar_include = 2130903073;
+			public const int design_layout_snackbar = 2130903073;
 			
 			// aapt resource value: 0x7f030022
-			public const int design_layout_tab_icon = 2130903074;
+			public const int design_layout_snackbar_include = 2130903074;
 			
 			// aapt resource value: 0x7f030023
-			public const int design_layout_tab_text = 2130903075;
+			public const int design_layout_tab_icon = 2130903075;
 			
 			// aapt resource value: 0x7f030024
-			public const int design_menu_item_action_area = 2130903076;
+			public const int design_layout_tab_text = 2130903076;
 			
 			// aapt resource value: 0x7f030025
-			public const int design_navigation_item = 2130903077;
+			public const int design_menu_item_action_area = 2130903077;
 			
 			// aapt resource value: 0x7f030026
-			public const int design_navigation_item_header = 2130903078;
+			public const int design_navigation_item = 2130903078;
 			
 			// aapt resource value: 0x7f030027
-			public const int design_navigation_item_separator = 2130903079;
+			public const int design_navigation_item_header = 2130903079;
 			
 			// aapt resource value: 0x7f030028
-			public const int design_navigation_item_subheader = 2130903080;
+			public const int design_navigation_item_separator = 2130903080;
 			
 			// aapt resource value: 0x7f030029
-			public const int design_navigation_menu = 2130903081;
+			public const int design_navigation_item_subheader = 2130903081;
 			
 			// aapt resource value: 0x7f03002a
-			public const int design_navigation_menu_item = 2130903082;
+			public const int design_navigation_menu = 2130903082;
 			
 			// aapt resource value: 0x7f03002b
-			public const int fragment_changelanguage = 2130903083;
+			public const int design_navigation_menu_item = 2130903083;
 			
 			// aapt resource value: 0x7f03002c
-			public const int fragment_delay = 2130903084;
+			public const int fragment_changelanguage = 2130903084;
 			
 			// aapt resource value: 0x7f03002d
-			public const int fragment_fuelentry = 2130903085;
+			public const int fragment_delay = 2130903085;
 			
 			// aapt resource value: 0x7f03002e
-			public const int fragment_gpscapture = 2130903086;
+			public const int fragment_fuelentry = 2130903086;
 			
 			// aapt resource value: 0x7f03002f
-			public const int fragment_loaddropcontainer = 2130903087;
+			public const int fragment_gpscapture = 2130903087;
 			
 			// aapt resource value: 0x7f030030
-			public const int fragment_messages = 2130903088;
+			public const int fragment_loaddropcontainer = 2130903088;
 			
 			// aapt resource value: 0x7f030031
-			public const int fragment_modifyreturntoyard = 2130903089;
+			public const int fragment_messages = 2130903089;
 			
 			// aapt resource value: 0x7f030032
-			public const int fragment_navigation = 2130903090;
+			public const int fragment_modifyreturntoyard = 2130903090;
 			
 			// aapt resource value: 0x7f030033
-			public const int fragment_navigation_header = 2130903091;
+			public const int fragment_navigation = 2130903091;
 			
 			// aapt resource value: 0x7f030034
-			public const int fragment_nbscan = 2130903092;
+			public const int fragment_navigation_header = 2130903092;
 			
 			// aapt resource value: 0x7f030035
-			public const int fragment_newmessage = 2130903093;
+			public const int fragment_nbscan = 2130903093;
 			
 			// aapt resource value: 0x7f030036
-			public const int fragment_photos = 2130903094;
+			public const int fragment_newmessage = 2130903094;
 			
 			// aapt resource value: 0x7f030037
-			public const int fragment_publicscaledetail = 2130903095;
+			public const int fragment_photos = 2130903095;
 			
 			// aapt resource value: 0x7f030038
-			public const int fragment_publicscalesummary = 2130903096;
+			public const int fragment_publicscaledetail = 2130903096;
 			
 			// aapt resource value: 0x7f030039
-			public const int fragment_routedetail = 2130903097;
+			public const int fragment_publicscalesummary = 2130903097;
 			
 			// aapt resource value: 0x7f03003a
-			public const int fragment_routesummary = 2130903098;
+			public const int fragment_routedetail = 2130903098;
 			
 			// aapt resource value: 0x7f03003b
-			public const int fragment_scaledetail = 2130903099;
+			public const int fragment_routesummary = 2130903099;
 			
 			// aapt resource value: 0x7f03003c
-			public const int fragment_scalesummary = 2130903100;
+			public const int fragment_scaledetail = 2130903100;
 			
 			// aapt resource value: 0x7f03003d
-			public const int fragment_settings = 2130903101;
+			public const int fragment_scalesummary = 2130903101;
 			
 			// aapt resource value: 0x7f03003e
-			public const int fragment_signin = 2130903102;
+			public const int fragment_settings = 2130903102;
 			
 			// aapt resource value: 0x7f03003f
 			public const int fragment_transactionconfirmation = 2130903103;

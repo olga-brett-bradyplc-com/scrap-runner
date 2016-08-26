@@ -574,7 +574,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     await _driverService.UpdateDriver(CurrentDriver);
 
-                    Close(this);
+                    //Close(this);
                     ShowViewModel<RouteSummaryViewModel>();
                 }
             }
