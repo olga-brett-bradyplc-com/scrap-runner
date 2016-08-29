@@ -21,6 +21,9 @@
         private DateTimeOffset? _nextPathTransmit;
         private DateTimeOffset? _nextPointAdded;
         private bool _started;
+        private readonly double[] _averageSpeeds = { 0.0f, 0.0f, 0.0f, 0.0f };
+        private double _averageSpeed = 0.0f;
+        private double _maxSpeed = 0.0f;
 
         public LocationPathService(IMvxMessenger mvxMessenger, IConnectionService connectionService)
         {
@@ -45,6 +48,7 @@
 
         public async void OnLocationModelMessage(LocationModelMessage locationMessage)
         {
+            UpdateSpeedAverage(locationMessage.Location.Speed);
             if (_locationPath.Count == 0)
             {
                 _nextPathTransmit = locationMessage.Location.Timestamp.AddMinutes(SendPathMinutes);
@@ -76,10 +80,46 @@
             }
         }
 
+        private void UpdateSpeedAverage(double? speed)
+        {
+            if (!speed.HasValue || speed == 0)
+            {
+                _averageSpeeds[0] = 0.0f;
+                _averageSpeeds[1] = 0.0f;
+                _averageSpeeds[2] = 0.0f;
+                _averageSpeeds[3] = 0.0f;
+                _averageSpeed = 0.0f;
+            }
+            else
+            {
+                _averageSpeeds[3] = _averageSpeeds[2];
+                _averageSpeeds[2] = _averageSpeeds[1];
+                _averageSpeeds[1] = _averageSpeeds[0];
+                _averageSpeeds[0] = speed.Value;
+                _averageSpeed = (_averageSpeeds[0] 
+                    + _averageSpeeds[1] 
+                    + _averageSpeeds[2] 
+                    + _averageSpeeds[3]) / 4;
+            }
+            if (_averageSpeed > _maxSpeed)
+                _maxSpeed = _averageSpeed;
+        }
+
         private void AddPath(LocationModel location)
         {
-            _locationPath.Add(location);
+            var newLocation = new LocationModel
+            {
+                Accuracy = location.Accuracy,
+                Heading = location.Heading,
+                HeadingAccuracy = location.HeadingAccuracy,
+                Latitude = location.Latitude,
+                Longitude = location.Longitude,
+                Speed = _maxSpeed,
+                Timestamp = location.Timestamp
+            };
+            _locationPath.Add(newLocation);
             _nextPointAdded = location.Timestamp.AddMinutes(AddPointMinutes);
+            _maxSpeed = 0.0f;
         }
 
         private void ClearPath()
