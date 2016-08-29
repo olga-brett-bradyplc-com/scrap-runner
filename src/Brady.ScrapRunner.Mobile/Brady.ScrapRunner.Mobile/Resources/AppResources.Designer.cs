@@ -188,6 +188,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A commodity must be selected.
+        /// </summary>
+        public static string CommodityRequried {
+            get {
+                return ResourceManager.GetString("CommodityRequried", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Complete.
         /// </summary>
         public static string Complete {
@@ -604,6 +613,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Container level is required.
+        /// </summary>
+        public static string LevelRequired {
+            get {
+                return ResourceManager.GetString("LevelRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Load/Drop Containers.
         /// </summary>
         public static string LoadDropContainer {
@@ -775,7 +793,7 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Container level is required, and no levels were found.
+        ///   Looks up a localized string similar to No container levels found in system database..
         /// </summary>
         public static string NoContainerLevels {
             get {

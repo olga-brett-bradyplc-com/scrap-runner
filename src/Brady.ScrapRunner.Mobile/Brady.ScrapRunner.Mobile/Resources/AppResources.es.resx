@@ -728,4 +728,12 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Introduzca Peso</value>
     <comment>Weights</comment>
   </data>
+  <data name="CommodityRequried" xml:space="preserve">
+    <value>A commodity must be selected.</value>
+    <comment>TransactionDetailViewModel; TRANSLATION REQUIRED</comment>
+  </data>
+  <data name="LevelRequired" xml:space="preserve">
+    <value>Container level is required</value>
+    <comment>TransactionDetailViewModel; TransactionDetailViewModel</comment>
+  </data>
 </root>

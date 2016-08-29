@@ -118,7 +118,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel) ==
                 Constants.Yes && SelectedLevel.CodeValue == null && _tripService.IsTripLegLoaded(Segment))
             {
-                UserDialogs.Instance.Alert(AppResources.NoContainerLevels, AppResources.Error, AppResources.OK);
+                UserDialogs.Instance.Alert(AppResources.LevelRequired, AppResources.Error, AppResources.OK);
+                return;
+            }
+
+            if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCommodSelection) ==
+                Constants.Yes && SelectedCommodity.CustCommodityCode == null && _tripService.IsTripLegLoaded(Segment))
+            {
+                UserDialogs.Instance.Alert(AppResources.CommodityRequried, AppResources.Error, AppResources.OK);
                 return;
             }
 

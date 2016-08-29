@@ -690,7 +690,7 @@ You will now be sent back to the login.</value>
     <value>Could not scan barcode</value>
   </data>
   <data name="NoContainerLevels" xml:space="preserve">
-    <value>Container level is required, and no levels were found</value>
+    <value>No container levels found in system database.</value>
   </data>
   <data name="SelectLevel" xml:space="preserve">
     <value>Select Level</value>
@@ -761,5 +761,13 @@ You will now be sent back to the login.</value>
   <data name="WeightHint" xml:space="preserve">
     <value>Enter Weight</value>
     <comment>Weights</comment>
+  </data>
+  <data name="CommodityRequried" xml:space="preserve">
+    <value>A commodity must be selected</value>
+    <comment>TransactionDetailViewModel</comment>
+  </data>
+  <data name="LevelRequired" xml:space="preserve">
+    <value>Container level is required</value>
+    <comment>TransactionDetailViewModel</comment>
   </data>
 </root>
