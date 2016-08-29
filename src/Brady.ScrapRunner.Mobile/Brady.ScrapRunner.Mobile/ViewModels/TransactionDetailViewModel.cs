@@ -71,6 +71,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CustLocation = CustomerLocationList.Count > 0 ? AppResources.NoLocationSelected : AppResources.NoLocationAval
             });
 
+            var custom = customerLocations.Select(l => l.CustLocation == Container?.TripSegContainerLocation);
+
+            // Was a custom location entered in dispatch
+            if( custom == null && Container?.TripSegContainerLocation != null )
+                CustomerLocationList.Insert(1, new CustomerLocationModel()
+                {
+                    CustHostCode = Segment.TripSegDestCustHostCode,
+                    CustLocation = Container.TripSegContainerLocation
+                });
+
             var customerCommodities = await _customerService.FindCustomerCommodites(Segment.TripSegDestCustHostCode);
             CustomerCommodityList = new ObservableCollection<CustomerCommodityModel>(customerCommodities);
             CustomerCommodityList.Insert(0, new CustomerCommodityModel
