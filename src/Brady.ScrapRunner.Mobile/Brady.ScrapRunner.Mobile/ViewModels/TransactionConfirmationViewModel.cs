@@ -116,6 +116,28 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 {
                     foreach (var segment in Containers)
                     {
+                        foreach (var container in segment)
+                        {
+                            var containerProcess = await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                            {
+                                EmployeeId = CurrentDriver.EmployeeId,
+                                PowerId = CurrentDriver.PowerId,
+                                ActionType = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? ContainerActionTypeConstants.Exception : ContainerActionTypeConstants.Done,
+                                ActionCode = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? container.TripSegContainerReviewReason : null,
+                                ActionDesc = container.TripSegContainerReivewReasonDesc,
+                                ActionDateTime = DateTime.Now,
+                                MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                                TripNumber = TripNumber,
+                                TripSegNumber = container.TripSegNumber,
+                                ContainerNumber = container.TripSegContainerNumber,
+                                ContainerLevel = container.TripSegContainerLevel
+                            });
+
+                            if (!containerProcess.WasSuccessful)
+                                UserDialogs.Instance.Alert(containerProcess.Failure.Summary, AppResources.Error,
+                                    AppResources.OK);
+                        }
+
                         var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
                             {
                                 EmployeeId = CurrentDriver.EmployeeId,

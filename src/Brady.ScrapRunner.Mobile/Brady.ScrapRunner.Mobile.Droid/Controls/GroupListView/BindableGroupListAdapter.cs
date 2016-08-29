@@ -146,6 +146,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                 if (info != null)
                     info.Text = $"{tscm.DefaultTripSegContainerNumber} {tscm.DefaultTripContainerTypeSize}";
 
+                if (commodity != null)
+                    commodity.Text = tscm.TripSegContainerCommodityDesc;
+
                 if (string.IsNullOrEmpty(tscm.TripSegContainerReivewReasonDesc))
                 {
                     reviewReason.Visibility = ViewStates.Gone;
