@@ -20,6 +20,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
         Name = "brady.scraprunner.mobile.droid.activities.SettingsActivity")]
     public class SettingsActivity : BaseActivity<SettingsViewModel>
     {
-        protected override int ActivityId => Resource.Layout.fragment_settings;
+        protected override int ActivityId => Resource.Layout.activity_settings;
     }
 }
