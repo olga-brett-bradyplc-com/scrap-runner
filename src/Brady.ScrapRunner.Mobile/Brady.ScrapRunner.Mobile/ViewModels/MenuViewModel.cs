@@ -5,6 +5,7 @@ using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
 
@@ -18,13 +19,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IMessagesService _messagesService;
         private readonly ILocationService _locationService;
         private readonly IDriverService _driverService;
+        private readonly ITerminalService _terminalService;
 
         public MenuViewModel(IConnectionService connection, 
             IBackgroundScheduler backgroundScheduler, 
             ICodeTableService codeTableService, 
             ILocationService locationService, 
             IMessagesService messageService,
-            IDriverService driverService)
+            IDriverService driverService,
+            ITerminalService terminalService)
         {
             _connection = connection;
             _backgroundScheduler = backgroundScheduler;
@@ -32,6 +35,48 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _locationService = locationService;
             _messagesService = messageService;
             _driverService = driverService;
+            _terminalService = terminalService;
+        }
+
+        public override async void Start()
+        {
+            CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
+            var employee = await _driverService.FindEmployeeAsync(CurrentDriver.EmployeeId);
+            var terminal = await _terminalService.FindTerminalMasterAsync(CurrentDriver.TerminalId);
+            var powermaster = await _driverService.FindPowerMasterAsync(CurrentDriver.PowerId);
+
+            DriverFullName = employee.FullName;
+            DriverYard = $"{CurrentDriver.TerminalId} - {terminal.TerminalName}";
+            DriverVehicle = $"{CurrentDriver.PowerId} - {powermaster.PowerDesc}";
+        }
+        
+        private DriverStatusModel _currentDriver;
+        public DriverStatusModel CurrentDriver
+        {
+            get { return _currentDriver; }
+            set { SetProperty(ref _currentDriver, value); }
+        }
+
+        private string _driverFullname;
+        public string DriverFullName
+        {
+            get { return _driverFullname; }
+            set { SetProperty(ref _driverFullname, value); }
+        }
+
+        private string _driverYard;
+        public string DriverYard
+        {
+            get { return _driverYard; }
+            set { SetProperty(ref _driverYard, value); }
+        }
+
+        private string _driverVehicle;
+        public string DriverVehicle
+        {
+            get { return _driverVehicle; }
+            set { SetProperty(ref _driverVehicle, value); }
         }
 
         private IMvxAsyncCommand _logoutCommand;

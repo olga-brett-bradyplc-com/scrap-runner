@@ -14,7 +14,7 @@ namespace Brady.ScrapRunner.Mobile
 
         public void Start(object hint = null)
         {
-            ShowViewModel<MainViewModel>();
+            ShowViewModel<SignInViewModel>();
         }
     }
 }

@@ -153,26 +153,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (!signInResult)
                     return;
 
-                var containers = await _containerService.FindPowerIdContainersAsync(TruckId);
-                var autoDrop =
-                    await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAutoDropContainers);
-
-                // Driver was in the middle of a trip during their last session, so return them to the appropiate screen
-                if (!string.IsNullOrEmpty(CurrentDriver.TripNumber) && 
-                    !string.IsNullOrEmpty(CurrentDriver.TripSegNumber) && 
-                    (CurrentDriver.Status == DriverStatusSRConstants.Enroute || CurrentDriver.Status == DriverStatusSRConstants.Arrive || CurrentDriver.Status == DriverStatusSRConstants.Done))
-                {
-                    ShowViewModel<RouteDetailViewModel>(new { tripNumber = CurrentDriver.TripNumber, status = CurrentDriver.Status });
-                    UserDialogs.Instance.Toast(AppResources.SessionRestoreHeader);
-                }
-                else if (containers.Any() && autoDrop == Constants.No)
-                {
-                    ShowViewModel<LoadDropContainerViewModel>(new {loginProcessed = true});
-                }
-                else
-                {
-                    ShowViewModel<RouteSummaryViewModel>();
-                }
+                ShowViewModel<MainViewModel>();
+                Close(this);
             }
             catch (Exception exception)
             {
@@ -340,13 +322,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 var employeeRecord = await _driverService.FindEmployeeAsync(UserName);
                 var terminal = await _terminalService.FindTerminalMasterAsync(CurrentDriver.TerminalId);
                 var power = await _driverService.FindPowerMasterAsync(TruckId);
-
-                _mvxMessenger.Publish(new DriverInfoMessage(this)
-                {
-                    DriverName = employeeRecord.FullName,
-                    DriverYard = terminal.TerminalName,
-                    DriverVehicle = $"{power.PowerDesc} {power.PowerId}"
-                });
 
                 var messagesTable = await _messagesService.ProcessDriverMessagesAsync(new DriverMessageProcess { EmployeeId = UserName });
 

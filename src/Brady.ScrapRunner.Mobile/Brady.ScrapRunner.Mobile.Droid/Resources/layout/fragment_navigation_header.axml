@@ -18,18 +18,21 @@
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            local:MvxBind="Text DriverFullName"
             tools:text="Steve Hartman" />
         <TextView
             android:id="@+id/text_view_yard"
             android:textColor="#fff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            local:MvxBind="Text DriverYard"
             tools:text="Fond Du Lac Yard" />
         <TextView
             android:id="@+id/text_view_vehicle"
             android:textColor="#fff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            local:MvxBind="Text DriverVehicle"
             tools:text="Truck 001" />
     </LinearLayout>
 </RelativeLayout>
