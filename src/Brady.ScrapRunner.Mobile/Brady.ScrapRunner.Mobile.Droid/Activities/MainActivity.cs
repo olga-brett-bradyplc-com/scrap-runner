@@ -15,10 +15,13 @@ using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.ViewModels;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Droid.Shared.Caching;
+using MvvmCross.Droid.Shared.Fragments;
 using MvvmCross.Droid.Support.V4;
 using MvvmCross.Droid.Support.V7.AppCompat;
+using MvvmCross.Droid.Views;
 using SupportV4 = Android.Support.V4.App;
 using MvvmCross.Platform;
+using MvvmCross.Platform.Exceptions;
 
 namespace Brady.ScrapRunner.Mobile.Droid.Activities
 {
@@ -60,9 +63,6 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
             return base.OnOptionsItemSelected(item);
         }
 
-        // Forcing a fragment replace solves some caching issues we were running in to. This may not be the best long term option.
-        // As a reminder, we're inheriting from MvxCachingFragmentCompatActivity instead of MvxFragmentCompatActivity because the latter
-        // doesn't implement IFragmentHost, which causes the app to crash. @TODO : Look into alternatives
         protected override void ShowFragment(string tag, int contentId, Bundle bundle, bool forceAddToBackStack = false, bool forceReplaceFragment = false)
         {
             base.ShowFragment(tag, contentId, bundle, forceAddToBackStack, true);
@@ -112,20 +112,11 @@ namespace Brady.ScrapRunner.Mobile.Droid.Activities
         //    if (!fragmentInfo.Tag.Contains(MenuViewModelKey))
         //        transaction.SetCustomAnimations(Resource.Animation.custom_enter_anim, Resource.Animation.custom_leave_anim);
         //}
-
-        // Clean up any duplicated fragments. The alternative is to write our own implementation of MvxCachingFragmentCompatActivity#ShowFragment
-        //public override void OnFragmentChanged(IMvxCachedFragmentInfo fragmentInfo)
-        //{
-        //    var duplicateFragments =
-        //        SupportFragmentManager.Fragments?.Where(t => t?.Tag != null).Count(f => f.Tag == fragmentInfo.Tag);
-
-        //    //if( duplicateFragments > 1 )
-        //    //    SupportFragmentManager.PopBackStackImmediate(fragmentInfo.Tag, (int) PopBackStackFlags.Inclusive);
-
-        //    var temp = SupportFragmentManager?.Fragments?.LastOrDefault()?.Tag;
-
-        //    UpdateBackStackValues();
-        //}
+        
+        public override void OnFragmentChanged(IMvxCachedFragmentInfo fragmentInfo)
+        {
+            UpdateBackStackValues();
+        }
 
         public void HideSoftKeyboard()
         {
