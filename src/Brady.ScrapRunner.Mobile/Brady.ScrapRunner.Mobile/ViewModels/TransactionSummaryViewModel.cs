@@ -224,37 +224,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             using ( var completeTripSegment = UserDialogs.Instance.Loading(AppResources.SavingContainer, maskType: MaskType.Black))
             {
-                var containerAction =
-                    await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
-                    {
-                        EmployeeId = CurrentDriver.EmployeeId,
-                        PowerId = CurrentDriver.PowerId,
-                        ActionType = ContainerActionTypeConstants.Done,
-                        ActionDateTime = DateTime.Now,
-                        MethodOfEntry = TripMethodOfCompletionConstants.Scanned,
-                        TripNumber = TripNumber,
-                        TripSegNumber = CurrentTransaction.TripSegNumber,
-                        ContainerNumber = scannedNumber,
-                        ContainerLevel = CurrentTransaction.TripSegContainerLevel
-                    });
+                if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
+                    CurrentTransaction.TripSegContainerNumber = scannedNumber;
 
-                if (containerAction.WasSuccessful)
-                {
-                    if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
-                        CurrentTransaction.TripSegContainerNumber = scannedNumber;
+                CurrentTransaction.TripSegContainerComplete = Constants.Yes;
+                CurrentTransaction.TripSegContainerReviewFlag = Constants.No;
 
-                    CurrentTransaction.TripSegContainerComplete = Constants.Yes;
-                    CurrentTransaction.TripSegContainerReviewFlag = Constants.No;
-
-                    await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
-                    await _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction);
-                    SelectNextTransactionContainer();
-                    ConfirmationSelectedCommand.RaiseCanExecuteChanged();
-                    return;
-                }
-
-                UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
-                return;
+                await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
+                await _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction);
+                SelectNextTransactionContainer();
+                ConfirmationSelectedCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -335,6 +314,28 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 {
                     foreach (var segment in Containers)
                     {
+                        foreach (var container in segment)
+                        {
+                            var containerProcess = await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                            {
+                                EmployeeId = CurrentDriver.EmployeeId,
+                                PowerId = CurrentDriver.PowerId,
+                                ActionType = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? ContainerActionTypeConstants.Exception : ContainerActionTypeConstants.Done,
+                                ActionCode = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? container.TripSegContainerReviewReason : null,
+                                ActionDesc = container.TripSegContainerReivewReasonDesc,
+                                ActionDateTime = DateTime.Now,
+                                MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                                TripNumber = TripNumber,
+                                TripSegNumber = container.TripSegNumber,
+                                ContainerNumber = container.TripSegContainerNumber,
+                                ContainerLevel = container.TripSegContainerLevel
+                            });
+
+                            if (!containerProcess.WasSuccessful)
+                                UserDialogs.Instance.Alert(containerProcess.Failure.Summary, AppResources.Error,
+                                    AppResources.OK);
+                        }
+
                         var tripSegmentProcess =
                             await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
                             {
