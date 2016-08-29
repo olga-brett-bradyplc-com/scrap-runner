@@ -188,6 +188,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
 
             var levelRequired = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel);
+            var commodityRequired = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCommodSelection);
 
             var currentSegment =
                 Containers.FirstOrDefault(ts => ts.Key.TripSegNumber == CurrentTransaction.TripSegNumber).Key;
@@ -222,39 +223,37 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentTransaction.TripSegContainerLevel = levelNum;
             }
 
+            // If commodity is required, show spinner dialog allowing them to select commodity, then continue procesing scan
+            if (CurrentTransaction.TripSegContainerCommodityCode == null && commodityRequired == Constants.Yes &&
+                _tripService.IsTripLegLoaded(currentSegment, true))
+            {
+                var commodities = await _customerService.FindCustomerCommodites(currentSegment.TripSegDestCustHostCode);
+
+                var commoditySelect =
+                    await
+                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectCommodity, "", "", null,
+                            commodities.Select(c => c.CustCommodityDesc).ToArray());
+
+                if (string.IsNullOrEmpty(commoditySelect)) return;
+
+                var commodity = commodities.First(c => c.CustCommodityDesc == commoditySelect);
+
+                CurrentTransaction.TripSegContainerCommodityCode = commodity.CustCommodityCode;
+                CurrentTransaction.TripSegContainerCommodityDesc = commodity.CustCommodityDesc;
+            }
+
             using ( var completeTripSegment = UserDialogs.Instance.Loading(AppResources.SavingContainer, maskType: MaskType.Black))
             {
-                var containerAction =
-                    await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
-                    {
-                        EmployeeId = CurrentDriver.EmployeeId,
-                        PowerId = CurrentDriver.PowerId,
-                        ActionType = ContainerActionTypeConstants.Done,
-                        ActionDateTime = DateTime.Now,
-                        MethodOfEntry = TripMethodOfCompletionConstants.Scanned,
-                        TripNumber = TripNumber,
-                        TripSegNumber = CurrentTransaction.TripSegNumber,
-                        ContainerNumber = scannedNumber,
-                        ContainerLevel = CurrentTransaction.TripSegContainerLevel
-                    });
+                if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
+                    CurrentTransaction.TripSegContainerNumber = scannedNumber;
 
-                if (containerAction.WasSuccessful)
-                {
-                    if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
-                        CurrentTransaction.TripSegContainerNumber = scannedNumber;
+                CurrentTransaction.TripSegContainerComplete = Constants.Yes;
+                CurrentTransaction.TripSegContainerReviewFlag = Constants.No;
 
-                    CurrentTransaction.TripSegContainerComplete = Constants.Yes;
-                    CurrentTransaction.TripSegContainerReviewFlag = Constants.No;
-
-                    await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
-                    await _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction);
-                    SelectNextTransactionContainer();
-                    ConfirmationSelectedCommand.RaiseCanExecuteChanged();
-                    return;
-                }
-
-                UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
-                return;
+                await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
+                await _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction);
+                SelectNextTransactionContainer();
+                ConfirmationSelectedCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -335,6 +334,28 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 {
                     foreach (var segment in Containers)
                     {
+                        foreach (var container in segment)
+                        {
+                            var containerProcess = await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                            {
+                                EmployeeId = CurrentDriver.EmployeeId,
+                                PowerId = CurrentDriver.PowerId,
+                                ActionType = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? ContainerActionTypeConstants.Exception : ContainerActionTypeConstants.Done,
+                                ActionCode = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? container.TripSegContainerReviewReason : null,
+                                ActionDesc = container.TripSegContainerReivewReasonDesc,
+                                ActionDateTime = DateTime.Now,
+                                MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                                TripNumber = TripNumber,
+                                TripSegNumber = container.TripSegNumber,
+                                ContainerNumber = container.TripSegContainerNumber,
+                                ContainerLevel = container.TripSegContainerLevel
+                            });
+
+                            if (!containerProcess.WasSuccessful)
+                                UserDialogs.Instance.Alert(containerProcess.Failure.Summary, AppResources.Error,
+                                    AppResources.OK);
+                        }
+
                         var tripSegmentProcess =
                             await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
                             {
