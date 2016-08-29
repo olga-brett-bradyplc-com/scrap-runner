@@ -680,7 +680,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             if (!MarkTripDone(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                  driverSegmentDoneProcess, employeeMaster, powerMaster, destCustomerMaster,
                                  currentTrip, tripSegList, tripContainerList, tripReferenceNumberList,
-                                 tripMileageList, tripDelayList))
+                                 tripMileageList, tripDelayList, Constants.No))
             {
                 return false;
             }
@@ -1257,7 +1257,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     if (!MarkTripDone(dataService, settings, changeSetResult, msgKey, userRoleIds, userCulture,
                                         driverSegmentDoneProcess, employeeMaster, powerMaster, destCustomerMaster,
                                         currentTrip, tripSegList, tripContainerList, tripReferenceNumberList,
-                                        tripMileageList, tripDelayList))
+                                        tripMileageList, tripDelayList, DEFUseErrorQ))
                     {
                         return false;
                     }
@@ -1840,7 +1840,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
            DriverSegmentDoneProcess driverSegmentDoneProcess, EmployeeMaster employeeMaster, PowerMaster powerMaster,
            CustomerMaster destCustomerMaster,Trip currentTrip, List<TripSegment> tripSegList, 
            List<TripSegmentContainer> tripContainerList,List<TripReferenceNumber> tripReferenceNumberList, 
-           List<TripSegmentMileage> tripMileageList, List<DriverDelay> tripDelayList)
+           List<TripSegmentMileage> tripMileageList, List<DriverDelay> tripDelayList, string DEFUseErrorQ)
         {
             DataServiceFault fault = null;
             //int containerHistoryInsertCount = 0;
@@ -1876,6 +1876,18 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     currentTrip.TripStatus = TripStatusConstants.Exception;
                     currentTrip.TripSpecInstructions = exception.FirstOrDefault().TripSegComments;
 
+                }
+            }
+            //If error queue is being used then...
+            //If any segment status is in error queue, set trip status to Q=Error Queue
+            if (DEFUseErrorQ == Constants.Yes)
+            {
+                var errorQ = from item in tripSegList
+                             where item.TripSegStatus == TripSegStatusConstants.ErrorQueue
+                             select item;
+                if (errorQ != null && errorQ.Count() > 0)
+                {
+                    currentTrip.TripStatus = TripStatusConstants.ErrorQueue;
                 }
             }
             //Lookup the TripStatus Description in the CodeTable TRIPSTATUS 

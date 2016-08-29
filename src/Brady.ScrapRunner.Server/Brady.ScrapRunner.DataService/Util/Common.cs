@@ -93,14 +93,18 @@ namespace Brady.ScrapRunner.DataService.Util
             {
                 //Calculate delay minutes for segment
                 tripSegmentDelayMin = (from item in tripDelayList
-                                       select (int)(item.DelayEndDateTime.Value.Subtract
-                                       (item.DelayStartDateTime.Value).TotalMinutes)).Sum();
+                                       select item.DelayEndDateTime.Value.Subtract
+                                       (item.DelayStartDateTime.Value).Minutes).Sum();
             }
 
             //Calculate actual segment minutes
             int? tripActualSegmentMin = currentTripSegment.TripSegActualStopMinutes
                                 + currentTripSegment.TripSegActualDriveMinutes
                                 - tripSegmentDelayMin;
+            if (tripActualSegmentMin < 0)
+            {
+                tripActualSegmentMin = 0;
+            }
             //Calculate standard segment minutes
             int? tripStandardSegmentMin = currentTripSegment.TripSegStandardDriveMinutes
                                 + currentTripSegment.TripSegStandardStopMinutes;
@@ -111,7 +115,8 @@ namespace Brady.ScrapRunner.DataService.Util
             float? tripStandardSegmentMileage = (float)(currentTripSegment.TripSegStandardMiles / 100.0);
 
             //Actual segment minutes must be >= 0 and standard segment minutes must be > 0
-            if (tripActualSegmentMin >= 0 && tripStandardSegmentMin > 0)
+            if (DEFPercentExcTime != null && 
+                tripActualSegmentMin >= 0 && tripStandardSegmentMin > 0)
             {
                 //Calculate excessive minutes
                 float? excessiveMin = (float)((100.0 + float.Parse(DEFPercentExcTime)) / 100.0 * tripStandardSegmentMin);
@@ -120,14 +125,23 @@ namespace Brady.ScrapRunner.DataService.Util
                 {
                     placeinErrorQueue = true;
                     excessiveTime = true;
-                    reasonInErrorQueue = "EXCESSIVE TIME";
-                    reasonInErrorQueueDetails = "SEG " + currentTripSegment.TripSegNumber + " "
+                    if (reasonInErrorQueue != "")
+                    {
+                        reasonInErrorQueue += "/";
+                    }
+                    reasonInErrorQueue += "EXCESSIVE TIME";
+                    if (reasonInErrorQueueDetails != "")
+                    {
+                        reasonInErrorQueueDetails += "|";
+                    }
+                    reasonInErrorQueueDetails += "SEG " + currentTripSegment.TripSegNumber + " "
                                        + tripActualSegmentMin.ToString() + " MIN vs "
                                        + tripStandardSegmentMin.ToString() + " STD";
                 }
             }
             //Actual segment mileage must be >= 0 and standard segment mileage must be > 0
-            if (tripActualSegmentMileage >= 0 && tripStandardSegmentMileage > 0)
+            if (DEFPercentExcMileage != null && 
+                tripActualSegmentMileage >= 0 && tripStandardSegmentMileage > 0)
             {
                 //Calculate excessive mileage
                 float? excessiveMileage = (float)((100.0 + float.Parse(DEFPercentExcMileage)) / 100.0 * tripStandardSegmentMileage);
@@ -154,7 +168,8 @@ namespace Brady.ScrapRunner.DataService.Util
             if (!excessiveTime)
             {
                 //Actual segment minutes must be >= 0 and standard segment minutes must be > 0
-                if (tripActualSegmentMin >= 0 && tripStandardSegmentMin > 0)
+                if (DEFPercentInsTime != null &&
+                    tripActualSegmentMin >= 0 && tripStandardSegmentMin > 0)
                 {
                     //Calculate insufficient minutes
                     float? insufficientMin = (float)((100.0 - float.Parse(DEFPercentInsTime)) / 100.0 * tripStandardSegmentMin);
@@ -180,7 +195,8 @@ namespace Brady.ScrapRunner.DataService.Util
             if (!excessiveDistance)
             {
                 //Actual segment mileage must be >= 0 and standard segment mileage must be > 0
-                if (tripActualSegmentMileage >= 0 && tripStandardSegmentMileage > 0)
+                if (DEFPercentInsMileage != null && 
+                    tripActualSegmentMileage >= 0 && tripStandardSegmentMileage > 0)
                 {
                     //Calculate insufficient mileage
                     float? insufficientMileage = (float)((100.0 - float.Parse(DEFPercentInsMileage)) / 100.0 * tripStandardSegmentMileage);
@@ -2090,7 +2106,7 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
-        
+
         /// <summary>
         /// Update a TripSegment record.
         /// </summary>
@@ -4477,7 +4493,107 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return trips;
         }
-    
+        /// TRIP Table  queries
+        /// <summary>
+        ///  Get a list of all trips dispatched, assigned, future for a driver in sequence order, then ready date time
+        ///  Caller needs to check if the fault is non-null before using the returned list.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="fault"></param>
+        /// <returns>An empty list if driverId is null or no entries are found </returns>
+        public static List<Trip> GetAllTripsForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, string driverId, out DataServiceFault fault)
+        {
+            fault = null;
+            var trips = new List<Trip>();
+            if (null != driverId)
+            {
+                //First get incomplete (pending or missed) trips dispatched to driver
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Trip>()
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverId)
+                    .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
+                    .And().Property(x => x.TripAssignStatus).In(TripAssignStatusConstants.Dispatched, TripAssignStatusConstants.Acked))
+                    .OrderBy(x => x.TripSequenceNumber)
+                    .OrderBy(x => x.TripReadyDateTime)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return trips;
+                }
+                trips.AddRange(queryResult.Records.Cast<Trip>().ToList());
+                //Next get incomplete (pending or missed) trips assigned to driver
+                query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Trip>()
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverId)
+                    .And().Property(x => x.TripStatus).In(TripStatusConstants.Pending, TripStatusConstants.Missed)
+                    .And().Property(x => x.TripAssignStatus).EqualTo(TripAssignStatusConstants.NotDispatched))
+                    .OrderBy(x => x.TripSequenceNumber)
+                    .OrderBy(x => x.TripReadyDateTime)
+                    .GetQuery()
+                };
+                queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return trips;
+                }
+                trips.AddRange(queryResult.Records.Cast<Trip>().ToList());
+                //Next get future trips assigned to driver
+                query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Trip>()
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverId)
+                    .And().Property(x => x.TripStatus).EqualTo(TripStatusConstants.Future))
+                    .OrderBy(x => x.TripSequenceNumber)
+                    .OrderBy(x => x.TripReadyDateTime)
+                    .GetQuery()
+                };
+                queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return trips;
+                }
+                trips.AddRange(queryResult.Records.Cast<Trip>().ToList());
+            }
+            return trips;
+        }
+        public static List<TripSegment> GetAllTripSegmentsForTripList(IDataService dataService, ProcessChangeSetSettings settings,
+              string userCulture, IEnumerable<long> userRoleIds, List<Trip> allTripList, out DataServiceFault fault)
+        {
+            fault = null;
+            var tripSegments = new List<TripSegment>();
+
+            if (null != allTripList)
+            {
+                //It is important to keep the trip segments in the same order as the trips
+                foreach (var trip in allTripList)
+                {
+                    //Get all the segments for each trip in allTripList 
+                    Query query = new Query
+                    {
+                        CurrentQuery = new QueryBuilder<TripSegment>()
+                        .Filter(y => y.Property(x => x.TripNumber).EqualTo(trip.TripNumber))
+                        .OrderBy(x => x.TripSegNumber)
+                        .GetQuery()
+                    };
+                    var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                    if (null != fault)
+                    {
+                        return tripSegments;
+                    }
+                    tripSegments.AddRange(queryResult.Records.Cast<TripSegment>().ToList());
+                }
+            }
+            return tripSegments;
+        }
         /// TRIP Table  queries
         /// <summary>
         ///  Get a list of all trips to be sent to a given driver at login time.
@@ -4596,7 +4712,42 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return trip;
         }
- 
+        /// <summary>
+        /// Get the last trip that was completed for this driver
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="driverId"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static Trip GetLastTripCompletedForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+             string userCulture, IEnumerable<long> userRoleIds, string driverId, out DataServiceFault fault)
+        {
+            fault = null;
+            var trip = new Trip();
+            if (null != driverId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<Trip>()
+                    .Filter(y => y.Property(x => x.TripDriverId).EqualTo(driverId)
+                    .And().Property(x => x.TripStatus).In(TripStatusConstants.Done, TripStatusConstants.Review, TripStatusConstants.Exception, TripStatusConstants.ErrorQueue))
+                    .OrderBy(x => x.TripCompletedDateTime, Direction.Descending)
+                    .Top(1)
+                    .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return trip;
+                }
+                trip = queryResult.Records.Cast<Trip>().FirstOrDefault();
+            }
+            return trip;
+        }
+
         /// TRIP Table  queries
         /// <summary>
         ///  Get the trip record for a given trip number.
@@ -5517,6 +5668,73 @@ namespace Brady.ScrapRunner.DataService.Util
                 tripTypeMasterDesc = queryResult.Records.Cast<TripTypeMasterDesc>().FirstOrDefault();
             }
             return tripTypeMasterDesc;
+        }
+        /// <summary>
+        /// Method to resequence a list of trips
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="employeeId"></param>
+        /// <param name="allTripList"></param>
+        /// <returns></returns>
+        public static ChangeSetResult<string> ResequenceTripsForDriver(IDataService dataService, ProcessChangeSetSettings settings,
+                                              List<Trip> allTripList)
+        {
+            ChangeSetResult<string> changeSetResult = null;
+            int idx = 1;
+            foreach (var trip in allTripList)
+            {
+                if (idx != trip.TripSequenceNumber)
+                {
+                    trip.TripSequenceNumber = idx;
+
+                    //Do the update
+                    changeSetResult = Common.UpdateTrip(dataService, settings, trip);
+
+                }//if (idx != trip.TripSequenceNumber)
+                idx++;
+            }//foreach (var trip in allTripList)
+
+            return changeSetResult;
+        }
+        public static ChangeSetResult<string> SetTripSegmentOrigins(IDataService dataService, ProcessChangeSetSettings settings,
+                                              List<TripSegment> allTripSegmentList)
+        {
+            ChangeSetResult<string> changeSetResult = null;
+            TripSegment previousTripSegment = null;
+
+            foreach (var tripSegment in allTripSegmentList)
+            {
+                if (previousTripSegment != null)
+                {
+                    if (tripSegment.TripSegNumber == Constants.FirstSegment)
+                    {
+                        if (tripSegment.TripSegOrigCustHostCode != previousTripSegment.TripSegDestCustHostCode)
+                        {
+                            //Set the origin of the segment to the destination of the previous segment
+                            tripSegment.TripSegOrigCustHostCode = previousTripSegment.TripSegDestCustHostCode;
+                            tripSegment.TripSegOrigCustType = previousTripSegment.TripSegDestCustType;
+                            tripSegment.TripSegOrigCustTypeDesc = previousTripSegment.TripSegDestCustTypeDesc;
+                            tripSegment.TripSegOrigCustHostCode = previousTripSegment.TripSegDestCustHostCode;
+                            tripSegment.TripSegOrigCustCode4_4 = previousTripSegment.TripSegDestCustCode4_4;
+                            tripSegment.TripSegOrigCustName = previousTripSegment.TripSegDestCustName;
+                            tripSegment.TripSegOrigCustAddress1 = previousTripSegment.TripSegDestCustAddress1;
+                            tripSegment.TripSegOrigCustAddress2 = previousTripSegment.TripSegDestCustAddress2;
+                            tripSegment.TripSegOrigCustCity = previousTripSegment.TripSegDestCustCity;
+                            tripSegment.TripSegOrigCustState = previousTripSegment.TripSegDestCustState;
+                            tripSegment.TripSegOrigCustZip = previousTripSegment.TripSegDestCustZip;
+                            tripSegment.TripSegOrigCustCountry = previousTripSegment.TripSegDestCustCountry;
+                            tripSegment.TripSegOrigCustPhone1 = previousTripSegment.TripSegDestCustPhone1;
+                            tripSegment.TripSegOrigCustTimeFactor = previousTripSegment.TripSegDestCustTimeFactor;
+
+                            changeSetResult = Common.UpdateTripSegment(dataService, settings, tripSegment);
+                        }
+                    }
+                }
+                //Save the segment for next loop
+                previousTripSegment = tripSegment;
+            }
+            return changeSetResult;
         }
     }
 }
