@@ -74,10 +74,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CustLocation = CustomerLocationList.Count > 0 ? AppResources.NoLocationSelected : AppResources.NoLocationAval
             });
 
-            var custom = customerLocations.Select(l => l.CustLocation == Container?.TripSegContainerLocation);
+            var customLocation = customerLocations.Any(l => l.CustLocation == Container?.TripSegContainerLocation);
 
             // Was a custom location entered in dispatch
-            if( custom == null && Container?.TripSegContainerLocation != null )
+            if(!customLocation && Container?.TripSegContainerLocation != null )
                 CustomerLocationList.Insert(1, new CustomerLocationModel()
                 {
                     CustHostCode = Segment.TripSegDestCustHostCode,

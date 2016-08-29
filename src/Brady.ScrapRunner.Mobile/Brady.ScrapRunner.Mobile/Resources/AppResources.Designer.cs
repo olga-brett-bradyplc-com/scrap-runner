@@ -1279,6 +1279,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Commodity.
+        /// </summary>
+        public static string SelectCommodity {
+            get {
+                return ResourceManager.GetString("SelectCommodity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select Delay Reason.
         /// </summary>
         public static string SelectDelay {

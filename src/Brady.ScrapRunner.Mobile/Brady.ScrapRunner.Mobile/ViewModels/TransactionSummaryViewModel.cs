@@ -231,7 +231,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 var commoditySelect =
                     await
-                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectLevel, "", "", null,
+                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectCommodity, "", "", null,
                             commodities.Select(c => c.CustCommodityDesc).ToArray());
 
                 if (string.IsNullOrEmpty(commoditySelect)) return;
