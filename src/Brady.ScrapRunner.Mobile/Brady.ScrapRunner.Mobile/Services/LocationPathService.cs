@@ -52,6 +52,11 @@
 
         public async void OnLocationModelMessage(LocationModelMessage locationMessage)
         {
+            if (!locationMessage.Location.Accuracy.HasValue)
+            {
+                Mvx.TaggedWarning(Constants.ScrapRunner, "Location accuracy is invalid.");
+                return;
+            }
             UpdateSpeedAverage(locationMessage.Location.Speed);
             if (_locationPath.Count == 0)
             {
