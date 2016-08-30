@@ -189,19 +189,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         driverEnrouteProcess.TripNumber);
                         break;
                     }
-                    ////////////////////////////////////////////////
-                    // Check if trip is out of order. 
-                    // If trip is out or order, resequence his trips.
-                    // TODO: Normally we would then send a resequence trips message to driver. 
-                    // Perhaps we no longer have to send a resequence trips message to driver. 
-                    if (driverEnrouteProcess.TripSegNumber == Constants.FirstSegment)
-                    {
-                        if (!CheckForTripOutOfOrder(dataService, settings, changeSetResult, msgKey, userRoleIds,
-                                               userCulture, employeeMaster, driverEnrouteProcess, currentTrip))
-                        {
-                            break;
-                        }
-                    }//if (driverEnrouteProcess.TripSegNumber == Constants.FirstSegment)
 
                     ////////////////////////////////////////////////////////
                     //Do not use the MDTId from the mobile app. Build it using the MDT Prefix (if it exists) plus the employee id.
@@ -298,6 +285,21 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                         + currentTripSegment.TripSegDestCustHostCode));
                         break;
                     }
+
+                    ////////////////////////////////////////////////
+                    // Check if trip is out of order. 
+                    // If trip is out or order, resequence his trips.
+                    // TODO: Normally we would then send a resequence trips message to driver. 
+                    // Perhaps we no longer have to send a resequence trips message to driver. 
+                    if (driverEnrouteProcess.TripSegNumber == Constants.FirstSegment)
+                    {
+                        if (!CheckForTripOutOfOrder(dataService, settings, changeSetResult, msgKey, userRoleIds,
+                                               userCulture, employeeMaster, driverEnrouteProcess, currentTrip, currentTripSegment))
+                        {
+                            break;
+                        }
+                    }//if (driverEnrouteProcess.TripSegNumber == Constants.FirstSegment)
+
                     ////////////////////////////////////////////////
                     //Define the TripSegmentContainer for use later
                     TripSegmentContainer tripSegmentContainer = new TripSegmentContainer();
@@ -916,12 +918,32 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             log.Info(RequestResponseUtil.CaptureResponse(changeSetResult, requestRespStrBld));
             return changeSetResult;
         }
+        /// <summary>
+        /// For the first segment, check to see if the driver has gone out of order.
+        /// If so, resequence the trips and then reset the trip segment origins.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="changeSetResult"></param>
+        /// <param name="msgKey"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="employeeMaster"></param>
+        /// <param name="driverEnrouteProcess"></param>
+        /// <param name="currentTrip"></param>
+        /// <param name="currentTripSegment"></param>
+        /// <returns></returns>
         public bool CheckForTripOutOfOrder(IDataService dataService, ProcessChangeSetSettings settings,
           ChangeSetResult<string> changeSetResult, String msgKey, long[] userRoleIds, string userCulture,
-          EmployeeMaster employeeMaster, DriverEnrouteProcess driverEnrouteProcess, Trip currentTrip)
+          EmployeeMaster employeeMaster, DriverEnrouteProcess driverEnrouteProcess, Trip currentTrip,
+          TripSegment currentTripSegment)
         {
             DataServiceFault fault;
 
+            //Get all of the trips that have been assigned to the driver.
+            //First, pending/missed trips dispatched to or acknowledged by the driver.
+            //Followed by pending/missed trips assigned to the driver.
+            //Followed by future trips assigned or dispatched to the driver.
             var allTripList = Common.GetAllTripsForDriver(dataService, settings, userCulture, userRoleIds,
                               employeeMaster.EmployeeId, out fault);
             if (null != fault)
@@ -931,31 +953,48 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
             if (allTripList != null && allTripList.Count() > 0)
             {
+                //If the driver's current trip is not the first in the list,we must resequence and ajust origins.
                 if (allTripList.First().TripNumber != currentTrip.TripNumber)
                 {
-                    //Must resequence
-                    //Remove the current trip for the list
+                    //Remove the current trip in the list.
                     allTripList.Remove(currentTrip);
-                    //Insert it at the top
+                    //Insert it back at the top.
+                    //Note: by removing and inserting the trip, we can then do additional update on the trip.
                     allTripList.Insert(0, currentTrip);
-                    //Call the resequence method
+
+                    //Call the resequence method.
                     changeSetResult = Common.ResequenceTripsForDriver(dataService, settings,allTripList);
 
-                    //Get the last trip that was completed by the driver
+                    //Prepare to get al list of all segments for the set origins method.
+                    //Get the last trip that was completed by the driver. We need this so that the origin of
+                    //the first segment of driver's current trip can be set to the destination of the last
+                    //segment of the last trip that the driver completed.
                     var lastCompletedTrip = Common.GetLastTripCompletedForDriver(dataService, settings, userCulture, userRoleIds,
                                             employeeMaster.EmployeeId, out fault);
                     if (lastCompletedTrip != null)
                     {
-                        //TODO: Adding this to the list so that the first segment origin can be set
-                        //causes an exception. 
-                        //allTripList.Insert(0, lastCompletedTrip);
+                        //Insert the segments of the last trip at the beginning of the list.
+                        allTripList.Insert(0, lastCompletedTrip);
                     }
 
-                    //TODO: Need to Set Origins at the TripSegment level.
+                    //Get all of the segments for all of the driver's trips keeping them in the same order as allTripList.
                     var allTripSegmentList = Common.GetAllTripSegmentsForTripList(dataService, settings, userCulture, 
                                              userRoleIds,  allTripList, out fault);
+                    //Since we may be updating the first segment of the current trip, we need to remove the current
+                    //trip segment and insert it back in at the same location.
+                    //This remove/insert step prevents the exception:
+                    //Exception saving 'TripSegment': NHibernate.NonUniqueObjectException: 
+                    //a different object with the same identifier value was already associated with the session
+                    int indexCurrentTripSegment = allTripSegmentList.IndexOf(currentTripSegment);
+                    //Should always be in the list, but just in case...
+                    if (-1 != indexCurrentTripSegment)
+                    {
+                        allTripSegmentList.RemoveAt(indexCurrentTripSegment);
+                        allTripSegmentList.Insert(indexCurrentTripSegment, currentTripSegment);
+                    }
+                    //Now call the method of set the origins as needed. Only ones where the origins are changed
+                    //will be updated.
                     changeSetResult = Common.SetTripSegmentOrigins(dataService, settings, allTripSegmentList);
-
 
                     ////////////////////////////////////////////////
                     //Add entry to Event Log – "DRIVER OUT OF ORDER". 
