@@ -33,6 +33,10 @@
             {
                 _mvxLocationToken = _mvxMessenger.Subscribe<LocationModelMessage>(OnLocationModelMessage);
             }
+            _geofenceContext = new GeofenceContext
+            {
+                State = GeofenceState.Unknown
+            };
             Mvx.TaggedTrace(Constants.ScrapRunner, "Geofence service started");
         }
 
