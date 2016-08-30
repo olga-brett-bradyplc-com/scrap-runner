@@ -26,6 +26,12 @@
         private readonly double[] _averageSpeeds = { 0.0f, 0.0f, 0.0f, 0.0f };
         private double _averageSpeed = 0.0f;
         private double _maxSpeed = 0.0f;
+        private MovementState _movementState = MovementState.Stationary;
+        private DateTimeOffset _movementStateDateTimeOffset;
+        private const double AccelerationSpeedLimit = 2.0f;
+        private const double DecelerationSpeedLimit = 4.0f;
+        private const int AccelerationDurationSeconds = 3;
+        private const int DecelerationDurationSeconds = 3;
 
         public LocationPathService(IMvxMessenger mvxMessenger, IConnectionService connectionService)
         {
@@ -38,6 +44,8 @@
             if (_started) return;
             _locationToken = _mvxMessenger.Subscribe<LocationModelMessage>(OnLocationModelMessage);
             _started = true;
+            _movementState = MovementState.Stationary;
+            _movementStateDateTimeOffset = DateTimeOffset.Now;
             Mvx.TaggedTrace(Constants.ScrapRunner, "Location path service started");
         }
 
@@ -58,6 +66,7 @@
                 return;
             }
             UpdateSpeedAverage(locationMessage.Location.Speed);
+            UpdateMovementState(locationMessage.Location);
             if (_locationPath.Count == 0)
             {
                 _nextPathTransmit = locationMessage.Location.Timestamp.AddMinutes(SendPathMinutes);
@@ -82,6 +91,76 @@
                 await SendPathAsync();
                 ClearPath();
             }
+        }
+
+        private TimeSpan TimeSinceAccelerationChange()
+        {
+            return DateTimeOffset.Now - _movementStateDateTimeOffset;
+        }
+
+        private void UpdateMovementState(LocationModel locationModel)
+        {
+            var speed = locationModel.Speed.GetValueOrDefault(0.0f);
+            var now = DateTimeOffset.Now;
+            switch (_movementState)
+            {
+                case MovementState.Stationary:
+                    if (speed > AccelerationSpeedLimit)
+                    {
+                        Mvx.TaggedTrace(Constants.ScrapRunner, "Acceleration detected.");
+                        _movementStateDateTimeOffset = now;
+                        _movementState = MovementState.Accelerating;
+                    }
+                    break;
+                case MovementState.Accelerating:
+                    if (speed < AccelerationSpeedLimit)
+                    {
+                        Mvx.TaggedTrace(Constants.ScrapRunner, "Acceleration aborted.");
+                        _movementStateDateTimeOffset = now;
+                        _movementState = MovementState.Stationary;
+                        return;
+                    }
+                    if (TimeSinceAccelerationChange().TotalSeconds > AccelerationDurationSeconds)
+                    {
+                        Mvx.TaggedTrace(Constants.ScrapRunner, "Movement detected.");
+                        _movementStateDateTimeOffset = now;
+                        _movementState = MovementState.Moving;
+                    }
+                    break;
+                case MovementState.Moving:
+                    if (speed < DecelerationSpeedLimit)
+                    {
+                        Mvx.TaggedTrace(Constants.ScrapRunner, "Deceleration detected.");
+                        _movementStateDateTimeOffset = now;
+                        _movementState = MovementState.Decelerating;
+                    }
+                    break;
+                case MovementState.Decelerating:
+                    if (speed > DecelerationSpeedLimit)
+                    {
+                        Mvx.TaggedTrace(Constants.ScrapRunner, "Deceleration aborted.");
+                        _movementStateDateTimeOffset = now;
+                        _movementState = MovementState.Moving;
+                        return;
+                    }
+                    if (TimeSinceAccelerationChange().TotalSeconds > DecelerationDurationSeconds)
+                    {
+                        Mvx.TaggedTrace(Constants.ScrapRunner, "Stationary detected.");
+                        _movementStateDateTimeOffset = now;
+                        _movementState = MovementState.Stationary;
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        enum MovementState
+        {
+            Stationary,
+            Accelerating,
+            Moving,
+            Decelerating
         }
 
         private void UpdateSpeedAverage(double? speed)
