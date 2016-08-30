@@ -308,25 +308,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                         break;
                     }
                     ////////////////////////////////////////////////
-                    // Get the current TripSegment record
-                    var currentTripSegment = (from item in tripSegList
-                                              where item.TripSegNumber == driverSegmentDoneProcess.TripSegNumber
-                                              select item).FirstOrDefault();
-                    if (null == currentTripSegment)
-                    {
-                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid TripSegment: " +
-                            driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
-                        break;
-                    }
-                    ////////////////////////////////////////////////
-                    //Check if trip segment is complete
-                    if (Common.IsTripSegmentComplete(currentTripSegment))
-                    {
-                        log.DebugFormat("SRTEST:TripSegNumber:{0}-{1} is Complete. Segment done processing ends.",
-                                        driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber);
-                        break;
-                    }
-                    ////////////////////////////////////////////////
                     // Get a list of all containers for the trip from the TripSegmentContainer table
                     var tripContainerList = Common.GetTripContainersForTrip(dataService, settings, userCulture, userRoleIds,
                                         driverSegmentDoneProcess.TripNumber, out fault);
@@ -360,7 +341,25 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                         break;
                     }
-
+                    ////////////////////////////////////////////////
+                    // Get the current TripSegment record
+                    var currentTripSegment = (from item in tripSegList
+                                              where item.TripSegNumber == driverSegmentDoneProcess.TripSegNumber
+                                              select item).FirstOrDefault();
+                    if (null == currentTripSegment)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Segment Done:Invalid TripSegment: " +
+                            driverSegmentDoneProcess.TripNumber + "-" + driverSegmentDoneProcess.TripSegNumber));
+                        break;
+                    }
+                    ////////////////////////////////////////////////
+                    //Check if trip segment is complete
+                    if (Common.IsTripSegmentComplete(currentTripSegment))
+                    {
+                        log.DebugFormat("SRTEST:TripSegNumber:{0}-{1} is Complete. Segment done processing ends.",
+                                        driverSegmentDoneProcess.TripNumber, driverSegmentDoneProcess.TripSegNumber);
+                        break;
+                    }
                     ////////////////////////////////////////////////
                     // Get the Customer record for the destination cust host code
                     var destCustomerMaster = Common.GetCustomer(dataService, settings, userCulture, userRoleIds,
@@ -766,8 +765,33 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                 return false;
             }
-            //ToDo: Adjust Origins
 
+            ////////////////////////////////////////////////
+            //Adjust Origins to exclude the canceled segment.
+            //Get all of the trips that have been assigned to the driver.
+            //First, pending/missed trips dispatched to or acknowledged by the driver.
+            //Followed by pending/missed trips assigned to the driver.
+            //Followed by future trips assigned or dispatched to the driver.
+            var allTripList = Common.GetAllTripsForDriver(dataService, settings, userCulture, userRoleIds,
+                              employeeMaster.EmployeeId, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (allTripList != null && allTripList.Count() > 0)
+            {
+                //Don't need to get the last completed trip, since the origin of his current trip did not change.
+                //Get all of the segments for all of the driver's trips keeping them in the same order as allTripList.
+                var allTripSegmentList = Common.GetAllTripSegmentsForTripList(dataService, settings, userCulture,
+                                            userRoleIds, allTripList, out fault);
+
+                //Remove the current trip segment since it has been canceled by the driver.
+                allTripSegmentList.Remove(currentTripSegment);
+                //Now call the method of set the origins as needed. Only ones where the origins are changed
+                //will be updated.
+                changeSetResult = Common.SetTripSegmentOrigins(dataService, settings, allTripSegmentList);
+            }
             return true;
 
         }
@@ -944,7 +968,7 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                 }
             }
-            //TODO: Check if the trip should be placed in the Error Queue
+            //Check if the trip should be placed in the Error Queue
             //If so,  set the Trip.TripStatus to TS_ERRQ (Q)
             //Set the Trip.TripErrorDesc to EXCESS TIME, EXCESS MILEAGE, INSUFFICIENT TIME, INSUFFICIENT MILEAGE
             ////////////////////////////////////////////////
@@ -1522,7 +1546,29 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             {
                 newTripSegment.TripSegStandardDriveMinutes = 0;
                 newTripSegment.TripSegStandardMiles = 0;
-                //ToDo: Send off a request to maps
+
+                ///////////////////////////////////////////////////////////////
+                //Send off a request to maps
+                tripPoints = new TripPoints();
+                tripPoints.TripPointsHostCode1 = newTripSegment.TripSegOrigCustHostCode;
+                tripPoints.TripPointsHostCode2 = newTripSegment.TripSegDestCustHostCode;
+                tripPoints.TripPointsSendToMaps = TripSendToMapsValue.Ready;
+                tripPoints.ChgDateTime = driverSegmentDoneProcess.ActionDateTime;
+                tripPoints.ChgEmployeeId = driverSegmentDoneProcess.EmployeeId;
+
+                //Do the TripPoints table update
+                changeSetResult = Common.UpdateTripPoints(dataService, settings, tripPoints);
+                log.DebugFormat("SRTEST:Saving TripPoints Record for Trip:{0}-{1} Orig:{2} Dest:{3} - Segment Add.",
+                                newTripSegment.TripNumber, newTripSegment.TripSegNumber,
+                                newTripSegment.TripSegOrigCustHostCode, newTripSegment.TripSegDestCustHostCode);
+                if (Common.LogChangeSetFailure(changeSetResult, newTripSegment, log))
+                {
+                    var s = string.Format("Segment Add:Could not update TripPoints for Trip:{0}-{1} Orig:{2} Dest:{3}.",
+                            newTripSegment.TripNumber, newTripSegment.TripSegNumber,
+                            newTripSegment.TripSegOrigCustHostCode, newTripSegment.TripSegDestCustHostCode);
+                    changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                    return false;
+                }
             }
             else
             {
@@ -1635,7 +1681,36 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 return false;
             }
 
-            //ToDo:Adjust Origins
+            ////////////////////////////////////////////////
+            //Adjust Origins to include the new trip segment.
+            //Get all of the trips that have been assigned to the driver.
+            //First, pending/missed trips dispatched to or acknowledged by the driver.
+            //Followed by pending/missed trips assigned to the driver.
+            //Followed by future trips assigned or dispatched to the driver.
+            var allTripList = Common.GetAllTripsForDriver(dataService, settings, userCulture, userRoleIds,
+                              employeeMaster.EmployeeId, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (allTripList != null && allTripList.Count() > 0)
+            {
+                //Get all of the segments for all of the driver's trips keeping them in the same order as allTripList.
+                var allTripSegmentList = Common.GetAllTripSegmentsForTripList(dataService, settings, userCulture,
+                                            userRoleIds, allTripList, out fault);
+                //Since we added a new segment of the current trip, we need to insert the new trip segment 
+                //after the current trip segment.
+                int indexCurrentTripSegment = allTripSegmentList.IndexOf(currentTripSegment);
+                //Should always be in the list, but just in case...
+                if (-1 != indexCurrentTripSegment)
+                {
+                    allTripSegmentList.Insert(indexCurrentTripSegment+1, newTripSegment);
+                }
+                //Now call the method of set the origins as needed. Only ones where the origins are changed
+                //will be updated.
+                changeSetResult = Common.SetTripSegmentOrigins(dataService, settings, allTripSegmentList);
+            }
 
             return true;
         }
@@ -1810,7 +1885,36 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                 return false;
             }
 
-            //ToDo:Adjust Origins
+            ////////////////////////////////////////////////
+            //Adjust Origins to include the modified trip segment.
+            //Get all of the trips that have been assigned to the driver.
+            //First, pending/missed trips dispatched to or acknowledged by the driver.
+            //Followed by pending/missed trips assigned to the driver.
+            //Followed by future trips assigned or dispatched to the driver.
+            var allTripList = Common.GetAllTripsForDriver(dataService, settings, userCulture, userRoleIds,
+                              employeeMaster.EmployeeId, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (allTripList != null && allTripList.Count() > 0)
+            {
+                //Get all of the segments for all of the driver's trips keeping them in the same order as allTripList.
+                var allTripSegmentList = Common.GetAllTripSegmentsForTripList(dataService, settings, userCulture,
+                                            userRoleIds, allTripList, out fault);
+                //Since we modified the current segment of the current trip, we need to remove and insert the modified trip segment 
+                int indexCurrentTripSegment = allTripSegmentList.IndexOf(currentTripSegment);
+                //Should always be in the list, but just in case...
+                if (-1 != indexCurrentTripSegment)
+                {
+                    allTripSegmentList.RemoveAt(indexCurrentTripSegment);
+                    allTripSegmentList.Insert(indexCurrentTripSegment, currentTripSegment);
+                }
+                //Now call the method of set the origins as needed. Only ones where the origins are changed
+                //will be updated.
+                changeSetResult = Common.SetTripSegmentOrigins(dataService, settings, allTripSegmentList);
+            }
 
             return true;
         }//end of public bool SegmentModify
@@ -2168,8 +2272,26 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
 
             ////////////////////////////////////////////////
-            //TODO: Resequence trips for the driver of the completed trip.
+            //Resequence trips for the driver of the completed trip.
+            //Get all of the trips that have been assigned to the driver.
+            //First, pending/missed trips dispatched to or acknowledged by the driver.
+            //Followed by pending/missed trips assigned to the driver.
+            //Followed by future trips assigned or dispatched to the driver.
+            var allTripList = Common.GetAllTripsForDriver(dataService, settings, userCulture, userRoleIds,
+                              employeeMaster.EmployeeId, out fault);
+            if (null != fault)
+            {
+                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                return false;
+            }
+            if (allTripList != null && allTripList.Count() > 0)
+            {
+                //Remove the current trip in the list since it is now complete.
+                allTripList.Remove(currentTrip);
 
+                //Call the resequence method.
+                changeSetResult = Common.ResequenceTripsForDriver(dataService, settings, allTripList);
+            }
             return true;
 
         } //end of  MarkTripDone
