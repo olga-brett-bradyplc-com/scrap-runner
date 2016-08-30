@@ -36,7 +36,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IBackgroundScheduler _backgroundScheduler;
         private readonly ILocationService _locationService;
         private readonly ILocationOdometerService _locationOdometerService;
-        private readonly IMvxMessenger _mvxMessenger;
         
         public SignInViewModel(
             IDbService dbService,
@@ -51,8 +50,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IConnectionService connection, 
             IBackgroundScheduler backgroundScheduler, 
             ILocationService locationService, 
-            ILocationOdometerService locationOdometerService,
-            IMvxMessenger mvxMessenger)
+            ILocationOdometerService locationOdometerService)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -63,7 +61,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _codeTableService = codeTableService;
             _terminalService = terminalService;
             _messagesService = messagesService;
-            _mvxMessenger = mvxMessenger;
 
             _connection = connection;
             _backgroundScheduler = backgroundScheduler;
