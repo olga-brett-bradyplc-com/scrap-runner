@@ -188,7 +188,7 @@
     <value>Sign in process failed.</value>
   </data>
   <data name="ConfirmEnRouteMessage" xml:space="preserve">
-    <value>You are about to go en route to:{0}{2}{1}{3}{1}{4}{0}Are you sure you want to start this trip?</value>
+    <value>You are about to go en route to:{1}{2}{1}{3}{1}{4}{1}{5}{0}Are you sure you want to start this trip?</value>
     <comment>Route Detail View</comment>
   </data>
   <data name="Settings" xml:space="preserve">
@@ -239,7 +239,7 @@
     <comment>Route Detail View</comment>
   </data>
   <data name="ConfirmArrivalMessage" xml:space="preserve">
-    <value>You are arriving at:{0}{2}{1}{3}{1}{4}{0} Are you sure you want to mark trip as arrived?</value>
+    <value>You are arriving at:{1}{2}{1}{3}{1}{4}{1}{5}{0} Are you sure you want to mark trip as arrived?</value>
     <comment>Transaction Detail View</comment>
   </data>
   <data name="ConfirmArrivalTitle" xml:space="preserve">
@@ -773,5 +773,8 @@ You will now be sent back to the login.</value>
   <data name="SelectCommodity" xml:space="preserve">
     <value>Select Commodity</value>
     <comment>TransactionSummaryViewModel</comment>
+  </data>
+  <data name="ConfirmEnRouteMessageRT" xml:space="preserve">
+    <value>You are about to go en route to:{1}{2}{1}{3}{1}{4}{1}{5}{0}Are you sure you want to continue?</value>
   </data>
 </root>

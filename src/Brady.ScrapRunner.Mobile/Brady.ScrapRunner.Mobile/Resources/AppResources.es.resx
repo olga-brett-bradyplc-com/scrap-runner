@@ -178,7 +178,7 @@
     <value>Entrar en el proceso falló.</value>
   </data>
   <data name="ConfirmEnRouteMessage" xml:space="preserve">
-    <value>Usted está a punto de entrar en el camino a:{0}{2}{1}{3}{1}{4}{0}¿Seguro que desea iniciar este viaje?</value>
+    <value>Usted está a punto de entrar en el camino a:{1}{2}{1}{3}{1}{4}{1}{5}{0}¿Seguro que desea iniciar este viaje?</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Ajustes</value>
@@ -224,7 +224,7 @@
     <comment>Scale Detail View</comment>
   </data>
   <data name="ConfirmArrivalMessage" xml:space="preserve">
-    <value>Usted está llegando:{0}{2}{1}{3}{1}{4}{0}¿Seguro que desea marcar viaje como llegado ?</value>
+    <value>Usted está llegando:{1}{2}{1}{3}{1}{4}{1}{5}{0}¿Seguro que desea marcar viaje como llegado ?</value>
   </data>
   <data name="ConfirmArrivalTitle" xml:space="preserve">
     <value>llegando</value>
@@ -739,5 +739,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
   <data name="SelectCommodity" xml:space="preserve">
     <value>Select Commodity</value>
     <comment>NEEDS TRANSLATION; TransactionSummaryViewModel</comment>
+  </data>
+  <data name="ConfirmEnRouteMessageRT" xml:space="preserve">
+    <value>Usted está a punto de entrar en el camino a:{1}{2}{1}{3}{1}{4}{1}{5}{0}¿Estás seguro de que quieres continuar?</value>
   </data>
 </root>

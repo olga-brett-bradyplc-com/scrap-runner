@@ -72,6 +72,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls
         // Replace with BindingInflate?
         private View SetLayoutInformation(View viewGroup, TripLegWrapper tripLeg)
         {
+            var companyHostCode = viewGroup.FindViewById<TextView>(Resource.Id.trip_companyhostcode);
+            companyHostCode.Text = tripLeg.TripCustHostCode;
+
             var companyName = viewGroup.FindViewById<TextView>(Resource.Id.trip_companyname);
             companyName.Text = tripLeg.TripCustName;
 
@@ -92,6 +95,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls
 
         private View SetDirectionsInformation(View viewGroup, CustomerDirectionsWrapper directions)
         {
+            var companyhostcode = viewGroup.FindViewById<TextView>(Resource.Id.trip_companyhostcode);
+            companyhostcode.Text = directions.TripCustHostCode;
+
             var companyName = viewGroup.FindViewById<TextView>(Resource.Id.trip_companyname);
             companyName.Text = directions.TripCustName;
 
