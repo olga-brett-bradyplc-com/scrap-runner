@@ -22,6 +22,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ITerminalService _terminalService;
         private readonly ILocationGeofenceService _locationGeofenceService;
         private readonly ILocationOdometerService _locationOdometerService;
+        private readonly ILocationPathService _locationPathService;
 
         public MenuViewModel(IConnectionService connection, 
             IBackgroundScheduler backgroundScheduler, 
@@ -31,7 +32,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IDriverService driverService,
             ITerminalService terminalService, 
             ILocationGeofenceService locationGeofenceService, 
-            ILocationOdometerService locationOdometerService)
+            ILocationOdometerService locationOdometerService, 
+            ILocationPathService locationPathService)
         {
             _connection = connection;
             _backgroundScheduler = backgroundScheduler;
@@ -42,6 +44,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _terminalService = terminalService;
             _locationGeofenceService = locationGeofenceService;
             _locationOdometerService = locationOdometerService;
+            _locationPathService = locationPathService;
         }
 
         public override async void Start()
@@ -91,9 +94,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private void Logout()
         {
             _backgroundScheduler.Unschedule();
+
             _locationService.Stop();
             _locationOdometerService.Stop();
             _locationGeofenceService.Stop();
+            _locationPathService.Stop();
+
             _connection.DeleteConnection();
 
             ShowViewModel<SignInViewModel>();

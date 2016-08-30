@@ -37,6 +37,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ILocationService _locationService;
         private readonly ILocationOdometerService _locationOdometerService;
         private readonly ILocationGeofenceService _locationGeofenceService;
+        private readonly ILocationPathService _locationPathService;
         private readonly IMvxMessenger _mvxMessenger;
         
         public SignInViewModel(
@@ -54,7 +55,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ILocationService locationService, 
             ILocationOdometerService locationOdometerService,
             IMvxMessenger mvxMessenger, 
-            ILocationGeofenceService locationGeofenceService)
+            ILocationGeofenceService locationGeofenceService, 
+            ILocationPathService locationPathService)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -67,6 +69,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _messagesService = messagesService;
             _mvxMessenger = mvxMessenger;
             _locationGeofenceService = locationGeofenceService;
+            _locationPathService = locationPathService;
 
             _connection = connection;
             _backgroundScheduler = backgroundScheduler;
@@ -187,6 +190,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _locationService.Stop();
                 _locationOdometerService.Stop();
                 _locationGeofenceService.Stop();
+                _locationPathService.Stop();
 
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
                 // have a need for a login service, leaving this as is.
@@ -401,6 +405,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _locationService.Start();
             _locationOdometerService.Start(Convert.ToDouble(Odometer));
             _locationGeofenceService.Start();
+            _locationPathService.Start();
             return true;
         }
 
