@@ -62,14 +62,12 @@
             {
                 _nextPathTransmit = locationMessage.Location.Timestamp.AddMinutes(SendPathMinutes);
                 AddPath(locationMessage.Location);
-                Mvx.TaggedTrace(Constants.ScrapRunner, "Add first point to location path.");
                 return;
             }
             var lastLocation = _locationPath.Last();
             if (_nextPointAdded.HasValue && locationMessage.Location.Timestamp > _nextPointAdded)
             {
                 AddPath(locationMessage.Location);
-                Mvx.TaggedTrace(Constants.ScrapRunner, "Add point to location path.");
             }
             if (lastLocation.Heading.HasValue && lastLocation.Heading > 0.0 &&
                 locationMessage.Location.Heading.HasValue && locationMessage.Location.Heading > 0.0)
@@ -77,14 +75,12 @@
                 if (Math.Abs(locationMessage.Location.Heading.Value - lastLocation.Heading.Value) >= AddPointDegrees)
                 {
                     AddPath(locationMessage.Location);
-                    Mvx.TaggedTrace(Constants.ScrapRunner, "Add heading change point to location path.");
                 }
             }
             if (_nextPathTransmit.HasValue && locationMessage.Location.Timestamp >= _nextPathTransmit)
             {
                 await SendPathAsync();
                 ClearPath();
-                Mvx.TaggedTrace(Constants.ScrapRunner, "Sent location path to server.");
             }
         }
 
@@ -126,6 +122,7 @@
                 Timestamp = location.Timestamp
             };
             _locationPath.Add(newLocation);
+            Mvx.TaggedTrace(Constants.ScrapRunner, $"Add point {_locationPath.Count} to location path.");
             _nextPointAdded = location.Timestamp.AddMinutes(AddPointMinutes);
             _maxSpeed = 0.0f;
         }
@@ -135,11 +132,13 @@
             _locationPath.Clear();
             _nextPointAdded = null;
             _nextPathTransmit = null;
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Location path cleared.");
         }
 
         private Task SendPathAsync()
         {
             // @TODO: Implement using _connectionService.
+            Mvx.TaggedTrace(Constants.ScrapRunner, $"Sent {_locationPath.Count} points in location path to server.");
             return Task.FromResult(default(object));
         }
     }

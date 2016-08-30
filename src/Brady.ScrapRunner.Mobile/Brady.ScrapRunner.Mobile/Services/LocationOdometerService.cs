@@ -52,6 +52,7 @@
                 Mvx.TaggedTrace(Constants.ScrapRunner,
                     $"Distance between {obj.Location.Latitude:F4},{obj.Location.Longitude:F4} and {_previousLocation.Latitude:F4},{_previousLocation.Longitude:F4} is {distance:F4}");
                 _tripOdometer += distance;
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Location odometer updated to {_tripOdometer:F4}.");
             }
             _previousLocation = obj.Location;
         }
