@@ -2089,6 +2089,22 @@ namespace Brady.ScrapRunner.DataService.Util
             var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
             return changeSetResult;
         }
+        /// <summary>
+        /// Add/Update a TripPoints record.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="tripPoints"></param>
+        /// <returns>The changeSetResult.  Caller must inspect for errors.</returns>
+        public static ChangeSetResult<string> UpdateTripPoints(IDataService dataService, ProcessChangeSetSettings settings,
+            TripPoints tripPoints)
+        {
+            var recordType = (TripPointsRecordType)dataService.RecordTypes.Single(x => x.TypeName == "TripPoints");
+            var changeSet = (ChangeSet<string, TripPoints>)recordType.GetNewChangeSet();
+            changeSet.AddUpdate(tripPoints.Id, tripPoints);
+            var changeSetResult = recordType.ProcessChangeSet(dataService, changeSet, settings);
+            return changeSetResult;
+        }
 
         /// <summary>
         /// Update a Trip record.
