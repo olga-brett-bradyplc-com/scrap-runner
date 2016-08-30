@@ -4,9 +4,11 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Domain;
     using Interfaces;
     using Messages;
     using Models;
+    using MvvmCross.Platform;
     using MvvmCross.Plugins.Messenger;
 
     public class LocationPathService : ILocationPathService
@@ -36,6 +38,7 @@
             if (_started) return;
             _locationToken = _mvxMessenger.Subscribe<LocationModelMessage>(OnLocationModelMessage);
             _started = true;
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Location path service started");
         }
 
         public void Stop()
@@ -44,6 +47,7 @@
             _mvxMessenger.Unsubscribe<LocationModelMessage>(_locationToken);
             _locationToken = null;
             _started = false;
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Location path service stopped");
         }
 
         public async void OnLocationModelMessage(LocationModelMessage locationMessage)
@@ -53,17 +57,14 @@
             {
                 _nextPathTransmit = locationMessage.Location.Timestamp.AddMinutes(SendPathMinutes);
                 AddPath(locationMessage.Location);
+                Mvx.TaggedTrace(Constants.ScrapRunner, "Add first point to location path.");
                 return;
             }
             var lastLocation = _locationPath.Last();
             if (_nextPointAdded.HasValue && locationMessage.Location.Timestamp > _nextPointAdded)
             {
                 AddPath(locationMessage.Location);
-                if (_nextPathTransmit.HasValue && locationMessage.Location.Timestamp >= _nextPathTransmit)
-                {
-                    await SendPathAsync();
-                    ClearPath();
-                }
+                Mvx.TaggedTrace(Constants.ScrapRunner, "Add point to location path.");
             }
             if (lastLocation.Heading.HasValue && lastLocation.Heading > 0.0 &&
                 locationMessage.Location.Heading.HasValue && locationMessage.Location.Heading > 0.0)
@@ -71,12 +72,14 @@
                 if (Math.Abs(locationMessage.Location.Heading.Value - lastLocation.Heading.Value) >= AddPointDegrees)
                 {
                     AddPath(locationMessage.Location);
+                    Mvx.TaggedTrace(Constants.ScrapRunner, "Add heading change point to location path.");
                 }
             }
             if (_nextPathTransmit.HasValue && locationMessage.Location.Timestamp >= _nextPathTransmit)
             {
                 await SendPathAsync();
                 ClearPath();
+                Mvx.TaggedTrace(Constants.ScrapRunner, "Sent location path to server.");
             }
         }
 
