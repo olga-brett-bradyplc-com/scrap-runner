@@ -36,6 +36,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IBackgroundScheduler _backgroundScheduler;
         private readonly ILocationService _locationService;
         private readonly ILocationOdometerService _locationOdometerService;
+        private readonly ILocationGeofenceService _locationGeofenceService;
         private readonly IMvxMessenger _mvxMessenger;
         
         public SignInViewModel(
@@ -52,7 +53,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IBackgroundScheduler backgroundScheduler, 
             ILocationService locationService, 
             ILocationOdometerService locationOdometerService,
-            IMvxMessenger mvxMessenger)
+            IMvxMessenger mvxMessenger, 
+            ILocationGeofenceService locationGeofenceService)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -64,6 +66,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _terminalService = terminalService;
             _messagesService = messagesService;
             _mvxMessenger = mvxMessenger;
+            _locationGeofenceService = locationGeofenceService;
 
             _connection = connection;
             _backgroundScheduler = backgroundScheduler;
@@ -183,6 +186,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _backgroundScheduler.Unschedule();
                 _locationService.Stop();
                 _locationOdometerService.Stop();
+                _locationGeofenceService.Stop();
 
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
                 // have a need for a login service, leaving this as is.
@@ -396,6 +400,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _backgroundScheduler.Schedule(60000);
             _locationService.Start();
             _locationOdometerService.Start(Convert.ToDouble(Odometer));
+            _locationGeofenceService.Start();
             return true;
         }
 

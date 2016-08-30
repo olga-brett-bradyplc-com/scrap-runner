@@ -20,6 +20,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ILocationService _locationService;
         private readonly IDriverService _driverService;
         private readonly ITerminalService _terminalService;
+        private readonly ILocationGeofenceService _locationGeofenceService;
+        private readonly ILocationOdometerService _locationOdometerService;
 
         public MenuViewModel(IConnectionService connection, 
             IBackgroundScheduler backgroundScheduler, 
@@ -27,7 +29,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ILocationService locationService, 
             IMessagesService messageService,
             IDriverService driverService,
-            ITerminalService terminalService)
+            ITerminalService terminalService, 
+            ILocationGeofenceService locationGeofenceService, 
+            ILocationOdometerService locationOdometerService)
         {
             _connection = connection;
             _backgroundScheduler = backgroundScheduler;
@@ -36,6 +40,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _messagesService = messageService;
             _driverService = driverService;
             _terminalService = terminalService;
+            _locationGeofenceService = locationGeofenceService;
+            _locationOdometerService = locationOdometerService;
         }
 
         public override async void Start()
@@ -82,6 +88,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private IMvxAsyncCommand _logoutCommand;
         public IMvxAsyncCommand LogoutCommand => _logoutCommand ?? (_logoutCommand = new MvxAsyncCommand(ExecuteLogoutAsync));
 
+        private void Logout()
+        {
+            _backgroundScheduler.Unschedule();
+            _locationService.Stop();
+            _locationOdometerService.Stop();
+            _locationGeofenceService.Stop();
+            _connection.DeleteConnection();
+
+            ShowViewModel<SignInViewModel>();
+        }
+
         private async Task ExecuteLogoutAsync()
         {
             var logoutDialog = await UserDialogs.Instance.ConfirmAsync(
@@ -103,10 +120,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (!logoffProcess.WasSuccessful)
                     UserDialogs.Instance.Alert(logoffProcess.Failure.Summary, AppResources.Error);
 
-                _backgroundScheduler.Unschedule();
-                _locationService.Stop();
-                _connection.DeleteConnection();
-                ShowViewModel<SignInViewModel>();
+                Logout();
             }
         }
 
@@ -118,11 +132,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             await UserDialogs.Instance.AlertAsync(
                             AppResources.ForcedLogoffMessage, AppResources.ForcedLogoff, AppResources.OK);
-
-            _backgroundScheduler.Unschedule();
-            _locationService.Stop();
-            _connection.DeleteConnection();
-            ShowViewModel<SignInViewModel>();
+            Logout();
         }
         private IMvxCommand _fuelentryCommand;
         public IMvxCommand FuelEntryCommand
