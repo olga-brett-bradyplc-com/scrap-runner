@@ -9,13 +9,14 @@
     <TextView
         android:id="@+id/TripCompanyName"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:background="@color/material_gray_900"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textColor="@color/material_white"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingLeft="18dp"
+        android:paddingRight="24dp"
         android:layout_marginTop="56dp"
         local:MvxBind="Text TripFor" />
     <Button

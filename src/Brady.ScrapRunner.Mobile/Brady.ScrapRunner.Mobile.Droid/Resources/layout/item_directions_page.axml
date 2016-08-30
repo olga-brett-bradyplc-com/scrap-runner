@@ -11,6 +11,14 @@
       android:padding="20dp"
       android:background="@color/material_white">
     <TextView
+       android:id="@+id/trip_companyhostcode"
+       android:layout_height="wrap_content"
+       android:layout_weight="1"
+       android:layout_alignParentLeft="true"
+       android:layout_width="match_parent"
+       android:textColor="@color/material_gray_900"
+       android:textSize="16sp" />
+    <TextView
         android:id="@+id/trip_companyname"
         android:layout_height="wrap_content"
         android:layout_weight="1"

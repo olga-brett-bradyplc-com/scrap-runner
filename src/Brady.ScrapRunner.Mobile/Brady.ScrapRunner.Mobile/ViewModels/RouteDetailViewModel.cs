@@ -65,7 +65,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             SubTitle = $"{AppResources.Trip} {trip.TripNumber}";
             TripDriverInstructions = trip.TripDriverInstructions;
             TripType = trip.TripType;
-            TripFor = trip.TripCustName;
+            TripFor = trip.TripCustHostCode + " " + trip.TripCustName;
 
             var fullTripSegments = await _tripService.FindAllSegmentsForTripAsync(TripNumber);
             var templist = new List<TripLegWrapper>();
@@ -76,6 +76,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if(customerDirections.Count > 0)
                 CustomerDirections = new CustomerDirectionsWrapper
                 {
+                    TripCustHostCode = fullTripSegments.FirstOrDefault().TripSegDestCustHostCode,
                     TripCustName = fullTripSegments.FirstOrDefault().TripSegDestCustName,
                     TripCustAddress = fullTripSegments.FirstOrDefault().TripSegDestCustAddress1,
                     TripCustCityStateZip = fullTripSegments.FirstOrDefault().DestCustCityStateZip,
@@ -105,6 +106,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripLegs = new List<TripLegWrapper>(templist);
 
             var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
+            TripCustHostCode = firstSegment.TripSegDestCustHostCode;
             TripCustName = firstSegment.TripSegDestCustName;
             TripDriverInstructions = trip.TripDriverInstructions;
             TripCustAddress = firstSegment.TripSegDestCustAddress1 +
@@ -194,6 +196,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _tripDriverInstructions, value); }
         }
 
+        private string _tripCustHostCode;
+
+        public string TripCustHostCode
+        {
+            get { return _tripCustHostCode; }
+            set { SetProperty(ref _tripCustHostCode, value); }
+        }
         private string _tripCustName;
         public string TripCustName
         {
@@ -281,15 +290,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ShowViewModel<ModifyReturnToYardViewModel>(new {changeType = TerminalChangeEnum.Edit, tripNumber = TripNumber});
         }
 
-        private async Task ExecuteEnRouteCommandAsync()
+        private async Task ExecuteEnRouteCommandAsync() 
         {
             var firstSegment = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key;
-            var message = string.Format(AppResources.ConfirmEnRouteMessage,
+            var confirmMessage = firstSegment.TripSegType == BasicTripTypeConstants.ReturnYard ||
+                                 firstSegment.TripSegType == BasicTripTypeConstants.ReturnYardNC
+                ? AppResources.ConfirmEnRouteMessageRT
+                : AppResources.ConfirmEnRouteMessage;
+
+            var message = string.Format(confirmMessage,
                 "\n\n",
                 "\n",
+                TripCustHostCode,
                 TripCustName,
                 TripCustAddress,
                 TripCustCityStateZip);
+
             var confirm = await UserDialogs.Instance.ConfirmAsync(message, AppResources.ConfirmEnrouteTitle);
             if (confirm)
             {
@@ -328,6 +344,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var message = string.Format(AppResources.ConfirmArrivalMessage,
                 "\n\n",
                 "\n",
+                TripCustHostCode,
                 TripCustName,
                 TripCustAddress,
                 TripCustCityStateZip);
@@ -387,7 +404,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                         string address = terminal.Address1?.TrimEnd();
                                         if (terminal.Address2?.TrimEnd() != "")
                                             address += terminal.Address2?.TrimEnd();
-                                        string termInfoText = terminal.TerminalName?.TrimEnd() + "\n" + address + "\n" +
+                                        string termInfoText = terminal?.TerminalId.TrimEnd() + "\n" + terminal.TerminalName?.TrimEnd() + "\n" + address + "\n" +
                                                                 terminal.City?.TrimEnd() + " " + terminal.State?.TrimEnd() + " " +
                                                                 terminal.Zip?.TrimEnd() + " " + terminal.Country?.TrimEnd();
 
@@ -422,7 +439,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                     string address = customer.CustAddress1?.TrimEnd();
                                     if (customer.CustAddress2?.TrimEnd() != "")
                                         address += customer.CustAddress2?.TrimEnd();
-                                    string termInfoText = customer.CustName?.TrimEnd() + "\n" + address + "\n" +
+                                    string termInfoText = customer.CustHostCode?.TrimEnd() + "\n" +
+                                                            customer.CustName?.TrimEnd() + "\n" + address + "\n" +
                                                             customer.CustCity?.TrimEnd() + " " + customer.CustState?.TrimEnd() + " " +
                                                             customer.CustZip?.TrimEnd() + " " + customer.CustCountry?.TrimEnd();
 
@@ -595,6 +613,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
     public class CustomerDirectionsWrapper
     {
+        public string TripCustHostCode { get; set; }
         public string TripCustName { get; set; }
         public string TripCustAddress { get; set; }
         public string TripCustCityStateZip { get; set; }

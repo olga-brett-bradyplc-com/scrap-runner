@@ -144,6 +144,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async void ExecuteGrossWeightSetCommand()
         {
             await CheckWeights(grossPressed);
+            if (GrossWeight <= 0)
+                return;
             GrossTime = DateTime.Now;
             TareWeightSetCommand.RaiseCanExecuteChanged();
             SecondGrossWeightSetCommand.RaiseCanExecuteChanged();
@@ -156,6 +158,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async void ExecuteTareWeightSetCommand()
         {
             await CheckWeights(tarePressed);
+            if (TareWeight <= 0)
+                return;
 
             TareTime = DateTime.Now;
         }
@@ -174,6 +178,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private async void ExecuteSecondGrossWeightSetCommand()
         {
             await CheckWeights(secondGrossPressed);
+            if (SecondGrossWeight <= 0)
+                return;
             SecondGrossTime = DateTime.Now;
         }
 
