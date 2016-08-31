@@ -249,6 +249,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 CurrentTransaction.TripSegContainerComplete = Constants.Yes;
                 CurrentTransaction.TripSegContainerReviewFlag = Constants.No;
+                CurrentTransaction.MethodOfEntry = TripMethodOfCompletionConstants.Scanned;
 
                 await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
                 await _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction);
@@ -344,7 +345,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                 ActionCode = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? container.TripSegContainerReviewReason : null,
                                 ActionDesc = container.TripSegContainerReivewReasonDesc,
                                 ActionDateTime = DateTime.Now,
-                                MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                                MethodOfEntry = container.MethodOfEntry,
                                 TripNumber = TripNumber,
                                 TripSegNumber = container.TripSegNumber,
                                 ContainerNumber = container.TripSegContainerNumber,
@@ -376,6 +377,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     }
 
                     await _tripService.PropagateContainerUpdates(TripNumber, Containers);
+
 
                     var nextTripSegmentList = await _tripService.FindNextTripSegmentsAsync(TripNumber);
                     var nextTripSegment = nextTripSegmentList.FirstOrDefault();

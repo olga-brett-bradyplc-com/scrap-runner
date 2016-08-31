@@ -126,7 +126,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                 ActionCode = (container.TripSegContainerReviewFlag == TripSegStatusConstants.Exception) ? container.TripSegContainerReviewReason : null,
                                 ActionDesc = container.TripSegContainerReivewReasonDesc,
                                 ActionDateTime = DateTime.Now,
-                                MethodOfEntry = TripMethodOfCompletionConstants.Manual,
+                                MethodOfEntry = container.MethodOfEntry,
                                 TripNumber = TripNumber,
                                 TripSegNumber = container.TripSegNumber,
                                 ContainerNumber = container.TripSegContainerNumber,

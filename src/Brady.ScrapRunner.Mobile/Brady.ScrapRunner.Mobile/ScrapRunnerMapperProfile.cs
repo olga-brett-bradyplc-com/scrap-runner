@@ -46,6 +46,7 @@
             CreateMap<TripSegmentContainer, TripSegmentContainerModel>()
                 .ForMember(tsc => tsc.TripSegComments, o => o.Ignore())
                 .ForMember(tsc => tsc.CompositeKey, o => o.Ignore())
+                .ForMember(tsc => tsc.MethodOfEntry, o => o.Ignore())
                 .ForMember(tsc => tsc.TripSegContainerReivewReasonDesc, o => o.Ignore());
             CreateMap<CodeTable, CodeTableModel>();
             CreateMap<Domain.Models.Messages, MessagesModel>()

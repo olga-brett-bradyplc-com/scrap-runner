@@ -138,6 +138,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 Container.TripSegContainerCommodityCode = string.IsNullOrEmpty(SelectedCommodity?.CustHostCode) ? null : SelectedCommodity.CustCommodityCode;
                 Container.TripSegContainerCommodityDesc = string.IsNullOrEmpty(SelectedCommodity?.CustHostCode) ? null : SelectedCommodity.CustCommodityDesc;
                 Container.TripSegContainerLocation = string.IsNullOrEmpty(SelectedLocation?.CustHostCode) ? null : SelectedLocation.CustLocation;
+                Container.MethodOfEntry = TripMethodOfCompletionConstants.Manual;
                 // Container.TripSegContainerNotes = not implemented server side
 
                 await _tripService.CompleteTripSegmentContainerAsync(Container);
