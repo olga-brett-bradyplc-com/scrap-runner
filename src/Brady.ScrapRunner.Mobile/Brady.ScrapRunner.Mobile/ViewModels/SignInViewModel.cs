@@ -67,6 +67,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _locationService = locationService;
             _locationOdometerService = locationOdometerService;
             Title = AppResources.SignInTitle;
+            _attemptNo = 0;
             SignInCommand = new MvxAsyncCommand(ExecuteSignInCommandAsync, CanExecuteSignInCommand);
         }
 
@@ -111,6 +112,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 SetProperty(ref _odometer, value);
                 SignInCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        private int? _attemptNo;
+        public int? AttemptNo
+        {
+            get { return _attemptNo; }
+            set
+            {
+                SetProperty(ref _attemptNo, value);
             }
         }
 
@@ -171,6 +182,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task<bool> SignInAsync()
         {
+            AttemptNo++;
+
             using (var loginData = UserDialogs.Instance.Loading(AppResources.LoggingIn, maskType: MaskType.Black))
             {
                 // Delete/Create necesscary SQLite tables
@@ -183,6 +196,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
                 // have a need for a login service, leaving this as is.
+
+                string overrideFlag = AttemptNo > 1 ? "Y" : "N";
+
                 var loginProcess = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(
                     new DriverLoginProcess {
                         EmployeeId = UserName,
@@ -190,7 +206,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         PowerId = TruckId,
                         Odometer = Odometer,
                         LocaleCode = 1033,
-                        OverrideFlag = Constants.No,
+                        OverrideFlag = overrideFlag,
                         Mdtid = "Phone",
                         LoginDateTime = DateTime.Now
                     }, requeryUpdated: false);
