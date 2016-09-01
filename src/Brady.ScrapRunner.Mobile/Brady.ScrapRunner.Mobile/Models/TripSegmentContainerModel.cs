@@ -99,6 +99,8 @@
             =>
                 string.IsNullOrEmpty(TripSegContainerSize)
                     ? TripSegContainerType
-                    : TripSegContainerType + "-" + TripSegContainerSize;
+                    : TripSegContainerTypeDesc + "-" + TripSegContainerSize;
+        [Ignore]
+        public string TripSegContainerTypeDesc { get; set; }
     }
 }

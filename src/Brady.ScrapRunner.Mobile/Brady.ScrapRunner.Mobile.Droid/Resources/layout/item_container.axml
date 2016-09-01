@@ -32,7 +32,7 @@
             android:textColor="#000000"
             android:padding="10dp"
             android:layout_marginBottom="10dp"
-            local:MvxBind="Text Format('{0} {1}', ContainerMasterItem.ContainerType, ContainerMasterItem.ContainerSize)"
+            local:MvxBind="Text Format('{0} {1}', ContainerMasterItem.ContainerTypeDesc, ContainerMasterItem.ContainerSize)"
             tools:text="Rolloff 30" />
     </RelativeLayout>
     <RelativeLayout

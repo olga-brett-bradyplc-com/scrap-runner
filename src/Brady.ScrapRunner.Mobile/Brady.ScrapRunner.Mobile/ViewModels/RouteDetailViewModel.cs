@@ -23,20 +23,23 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IPreferenceService _preferenceService;
         private readonly ICustomerService _customerService;
         private readonly ITerminalService _terminalService;
+        private readonly ICodeTableService _codeTableService;
 
         public RouteDetailViewModel(
             ITripService tripService, 
             IDriverService driverService, 
             IPreferenceService preferenceService, 
             ICustomerService customerService,
-            ITerminalService terminalService)
+            ITerminalService terminalService,
+            ICodeTableService codeTableService)
         {
             _tripService = tripService;
             _driverService = driverService;
             _preferenceService = preferenceService;
             _customerService = customerService;
             _terminalService = terminalService;
-            
+            _codeTableService = codeTableService;
+
             EnRouteCommand = new MvxAsyncCommand(ExecuteEnRouteCommandAsync);
             ArriveCommand = new MvxAsyncCommand(ExecuteArriveCommandAsync);
             NextStageCommand = new MvxAsyncCommand(ExecuteNextStageCommandAsync);
@@ -45,6 +48,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
+        }
+        private List<CodeTableModel> _contTypeList;
+        public List<CodeTableModel> ContTypesList
+        {
+            get { return _contTypeList; }
+            set { SetProperty(ref _contTypeList, value); }
         }
 
         public void Init(string tripNumber, string status)
@@ -56,6 +65,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public override async void Start()
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
+            ContTypesList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerType);
 
             // We grab all the trips to validate driver is on correct trip if DEFEnforceSeqProcess = Y
             var trips = await _tripService.FindTripsAsync();
@@ -86,6 +96,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             foreach (var segment in fullTripSegments.Where(sg => sg.TripSegStatus == TripSegStatusConstants.Pending || sg.TripSegStatus == TripSegStatusConstants.Missed))
             {
                 var currentContainers = await _tripService.FindAllContainersForTripSegmentAsync(TripNumber, segment.TripSegNumber);
+                foreach (var cont in currentContainers)
+                {
+                    var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == cont.TripSegContainerType?.TrimEnd());
+                    cont.TripSegContainerTypeDesc = contType != null ? contType.CodeDisp1?.TrimEnd() : cont.TripSegContainerType;
+                }
+
                 var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(segment, currentContainers);
                 if (templist.LastOrDefault()?.TripCustHostCode == segment.TripSegDestCustHostCode)
                     templist.LastOrDefault().TripSegments.Add(grouping);
