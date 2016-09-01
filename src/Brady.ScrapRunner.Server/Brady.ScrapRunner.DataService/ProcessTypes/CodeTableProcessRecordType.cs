@@ -173,7 +173,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     // Lookup code tables.  
-                    //This query does not include container level
                     var codeTableList = Common.GetCodeTablesForDriver(dataService, settings, userCulture, userRoleIds,
                                     employeeMaster.RegionId, prefDefCountry, prefUseContainerLevel,out fault);
                     if (fault != null)
@@ -185,6 +184,14 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     // Don't forget to actually backfill the CodeTableProcess object contained within 
                     // the ChangeSetResult that exits this method and is returned to the caller.
                     codetablesProcess.CodeTables = codeTableList;
+
+                    //For testing
+                    //foreach (var code in codeTableList)
+                    //{
+                    //    log.DebugFormat("SRTEST:CodeTableProcess:{0} {1} Disp1:{2} Disp2:{3} Disp3:{4} Disp4:{5} Disp5:{6} Disp6:{7}",
+                    //                code.CodeName,code.CodeValue,code.CodeDisp1,code.CodeDisp2,
+                    //                code.CodeDisp3,code.CodeDisp4,code.CodeDisp5,code.CodeDisp6);
+                    //}
                 }
             }
 
