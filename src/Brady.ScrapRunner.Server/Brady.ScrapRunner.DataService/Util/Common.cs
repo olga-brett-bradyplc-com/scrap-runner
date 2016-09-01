@@ -2403,15 +2403,12 @@ namespace Brady.ScrapRunner.DataService.Util
         {
             fault = null;
             var codetables = new List<CodeTable>();
+            //First get the CodeTables: CONTAINERTYPE, CONTAINERSIZE, STATESxxx
             Query query = new Query
             {
                 CurrentQuery = new QueryBuilder<CodeTable>()
                     .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerType)
                     .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerSize)
-                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.DelayCodes)
-                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ExceptionCodes)
-                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ReasonCodes)
-                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerLevel)
                     .Or().Property(x => x.CodeName).EqualTo(Constants.StatesPrefix + prefDefCountry))
                     .OrderBy(x => x.CodeName)
                     .OrderBy(x => x.CodeValue)
@@ -2422,27 +2419,49 @@ namespace Brady.ScrapRunner.DataService.Util
             {
                 return codetables;
             }
-            codetables = queryResult.Records.Cast<CodeTable>().ToList();
-
-            //Filter the results
+            codetables.AddRange(queryResult.Records.Cast<CodeTable>().ToList());
+            //Next get the CodeTables: DELAYCODES, EXCEPTIONCODES, REASONCODES
             //If a region id is in the CodeDisp5 field, make sure it matches the region id for the user
             //Also for reason codes, do not send the reason code SR#
-            var filteredcodetables = 
-                from entry in codetables
-                where (entry.CodeDisp5 == regionId || entry.CodeDisp5 == null)
-                && (entry.CodeValue != Constants.ScaleRefNotAvailable)
-                select entry;
-
-            //If the preference to use container level is not set, then remove container levels from the list
-            if (prefUseContainerLevel != Constants.Yes ||
-                prefUseContainerLevel == null)
+            query = new Query
             {
-                filteredcodetables =
-                    from entry in filteredcodetables
-                    where (entry.CodeName != CodeTableNameConstants.ContainerLevel)
-                    select entry;
+                CurrentQuery = new QueryBuilder<CodeTable>()
+                    .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.DelayCodes)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ExceptionCodes)
+                    .Or().Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ReasonCodes)
+                    .And().Property(x => x.CodeDisp5).EqualTo(regionId)
+                    .Or().Property(x => x.CodeDisp5).IsNull()
+                    .And().Property(x => x.CodeValue).NotEqualTo(Constants.ScaleRefNotAvailable))
+                    .OrderBy(x => x.CodeName)
+                    .OrderBy(x => x.CodeValue)
+                    .GetQuery()
+            };
+            queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+            if (null != fault)
+            {
+                return codetables;
             }
-            return filteredcodetables.ToList();
+            codetables.AddRange(queryResult.Records.Cast<CodeTable>().ToList());
+
+            //If the preference to use container level is set, get the CodeTable: CONTAINERLEVEL
+            if (prefUseContainerLevel == Constants.Yes)
+            {
+                query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<CodeTable>()
+                        .Filter(y => y.Property(x => x.CodeName).EqualTo(CodeTableNameConstants.ContainerLevel))
+                        .OrderBy(x => x.CodeName)
+                        .OrderBy(x => x.CodeValue)
+                        .GetQuery()
+                };
+                queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return codetables;
+                }
+                codetables.AddRange(queryResult.Records.Cast<CodeTable>().ToList());
+            }
+            return codetables;
         }
 
         /// CODETABLE Table queries
