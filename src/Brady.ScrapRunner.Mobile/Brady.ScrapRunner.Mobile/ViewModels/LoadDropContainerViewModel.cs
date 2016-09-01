@@ -18,17 +18,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         private readonly IContainerService _containerService;
         private readonly IDriverService _driverService;
+        private readonly ICodeTableService _codeTableService;
 
-        public LoadDropContainerViewModel(IContainerService containerService, IDriverService driverService)
+        public LoadDropContainerViewModel(IContainerService containerService, IDriverService driverService, ICodeTableService codeTableService)
         {
             _containerService = containerService;
             _driverService = driverService;
+            _codeTableService = codeTableService;
             Title = AppResources.LoadDropContainer;
         }
 
         public void Init(bool loginProcessed)
         {
             LoginProcessed = loginProcessed;
+        }
+        private List<CodeTableModel> _contTypeList;
+        public List<CodeTableModel> ContTypesList
+        {
+            get { return _contTypeList; }
+            set { SetProperty(ref _contTypeList, value); }
         }
 
         public override async void Start()
@@ -38,9 +46,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             CurrentContainers = new ObservableCollection<ContainerWrapper>();
 
+            ContTypesList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerType);
+
             foreach (var container in containers)
-                CurrentContainers.Add(new ContainerWrapper(container, this));
-        }
+            {
+                var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == container.ContainerType?.TrimEnd());
+                CurrentContainers.Add(new ContainerWrapper(container, this, contType != null ? contType.CodeDisp1?.TrimEnd() : ""));
+            }
+    }
 
         // Used to know whether or not this was passed from initial login, or from selecting menu option
         public bool LoginProcessed { get; set; }
@@ -100,6 +113,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 UserDialogs.Instance.Alert(string.Format(AppResources.ContainerNotFound, containerNumber), AppResources.Error);
                 return;
             }
+            var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == container.ContainerType?.TrimEnd());
 
             // Container has already been loaded
             if (CurrentContainers.Any(ct => ct.ContainerMasterItem.ContainerNumber == containerNumber))
@@ -131,7 +145,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         });
 
                     if (containerProcess.WasSuccessful)
-                        CurrentContainers.Add(new ContainerWrapper(container, this));
+                        CurrentContainers.Add(new ContainerWrapper(container, this, contType.CodeDisp1?.TrimEnd()));
                     else
                         UserDialogs.Instance.Alert(containerProcess.Failure.Summary, AppResources.Error);
                 }
@@ -182,9 +196,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             private readonly LoadDropContainerViewModel _parent;
 
-            public ContainerWrapper(ContainerMasterModel containerMaster, LoadDropContainerViewModel parent)
-            {
+            public string ContainerTypeDesc { get; set; }
+
+            public ContainerWrapper(ContainerMasterModel containerMaster, LoadDropContainerViewModel parent, string containerTypeDesc)
+            { 
                 _parent = parent;
+                ContainerTypeDesc = containerTypeDesc != "" ? containerTypeDesc : containerMaster.ContainerType;
                 ContainerMasterItem = containerMaster;
             }
 

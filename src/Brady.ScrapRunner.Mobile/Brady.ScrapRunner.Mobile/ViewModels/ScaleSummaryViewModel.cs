@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
@@ -15,14 +17,21 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     public class ScaleSummaryViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
+        private readonly ICodeTableService _codeTableService;
 
-        public ScaleSummaryViewModel(ITripService tripService)
+        public ScaleSummaryViewModel(ITripService tripService, ICodeTableService codeTableService)
         {
             _tripService = tripService;
+            _codeTableService = codeTableService;
 
             ContainerSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteContainerSelectedCommand);
         }
-
+        private List<CodeTableModel> _contTypeList;
+        public List<CodeTableModel> ContTypesList
+        {
+            get { return _contTypeList; }
+            set { SetProperty(ref _contTypeList, value); }
+        }
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
@@ -32,6 +41,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             Title = AppResources.YardScaleSummary;
             SubTitle = AppResources.Trip + $" {TripNumber}";
+            ContTypesList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerType);
+
             using (var tripDataLoad = UserDialogs.Instance.Loading(AppResources.LoadingTripData, maskType: MaskType.Clear))
             {
                 var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
@@ -41,6 +52,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 {
                     var containers =
                         await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+                    foreach (var cont in containers)
+                    {
+                        var contType =
+                            ContTypesList.FirstOrDefault(ct => ct.CodeValue == cont.TripSegContainerType?.TrimEnd());
+                        cont.TripSegContainerTypeDesc = contType != null
+                            ? contType.CodeDisp1?.TrimEnd()
+                            : cont.TripSegContainerType;
+                    }
                     var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
                     list.Add(grouping);
                 }
@@ -50,6 +69,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
 
             base.Start();
+        }
+        private string _containerTypeDesc;
+
+        public string ContainerTypeDesc
+        {
+            get { return _containerTypeDesc; }
+            set { SetProperty(ref _containerTypeDesc, value); }
         }
 
         // Listview bindings

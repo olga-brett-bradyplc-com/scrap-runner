@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,17 +33,29 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripNumber = tripNumber;
             SubTitle = $"{AppResources.Trip} {tripNumber}";
         }
+        private List<CodeTableModel> _contTypeList;
+        public List<CodeTableModel> ContTypesList
+        {
+            get { return _contTypeList; }
+            set { SetProperty(ref _contTypeList, value); }
+        }
 
         public override async void Start()
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
             var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
+            ContTypesList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerType);
 
             foreach (var tsm in segments)
             {
                 var containers =
                     await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+                foreach (var cont in containers)
+                {
+                    var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == cont.TripSegContainerType?.TrimEnd());
+                    cont.TripSegContainerTypeDesc = contType != null ? contType.CodeDisp1?.TrimEnd() : cont.TripSegContainerType;
+                }
                 var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
                 list.Add(grouping);
             }
