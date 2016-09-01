@@ -24,7 +24,9 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<int> CreateContainerAsync(ContainerMasterModel container);
 
-        Task<int> RemoveContainerFromPowerId(string powerId, string containerNumber);
+        Task<int> UnloadContainerFromPowerId(string powerId, string containerNumber);
+
+        Task<int> LoadContainerOnPowerId(string powerId, string containerNumber);
 
         Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessContainerActionAsync(
             DriverContainerActionProcess containerActionProcess);

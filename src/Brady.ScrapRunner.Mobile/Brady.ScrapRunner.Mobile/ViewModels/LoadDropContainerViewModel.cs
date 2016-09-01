@@ -131,7 +131,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         });
 
                     if (containerProcess.WasSuccessful)
+                    {
+                        await _containerService.LoadContainerOnPowerId(CurrentDriver.PowerId, containerNumber);
                         CurrentContainers.Add(new ContainerWrapper(container, this));
+                    }
                     else
                         UserDialogs.Instance.Alert(containerProcess.Failure.Summary, AppResources.Error);
                 }
@@ -168,7 +171,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 {
                     CurrentContainers.Remove(
                         CurrentContainers.First(ct => ct.ContainerMasterItem.ContainerNumber == containerNumber));
-                    await _containerService.RemoveContainerFromPowerId(powerId, containerNumber);
+                    await _containerService.UnloadContainerFromPowerId(powerId, containerNumber);
                 }
                 else
                 {

@@ -251,6 +251,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentTransaction.TripSegContainerReviewFlag = Constants.No;
                 CurrentTransaction.MethodOfEntry = TripMethodOfCompletionConstants.Scanned;
 
+                if (_tripService.IsTripLegLoaded(currentSegment))
+                    await _containerService.LoadContainerOnPowerId(CurrentDriver.PowerId,
+                        CurrentTransaction.TripSegContainerNumber);
+                else if (_tripService.IsTripLegDropped(currentSegment))
+                    await
+                        _containerService.UnloadContainerFromPowerId(CurrentDriver.PowerId,
+                            CurrentTransaction.TripSegContainerNumber);
+
                 await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
                 await _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction);
                 SelectNextTransactionContainer();

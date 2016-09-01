@@ -382,7 +382,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         #endregion
 
         #region Helper methods
-
+        
         /// <summary>
         /// Retrieve whether trip order in enforced via preferences table
         /// </summary>

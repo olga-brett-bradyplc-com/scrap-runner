@@ -25,7 +25,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// 
+        /// Map ContainerMaster records to ContainerMasterModel, then update local SQLite ContainerMaster table
         /// </summary>
         /// <param name="containerMaster"></param>
         /// <returns></returns>
@@ -36,7 +36,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// 
+        /// Map ContainerChange records to ContainerMasterModel, then either update or delete from ContainerMaster table
         /// </summary>
         /// <param name="containerChange"></param>
         /// <returns></returns>
@@ -54,7 +54,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// 
+        /// Find a specific container
         /// </summary>
         /// <param name="containerNumber"></param>
         /// <returns></returns>
@@ -64,7 +64,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// 
+        /// Find all containers listed as loaded on a specific power id
         /// </summary>
         /// <param name="powerId"></param>
         /// <returns></returns>
@@ -77,15 +77,30 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// 
+        /// Unload a container from a power id
         /// </summary>
         /// <param name="powerId"></param>
         /// <param name="containerNumber"></param>
         /// <returns></returns>
-        public async Task<int> RemoveContainerFromPowerId(string powerId, string containerNumber)
+        public async Task<int> UnloadContainerFromPowerId(string powerId, string containerNumber)
         {
             var container = await FindContainerAsync(containerNumber);
             container.ContainerPowerId = null;
+            return await _containerMasterRepository.UpdateAsync(container);
+        }
+
+        /// <summary>
+        /// Load container onto power id.
+        /// Typically, I'd rather pass an object reference and doing a straight update since we usually already have it in the viewmodel
+        /// but this and unload are special cases in that this also needs to work with a TripSegmentContainerModel
+        /// </summary>
+        /// <param name="powerId"></param>
+        /// <param name="containerNumber"></param>
+        /// <returns></returns>
+        public async Task<int> LoadContainerOnPowerId(string powerId, string containerNumber)
+        {
+            var container = await FindContainerAsync(containerNumber);
+            container.ContainerPowerId = powerId;
             return await _containerMasterRepository.UpdateAsync(container);
         }
 
