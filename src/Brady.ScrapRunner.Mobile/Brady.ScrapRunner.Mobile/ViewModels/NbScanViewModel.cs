@@ -20,12 +20,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IContainerService _containerService;
         private readonly ICodeTableService _codeTableService;
         private readonly IDriverService _driverService;
+        private readonly IPreferenceService _preferenceService;
 
-        public NbScanViewModel(IContainerService containerService, ICodeTableService codeTableService, IDriverService driverService)
+        public NbScanViewModel(IContainerService containerService, ICodeTableService codeTableService, 
+            IDriverService driverService, IPreferenceService preferenceService)
         {
             _containerService = containerService;
             _codeTableService = codeTableService;
             _driverService = driverService;
+            _preferenceService = preferenceService;
             Title = AppResources.AddNewContainer;
         }
 
@@ -124,6 +127,23 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (container == null) return;
 
+            string sCount = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFContainerValidationCount);
+
+            if (sCount == null) sCount = "0";
+
+            int iCount = int.Parse(sCount);
+            if (iCount > 1)
+            {
+                for (var i = 0; i < iCount; i++)
+                {
+                    var contPrompt = await UserDialogs.Instance.PromptAsync(AppResources.EnterContainerNumber, "",
+                        AppResources.Save, AppResources.Cancel, "", InputType.Default);
+                    if (ContainerId != contPrompt.Text)
+                        i--;
+                    else
+                        ContainerId = contPrompt.Text;
+                }
+            }
             using (var loginData = UserDialogs.Instance.Loading(AppResources.AddingContainer, maskType: MaskType.Black)) {
 
                 var containerNewProcess = await _containerService.ProcessNewContainerAsync(new DriverNewContainerProcess

@@ -586,6 +586,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid Container Number.
+        /// </summary>
+        public static string InvalidContainerNumber {
+            get {
+                return ResourceManager.GetString("InvalidContainerNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Language.
         /// </summary>
         public static string LanguageLabel {
