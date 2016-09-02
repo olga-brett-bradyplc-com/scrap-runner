@@ -1,23 +1,15 @@
 ﻿using Brady.ScrapRunner.Domain.Process;
-using BWF.DataServices.PortableClients;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain;
-using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
-using Brady.ScrapRunner.Mobile.Messages;
 using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Core.ViewModels;
-using MvvmCross.Plugins.Sqlite;
 using Brady.ScrapRunner.Mobile.Resources;
-using Brady.ScrapRunner.Mobile.Services;
 using Brady.ScrapRunner.Mobile.Validators;
-using MvvmCross.Plugins.Messenger;
-using Plugin.Settings.Abstractions;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -38,7 +30,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ILocationOdometerService _locationOdometerService;
         private readonly ILocationGeofenceService _locationGeofenceService;
         private readonly ILocationPathService _locationPathService;
-        private readonly IMvxMessenger _mvxMessenger;
         
         public SignInViewModel(
             IDbService dbService,
@@ -54,7 +45,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IBackgroundScheduler backgroundScheduler, 
             ILocationService locationService, 
             ILocationOdometerService locationOdometerService,
-            IMvxMessenger mvxMessenger, 
             ILocationGeofenceService locationGeofenceService, 
             ILocationPathService locationPathService)
         {
@@ -67,7 +57,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _codeTableService = codeTableService;
             _terminalService = terminalService;
             _messagesService = messagesService;
-            _mvxMessenger = mvxMessenger;
             _locationGeofenceService = locationGeofenceService;
             _locationPathService = locationPathService;
 
