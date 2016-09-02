@@ -266,16 +266,17 @@
         {
             var resequencedTrips = await GetTripsResequencedAsync(driverId);
             if (resequencedTrips.TotalCount == 0) return;
-            await AckTripResequenceAsync(resequencedTrips);
+            var showNotification =
+                resequencedTrips.Records.Any(t => t.TripSendReseqFlag == TripSendReseqFlagValue.ManualReseq);
             var mappedTrips = Mapper.Map<List<Trip>, List<TripModel>>(resequencedTrips.Records);
-            for (var i = 0; i < mappedTrips.Count; i++)
+            foreach (var trip in mappedTrips)
             {
-                Mvx.TaggedTrace(Constants.ScrapRunner, $"Trip {mappedTrips[i].TripNumber} resequenced {resequencedTrips.Records[i].TripSendReseqFlag}");
-                await _tripService.UpdateTripAsync(mappedTrips[i]);
-                if (resequencedTrips.Records[i].TripSendReseqFlag != TripSendReseqFlagValue.ManualReseq) continue;
-                await _scrapRunnerNotificationService.TripsResequencedAsync();
-                _mvxMessenger.Publish(new TripResequencedMessage(this));
+                await _tripService.UpdateTripAsync(trip);
             }
+            await AckTripResequenceAsync(resequencedTrips);
+            _mvxMessenger.Publish(new TripResequencedMessage(this));
+            if (showNotification)
+                await _scrapRunnerNotificationService.TripsResequencedAsync();
         }
 
         private Task<QueryResult<ContainerChange>> GetContainerChangesAsync(string terminalId, string regionId)

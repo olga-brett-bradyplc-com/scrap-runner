@@ -1,23 +1,15 @@
 ﻿using Brady.ScrapRunner.Domain.Process;
-using BWF.DataServices.PortableClients;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain;
-using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
-using Brady.ScrapRunner.Mobile.Messages;
 using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Core.ViewModels;
-using MvvmCross.Plugins.Sqlite;
 using Brady.ScrapRunner.Mobile.Resources;
-using Brady.ScrapRunner.Mobile.Services;
 using Brady.ScrapRunner.Mobile.Validators;
-using MvvmCross.Plugins.Messenger;
-using Plugin.Settings.Abstractions;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -36,6 +28,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IBackgroundScheduler _backgroundScheduler;
         private readonly ILocationService _locationService;
         private readonly ILocationOdometerService _locationOdometerService;
+        private readonly ILocationGeofenceService _locationGeofenceService;
+        private readonly ILocationPathService _locationPathService;
         
         public SignInViewModel(
             IDbService dbService,
@@ -50,7 +44,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             IConnectionService connection, 
             IBackgroundScheduler backgroundScheduler, 
             ILocationService locationService, 
-            ILocationOdometerService locationOdometerService)
+            ILocationOdometerService locationOdometerService,
+            ILocationGeofenceService locationGeofenceService, 
+            ILocationPathService locationPathService)
         {
             _dbService = dbService;
             _preferenceService = preferenceService;
@@ -61,13 +57,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _codeTableService = codeTableService;
             _terminalService = terminalService;
             _messagesService = messagesService;
+            _locationGeofenceService = locationGeofenceService;
+            _locationPathService = locationPathService;
 
             _connection = connection;
             _backgroundScheduler = backgroundScheduler;
             _locationService = locationService;
             _locationOdometerService = locationOdometerService;
             Title = AppResources.SignInTitle;
-            _attemptNo = 0;
             SignInCommand = new MvxAsyncCommand(ExecuteSignInCommandAsync, CanExecuteSignInCommand);
         }
 
@@ -112,16 +109,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 SetProperty(ref _odometer, value);
                 SignInCommand.RaiseCanExecuteChanged();
-            }
-        }
-
-        private int? _attemptNo;
-        public int? AttemptNo
-        {
-            get { return _attemptNo; }
-            set
-            {
-                SetProperty(ref _attemptNo, value);
             }
         }
 
@@ -182,8 +169,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task<bool> SignInAsync()
         {
-            AttemptNo++;
-
             using (var loginData = UserDialogs.Instance.Loading(AppResources.LoggingIn, maskType: MaskType.Black))
             {
                 // Delete/Create necesscary SQLite tables
@@ -193,12 +178,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 _backgroundScheduler.Unschedule();
                 _locationService.Stop();
                 _locationOdometerService.Stop();
+                _locationGeofenceService.Stop();
+                _locationPathService.Stop();
 
                 // Trying to push all remote calls via BWF down into a respective service, since however we don't
                 // have a need for a login service, leaving this as is.
-
-                string overrideFlag = AttemptNo > 1 ? "Y" : "N";
-
                 var loginProcess = await _connection.GetConnection(ConnectionType.Online).UpdateAsync(
                     new DriverLoginProcess {
                         EmployeeId = UserName,
@@ -206,7 +190,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         PowerId = TruckId,
                         Odometer = Odometer,
                         LocaleCode = 1033,
-                        OverrideFlag = overrideFlag,
+                        OverrideFlag = Constants.No,
                         Mdtid = "Phone",
                         LoginDateTime = DateTime.Now
                     }, requeryUpdated: false);
@@ -409,6 +393,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _backgroundScheduler.Schedule(60000);
             _locationService.Start();
             _locationOdometerService.Start(Convert.ToDouble(Odometer));
+            _locationGeofenceService.Start();
+            _locationPathService.Start();
             return true;
         }
 
