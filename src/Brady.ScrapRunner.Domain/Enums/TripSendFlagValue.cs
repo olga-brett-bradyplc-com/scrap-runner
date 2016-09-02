@@ -60,7 +60,35 @@ namespace Brady.ScrapRunner.Domain.Enums
         [RichEnum("Send Failed", "SendFailed")]
         SendFailed = 3,
     }
+    
+    [JsonConverter(typeof(RichEnumConverter))]
+    //Trip Send to Maps Flag Values
+    public enum TripSendToMapsValue
+    {
+        /// <summary>
+        /// 0 - Not ready to be sent.
+        /// </summary>
+        [RichEnum("Not Ready", "NotReady")]
+        NotReady = 0,
 
+        /// <summary>
+        /// 1 - Ready to be sent to maps.
+        /// </summary>
+        [RichEnum("Ready", "Ready")]
+        Ready = 1,
+
+        /// <summary>
+        /// 2 - Sent to maps.
+        /// </summary> 
+        [RichEnum("Sent To Maps", "SentToMaps")]
+        SentToDriver = 2,
+
+        /// <summary>
+        /// 2 - Sent to maps.
+        /// </summary> 
+        [RichEnum("Ack From Maps", "MapsAck")]
+        MapsAck = 3,
+    }
     [JsonConverter(typeof(RichEnumConverter))]
     //Trip Send Auto Receipt Flag Values
     public enum TripSendAutoReceiptValue

@@ -52,6 +52,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             TripNumber = tripNumber;
         }
+        private List<CodeTableModel> _contTypeList;
+        public List<CodeTableModel> ContTypesList
+        {
+            get { return _contTypeList; }
+            set { SetProperty(ref _contTypeList, value); }
+        }
 
         public override async void Start()
         {
@@ -63,7 +69,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
             Containers = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
-
+            ContTypesList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerType);
             /*
                 A trip leg can contain, for example, trip segments of DE, PF and SC. We don't want to
                 process the SC containers on this screen, but navigate them to the scale screens after
@@ -73,6 +79,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 var containers =
                     await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+
+                foreach (var cont in containers)
+                {
+                    var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == cont.TripSegContainerType?.TrimEnd());
+                    cont.TripSegContainerTypeDesc = contType != null ? contType.CodeDisp1?.TrimEnd() : cont.TripSegContainerType;
+                }
 
                 // Find first non-completed, non-reviewed container and set it as the current transaction
                 if (CurrentTransaction == null && containers.FirstOrDefault(ct => string.IsNullOrEmpty(ct.TripSegContainerComplete) && string.IsNullOrEmpty(ct.TripSegContainerReviewFlag)) != null)

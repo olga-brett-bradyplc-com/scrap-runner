@@ -62,6 +62,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _methodOfEntry; }
             set { SetProperty(ref _methodOfEntry, value); }
         }
+        private List<CodeTableModel> _contTypeList;
+        public List<CodeTableModel> ContTypesList
+        {
+            get { return _contTypeList; }
+            set { SetProperty(ref _contTypeList, value); }
+        }
 
         private DriverStatusModel CurrentDriver { get; set; }
 
@@ -71,11 +77,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
             var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
+            ContTypesList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerType);
 
             foreach (var tsm in segments)
             {
                 var containers =
                     await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+                foreach (var cont in containers)
+                {
+                    var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == cont.TripSegContainerType?.TrimEnd());
+                    cont.TripSegContainerTypeDesc = contType != null ? contType.CodeDisp1?.TrimEnd() : cont.TripSegContainerType ;
+                }
                 var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
                 list.Add(grouping);
             }
