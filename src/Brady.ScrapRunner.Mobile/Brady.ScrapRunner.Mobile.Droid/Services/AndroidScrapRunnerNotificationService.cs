@@ -108,6 +108,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Services
                 title: AppResources.NotificationTripResequenceTitle,
                 text: AppResources.NotificationTripResequenceText);
             await UpdateNotificationContentIntentAsync(notificationType, (AndroidNotification)notification);
+            ShowTripNotificationActivity(string.Empty, TripNotificationContext.Resequenced, notification.Id);
             _notificationService.Notify(notification);
         }
 

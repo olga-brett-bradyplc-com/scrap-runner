@@ -27,12 +27,14 @@
             _mvxSubscriptionToken = _mvxMessenger.Subscribe<LocationModelMessage>(OnLocationModelMessage);
             _previousLocation = null;
             _tripOdometer = startingOdometer;
+            Mvx.TaggedTrace(Constants.ScrapRunner, $"Location odometer service started {startingOdometer}");
         }
 
         public void Stop()
         {
             if (_mvxSubscriptionToken == null) return;
             _mvxMessenger.Unsubscribe<LocationModelMessage>(_mvxSubscriptionToken);
+            Mvx.TaggedTrace(Constants.ScrapRunner, "Location odometer service stopped.");
         }
 
         public double? CurrentOdometer => _tripOdometer;
@@ -44,12 +46,13 @@
                 _previousLocation = obj.Location;
                 return;
             }
-            if (obj.Location.Speed > 0)
+            if (obj.Location.Accuracy.HasValue && obj.Location.Speed > 0.0f)
             {
                 var distance = GetDistance(obj.Location, _previousLocation);
                 Mvx.TaggedTrace(Constants.ScrapRunner,
                     $"Distance between {obj.Location.Latitude:F4},{obj.Location.Longitude:F4} and {_previousLocation.Latitude:F4},{_previousLocation.Longitude:F4} is {distance:F4}");
                 _tripOdometer += distance;
+                Mvx.TaggedTrace(Constants.ScrapRunner, $"Location odometer updated to {_tripOdometer:F4}.");
             }
             _previousLocation = obj.Location;
         }
