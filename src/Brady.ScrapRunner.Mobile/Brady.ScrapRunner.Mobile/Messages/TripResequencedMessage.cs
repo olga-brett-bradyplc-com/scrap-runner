@@ -1,4 +1,7 @@
-﻿namespace Brady.ScrapRunner.Mobile.Messages
+﻿using System.Collections.Generic;
+using Brady.ScrapRunner.Mobile.Models;
+
+namespace Brady.ScrapRunner.Mobile.Messages
 {
     using MvvmCross.Plugins.Messenger;
 
