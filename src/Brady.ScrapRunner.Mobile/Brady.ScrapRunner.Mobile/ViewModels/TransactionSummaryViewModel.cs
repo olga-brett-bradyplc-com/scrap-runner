@@ -252,11 +252,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentTransaction.MethodOfEntry = TripMethodOfCompletionConstants.Scanned;
 
                 if (_tripService.IsTripLegLoaded(currentSegment))
-                    await _containerService.LoadContainerOnPowerId(CurrentDriver.PowerId,
+                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId,
                         CurrentTransaction.TripSegContainerNumber);
                 else if (_tripService.IsTripLegDropped(currentSegment))
                     await
-                        _containerService.UnloadContainerFromPowerId(CurrentDriver.PowerId,
+                        _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId,
                             CurrentTransaction.TripSegContainerNumber);
 
                 await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
@@ -378,17 +378,65 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                 Longitude = segment.Key.TripSegEndLongitude
                             });
 
-                        if (tripSegmentProcess.WasSuccessful)
-                            await _tripService.CompleteTripSegmentAsync(segment.Key);
-                        else
+                        if (!tripSegmentProcess.WasSuccessful)
+                        {
                             UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
+                            return;
+                        }
+
+                        // We've marked the segment with an exception somewhere in the process, so don't mark it as complete
+                        if(segment.Key.TripSegStatus != TripSegStatusConstants.Exception )
+                            await _tripService.CompleteTripSegmentAsync(segment.Key);
+                    }
+                    
+                    var nextTripSegmentList = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+                    var nextTripSegment = nextTripSegmentList.FirstOrDefault();
+
+                    // Exception processing
+                    if (Containers.Any(c => c.Key.TripSegStatus == TripSegStatusConstants.Exception) && _tripService.IsTripLegScale(nextTripSegment))
+                    {
+                        completeTripSegment.Hide();
+
+                        var endTrip =
+                            await UserDialogs.Instance.ConfirmAsync(
+                                string.Format(AppResources.ConfirmRTNeeded, "\n\n"), 
+                                AppResources.ConfirmLabel,
+                                AppResources.Yes, 
+                                AppResources.No);
+
+                        if (!endTrip)
+                        {
+                            completeTripSegment.Show();
+
+                            foreach (var segment in nextTripSegmentList)
+                            {
+                                var tripSegmentProcess =
+                                    await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                                    {
+                                        EmployeeId = CurrentDriver.EmployeeId,
+                                        TripNumber = TripNumber,
+                                        TripSegNumber = segment.TripSegNumber,
+                                        ActionType = TripSegmentActionTypeConstants.Canceled,
+                                        ActionDateTime = DateTime.Now,
+                                        PowerId = CurrentDriver.PowerId,
+                                        Latitude = segment.TripSegEndLatitude,
+                                        Longitude = segment.TripSegEndLongitude
+                                    });
+
+                                if (tripSegmentProcess.WasSuccessful) continue;
+
+                                UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary);
+                                return;
+                            }
+                            
+                            await CompleteTrip();
+                            return;
+                        }
+
+                        completeTripSegment.Show();
                     }
 
                     await _tripService.PropagateContainerUpdates(TripNumber, Containers);
-
-
-                    var nextTripSegmentList = await _tripService.FindNextTripSegmentsAsync(TripNumber);
-                    var nextTripSegment = nextTripSegmentList.FirstOrDefault();
 
                     if (nextTripSegment != null && nextTripSegment?.TripSegDestCustHostCode == Containers.FirstOrDefault().Key.TripSegDestCustHostCode && _tripService.IsTripLegScale(nextTripSegment))
                     {
@@ -430,22 +478,27 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     }
                     else
                     {
-                        await _tripService.CompleteTripAsync(TripNumber);
-
-                        var nextTrip = await _tripService.FindNextTripAsync();
-                        var seg = await _tripService.FindNextTripSegmentsAsync(nextTrip?.TripNumber);
-
-                        CurrentDriver.Status = nextTrip == null ? DriverStatusSRConstants.NoWork : DriverStatusSRConstants.Available;
-                        CurrentDriver.TripNumber = nextTrip == null ? "" : nextTrip.TripNumber;
-                        CurrentDriver.TripSegNumber = seg.Count < 1 ? "" : seg.FirstOrDefault().TripSegNumber;
-
-                        await _driverService.UpdateDriver(CurrentDriver);
-
-                        Close(this);
-                        ShowViewModel<RouteSummaryViewModel>();
+                        await CompleteTrip();
                     }
                 }
             }
+        }
+
+        private async Task CompleteTrip()
+        {
+            await _tripService.CompleteTripAsync(TripNumber);
+
+            var nextTrip = await _tripService.FindNextTripAsync();
+            var seg = await _tripService.FindNextTripSegmentsAsync(nextTrip?.TripNumber);
+
+            CurrentDriver.Status = nextTrip == null ? DriverStatusSRConstants.NoWork : DriverStatusSRConstants.Available;
+            CurrentDriver.TripNumber = nextTrip == null ? "" : nextTrip.TripNumber;
+            CurrentDriver.TripSegNumber = seg.Count < 1 ? "" : seg.FirstOrDefault().TripSegNumber;
+
+            await _driverService.UpdateDriver(CurrentDriver);
+
+            Close(this);
+            ShowViewModel<RouteSummaryViewModel>();
         }
     }
 

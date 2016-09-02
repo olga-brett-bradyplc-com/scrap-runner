@@ -257,8 +257,7 @@ namespace Brady.ScrapRunner.Mobile.Services
                 .Where(ts =>
                     ts.TripNumber == tripNumber
                     &&
-                    ts.TripSegNumber == tripSegmentNumber)
-                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
+                    ts.TripSegNumber == tripSegmentNumber).FirstOrDefaultAsync();
 
             return segment;
         }
@@ -275,8 +274,7 @@ namespace Brady.ScrapRunner.Mobile.Services
                     ts.TripNumber == tripNumber
                     &&
                     (ts.TripSegStatus == TripSegStatusConstants.Pending ||
-                     ts.TripSegStatus == TripSegStatusConstants.Missed ||
-                     ts.TripSegStatus == TripSegStatusConstants.Exception))
+                     ts.TripSegStatus == TripSegStatusConstants.Missed ))
                 .OrderBy(ts => ts.TripSegNumber)
                 .ToListAsync();
             if (!segments.Any())
