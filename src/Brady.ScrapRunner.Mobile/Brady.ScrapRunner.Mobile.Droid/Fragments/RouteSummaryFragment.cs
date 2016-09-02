@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
+using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Mobile.Droid.Messages;
 using Brady.ScrapRunner.Mobile.Interfaces;
 using Brady.ScrapRunner.Mobile.Messages;
@@ -19,9 +21,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
     [Register("brady.scraprunner.mobile.droid.fragments.RouteSummaryFragment")]
     public class RouteSummaryFragment : BaseFragment<RouteSummaryViewModel>
     {
-        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private MvxSubscriptionToken _mvxSubscriptionToken, _mvxSubscriptionToken2;
         private IMvxMessenger _mvxMessenger;
         private IDriverService _driverService;
+        private ITripService _tripService;
 
         protected override int FragmentId => Resource.Layout.fragment_routesummary;
         protected override bool NavMenuEnabled => true;
@@ -30,9 +33,12 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             _mvxMessenger = Mvx.Resolve<IMvxMessenger>();
             _driverService = Mvx.Resolve<IDriverService>();
+            _tripService = Mvx.Resolve<ITripService>();
 
             // TODO : Disabling this until polling service pulls TripSegments and TripSegmentContainers when fetching new trips
             _mvxSubscriptionToken = _mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
+            _mvxSubscriptionToken2 =
+                _mvxMessenger.SubscribeOnMainThread<TripResequencedMessage>(OnTripResequenceNotification);
 
             var task = CheckMenuState();
         }
@@ -43,7 +49,10 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             
             // If driver is in the middle of a trip, do not change the menu to MenuState.Avaliable
             // We never set MenuState.OnTrip here because a user would never be taken here manually if on a trip
-            if (driverStatus.Status != "E" && driverStatus.Status != "A" && driverStatus.Status != "D")
+            if (driverStatus.Status != DriverStatusSRConstants.Enroute && driverStatus.Status != DriverStatusSRConstants.Arrive && 
+                driverStatus.Status != DriverStatusSRConstants.Done)
+                _mvxMessenger.Publish(new MenuStateMessage(this) { Context = MenuState.Avaliable });
+            if (driverStatus.Status != DriverStatusSRConstants.Enroute && driverStatus.Status != DriverStatusSRConstants.Arrive)
                 _mvxMessenger.Publish(new MenuStateMessage(this) { Context = MenuState.Avaliable });
         }
 
@@ -51,11 +60,21 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         {
             base.OnDestroyView();
 
-            if (_mvxSubscriptionToken == null)
+            if (_mvxSubscriptionToken == null && _mvxSubscriptionToken2 == null)
                 return;
-
-            _mvxMessenger.Unsubscribe<TripNotificationMessage>(_mvxSubscriptionToken);
+            if(_mvxSubscriptionToken != null) 
+                _mvxMessenger.Unsubscribe<TripNotificationMessage>(_mvxSubscriptionToken);
+            if(_mvxSubscriptionToken2 != null)
+                _mvxMessenger.Unsubscribe<TripResequencedMessage>(_mvxSubscriptionToken2);
         }
+        private async void OnTripResequenceNotification(TripResequencedMessage msg)
+        {
+            ViewModel.RouteSummaryList.Clear();
+            List<TripModel> trips = await _tripService.FindTripsAsync();
+            foreach (var trip in trips)
+                ViewModel.RouteSummaryList.Add(trip);
+        }
+
 
         private void OnTripNotification(TripNotificationMessage msg)
         {
