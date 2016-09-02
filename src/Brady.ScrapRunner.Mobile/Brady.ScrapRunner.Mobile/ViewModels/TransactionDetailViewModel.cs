@@ -126,6 +126,24 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionCompleteCommand()
         {
+            string sCount = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFContainerValidationCount);
+
+            if (sCount == null) sCount = "0";
+
+            int iCount = int.Parse(sCount);
+            if (iCount > 1)
+            {
+                for (var i = 0; i < iCount; i++)
+                {
+                    var contPrompt = await UserDialogs.Instance.PromptAsync(AppResources.EnterContainerNumber, "",
+                        AppResources.Save, AppResources.Cancel, "", InputType.Default);
+                    if (TripSegContainerNumber != contPrompt.Text)
+                        i--;
+                    else
+                        TripSegContainerNumber = contPrompt.Text;
+                }
+            }
+
             if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel) ==
                 Constants.Yes && SelectedLevel.CodeValue == null && _tripService.IsTripLegLoaded(Segment))
             {
