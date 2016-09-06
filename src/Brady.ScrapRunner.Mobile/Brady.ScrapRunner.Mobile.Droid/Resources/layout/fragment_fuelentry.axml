@@ -14,6 +14,7 @@
         android:layout_centerInParent="true">
            <EditText
                 android:id="@+id/fuelAmountInputField"
+                android:inputType="number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
@@ -25,6 +26,7 @@
                 android:focusableInTouchMode="true" />
            <EditText
                 android:id="@+id/odometerInputField"
+                android:inputType="number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
@@ -37,7 +39,6 @@
       <MvxSpinner
         android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:foreground="#ffffff"
             android:spinnerMode="dialog"
             android:textSize="40sp"
             android:id="@+id/MvxStateSpinner"
