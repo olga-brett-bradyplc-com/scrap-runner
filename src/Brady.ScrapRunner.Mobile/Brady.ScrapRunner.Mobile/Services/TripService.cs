@@ -242,6 +242,12 @@ namespace Brady.ScrapRunner.Mobile.Services
                 .OrderBy(tscm => tscm.TripSegContainerSeqNumber)
                 .ToListAsync();
 
+            if (!tripSegmentContainers.Any())
+            {
+                Mvx.TaggedError(Constants.ScrapRunner, $"Couldn't find containers for trip {tripNumber}.");
+                return Enumerable.Empty<TripSegmentContainerModel>().ToList();
+            }
+
             return tripSegmentContainers;
         }
 

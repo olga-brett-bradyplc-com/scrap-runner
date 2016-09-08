@@ -6,16 +6,16 @@
     android:layout_height="wrap_content"
     android:padding="10dp"
     android:background="#ffffff">
-  <TextView
-      android:id="@+id/trip_companyhostcode"
-      android:layout_height="wrap_content"
-      android:layout_weight="1"
-      android:layout_alignParentLeft="true"
-      android:layout_width="match_parent"
-      android:textColor="@color/material_gray_900"
-      android:textSize="22sp"
-      local:MvxBind="Text Key.TripSegOrigCustHostCode" />
-  <TextView
+    <TextView
+        android:id="@+id/trip_companyhostcode"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_alignParentLeft="true"
+        android:layout_width="match_parent"
+        android:textColor="@color/material_gray_900"
+        android:textSize="22sp"
+        local:MvxBind="Text Key.CustHostCode" />
+    <TextView
         android:id="@+id/trip_companyname"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:textColor="@color/material_gray_900"
         android:textSize="22sp"
-        local:MvxBind="Text Key.TripSegOrigCustName" />
+        local:MvxBind="Text Key.Name" />
     <TextView
         android:id="@+id/trip_address"
         android:layout_height="wrap_content"
@@ -32,13 +32,5 @@
         android:textColor="@color/material_gray_900"
         android:layout_marginBottom="10dp"
         android:textSize="19sp"
-        local:MvxBind="Text 'Trip ' + Key.TripNumber + ' - ' + Key.TripSegOrigCustHostCode" />
-    <TextView
-        android:id="@+id/trip_citystatezip"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_width="match_parent"
-        android:textColor="@color/material_gray_900"
-        android:textSize="14sp"
-        local:MvxBind="Text Key.TripSegComments" />
+        local:MvxBind="Text Key.TripNumber" />
 </LinearLayout>

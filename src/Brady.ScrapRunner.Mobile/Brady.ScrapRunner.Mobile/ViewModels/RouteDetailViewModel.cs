@@ -575,6 +575,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         }
 
                         await CompleteTrip();
+                        return;
                     }
 
                     Close(this);
@@ -602,7 +603,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                     PowerId = CurrentDriver.PowerId,
                                     ActionType = ContainerActionTypeConstants.Done,
                                     ActionDateTime = DateTime.Now,
-                                    MethodOfEntry = TripMethodOfCompletionConstants.Driver,
+                                    MethodOfEntry = container.MethodOfEntry,
                                     TripNumber = TripNumber,
                                     TripSegNumber = container.TripSegNumber,
                                     ContainerNumber = container.TripSegContainerNumber,

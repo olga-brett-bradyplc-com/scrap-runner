@@ -31,6 +31,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             LoginProcessed = loginProcessed;
         }
 
+        // Coming from exception processing
+        public void Init(string tripNumber)
+        {
+            TripNumber = tripNumber;
+        }
+
         public override async void Start()
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
@@ -66,6 +72,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _currentContainer, value); }
         }
 
+        private string _tripNumber;
+        public string TripNumber
+        {
+            get { return _tripNumber; }
+            set { SetProperty(ref _tripNumber, value); }
+        }
+
         private DriverStatusModel CurrentDriver { get; set; }
 
         private IMvxAsyncCommand _addContainerCommand;
@@ -78,7 +91,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     UserDialogs.Instance.PromptAsync(AppResources.EnterContainerNumber, AppResources.AddContainer, AppResources.OK,
                         AppResources.Cancel, AppResources.ContainerNumber);
 
-            if (!string.IsNullOrEmpty(containerNumberPrompt.Text))
+            if (!string.IsNullOrEmpty(containerNumberPrompt.Text) && containerNumberPrompt.Text != AppResources.Cancel)
                 await ProcessContainerLoad(containerNumberPrompt.Text, ContainerMethodOfEntry.Manual);
         }
 
@@ -132,8 +145,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     if (containerProcess.WasSuccessful)
                     {
-                        await _containerService.LoadContainerOnPowerId(CurrentDriver.PowerId, containerNumber);
+                        await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, containerNumber);
                         CurrentContainers.Add(new ContainerWrapper(container, this));
+                        ConfirmContainersCommand.RaiseCanExecuteChanged();
                     }
                     else
                         UserDialogs.Instance.Alert(containerProcess.Failure.Summary, AppResources.Error);
@@ -141,11 +155,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
         }
 
+        private bool CanExecuteContinue()
+        {
+            return CurrentContainers.Count > 0 || TripNumber == null;
+        }
+
         private IMvxCommand _confirmContainersCommand;
-        public IMvxCommand ConfirmContainersCommand => _confirmContainersCommand ?? (_confirmContainersCommand = new MvxCommand(ExecuteConfirmContainersCommand));
+        public IMvxCommand ConfirmContainersCommand => _confirmContainersCommand ?? (_confirmContainersCommand = new MvxCommand(ExecuteConfirmContainersCommand, CanExecuteContinue));
 
         public void ExecuteConfirmContainersCommand()
-        {
+        {   
             Close(this);
             if (LoginProcessed)
                 ShowViewModel<RouteSummaryViewModel>();
@@ -169,9 +188,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 if (containerProcess.WasSuccessful)
                 {
-                    CurrentContainers.Remove(
-                        CurrentContainers.First(ct => ct.ContainerMasterItem.ContainerNumber == containerNumber));
-                    await _containerService.UnloadContainerFromPowerId(powerId, containerNumber);
+                    CurrentContainers.Remove(CurrentContainers.First(ct => ct.ContainerMasterItem.ContainerNumber == containerNumber));
+                    ConfirmContainersCommand.RaiseCanExecuteChanged();
+
+                    var containerMaster = await _containerService.FindContainerAsync(containerNumber);
+                    containerMaster.ContainerPowerId = null;
+                    await _containerService.UpdateContainerAsync(containerMaster);
                 }
                 else
                 {

@@ -12,30 +12,30 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_centerInParent="true">
-           <EditText
-                android:id="@+id/fuelAmountInputField"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:layout_marginRight="15dp"
-                local:MvxBind="Text FuelAmount"
-                local:MvxLang="Hint AmountHint"
-                android:focusable="true"
-                android:layout_weight=".85"
-                android:focusableInTouchMode="true" />
-           <EditText
-                android:id="@+id/odometerInputField"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:layout_marginRight="15dp"
-                local:MvxBind="Text OdometerReading"
-                local:MvxLang="Hint CurrentOdometerHint"
-                android:focusable="true"
-                android:layout_weight=".85"
-                android:focusableInTouchMode="true" />
-      <MvxSpinner
-        android:layout_width="match_parent"
+        <EditText
+            android:id="@+id/fuelAmountInputField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginRight="15dp"
+            local:MvxBind="Text FuelAmount"
+            local:MvxLang="Hint AmountHint"
+            android:focusable="true"
+            android:layout_weight=".85"
+            android:focusableInTouchMode="true" />
+        <EditText
+            android:id="@+id/odometerInputField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginRight="15dp"
+            local:MvxBind="Text OdometerReading"
+            local:MvxLang="Hint CurrentOdometerHint"
+            android:focusable="true"
+            android:layout_weight=".85"
+            android:focusableInTouchMode="true" />
+        <MvxSpinner
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:foreground="#ffffff"
             android:spinnerMode="dialog"
@@ -43,8 +43,8 @@
             android:id="@+id/MvxStateSpinner"
             local:MvxItemTemplate="@layout/item_codetable"
             local:MvxDropDownItemTemplate="@layout/item_spinnerdropdown_codetable"
-            local:MvxBind="ItemsSource StatesList;SelectedItem SelectedState, Mode=TwoWay" 
-            android:layout_marginTop="15dp"/>
+            local:MvxBind="ItemsSource StatesList;SelectedItem SelectedState, Mode=TwoWay"
+            android:layout_marginTop="15dp" />
         <Button
             local:MvxBind="Click SaveFuelEntryCommand"
             local:MvxLang="Text Save"

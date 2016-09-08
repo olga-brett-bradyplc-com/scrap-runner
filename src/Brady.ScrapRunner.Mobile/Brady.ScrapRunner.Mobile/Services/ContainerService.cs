@@ -71,9 +71,21 @@ namespace Brady.ScrapRunner.Mobile.Services
         public async Task<List<ContainerMasterModel>> FindPowerIdContainersAsync(string powerId)
         {
             var containers = await _containerMasterRepository.AsQueryable()
-                .Where(ct => ct.ContainerPowerId == powerId).ToListAsync();
+                .Where(ct => ct.ContainerPowerId == powerId)
+                .OrderBy(c => c.ContainerCustHostCode).ToListAsync();
 
             return containers;
+        }
+
+        /// <summary>
+        /// Does given power id have multiple containers loaded?
+        /// </summary>
+        /// <param name="powerId"></param>
+        /// <returns></returns>
+        public async Task<bool> HasMultipleContainersLoadedAsync(string powerId)
+        {
+            var containers = await FindPowerIdContainersAsync(powerId);
+            return containers.Count > 1;
         }
 
         /// <summary>
@@ -82,10 +94,12 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <param name="powerId"></param>
         /// <param name="containerNumber"></param>
         /// <returns></returns>
-        public async Task<int> UnloadContainerFromPowerId(string powerId, string containerNumber)
+        public async Task<int> UnloadContainerFromPowerIdAsync(string powerId, string containerNumber)
         {
             var container = await FindContainerAsync(containerNumber);
             container.ContainerPowerId = null;
+            container.ContainerCurrentTripNumber = null;
+            container.ContainerCurrentTripSegNumber = null;
             return await _containerMasterRepository.UpdateAsync(container);
         }
 
@@ -96,11 +110,19 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// </summary>
         /// <param name="powerId"></param>
         /// <param name="containerNumber"></param>
+        /// <param name="tripContainer"></param>
         /// <returns></returns>
-        public async Task<int> LoadContainerOnPowerId(string powerId, string containerNumber)
+        public async Task<int> LoadContainerOnPowerIdAsync(string powerId, string containerNumber, TripSegmentContainerModel tripContainer = null)
         {
             var container = await FindContainerAsync(containerNumber);
             container.ContainerPowerId = powerId;
+
+            container.ContainerCurrentTripNumber = tripContainer?.TripNumber;
+            container.ContainerCurrentTripSegNumber = tripContainer?.TripSegNumber;
+            container.ContainerCommodityCode = tripContainer?.TripSegContainerCommodityCode;
+            container.ContainerCommodityDesc = tripContainer?.TripSegContainerCommodityDesc;
+            container.ContainerLocation = tripContainer?.TripSegContainerLocation;
+
             return await _containerMasterRepository.UpdateAsync(container);
         }
 

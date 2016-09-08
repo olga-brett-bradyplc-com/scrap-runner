@@ -51,6 +51,17 @@ namespace Brady.ScrapRunner.Mobile.Models
 
         public int ContainerLevel { get; set; }
 
+        // These fields are un-mapped to help else track unused contianers left on power id
+        [MaxLength(1)]
+        public string ContainerComplete { get; set; }
+
+        [MaxLength(1)]
+        public string ContainerReviewFlag { get; set; }
+
+        // This is a special field that allows us to unload a container at a later time
+        [MaxLength(1)]
+        public string ContainerToBeUnloaded { get; set; }
+
         [Ignore]
         // Convienence methods
         public string ContainerFullDescription

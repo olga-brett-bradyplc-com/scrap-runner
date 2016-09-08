@@ -18,14 +18,14 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
     /// <summary>
     /// Taken from https://github.com/deapsquatter/MvvmCross.DeapExtensions
     /// </summary>
-    public class BindableGroupListView : MvxListView
+    public class BindableGroupListScaleView : MvxListView
     {
-        public BindableGroupListView(Context context, IAttributeSet attrs)
-                    : this(context, attrs, new BindableGroupListAdapter(context))
+        public BindableGroupListScaleView(Context context, IAttributeSet attrs)
+                    : this(context, attrs, new BindableGroupListScaleAdapter(context))
         {
         }
 
-        public BindableGroupListView(Context context, IAttributeSet attrs, BindableGroupListAdapter adapter)
+        public BindableGroupListScaleView(Context context, IAttributeSet attrs, BindableGroupListScaleAdapter adapter)
             : base(context, attrs, adapter)
         {
             var groupTemplateId = MvxAttributeHelpers.ReadAttributeValue(context, attrs,
@@ -44,36 +44,18 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
             if (item == null)
                 return;
 
-            if (Adapter is BindableGroupListScaleAdapter)
-            {
-                var flatItem = (BindableGroupListScaleAdapter.FlatItem)item;
+            var flatItem = (BindableGroupListScaleAdapter.FlatItem)item;
 
-                if (flatItem.IsGroup)
-                    command = GroupClick;
+            if (flatItem.IsGroup)
+                command = GroupClick;
 
-                if (command == null)
-                    return;
+            if (command == null)
+                return;
 
-                if (!command.CanExecute(flatItem.Item))
-                    return;
+            if (!command.CanExecute(flatItem.Item))
+                return;
 
-                command.Execute(flatItem.Item);
-            }
-            else
-            {
-                var flatItem = (BindableGroupListAdapter.FlatItem)item;
-
-                if (flatItem.IsGroup)
-                    command = GroupClick;
-
-                if (command == null)
-                    return;
-
-                if (!command.CanExecute(flatItem.Item))
-                    return;
-
-                command.Execute(flatItem.Item);
-            }
+            command.Execute(flatItem.Item);
         }
     }
 }
