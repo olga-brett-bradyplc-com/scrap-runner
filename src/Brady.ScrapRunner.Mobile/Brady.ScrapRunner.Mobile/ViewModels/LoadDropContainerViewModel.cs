@@ -166,7 +166,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public void ExecuteConfirmContainersCommand()
         {   
             Close(this);
-            if (LoginProcessed)
+
+            if (TripNumber != null)
+                ShowViewModel<ScaleSummaryViewModel>(new {tripNumber = TripNumber});
+            else if (LoginProcessed)
                 ShowViewModel<RouteSummaryViewModel>();
         }
 

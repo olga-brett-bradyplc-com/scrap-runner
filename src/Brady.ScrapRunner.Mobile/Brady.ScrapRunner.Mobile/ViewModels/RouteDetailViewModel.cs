@@ -507,7 +507,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             else if (_tripService.IsTripLegScale(firstSegment))
             {
                 var containersOnPowerId = await _containerService.FindPowerIdContainersAsync(CurrentDriver.PowerId);
-                if (_tripService.IsTripLegTypePublicScale(firstSegment) && containersOnPowerId.Count >= 1)
+                if (_tripService.IsTripLegTypePublicScale(firstSegment))
                 {
                     Close(this);
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
@@ -528,28 +528,31 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     if (!loadContainer)
                     {
-                        await UserDialogs.Instance.AlertAsync(AppResources.NoContainersSkipScale, AppResources.OK);
-
-                        var tripSegmentProcess =
-                            await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
-                            {
-                                EmployeeId = CurrentDriver.EmployeeId,
-                                TripNumber = TripNumber,
-                                TripSegNumber = firstSegment.TripSegNumber,
-                                ActionType = TripSegmentActionTypeConstants.Done,
-                                ActionDateTime = DateTime.Now,
-                                PowerId = CurrentDriver.PowerId,
-                                Latitude = firstSegment.TripSegEndLatitude,
-                                Longitude = firstSegment.TripSegEndLongitude
-                            });
-
-                        if (!tripSegmentProcess.WasSuccessful)
+                        using ( var completeTrip = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
                         {
-                            await UserDialogs.Instance.AlertAsync(tripSegmentProcess.Failure.Summary, AppResources.Error, AppResources.OK);
-                            return;
+                            var tripSegmentProcess =
+                                await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                                {
+                                    EmployeeId = CurrentDriver.EmployeeId,
+                                    TripNumber = TripNumber,
+                                    TripSegNumber = firstSegment.TripSegNumber,
+                                    ActionType = TripSegmentActionTypeConstants.Done,
+                                    ActionDateTime = DateTime.Now,
+                                    PowerId = CurrentDriver.PowerId,
+                                    Latitude = firstSegment.TripSegEndLatitude,
+                                    Longitude = firstSegment.TripSegEndLongitude
+                                });
+
+                            if (!tripSegmentProcess.WasSuccessful)
+                            {
+                                await UserDialogs.Instance.AlertAsync(tripSegmentProcess.Failure.Summary, AppResources.Error, AppResources.OK);
+                                return;
+                            }
+
+                            await CompleteTrip();
                         }
 
-                        await CompleteTrip();
+                        UserDialogs.Instance.Toast(AppResources.NoContainersSkipScale, new TimeSpan(5000));
                         return;
                     }
 

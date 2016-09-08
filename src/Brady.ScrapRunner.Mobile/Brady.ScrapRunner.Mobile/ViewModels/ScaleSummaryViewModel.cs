@@ -258,12 +258,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private bool CanExecuteFinishSegmentCommand()
         {
             return
-                ContainersOnPowerId.Any(
-                    grp =>
-                        grp.Any(
-                            c =>
-                                !string.IsNullOrEmpty(c.TripSegmentContainer.TripSegContainerReviewFlag) ||
-                                !string.IsNullOrEmpty(c.ContainerMaster.ContainerComplete)));
+                ContainersOnPowerId.SelectMany(grouping => grouping)
+                    .All(container => !string.IsNullOrEmpty(container.ContainerMaster?.ContainerComplete));
         }
 
         // Command bindings
