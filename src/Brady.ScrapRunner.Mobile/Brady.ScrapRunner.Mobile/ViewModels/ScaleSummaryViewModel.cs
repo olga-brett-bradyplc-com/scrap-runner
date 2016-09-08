@@ -185,16 +185,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                 UserDialogs.Instance.Alert(unusedContainerAction.Failure.Summary, AppResources.Error);
                                 return;
                             }
-
-                            if (container.ContainerMaster.ContainerToBeUnloaded == Constants.Yes)
-                                await
-                                    _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId,
-                                        container.ContainerMaster.ContainerNumber);
                         }
                         else
                         {
-                             var containerAction =
-                                await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                             var containerAction = await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
                                 {
                                     EmployeeId = CurrentDriver.EmployeeId,
                                     PowerId = CurrentDriver.PowerId,
@@ -215,17 +209,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                     TareWeight = container.TripSegmentContainer.TripSegContainerWeightTare.GetValueOrDefault()
                                 });
 
-                                if (!containerAction.WasSuccessful)
-                                {
-                                    UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
-                                    return;
-                                }
-
-                                if (container.ContainerMaster.ContainerToBeUnloaded == Constants.Yes)
-                                    await
-                                        _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId,
-                                            container.ContainerMaster.ContainerNumber);
+                            if (!containerAction.WasSuccessful)
+                            {
+                                UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                                return;
+                            }
                         }
+
+                        await _containerService.ResetContainer(container.ContainerMaster);
                     }
                     
                     var tripSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber, TripSegNumber);
@@ -260,7 +251,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                     Close(this);
                     ShowViewModel<RouteSummaryViewModel>();
-
                 }
             }
         }

@@ -46,6 +46,9 @@ namespace Brady.ScrapRunner.Mobile.Models
         [MaxLength(2)]
         public string ContainerCurrentTripSegType { get; set; }
 
+        [MaxLength(10)]
+        public string ContainerPrevTripNumber { get; set; }
+
         [MaxLength(15)]
         public string ContainerBarCodeNo { get; set; }
 

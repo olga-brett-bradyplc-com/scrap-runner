@@ -105,7 +105,7 @@ namespace Brady.ScrapRunner.Mobile.Services
 
         /// <summary>
         /// Load container onto power id.
-        /// Typically, I'd rather pass an object reference and doing a straight update since we usually already have it in the viewmodel
+        /// Typically, I'd rather pass an object reference instead of multiple parameters
         /// but this and unload are special cases in that this also needs to work with a TripSegmentContainerModel
         /// </summary>
         /// <param name="powerId"></param>
@@ -122,6 +122,26 @@ namespace Brady.ScrapRunner.Mobile.Services
             container.ContainerCommodityCode = tripContainer?.TripSegContainerCommodityCode;
             container.ContainerCommodityDesc = tripContainer?.TripSegContainerCommodityDesc;
             container.ContainerLocation = tripContainer?.TripSegContainerLocation;
+
+            return await _containerMasterRepository.UpdateAsync(container);
+        }
+
+        public async Task<int> ResetContainer(ContainerMasterModel container)
+        {
+            container.ContainerPrevTripNumber = container.ContainerCurrentTripNumber;
+            container.ContainerComplete = null;
+            container.ContainerReviewFlag = null;
+            container.ContainerCurrentTripNumber = null;
+            container.ContainerCurrentTripSegNumber = null;
+            container.ContainerCurrentTripSegType = null;
+
+            if (container.ContainerToBeUnloaded == Constants.Yes)
+            {
+                container.ContainerPowerId = null;
+                container.ContainerCustHostCode = null;
+            }
+
+            container.ContainerToBeUnloaded = null;
 
             return await _containerMasterRepository.UpdateAsync(container);
         }
