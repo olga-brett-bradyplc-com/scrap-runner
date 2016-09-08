@@ -506,45 +506,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             }
             else if (_tripService.IsTripLegScale(firstSegment))
             {
-                var segmentContainers = TripLegs.FirstOrDefault().TripSegments.FirstOrDefault();
                 var containersOnPowerId = await _containerService.FindPowerIdContainersAsync(CurrentDriver.PowerId);
-                if (_tripService.IsTripLegTypePublicScale(firstSegment) && containersOnPowerId.Count >= 2)
+                if (_tripService.IsTripLegTypePublicScale(firstSegment) && containersOnPowerId.Count >= 1)
                 {
                     Close(this);
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
                 }
-                else if (_tripService.IsTripLegTypePublicScale(firstSegment))
-                {
-                    Close(this);
-                    ShowViewModel<PublicScaleDetailViewModel>(
-                        new
-                        {
-                            tripNumber = TripNumber,
-                            tripSegNumber = segmentContainers.Key.TripSegNumber,
-                            tripSegContainerSeqNumber = segmentContainers.SingleOrDefault().TripSegContainerSeqNumber,
-                            tripSegContainerNumber = segmentContainers.SingleOrDefault().TripSegContainerNumber,
-                            methodOfEntry = ContainerMethodOfEntry.Manual
-                        });
-                }
-                else if (containersOnPowerId.Count >= 2)
+                else if (containersOnPowerId.Count >= 1)
                 {
                     Close(this);
                     ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
                 }
-                else if (containersOnPowerId.Count == 1)
-                {
-                    Close(this);
-                    ShowViewModel<ScaleDetailViewModel>(
-                        new
-                        {
-                            tripNumber = TripNumber,
-                            tripSegNumber = segmentContainers.Key.TripSegNumber,
-                            tripSegContainerSeqNumber = segmentContainers.SingleOrDefault().TripSegContainerSeqNumber,
-                            tripSegContainerNumber = segmentContainers.SingleOrDefault().TripSegContainerNumber
-                        });
-                }
                 else
                 {
+                    // Exception processing
                     var loadContainer = await UserDialogs.Instance.ConfirmAsync(
                         string.Format(AppResources.NoInventoryConfirmation, "\n\n"),
                         AppResources.ConfirmLabel, 
