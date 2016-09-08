@@ -7,7 +7,9 @@ using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
+using Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView;
 using Brady.ScrapRunner.Mobile.ViewModels;
+using MvvmCross.Binding.Droid.BindingContext;
 using MvvmCross.Binding.Droid.Views;
 using MvvmCross.Droid.Shared.Attributes;
 using MvvmCross.Platform.WeakSubscription;
@@ -26,11 +28,14 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
 
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
-            var listGrouping = View.FindViewById<MvxListView>(Resource.Id.ScaleSummaryListView);
-            if (ViewModel.Containers != null)
-                listGrouping.ItemsSource = ViewModel.Containers;
+            var listGrouping = View.FindViewById<BindableGroupListView>(Resource.Id.ScaleSummaryListView);
+            var groupLayout = Resource.Layout.item_scalesummary;
+            listGrouping.Adapter = new BindableGroupListScaleAdapter(Activity, (MvxAndroidBindingContext)BindingContext, groupLayout);
 
-            _containersToken = ViewModel.WeakSubscribe(() => ViewModel.Containers, OnContainersChanged);
+            if (ViewModel.ContainersOnPowerId != null)
+                listGrouping.ItemsSource = ViewModel.ContainersOnPowerId;
+
+            _containersToken = ViewModel.WeakSubscribe(() => ViewModel.ContainersOnPowerId, OnContainersChanged);
         }
 
         public override void OnDestroyView()
@@ -45,8 +50,8 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
         private void OnContainersChanged(object sender, PropertyChangedEventArgs args)
         {
             var listGrouping = View.FindViewById<MvxListView>(Resource.Id.ScaleSummaryListView);
-            if (ViewModel.Containers != null)
-                listGrouping.ItemsSource = ViewModel.Containers;
+            if (ViewModel.ContainersOnPowerId != null)
+                listGrouping.ItemsSource = ViewModel.ContainersOnPowerId;
         }
 
     }

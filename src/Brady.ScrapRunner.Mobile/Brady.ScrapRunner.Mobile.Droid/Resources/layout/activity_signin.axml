@@ -4,90 +4,90 @@
     android:layout_width="match_parent"
     android:background="@drawable/loginsplash800x1280_4"
     android:layout_height="match_parent">
-  <ImageView
-      android:id="@+id/loginImageView"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:src="@drawable/logo_2"
-      android:adjustViewBounds="true"
-      android:layout_centerHorizontal="true"
-      android:scaleType="fitStart"
-      android:paddingLeft="15dp"
-      android:paddingRight="15dp"
-      android:layout_above="@id/center_panel" />
-  <LinearLayout
-      android:id="@+id/center_panel"
-      android:orientation="vertical"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_centerInParent="true"
-      android:paddingLeft="15dp"
-      android:paddingRight="15dp">
-    <android.support.design.widget.TextInputLayout
-        android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
+    <ImageView
+        android:id="@+id/loginImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_2"
+        android:adjustViewBounds="true"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitStart"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:layout_above="@id/center_panel" />
+    <LinearLayout
+        android:id="@+id/center_panel"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-      <android.support.design.widget.TextInputEditText
-          android:id="@+id/employeeIdInputField"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:singleLine="true"
-          local:MvxBind="Text UserName"
-          local:MvxLang="Hint UserNameHint"
-          android:hint="Employee ID" />
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-      <android.support.design.widget.TextInputEditText
-          android:id="@+id/passwordInputField"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:inputType="textPassword"
-          android:singleLine="true"
-          local:MvxBind="Text Password"
-          local:MvxLang="Hint PasswordHint" />
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-      <android.support.design.widget.TextInputEditText
-          android:id="@+id/powerUnitIdInputField"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:singleLine="true"
-          local:MvxBind="Text TruckId"
-          local:MvxLang="Hint TruckIdHint" />
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
-        android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-      <android.support.design.widget.TextInputEditText
-          android:id="@+id/odometerInputField"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:singleLine="true"
-          android:inputType="number"
-          local:MvxBind="Text Odometer, Converter=NullableInt"
-          local:MvxLang="Hint OdometerReadingHint" />
-    </android.support.design.widget.TextInputLayout>
-    <Button
-        local:MvxBind="Click SignInCommand"
-        local:MvxLang="Text SignIn"
-        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/employeeIdInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                local:MvxBind="Text UserName"
+                local:MvxLang="Hint UserNameHint"
+                android:hint="Employee ID" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/passwordInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:singleLine="true"
+                local:MvxBind="Text Password"
+                local:MvxLang="Hint PasswordHint" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/powerUnitIdInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                local:MvxBind="Text TruckId"
+                local:MvxLang="Hint TruckIdHint" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:theme="@style/ScrapRunnerTheme.TextAppearance.Light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/odometerInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:inputType="number"
+                local:MvxBind="Text Odometer, Converter=NullableInt"
+                local:MvxLang="Hint OdometerReadingHint" />
+        </android.support.design.widget.TextInputLayout>
+        <Button
+            local:MvxBind="Click SignInCommand"
+            local:MvxLang="Text SignIn"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+    <ImageButton
+        android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginTop="4dp" />
-  </LinearLayout>
-  <ImageButton
-      android:layout_width="48dp"
-      android:layout_height="48dp"
-      android:layout_alignParentBottom="true"
-      android:layout_alignParentRight="true"
-      android:layout_marginRight="@dimen/activity_horizontal_margin"
-      android:layout_marginBottom="@dimen/activity_horizontal_margin"
-      android:background="@drawable/ic_settings_white_48dp"
-      local:MvxBind="Click SettingsCommand" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_horizontal_margin"
+        android:background="@drawable/ic_settings_white_48dp"
+        local:MvxBind="Click SettingsCommand" />
 </RelativeLayout>

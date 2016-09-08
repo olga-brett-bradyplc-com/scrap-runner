@@ -14,7 +14,7 @@
         android:layout_alignParentLeft="true"
         android:textColor="@color/material_gray_900"
         tools:text="LU"
-        local:MvxBind="Text DefaultTripSegContainerNumber + ' ' + DefaultTripContainerTypeSize" />
+        local:MvxBind="Text ContainerMaster.ContainerNumber + ' ' + ContainerMaster.ContainerType" />
     <TextView
         android:id="@+id/tripContainerLocation"
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
         android:layout_below="@id/tripContainerInfo"
         android:textColor="@color/material_gray_900"
         tools:text="Trash Can"
-        local:MvxBind="Text TripSegContainerLocation" />
+        local:MvxBind="Text ContainerMaster.ContainerLocation" />
     <TextView
         android:id="@+id/tripCommodityDesc"
         android:layout_width="match_parent"
@@ -30,5 +30,5 @@
         android:layout_below="@id/tripContainerLocation"
         android:textColor="@color/material_gray_900"
         tools:text="#2 Tin"
-        local:MvxBind="Text TripSegContainerCommodityDesc" />
+        local:MvxBind="Text ContainerMaster.ContainerCommodityDesc" />
 </RelativeLayout>

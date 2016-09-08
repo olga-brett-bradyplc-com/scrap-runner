@@ -21,17 +21,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ICustomerService _customerService;
         private readonly IDriverService _driverService;
         private readonly IPreferenceService _preferenceService;
+        private readonly IContainerService _containerService;
 
         public TransactionDetailViewModel(ITripService tripService, 
             ICodeTableService codeTableService, 
             ICustomerService customerService,
             IPreferenceService preferenceService,
+            IContainerService containerService,
             IDriverService driverService)
         {
             _tripService = tripService;
             _codeTableService = codeTableService;
             _customerService = customerService;
             _preferenceService = preferenceService;
+            _containerService = containerService;
             _driverService = driverService;
         }
 
@@ -167,7 +170,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 Container.TripSegContainerCommodityCode = string.IsNullOrEmpty(SelectedCommodity?.CustHostCode) ? null : SelectedCommodity.CustCommodityCode;
                 Container.TripSegContainerCommodityDesc = string.IsNullOrEmpty(SelectedCommodity?.CustHostCode) ? null : SelectedCommodity.CustCommodityDesc;
                 Container.TripSegContainerLocation = string.IsNullOrEmpty(SelectedLocation?.CustHostCode) ? null : SelectedLocation.CustLocation;
+                Container.MethodOfEntry = TripMethodOfCompletionConstants.Manual;
                 // Container.TripSegContainerNotes = not implemented server side
+
+                if (_tripService.IsTripLegLoaded(Segment))
+                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId,
+                        Container.TripSegContainerNumber);
+                else if (_tripService.IsTripLegDropped(Segment))
+                    await
+                        _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId,
+                            Container.TripSegContainerNumber);
 
                 await _tripService.CompleteTripSegmentContainerAsync(Container);
 
@@ -199,6 +211,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     var exceptionObj = exceptions.FirstOrDefault(ct => ct.CodeDisp1 == exceptionDialogAsync);
                     if (!string.IsNullOrEmpty(TripSegContainerNumber))
                         Container.TripSegContainerNumber = TripSegContainerNumber;
+
+                    Container.MethodOfEntry = TripMethodOfCompletionConstants.Manual;
 
                     Container.TripSegContainerLevel = short.TryParse(SelectedLevel.CodeValue, out selectedLevel) ? selectedLevel : (short?)null;
 

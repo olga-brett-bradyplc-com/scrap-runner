@@ -86,6 +86,9 @@
         [MaxLength(1)]
         public string TripSegContainerComplete { get; set; }
 
+        [MaxLength(1)]
+        public string MethodOfEntry { get; set; }
+
         // Used internally for scanning functionality
         [Ignore]
         public bool SelectedTransaction { get; set; }

@@ -13,7 +13,10 @@
             CreateMap<EmployeeMaster, EmployeeMasterModel>();
             CreateMap<Preference, PreferenceModel>();
             CreateMap<PowerMaster, PowerMasterModel>();
-            CreateMap<ContainerMaster, ContainerMasterModel>();
+            CreateMap<ContainerMaster, ContainerMasterModel>()
+                .ForMember(c => c.ContainerToBeUnloaded, o => o.Ignore())
+                .ForMember(c => c.ContainerReviewFlag, o => o.Ignore())
+                .ForMember(c => c.ContainerComplete, o => o.Ignore());
             CreateMap<ContainerChange, ContainerMasterModel>()
                 .ForSourceMember(cc => cc.ActionDate, o => o.Ignore())
                 .ForSourceMember(cc => cc.ActionFlag, o => o.Ignore());
@@ -46,6 +49,7 @@
             CreateMap<TripSegmentContainer, TripSegmentContainerModel>()
                 .ForMember(tsc => tsc.TripSegComments, o => o.Ignore())
                 .ForMember(tsc => tsc.CompositeKey, o => o.Ignore())
+                .ForMember(tsc => tsc.MethodOfEntry, o => o.Ignore())
                 .ForMember(tsc => tsc.TripSegContainerReivewReasonDesc, o => o.Ignore());
             CreateMap<CodeTable, CodeTableModel>();
             CreateMap<Domain.Models.Messages, MessagesModel>()
