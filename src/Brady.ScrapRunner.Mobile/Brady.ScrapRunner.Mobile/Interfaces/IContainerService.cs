@@ -30,7 +30,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<int> ResetContainer(ContainerMasterModel container);
 
-        Task<int> LoadContainerOnPowerIdAsync(string powerId, string containerNumber, TripSegmentContainerModel tripContainer = null);
+        Task<int> LoadContainerOnPowerIdAsync(string powerId, string containerNumber, string custHostCode = null, TripSegmentContainerModel tripContainer = null);
 
         Task<ChangeResultWithItem<DriverContainerActionProcess>> ProcessContainerActionAsync(
             DriverContainerActionProcess containerActionProcess);

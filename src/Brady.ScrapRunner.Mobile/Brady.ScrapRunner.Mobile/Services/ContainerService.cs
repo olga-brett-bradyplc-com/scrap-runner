@@ -112,7 +112,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// <param name="containerNumber"></param>
         /// <param name="tripContainer"></param>
         /// <returns></returns>
-        public async Task<int> LoadContainerOnPowerIdAsync(string powerId, string containerNumber, TripSegmentContainerModel tripContainer = null)
+        public async Task<int> LoadContainerOnPowerIdAsync(string powerId, string containerNumber, string custHostCode = null, TripSegmentContainerModel tripContainer = null)
         {
             var container = await FindContainerAsync(containerNumber);
             container.ContainerPowerId = powerId;
@@ -122,6 +122,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             container.ContainerCommodityCode = tripContainer?.TripSegContainerCommodityCode;
             container.ContainerCommodityDesc = tripContainer?.TripSegContainerCommodityDesc;
             container.ContainerLocation = tripContainer?.TripSegContainerLocation;
+            container.ContainerCustHostCode = custHostCode;
 
             return await _containerMasterRepository.UpdateAsync(container);
         }
