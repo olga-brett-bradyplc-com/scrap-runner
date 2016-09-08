@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.bradyplc.scraprunner" android:installLocation="auto" android:versionName="0.0.0.3" android:versionCode="1">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.bradyplc.scraprunner" android:installLocation="auto" android:versionName="0.0.0.4" android:versionCode="1">
 	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="23" />
 	<application android:label="ScrapRunner" android:theme="@style/ScrapRunnerTheme"></application>
 	<uses-permission android:name="android.permission.INTERNET" />
