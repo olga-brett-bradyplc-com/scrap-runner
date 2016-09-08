@@ -755,4 +755,8 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>You have no containers in truck inventory. Do you need to load a container? {0} Selecting 'No' will complete the trip.</value>
     <comment>NEEDS TRANSLATION; RouteDetailViewModel</comment>
   </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
 </root>

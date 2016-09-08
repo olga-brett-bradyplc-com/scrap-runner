@@ -63,6 +63,7 @@
         <Button
             style="@style/ScrapRunnerTheme.StandardButtonStyle"
             android:background="@color/material_red_500"
-            local:MvxBind="Text NextActionLabel; Click NextStageCommand" />
+            local:MvxLang="Text Next"
+            local:MvxBind="Click NextStageCommand" />
     </LinearLayout>
 </RelativeLayout>

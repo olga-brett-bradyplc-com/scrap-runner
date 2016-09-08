@@ -789,4 +789,7 @@ You will now be sent back to the login.</value>
     <value>You have no containers in truck inventory. Do you need to load a container? {0} Selecting 'No' will complete the trip.</value>
     <comment>RouteDetailViewModel</comment>
   </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
 </root>

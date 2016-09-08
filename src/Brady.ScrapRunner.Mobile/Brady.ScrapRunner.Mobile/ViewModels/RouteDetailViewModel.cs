@@ -148,10 +148,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                  CurrentDriver.Status == DriverStatusSRConstants.Enroute))
                 CurrentStatus = CurrentDriver.Status;
 
-            // Set the appropiate button text if user is resuming a trip in "arrived" status
-            if (CurrentDriver.TripNumber == TripNumber && CurrentStatus == DriverStatusSRConstants.Arrive)
-                SetNextStageLabel(fullTripSegments.FirstOrDefault(sg => sg.TripSegStatus == TripSegStatusConstants.Pending || sg.TripSegStatus == TripSegStatusConstants.Missed));
-
             base.Start();
         }
 
@@ -232,13 +228,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             get { return _currentStatus; }
             set { SetProperty(ref _currentStatus, value); }
-        }
-
-        private string _nextActionLabel;
-        public string NextActionLabel
-        {
-            get { return _nextActionLabel; }
-            set { SetProperty(ref _nextActionLabel, value);  }
         }
 
         private bool? _allowRtnEdit;
@@ -458,7 +447,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                     await SetDriverArrive();
                             }
                         }
-                        SetNextStageLabel(firstSegment);
                     }
                     else
                         await SetDriverArrive();
@@ -484,16 +472,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 await UserDialogs.Instance.AlertAsync(setDriverArrived.Failure.Summary,
                     AppResources.Error, AppResources.OK);
             }
-        }
-
-        private void SetNextStageLabel(TripSegmentModel tripSegment)
-        {
-            if (_tripService.IsTripLegTransaction(tripSegment))
-                NextActionLabel = AppResources.Transactions;
-            else if (_tripService.IsTripLegScale(tripSegment))
-                NextActionLabel = AppResources.YardScaleLabel;
-            else if (_tripService.IsTripLegNoScreen(tripSegment))
-                NextActionLabel = AppResources.FinishTripLabel;
         }
 
         private async Task ExecuteNextStageCommandAsync()
