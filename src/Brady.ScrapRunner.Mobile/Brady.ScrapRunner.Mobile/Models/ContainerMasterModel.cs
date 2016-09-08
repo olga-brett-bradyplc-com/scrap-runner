@@ -16,6 +16,9 @@ namespace Brady.ScrapRunner.Mobile.Models
         [MaxLength(5)]
         public string ContainerType { get; set; }
 
+        [MaxLength(30)]
+        public string ContainerTypeDesc { get; set; }
+
         [MaxLength(5)]
         public string ContainerSize { get; set; }
 

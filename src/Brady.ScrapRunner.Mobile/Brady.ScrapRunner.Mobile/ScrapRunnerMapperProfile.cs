@@ -16,6 +16,7 @@
             CreateMap<ContainerMaster, ContainerMasterModel>()
                 .ForMember(c => c.ContainerToBeUnloaded, o => o.Ignore())
                 .ForMember(c => c.ContainerReviewFlag, o => o.Ignore())
+                .ForMember(c => c.ContainerTypeDesc, o => o.Ignore())
                 .ForMember(c => c.ContainerComplete, o => o.Ignore());
             CreateMap<ContainerChange, ContainerMasterModel>()
                 .ForSourceMember(cc => cc.ActionDate, o => o.Ignore())

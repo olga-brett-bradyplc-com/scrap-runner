@@ -746,4 +746,20 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
   <data name="InvalidContainerNumber" xml:space="preserve">
     <value>Número de contenedores no válido</value>
   </data>
+  <data name="ConfirmRTNeeded" xml:space="preserve">
+    <value>You could not process some containers. {0}Do you still need to return to yard? Selecting 'No' will end this trip.</value>
+    <comment>NEEDS TRANSLATION; TransactionSummaryViewModel/TransactionConfirmationViewModel</comment>
+  </data>
+  <data name="NoContainersSkipScale" xml:space="preserve">
+    <value>You have no containers in truck inventory, skipping scale form and completing trip.</value>
+    <comment>NEEDS TRANSLATION; RouteDetailViewModel</comment>
+  </data>
+  <data name="NoInventoryConfirmation" xml:space="preserve">
+    <value>You have no containers in truck inventory. Do you need to load a container? {0} Selecting 'No' will complete the trip.</value>
+    <comment>NEEDS TRANSLATION; RouteDetailViewModel</comment>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+    <comment>NEEDS TRANSLATION;</comment>
+  </data>
 </root>

@@ -781,4 +781,19 @@ You will now be sent back to the login.</value>
     <value>Invalid Container Number</value>
     <comment>Container Validation</comment>
   </data>
+  <data name="ConfirmRTNeeded" xml:space="preserve">
+    <value>You could not process some containers. {0}Do you still need to return to yard? Selecting 'No' will end this trip.</value>
+    <comment>TransactionSummaryViewModel/TransactionConfirmationViewModel</comment>
+  </data>
+  <data name="NoContainersSkipScale" xml:space="preserve">
+    <value>You have no containers in truck inventory, skipping scale form and completing trip.</value>
+    <comment>RouteDetailViewModel</comment>
+  </data>
+  <data name="NoInventoryConfirmation" xml:space="preserve">
+    <value>You have no containers in truck inventory. Do you need to load a container? {0} Selecting 'No' will complete the trip.</value>
+    <comment>RouteDetailViewModel</comment>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
 </root>
