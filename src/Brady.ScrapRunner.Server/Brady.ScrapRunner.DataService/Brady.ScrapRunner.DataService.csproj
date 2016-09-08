@@ -202,7 +202,9 @@
     <Compile Include="Mappings\DriverStateLineProcessMap.cs" />
     <Compile Include="Mappings\DriverTripAckProcessMap.cs" />
     <Compile Include="Mappings\DriverFuelEntryProcessMap.cs" />
+    <Compile Include="Mappings\EmployeePreferencesMap.cs" />
     <Compile Include="Mappings\GPSLocationMap.cs" />
+    <Compile Include="Mappings\PreferencesDefaultMap.cs" />
     <Compile Include="ProcessTypes\DriverDelayProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverGPSLocationProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverImageProcessRecordType.cs" />
@@ -288,10 +290,12 @@
     <Compile Include="ProcessTypes\PreferencesProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverLoginProcessRecordType.cs" />
     <Compile Include="ProcessTypes\DriverTripAckProcessRecordType.cs" />
+    <Compile Include="RecordTypes\EmployeePreferencesRecordType.cs" />
     <Compile Include="RecordTypes\GPSLocationRecordType.cs" />
     <Compile Include="RecordTypes\MessagesRecordType.cs" />
     <Compile Include="ProcessTypes\TerminalChangeProcessRecordType.cs" />
     <Compile Include="ProcessTypes\TripInfoProcessRecordType.cs" />
+    <Compile Include="RecordTypes\PreferencesDefaultRecordType.cs" />
     <Compile Include="RecordTypes\TripPointsRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentImageRecordType.cs" />
     <Compile Include="RecordTypes\TripSegmentTimeContainerRecordType.cs" />
@@ -399,8 +403,12 @@
     <Compile Include="Validators\DriverTripAckProcessValidator.cs" />
     <Compile Include="Validators\DriverFuelEntryProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverFuelEntryProcessValidator.cs" />
+    <Compile Include="Validators\EmployeePreferencesDeletionValidator.cs" />
+    <Compile Include="Validators\EmployeePreferencesValidator.cs" />
     <Compile Include="Validators\GPSLocationDeletionValidator.cs" />
     <Compile Include="Validators\GPSLocationValidator.cs" />
+    <Compile Include="Validators\PreferencesDefaultDeletionValidator.cs" />
+    <Compile Include="Validators\PreferencesDefaultValidator.cs" />
     <Compile Include="Validators\PreferencesProcessValidator.cs" />
     <Compile Include="Validators\PreferencesProcessDeletionValidator.cs" />
     <Compile Include="Validators\DriverLoginProcessDeletionValidator.cs" />

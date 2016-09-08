@@ -3809,7 +3809,48 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return users;
         }
-     
+        ///EMPLOYEEPREFERENCES TABLE queries
+        /// <summary>
+        /// Get the preferences for an individual employee.
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
+        /// <param name="terminalId"></param>
+        /// <param name="parameter"></param>
+        /// <param name="employeeId"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static List<EmployeePreferences> GetEmployeePreferences(IDataService dataService, ProcessChangeSetSettings settings,
+       string userCulture, IEnumerable<long> userRoleIds, string regionId, string terminalId, string employeeId, out DataServiceFault fault)
+        {
+            fault = null;
+            var preferences = new List<EmployeePreferences>();
+
+            if (null != regionId && null != terminalId && null != employeeId)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<EmployeePreferences>()
+                        .Filter(y => y.Property(x => x.RegionId).EqualTo(regionId)
+                        .And().Property(x => x.TerminalId).EqualTo(terminalId)
+                        .And().Property(x => x.EmployeeId).EqualTo(employeeId))
+                        .OrderBy(x => x.PreferenceSeqNo)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return preferences;
+                }
+
+                preferences = queryResult.Records.Cast<EmployeePreferences>().ToList();
+            }
+            return preferences;
+        }
+
         /// <summary>
         /// Get the last history trip record
         /// </summary>
@@ -4263,20 +4304,22 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return region;
         }
-    
+
         /// PREFERENCE Table queries
         /// <summary>
-        ///  Get the preferencse by terminal.
+        ///  Get the preferences by terminal.
         ///  Caller needs to check if the fault is non-null before using the returned list.
         /// </summary>
         /// <param name="dataService"></param>
         /// <param name="settings"></param>
         /// <param name="userCulture"></param>
         /// <param name="userRoleIds"></param>
+        /// <param name="regionId"></param>
         /// <param name="terminalId"></param>
+        /// <param name="employeeId"></param>
         /// <param name="fault"></param>
         /// <returns>>An empty list if terminalId is null or no entries are found</returns>
-        public static List<Preference> GetPreferenceByTerminal(IDataService dataService, ProcessChangeSetSettings settings,
+        public static List<Preference> GetPreferencesByTerminal(IDataService dataService, ProcessChangeSetSettings settings,
              string userCulture, IEnumerable<long> userRoleIds, string terminalId, out DataServiceFault fault)
         { 
             fault = null;
@@ -4300,7 +4343,43 @@ namespace Brady.ScrapRunner.DataService.Util
             }
             return preferences;
         }
-     
+        //PREFERENCESDEFAULT TABLE queries
+        /// <summary>
+        /// Get the preferences for a specific type, i.e. D=Driver
+        /// </summary>
+        /// <param name="dataService"></param>
+        /// <param name="settings"></param>
+        /// <param name="userCulture"></param>
+        /// <param name="userRoleIds"></param>
+        /// <param name="preferenceType"></param>
+        /// <param name="fault"></param>
+        /// <returns></returns>
+        public static List<PreferencesDefault> GetPreferencesDefaultByType(IDataService dataService, ProcessChangeSetSettings settings,
+            string userCulture, IEnumerable<long> userRoleIds, string preferenceType, out DataServiceFault fault)
+        {
+            fault = null;
+            var preferences = new List<PreferencesDefault>();
+
+            if (null != preferenceType)
+            {
+                Query query = new Query
+                {
+                    CurrentQuery = new QueryBuilder<PreferencesDefault>()
+                        .Filter(y => y.Property(x => x.PreferenceType).EqualTo(preferenceType))
+                        .OrderBy(x => x.PreferenceSeqNo)
+                        .GetQuery()
+                };
+                var queryResult = dataService.Query(query, settings.Username, userRoleIds, userCulture, settings.Token, out fault);
+                if (null != fault)
+                {
+                    return preferences;
+                }
+
+                preferences = queryResult.Records.Cast<PreferencesDefault>().ToList();
+            }
+            return preferences;
+        }
+        
         /// TERMINALCHANGE Table queries
         /// <summary>
         ///  Get a list of all terminal master updates after a given date time for a given region.
