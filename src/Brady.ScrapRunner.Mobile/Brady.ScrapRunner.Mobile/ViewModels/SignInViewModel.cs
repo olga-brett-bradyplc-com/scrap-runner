@@ -275,8 +275,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     if (containerChanges.Item?.Containers?.Count > 0)
                         await _containerService.UpdateContainerChangeIntoMaster(containerChanges.Item.Containers);
 
-                    // TODO : Is there a specific reason why we don't use SharedPreferences for monitoring this, since
-                    // TODO : we could run into issues with getting proper container updates if a user uses multiple devices?
                     PhoneSettings.ContainerSettings = DateTime.Now;
                     await _driverService.UpdateContainerMasterDateTimeAsync(DateTime.Now);
                 }
