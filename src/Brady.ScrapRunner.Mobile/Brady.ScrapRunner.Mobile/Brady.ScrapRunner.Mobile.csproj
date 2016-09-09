@@ -44,6 +44,8 @@
     <Compile Include="CustomLanguageBindingParser.cs" />
     <Compile Include="Enums\TerminalChangeEnum.cs" />
     <Compile Include="Helpers\ChangeSetExtensions.cs" />
+    <Compile Include="Helpers\ContainerGroupKey.cs" />
+    <Compile Include="Helpers\ContainerMasterWithTripContainer.cs" />
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Helpers\PhoneSettings.cs" />
     <Compile Include="Interfaces\ICodeTableService.cs" />
@@ -98,12 +100,12 @@
     <Compile Include="Models\TripSegmentContainerModel.cs" />
     <Compile Include="Models\TripSegmentModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="Resources\AppResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\ILocalize.cs" />
     <Compile Include="ScrapRunnerMapperProfile.cs" />
     <Compile Include="Services\CodeTableService.cs" />
     <Compile Include="Services\ContainerService.cs" />
@@ -164,8 +166,8 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\AppResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

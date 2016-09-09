@@ -93,9 +93,9 @@ namespace Brady.ScrapRunner.Mobile.Droid.Fragments
             if (ViewModel.AllowRtnAdd.HasValue && (bool) ViewModel.AllowRtnAdd)
                 menu.Add(0, AddReturnToYardNav, Menu.None, AppResources.ReturnToYardAdd).SetShowAsAction(ShowAsAction.Never);
 
-#if DEBUG
+//#if DEBUG
     menu.Add(0, SimulateScanNav, Menu.None, "Simulate Scan (DEV)").SetShowAsAction(ShowAsAction.Never);
-#endif
+//#endif
         }
 
         public override void OnDestroyView()

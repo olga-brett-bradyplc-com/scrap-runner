@@ -16,6 +16,9 @@ namespace Brady.ScrapRunner.Mobile.Models
         [MaxLength(5)]
         public string ContainerType { get; set; }
 
+        [MaxLength(30)]
+        public string ContainerTypeDesc { get; set; }
+
         [MaxLength(5)]
         public string ContainerSize { get; set; }
 
@@ -37,8 +40,33 @@ namespace Brady.ScrapRunner.Mobile.Models
         [MaxLength(16)]
         public string ContainerPowerId { get; set; }
 
+        [MaxLength(10)]
+        public string ContainerCurrentTripNumber { get; set; }
+
+        [MaxLength(2)]
+        public string ContainerCurrentTripSegNumber { get; set; }
+
+        [MaxLength(2)]
+        public string ContainerCurrentTripSegType { get; set; }
+
+        [MaxLength(10)]
+        public string ContainerPrevTripNumber { get; set; }
+
         [MaxLength(15)]
         public string ContainerBarCodeNo { get; set; }
+
+        public int ContainerLevel { get; set; }
+
+        // These fields are un-mapped to help else track unused contianers left on power id
+        [MaxLength(1)]
+        public string ContainerComplete { get; set; }
+
+        [MaxLength(1)]
+        public string ContainerReviewFlag { get; set; }
+
+        // This is a special field that allows us to unload a container at a later time
+        [MaxLength(1)]
+        public string ContainerToBeUnloaded { get; set; }
 
         [Ignore]
         // Convienence methods

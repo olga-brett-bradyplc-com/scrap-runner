@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <include
@@ -11,7 +10,19 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
+        android:layout_marginTop="56dp"
         local:MvxItemTemplate="@layout/item_scalesummary_listitem"
         local:GroupItemTemplate="@layout/item_scalesummary"
         local:MvxBind="ItemClick ContainerSelectedCommand" />
-</LinearLayout>
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:orientation="vertical">
+    <Button
+        style="@style/ScrapRunnerTheme.StandardButtonStyle"
+        android:background="@color/material_red_500"
+        local:MvxBind="Click FinishSegmentCommand"
+        local:MvxLang="Text FinishLabel" />
+  </LinearLayout>
+</RelativeLayout>

@@ -292,6 +292,8 @@
     <Compile Include="Controls\ChatAdapter\ChatMessageAdapter.cs" />
     <Compile Include="Controls\GroupListView\AndroidBindingResource.cs" />
     <Compile Include="Controls\GroupListView\BindableGroupListAdapter.cs" />
+    <Compile Include="Controls\GroupListView\BindableGroupListScaleAdapter.cs" />
+    <Compile Include="Controls\GroupListView\BindableGroupListScaleView.cs" />
     <Compile Include="Controls\GroupListView\BindableGroupListView.cs" />
     <Compile Include="Controls\ImageGridViewAdapter\ImageGridViewAdapter.cs" />
     <Compile Include="Controls\MvxExpandableExListView.cs" />
