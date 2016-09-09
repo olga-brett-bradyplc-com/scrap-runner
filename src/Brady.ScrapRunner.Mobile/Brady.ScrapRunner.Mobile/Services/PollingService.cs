@@ -337,8 +337,12 @@
             else
                 containerChanges = await GetContainerChangesAfterAsync(terminalId, regionId, containerMasterDate.Value);
             if (!containerChanges.Records.Any()) return;
-
+            
             await _containerService.UpdateContainerChangeIntoMaster(containerChanges.Records);
+            
+            // Is there a specific reason why we don't use SharedPreferences for monitoring this, since
+            // we could run into issues with getting proper container updates if a user uses multiple devices?
+            // TODO : Look into this
             await _driverService.UpdateContainerMasterDateTimeAsync(containerChanges.Records.Max(containerChange => containerChange.ActionDate));
 
             foreach (var containerChange in containerChanges.Records)
