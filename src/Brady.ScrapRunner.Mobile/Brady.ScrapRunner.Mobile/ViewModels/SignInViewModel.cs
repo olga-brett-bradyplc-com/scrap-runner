@@ -218,8 +218,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     await _driverService.CreateDriverStatus(CurrentDriver);
 
                     // Get the EmployeeMaster record for the current driver and update local DB
-                    var driverEmployeeRecord =
-                        await _driverService.FindEmployeeMasterForDriverRemoteAsync(loginProcess.Item.EmployeeId);
+                    var driverEmployeeRecord = await _driverService.FindEmployeeMasterForDriverRemoteAsync(loginProcess.Item.EmployeeId);
                     await _driverService.UpdateDriverEmployeeRecord(driverEmployeeRecord);
                 }
                 else
@@ -277,6 +276,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         await _containerService.UpdateContainerChangeIntoMaster(containerChanges.Item.Containers);
 
                     PhoneSettings.ContainerSettings = DateTime.Now;
+                    await _driverService.UpdateContainerMasterDateTimeAsync(DateTime.Now);
                 }
                 else
                 {
@@ -307,18 +307,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         AppResources.Error, AppResources.OK);
                     return false;
                 }
-
-                // The long term fix for updating the menu driver information is to have the login & settings
-                // view as their own activities, that way we don't have to worry about the menu trying to look
-                // up information it doesn't have yet on initial app load, since that info is fetched during the login
-                // The menu fragment doesn't need to be loaded on those views
-                // @TODO : Implement above
+                
                 var employeePowerMaster = await _driverService.FindEmployeePowerMasterRemoteAsync(TruckId);
                 await _driverService.UpdatePowerMasterRecord(employeePowerMaster);
-
-                var employeeRecord = await _driverService.FindEmployeeAsync(UserName);
-                var terminal = await _terminalService.FindTerminalMasterAsync(CurrentDriver.TerminalId);
-                var power = await _driverService.FindPowerMasterAsync(TruckId);
 
                 var messagesTable = await _messagesService.ProcessDriverMessagesAsync(new DriverMessageProcess { EmployeeId = UserName });
 
