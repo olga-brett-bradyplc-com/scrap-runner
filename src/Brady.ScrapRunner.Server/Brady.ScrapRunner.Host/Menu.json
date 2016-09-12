@@ -208,6 +208,10 @@
             {
               "text": "EmployeeMaster",
               "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeeMaster"
+            },
+            {
+              "text": "EmployeePreferences",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/EmployeePreferences"
             }
           ]
         },
@@ -280,7 +284,16 @@
         },
         {
           "text": "Preferences",
-          "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Preference"
+          "items": [
+            {
+              "text": "Preferences",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/Preference"
+            },
+            {
+              "text": "PreferencesDefault",
+              "link": "{{appSetting-ExplorerHostUrl}}/view/#default/scraprunner/PreferencesDefault"
+            }
+          ]
         },
         {
           "text": "RegionMaster",

@@ -242,6 +242,12 @@ namespace Brady.ScrapRunner.Mobile.Services
                 .OrderBy(tscm => tscm.TripSegContainerSeqNumber)
                 .ToListAsync();
 
+            if (!tripSegmentContainers.Any())
+            {
+                Mvx.TaggedError(Constants.ScrapRunner, $"Couldn't find containers for trip {tripNumber}.");
+                return Enumerable.Empty<TripSegmentContainerModel>().ToList();
+            }
+
             return tripSegmentContainers;
         }
 
@@ -257,8 +263,7 @@ namespace Brady.ScrapRunner.Mobile.Services
                 .Where(ts =>
                     ts.TripNumber == tripNumber
                     &&
-                    ts.TripSegNumber == tripSegmentNumber)
-                .OrderBy(ts => ts.TripSegNumber).FirstOrDefaultAsync();
+                    ts.TripSegNumber == tripSegmentNumber).FirstOrDefaultAsync();
 
             return segment;
         }
@@ -275,8 +280,7 @@ namespace Brady.ScrapRunner.Mobile.Services
                     ts.TripNumber == tripNumber
                     &&
                     (ts.TripSegStatus == TripSegStatusConstants.Pending ||
-                     ts.TripSegStatus == TripSegStatusConstants.Missed ||
-                     ts.TripSegStatus == TripSegStatusConstants.Exception))
+                     ts.TripSegStatus == TripSegStatusConstants.Missed ))
                 .OrderBy(ts => ts.TripSegNumber)
                 .ToListAsync();
             if (!segments.Any())
@@ -382,7 +386,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         #endregion
 
         #region Helper methods
-
+        
         /// <summary>
         /// Retrieve whether trip order in enforced via preferences table
         /// </summary>

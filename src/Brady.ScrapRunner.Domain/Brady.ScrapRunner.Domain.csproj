@@ -64,7 +64,9 @@
     <Compile Include="Metadata\DriverStateLineProcessMetadata.cs" />
     <Compile Include="Metadata\DriverTripAckProcessMetadata.cs" />
     <Compile Include="Metadata\DriverFuelEntryProcessMetadata.cs" />
+    <Compile Include="Metadata\EmployeePreferencesMetadata.cs" />
     <Compile Include="Metadata\GPSLocationMetadata.cs" />
+    <Compile Include="Metadata\PreferencesDefaultMetadata.cs" />
     <Compile Include="Metadata\PreferencesProcessMetadata.cs" />
     <Compile Include="Metadata\DriverMasterMetadata.cs" />
     <Compile Include="Metadata\DriverLoginProcessMetadata.cs" />
@@ -128,6 +130,7 @@
     <Compile Include="Models\DriverMaster.cs" />
     <Compile Include="Models\EmployeeArea.cs" />
     <Compile Include="Models\EmployeeChange.cs" />
+    <Compile Include="Models\EmployeePreferences.cs" />
     <Compile Include="Models\ErrorLog.cs" />
     <Compile Include="Models\EventLog.cs" />
     <Compile Include="Models\CodeTable.cs" />
@@ -144,6 +147,7 @@
     <Compile Include="Models\Messages.cs" />
     <Compile Include="Models\PowerFuel.cs" />
     <Compile Include="Models\PowerLimits.cs" />
+    <Compile Include="Models\PreferencesDefault.cs" />
     <Compile Include="Models\SecurityMaster.cs" />
     <Compile Include="Models\TerminalChange.cs" />
     <Compile Include="Models\ContainerChange.cs" />

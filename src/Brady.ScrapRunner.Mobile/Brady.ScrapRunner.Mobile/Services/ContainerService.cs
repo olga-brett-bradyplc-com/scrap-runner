@@ -25,7 +25,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// 
+        /// Map ContainerMaster records to ContainerMasterModel, then update local SQLite ContainerMaster table
         /// </summary>
         /// <param name="containerMaster"></param>
         /// <returns></returns>
@@ -36,7 +36,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// 
+        /// Map ContainerChange records to ContainerMasterModel, then either update or delete from ContainerMaster table
         /// </summary>
         /// <param name="containerChange"></param>
         /// <returns></returns>
@@ -54,7 +54,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// 
+        /// Find a specific container
         /// </summary>
         /// <param name="containerNumber"></param>
         /// <returns></returns>
@@ -64,28 +64,86 @@ namespace Brady.ScrapRunner.Mobile.Services
         }
 
         /// <summary>
-        /// 
+        /// Find all containers listed as loaded on a specific power id
         /// </summary>
         /// <param name="powerId"></param>
         /// <returns></returns>
         public async Task<List<ContainerMasterModel>> FindPowerIdContainersAsync(string powerId)
         {
             var containers = await _containerMasterRepository.AsQueryable()
-                .Where(ct => ct.ContainerPowerId == powerId).ToListAsync();
+                .Where(ct => ct.ContainerPowerId == powerId)
+                .OrderBy(c => c.ContainerCustHostCode).ToListAsync();
 
             return containers;
         }
 
         /// <summary>
-        /// 
+        /// Does given power id have multiple containers loaded?
+        /// </summary>
+        /// <param name="powerId"></param>
+        /// <returns></returns>
+        public async Task<bool> HasMultipleContainersLoadedAsync(string powerId)
+        {
+            var containers = await FindPowerIdContainersAsync(powerId);
+            return containers.Count > 1;
+        }
+
+        /// <summary>
+        /// Unload a container from a power id
         /// </summary>
         /// <param name="powerId"></param>
         /// <param name="containerNumber"></param>
         /// <returns></returns>
-        public async Task<int> RemoveContainerFromPowerId(string powerId, string containerNumber)
+        public async Task<int> UnloadContainerFromPowerIdAsync(string powerId, string containerNumber)
         {
             var container = await FindContainerAsync(containerNumber);
             container.ContainerPowerId = null;
+            container.ContainerCurrentTripNumber = null;
+            container.ContainerCurrentTripSegNumber = null;
+            return await _containerMasterRepository.UpdateAsync(container);
+        }
+
+        /// <summary>
+        /// Load container onto power id.
+        /// Typically, I'd rather pass an object reference instead of multiple parameters
+        /// but this and unload are special cases in that this also needs to work with a TripSegmentContainerModel
+        /// </summary>
+        /// <param name="powerId"></param>
+        /// <param name="containerNumber"></param>
+        /// <param name="tripContainer"></param>
+        /// <returns></returns>
+        public async Task<int> LoadContainerOnPowerIdAsync(string powerId, string containerNumber, string custHostCode = null, TripSegmentContainerModel tripContainer = null)
+        {
+            var container = await FindContainerAsync(containerNumber);
+            container.ContainerPowerId = powerId;
+
+            container.ContainerCurrentTripNumber = tripContainer?.TripNumber;
+            container.ContainerCurrentTripSegNumber = tripContainer?.TripSegNumber;
+            container.ContainerCommodityCode = tripContainer?.TripSegContainerCommodityCode;
+            container.ContainerCommodityDesc = tripContainer?.TripSegContainerCommodityDesc;
+            container.ContainerLocation = tripContainer?.TripSegContainerLocation;
+            container.ContainerCustHostCode = custHostCode;
+
+            return await _containerMasterRepository.UpdateAsync(container);
+        }
+
+        public async Task<int> ResetContainer(ContainerMasterModel container)
+        {
+            container.ContainerPrevTripNumber = container.ContainerCurrentTripNumber;
+            container.ContainerComplete = null;
+            container.ContainerReviewFlag = null;
+            container.ContainerCurrentTripNumber = null;
+            container.ContainerCurrentTripSegNumber = null;
+            container.ContainerCurrentTripSegType = null;
+
+            if (container.ContainerToBeUnloaded == Constants.Yes)
+            {
+                container.ContainerPowerId = null;
+                container.ContainerCustHostCode = null;
+            }
+
+            container.ContainerToBeUnloaded = null;
+
             return await _containerMasterRepository.UpdateAsync(container);
         }
 

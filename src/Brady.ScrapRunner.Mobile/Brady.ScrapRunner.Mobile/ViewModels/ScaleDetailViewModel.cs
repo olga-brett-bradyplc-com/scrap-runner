@@ -21,21 +21,36 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
         private readonly ICodeTableService _codeTableService;
         private readonly IPreferenceService _preferenceService;
+        private readonly IContainerService _containerService;
+        private readonly ICustomerService _customerService;
 
         private static readonly int tarePressed = 2;
         private static readonly int secondGrossPressed = 1;
         private static readonly int grossPressed = 0;
 
-        public ScaleDetailViewModel(ITripService tripService, IDriverService driverService, ICodeTableService codeTableService,
-            IPreferenceService preferenceService)
+        public ScaleDetailViewModel(
+            ITripService tripService, 
+            IDriverService driverService, 
+            ICodeTableService codeTableService,
+            IPreferenceService preferenceService,
+            IContainerService containerService,
+            ICustomerService customerService)
         {
             _tripService = tripService;
             _driverService = driverService;
             _codeTableService = codeTableService;
             _preferenceService = preferenceService;
+            _containerService = containerService;
+            _customerService = customerService;
 
             ContainerSetDownCommand = new MvxAsyncCommand(ExecuteContainerSetDownCommandAsync);
             ContainerLeftOnTruckCommand = new MvxAsyncCommand(ExecuteContainerLeftOnTruckCommandAsync);
+        }
+
+        public void Init(string tripNumber, string containerNumber)
+        {
+            TripNumber = tripNumber;
+            ContainerNumber = containerNumber;
         }
 
         public void Init(string tripNumber, string tripSegNumber, short tripSegContainerSeqNumber, string tripSegContainerNumber)
@@ -57,38 +72,59 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             Title = AppResources.YardScaleDetail;
             SubTitle = $"{AppResources.Trip} {TripNumber}";
 
+            var currentTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+            TripSegNumber = currentTripSegment.FirstOrDefault().TripSegNumber;
+
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
+
             var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
-            var list = new ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>>();
             ContTypesList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerType);
+            var container = await _containerService.FindContainerAsync(ContainerNumber);
 
-            foreach (var tsm in segments) 
+            var tripContainers = await _tripService.FindAllContainersForTripSegmentAsync(container.ContainerCurrentTripNumber, container.ContainerCurrentTripSegNumber);
+
+            var list = new ObservableCollection<Grouping<ContainerGroupKey, ContainerMasterWithTripContainer>>();
+            var tempCustomerName = await _customerService.FindCustomerMaster(container.ContainerCustHostCode);
+            
+            var tempContainerKey = new ContainerGroupKey
             {
-                var containers =
-                    await _tripService.FindNextTripSegmentContainersAsync(TripNumber, tsm.TripSegNumber);
+                TripNumber = container.ContainerCurrentTripNumber,
+                CustHostCode = container.ContainerCustHostCode,
+                Name = tempCustomerName.CustName
+            };
 
-                foreach (var cont in containers)
+            var cont = ContTypesList.FirstOrDefault(ct => ct.CodeDisp1 == container.ContainerType);
+            container.ContainerTypeDesc = cont != null ? cont.CodeDisp1 : container.ContainerType;
+
+            var tempContainerMasterTripSeg = new List<ContainerMasterWithTripContainer>
+            {
+                new ContainerMasterWithTripContainer
                 {
-                    var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == cont.TripSegContainerType?.TrimEnd());
-                    cont.TripSegContainerTypeDesc = contType != null ? contType.CodeDisp1?.TrimEnd() : cont.TripSegContainerType;
+                    ContainerMaster = container,
+                    TripSegmentContainer = tripContainers.FirstOrDefault(ts => ts.TripSegNumber == container.ContainerCurrentTripSegNumber)
                 }
+            };
 
-                var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
-                list.Add(grouping);
-            }
+            list.Add(new Grouping<ContainerGroupKey, ContainerMasterWithTripContainer>(tempContainerKey, tempContainerMasterTripSeg));
 
-            if (list.Any())
-                Containers = list;
+            Containers = list;
 
             base.Start();
         }
 
         // Listview bindings
-        private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
-        public ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> Containers
+        private ObservableCollection<Grouping<ContainerGroupKey, ContainerMasterWithTripContainer>> _containers;
+        public ObservableCollection<Grouping<ContainerGroupKey, ContainerMasterWithTripContainer>> Containers
         {
             get { return _containers; }
             set { SetProperty(ref _containers, value); }
+        }
+
+        private string _containerNumber;
+        public string ContainerNumber
+        {
+            get { return _containerNumber; }
+            set { SetProperty(ref _containerNumber, value); }
         }
 
         // Field bindings
@@ -280,10 +316,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ProcessContainers(bool setDownInYard, string confirmationMessage)
         {
-            var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
-            var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
-
             // Show review exception dialog if gross time isn't set.
+            var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
             var reasonDialogAsync = (!GrossTime.HasValue || !TareTime.HasValue)
                 ? await
                     UserDialogs.Instance.ActionSheetAsync(AppResources.SelectReviewReason, AppResources.Cancel, "", null,
@@ -294,106 +328,34 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
 
-            var completeMessage = tripSegmentContainers.TakeWhile(
-                                       tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete) && tscm.TripSegContainerNumber != TripSegContainerNumber).Any()
-                ? confirmationMessage
-                : confirmationMessage + "\n\n" + AppResources.CompleteTrip;
-
-            var result = await UserDialogs.Instance.ConfirmAsync(completeMessage, AppResources.ConfirmLabel);
-            
-            if (result)
+            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
             {
-                using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
+                // Go through each container, updating both the local and remote db
+                foreach (var container in Containers.SelectMany(grouping => grouping))
                 {
-                    // Go through each container, updating both the local and remote db
-                    foreach (var container in Containers.SelectMany(grouping => grouping))
+                    if (container.TripSegmentContainer == null)
                     {
-                        await _tripService.UpdateTripSegmentContainerWeightTimesAsync(container, GrossTime, SecondGrossTime, TareTime);
-                        await _tripService.CompleteTripSegmentContainerAsync(container);
+                        container.ContainerMaster.ContainerReviewFlag = ContainerActionTypeConstants.Done;
+                        container.ContainerMaster.ContainerComplete = Constants.Yes;
+                        container.ContainerMaster.ContainerToBeUnloaded = (setDownInYard) ? Constants.Yes : Constants.No;
+
+                        await _containerService.UpdateContainerAsync(container.ContainerMaster);
+                    }
+                    else
+                    {
+                        await _tripService.UpdateTripSegmentContainerWeightTimesAsync(container.TripSegmentContainer, GrossTime, SecondGrossTime, TareTime);
+                        await _tripService.CompleteTripSegmentContainerAsync(container.TripSegmentContainer);
                         // @TODO : Implement once we have our location service working
                         //await _tripService.UpdateTripSegmentContainerLongLatAsync(TripSegmentContainerModel container , Latitude, Longitude);
+                            
+                        container.ContainerMaster.ContainerReviewFlag = (string.IsNullOrEmpty(reason?.CodeDisp1)) ? ContainerActionTypeConstants.Done : ContainerActionTypeConstants.Exception;
+                        container.ContainerMaster.ContainerComplete = Constants.Yes;
+                        container.ContainerMaster.ContainerToBeUnloaded = (setDownInYard) ? Constants.Yes : Constants.No;
 
-                        var containerAction =
-                            await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
-                            {
-                                EmployeeId = CurrentDriver.EmployeeId,
-                                PowerId = CurrentDriver.PowerId,
-                                ActionType = (string.IsNullOrEmpty(reason?.CodeDisp1)) ? ContainerActionTypeConstants.Done : ContainerActionTypeConstants.Review,
-                                ActionDateTime = DateTime.Now,
-                                TripNumber = TripNumber,
-                                TripSegNumber = container.TripSegNumber,
-                                ContainerNumber = container.TripSegContainerNumber,
-                                Gross1ActionDateTime = GrossTime,
-                                TareActionDateTime = TareTime,
-                                Gross2ActionDateTime = SecondGrossTime,
-                                SetInYardFlag = setDownInYard ? Constants.Yes : Constants.No,
-                                MethodOfEntry = ContainerMethodOfEntry.Manual,
-                                ActionCode = reason?.CodeValue,
-                                ActionDesc = reason?.CodeDisp1,
-                                Gross1Weight = GrossWeight,
-                                Gross2Weight = SecondGrossWeight,
-                                TareWeight = TareWeight,//if gross time is not null and tare time is, it's loaded. If gross time and tare time are both not null, it's empty
-                                ContainerContents = (GrossWeight != 0 && TareWeight == 0) ? 
-                                                    ContainerContentsConstants.Loaded : ContainerContentsConstants.Empty
-                            });
-
-                        if (containerAction.WasSuccessful) continue;
-
-                        UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
-                        return;
+                        await _containerService.UpdateContainerAsync(container.ContainerMaster);
                     }
-
-                    await ExecuteNextStage();
                 }
-            }
-        }
-
-        private async Task ExecuteNextStage()
-        {
-            // Are there any more containers that need to be weighed?
-            // Check to see if any containers/segments exists
-            // If not, mark the trip as complete and return to route summary
-            // Otherwise, we'd go to the next point in the trip
-            var tripSegmentContainers = await _tripService.FindNextTripSegmentContainersAsync(TripNumber, TripSegNumber);
-
-            if (!tripSegmentContainers.TakeWhile(tscm => string.IsNullOrEmpty(tscm.TripSegContainerComplete)).Any())
-            {
-                foreach (var segment in Containers)
-                {
-                    var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
-                    {
-                        EmployeeId = CurrentDriver.EmployeeId,
-                        TripNumber = TripNumber,
-                        TripSegNumber = segment.Key.TripSegNumber,
-                        ActionDateTime = DateTime.Now,
-                        PowerId = CurrentDriver.PowerId,
-                        ActionType = TripSegStatusConstants.Done,
-                        Latitude = segment.Key.TripSegEndLatitude,
-                        Longitude = segment.Key.TripSegEndLongitude
-                    });
-
-                    if (tripSegmentProcess.WasSuccessful)
-                        await _tripService.CompleteTripSegmentAsync(segment.Key);
-                    else
-                        UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
-                }
-
-                await _tripService.CompleteTripAsync(TripNumber);
-
-                var nextTrip = await _tripService.FindNextTripAsync();
-                var seg = await _tripService.FindNextTripSegmentsAsync(nextTrip?.TripNumber);
-
-                CurrentDriver.Status = nextTrip == null ? DriverStatusSRConstants.NoWork : DriverStatusSRConstants.Available;
-                CurrentDriver.TripNumber = nextTrip == null ? "" : nextTrip.TripNumber;
-                CurrentDriver.TripSegNumber = seg.Count < 1 ? "" : seg.FirstOrDefault().TripSegNumber;
-
-                await _driverService.UpdateDriver(CurrentDriver);
-
-                Close(this);
-                ShowViewModel<RouteSummaryViewModel>();
-            }
-            else
-            {
+                    
                 Close(this);
                 ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
             }

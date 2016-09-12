@@ -164,9 +164,27 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
-                    // Lookup preferences.  
-                    var preferences = Common.GetPreferenceByTerminal(dataService, settings, userCulture, userRoleIds,
+                    // Lookup default preferences.  
+                    var preferencesDefault = Common.GetPreferencesDefaultByType(dataService, settings, userCulture, userRoleIds,
+                                      PreferenceTypeConstants.Driver, out fault);
+                    if (fault != null)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    ////////////////////////////////////////////////
+                    // Lookup terminal preferences.  
+                    var preferencesTerminal = Common.GetPreferencesByTerminal(dataService, settings, userCulture, userRoleIds,
                                   employeeMaster.TerminalId, out fault);
+                    if (fault != null)
+                    {
+                        changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
+                        break;
+                    }
+                    ////////////////////////////////////////////////
+                    // Lookup employee preferences.  
+                    var preferencesEmployee = Common.GetEmployeePreferences(dataService, settings, userCulture, userRoleIds,
+                                  employeeMaster.RegionId, employeeMaster.TerminalId, employeeMaster.EmployeeId, out fault);
                     if (fault != null)
                     {
                         changeSetResult.FailedUpdates.Add(msgKey, new MessageSet("Server fault: " + fault.Message));
@@ -184,49 +202,67 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
 
                     ////////////////////////////////////////////////
-                    // Filter for the 30some properties of interst.
-                    // Suppliment with the two additional timezone preferences
-                    // Return preferences
-                    string[] propNamesDesired = {
-                        PrefDriverConstants.DEFEnforceSeqProcess,
-                        PrefDriverConstants.DEFMinAutoTriggerDone,
-                        PrefDriverConstants.DEFUseDrvAutoDelay,
-                        PrefDriverConstants.DEFDrvAutoDelayTime,
-                        PrefDriverConstants.DEFOneContPerPowerUnit,
-                        PrefDriverConstants.DEFConfirmTruckInvMsg,
-                        PrefDriverConstants.DEFPrevChangContID,
-                        PrefDriverConstants.DEFAutoDropContainers,
-                        PrefDriverConstants.DEFShowSimilarContainers,
-                        PrefDriverConstants.DEFUseContainerLevel,
-                        PrefDriverConstants.DEFContainerValidationCount,
-                        PrefDriverConstants.DEFReqEntryContNumberForNB,
-                        PrefDriverConstants.DEFCommodSelection,
-                        PrefDriverConstants.DEFDriverReceipt,
-                        PrefDriverConstants.DEFDriverReceiptAllTrips,
-                        PrefDriverConstants.DEFDriverReceiptMask,
-                        PrefDriverConstants.DEFReceiptValidationCount,
-                        PrefDriverConstants.DEFDriverReference,
-                        PrefDriverConstants.DEFReqScaleRefNo,
-                        PrefDriverConstants.DEFDriverReferenceMask,
-                        PrefDriverConstants.DEFReferenceValidationCount,
-                        PrefDriverConstants.DEFNotAvlScalRefNo,
-                        PrefDriverConstants.DEFDriverWeights,
-                        PrefDriverConstants.DEFShowHostCode,
-                        PrefDriverConstants.DEFAllowAddRT,
-                        PrefDriverConstants.DEFAllowChangeRT,
-                        PrefDriverConstants.DEFPromptRTMsg,
-                        PrefDriverConstants.DEFEnableImageCapture,
-                        PrefDriverConstants.DEFCountry,
-                        PrefDriverConstants.DEFUseLitre,
-                        PrefDriverConstants.DEFUseKM,
-                        PrefDriverConstants.DEFSendOnlyYardsForArea
-                    };
-                    var keepSet = new HashSet<string>(propNamesDesired);
+                    //Build the list of preferences to return to the driver.
+                    ////////////////////////////////////////////////
+                    //Start with the default driver preferences
+                    var preferenceList = new List <Preference>();
 
-                    //
-                    // TODO:  Send a list of "PreferenceLite" objects akin to PARAMS_MSG("PX")
-                    // 
-                    var preferenceList = preferences.Where(p => keepSet.Contains(p.Parameter)).ToList();
+                    foreach (var item in preferencesDefault)
+                    {
+                        preferenceList.Add(new Preference()
+                        {
+                            TerminalId = employeeMaster.TerminalId,
+                            Parameter = item.Parameter,
+                            ParameterValue = item.ParameterValue,
+                            Description = item.Description
+                        });
+
+                    }
+                    ////////////////////////////////////////////////
+                    //Next overlay the default ParameterValue with the terminal ParameterValue
+                    //for terminal Parameters that match default Parameters
+                    //There may not be a terminal Parameter for every default Parameter
+                    foreach (var item in preferencesDefault)
+                    {
+                        //preferencesDefault and preferenceList should contain the same preferences in
+                        //the same order, but just in case...
+                        var indexPrefList = preferenceList.FindIndex(x => x.Parameter == item.Parameter);
+                        var indexPrefTerminal = preferencesTerminal.FindIndex(x => x.Parameter == item.Parameter);
+                        if (-1 != indexPrefTerminal)
+                        {
+                            var preference = preferencesTerminal.ElementAt(indexPrefTerminal);
+                            preferenceList[indexPrefList] = new Preference()
+                            {
+                                TerminalId = employeeMaster.TerminalId,
+                                Parameter = item.Parameter,
+                                ParameterValue = preference.ParameterValue,
+                                Description = item.Description
+                            };
+                        }
+                    }
+                    ////////////////////////////////////////////////
+                    //Next overlay the ParameterValue with the employee ParameterValue
+                    //for employee Parameters that match default Parameters
+                    //There may not be a employee Parameter for every default Parameter
+                    foreach (var item in preferencesDefault)
+                    {
+                        //preferencesDefault and preferenceList should contain the same preferences in
+                        //the same order, but just in case...
+                        var indexPrefList = preferenceList.FindIndex(x => x.Parameter == item.Parameter);
+                        var indexPrefEmployee = preferencesEmployee.FindIndex(x => x.Parameter == item.Parameter);
+                        if (-1 != indexPrefEmployee)
+                        {
+                            var preference = preferencesEmployee.ElementAt(indexPrefEmployee);
+                            preferenceList[indexPrefList] = new Preference()
+                            {
+                                TerminalId = employeeMaster.TerminalId,
+                                Parameter = item.Parameter,
+                                ParameterValue = preference.ParameterValue,
+                                Description = item.Description
+                            };
+                        }
+                    }
+
                     if (null != terminalMaster?.TimeZoneFactor)
                     {
                         preferenceList.Add(new Preference()
@@ -247,6 +283,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             Description = "The TerminalMaster.DaylightSavings"
                         });
                     }
+
+                    //Populate the return list of preferences
                     preferencesProcess.Preferences = preferenceList;
                     //For testing
                     foreach (var preference in preferenceList)

@@ -305,6 +305,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You could not process some containers. {0}Do you still need to return to yard? Selecting &apos;No&apos; will end this trip..
+        /// </summary>
+        public static string ConfirmRTNeeded {
+            get {
+                return ResourceManager.GetString("ConfirmRTNeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Container Complete.
         /// </summary>
         public static string ContainerComplete {
@@ -586,6 +595,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid Container Number.
+        /// </summary>
+        public static string InvalidContainerNumber {
+            get {
+                return ResourceManager.GetString("InvalidContainerNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Language.
         /// </summary>
         public static string LanguageLabel {
@@ -766,6 +784,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        public static string Next {
+            get {
+                return ResourceManager.GetString("Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Next Stage.
         /// </summary>
         public static string NextStageLabel {
@@ -811,11 +838,29 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You have no containers in truck inventory, skipping scale form and completing trip..
+        /// </summary>
+        public static string NoContainersSkipScale {
+            get {
+                return ResourceManager.GetString("NoContainersSkipScale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to GPS is not available.
         /// </summary>
         public static string NoGpsAvailable {
             get {
                 return ResourceManager.GetString("NoGpsAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have no containers in truck inventory. Do you need to load a container? {0} Selecting &apos;No&apos; will complete the trip..
+        /// </summary>
+        public static string NoInventoryConfirmation {
+            get {
+                return ResourceManager.GetString("NoInventoryConfirmation", resourceCulture);
             }
         }
         

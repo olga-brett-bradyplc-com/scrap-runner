@@ -58,6 +58,13 @@
 
         private async Task StartAsync()
         {
+            if (_notificationContext == TripNotificationContext.Resequenced)
+            {
+                // Resequence notification doesn't have a specific trip associated with it.
+                Title = AppResources.NotificationTripResequenceTitle;
+                NotificationMessage = AppResources.NotificationTripResequenceText;
+                return;
+            }
             var trip = await _tripService.FindTripAsync(_tripNumber);
             if (trip == null)
             {
@@ -90,9 +97,7 @@
                     Title = AppResources.NotificationTripMarkedDoneTitle;
                     NotificationMessage = string.Format(AppResources.NotificationTripMarkedDoneText, tripCustomerName);
                     break;
-                case TripNotificationContext.Resequenced:
-                    Title = AppResources.NotificationTripResequenceTitle;
-                    NotificationMessage = AppResources.NotificationTripResequenceText;
+                case TripNotificationContext.Resequenced: // Handled above
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

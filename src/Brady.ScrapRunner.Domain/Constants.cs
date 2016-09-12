@@ -420,8 +420,13 @@
         /// <summary>Signature/Picture:S/P </summary>
         public static readonly string Both = "S/P";
     }
-
-
+    /// <summary>
+    /// Default Preference Type Codes
+    /// </summary>
+    public static class PreferenceTypeConstants
+    {
+        public static readonly string Driver = "D";
+    }
     /// <summary>
     /// Driver Preference internal codes. From the Preferences table.
     /// </summary>
@@ -435,6 +440,7 @@
         /// DEFContMasterScannedVal:Container Master validation for scanned entry (Y/N) - Always validate.
         /// DEFDriverEntersGPS:Allow Driver to enter GPS (Y/N) - Always allow.
         /// DEFDriverAdd:Driver may add container on site (Y/N) - Not used.
+        /// DEFDrvAutoDelayTime:Driver Auto Delay Time (minutes) - replaced with DEFDrvAutoDelayGross and DEFDrvAutoDelayTare
         /// </summary>
 
         /// TRIP-RELATED PREFERENCES
@@ -463,12 +469,22 @@
         public static readonly string DEFUseDrvAutoDelay = "DEFUseDrvAutoDelay";
 
         /// <summary>
-        /// DEFDrvAutoDelayTime:
-        /// Driver Auto Delay Time (minutes):
-        /// The number of minutes after which the handheld will display the “Delay” screen if the 
-        /// “Use Driver Auto Delay” option has been set to “Y”. 
+        /// DEFDrvAutoDelayGross:
+        /// Arrive to gross weight auto delay minutes:
+        /// The number of minutes after driver arrives and before he weighs gross when the 
+        /// handheld will display the “Delay” screen.
+        /// “Use Driver Auto Delay” option must be set to “Y”. 
         /// </summary>
-        public static readonly string DEFDrvAutoDelayTime = "DEFDrvAutoDelayTime";
+        public static readonly string DEFDrvAutoDelayGross = "DEFDrvAutoDelayGross";
+
+        /// <summary>
+        /// DEFDrvAutoDelayTare:
+        /// Gross to tare weight auto delay minutes:
+        /// The number of minutes after driver weighs gross and before he weighs tare when the 
+        /// handheld will display the “Delay” screen.
+        /// “Use Driver Auto Delay” option must be set to “Y”. 
+        /// </summary>
+        public static readonly string DEFDrvAutoDelayTare = "DEFDrvAutoDelayTare";
 
         /// CONTAINER-RELATED PREFERENCES
         /// <summary>
