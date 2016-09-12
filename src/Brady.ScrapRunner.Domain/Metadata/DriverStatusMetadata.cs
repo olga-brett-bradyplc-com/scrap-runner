@@ -45,7 +45,7 @@ namespace Brady.ScrapRunner.Domain.Metadata
             StringProperty(x => x.PrevDriverStatus);
             StringProperty(x => x.MdtVersion);
             StringProperty(x => x.GPSXmitFlag);
-            IntegerProperty(x => x.SendHHLogoffFlag);
+            EnumProperty(x => x.SendHHLogoffFlag);
             TimeProperty(x => x.TerminalMasterDateTime);
             IntegerProperty(x => x.DriverLCID);
             StringProperty(x => x.ServicesFlag);
