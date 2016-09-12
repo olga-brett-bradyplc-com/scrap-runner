@@ -65,6 +65,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _locationService = locationService;
             _locationOdometerService = locationOdometerService;
             Title = AppResources.SignInTitle;
+            _attemptNo = 0;
             SignInCommand = new MvxAsyncCommand(ExecuteSignInCommandAsync, CanExecuteSignInCommand);
         }
 
@@ -118,6 +119,15 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _currentDriver; }
             set { SetProperty(ref _currentDriver, value); }
         }
+        private int? _attemptNo;
+        public int? AttemptNo  
+        {  
+            get { return _attemptNo; }  
+            set  
+            {  
+                SetProperty(ref _attemptNo, value);  
+            }  
+        }  
 
         public IMvxAsyncCommand SignInCommand { get; protected set; }
 
@@ -169,6 +179,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task<bool> SignInAsync()
         {
+            AttemptNo++;
             using (var loginData = UserDialogs.Instance.Loading(AppResources.LoggingIn, maskType: MaskType.Black))
             {
                 // Delete/Create necesscary SQLite tables
@@ -190,8 +201,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         PowerId = TruckId,
                         Odometer = Odometer,
                         LocaleCode = 1033,
-                        OverrideFlag = Constants.No,
+                        OverrideFlag = AttemptNo > 1 ? Constants.Yes : Constants.No,
                         Mdtid = "Phone",
+                        
                         LoginDateTime = DateTime.Now
                     }, requeryUpdated: false);
 
