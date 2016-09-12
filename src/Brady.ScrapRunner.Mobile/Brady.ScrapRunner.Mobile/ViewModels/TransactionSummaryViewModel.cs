@@ -235,25 +235,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentTransaction.TripSegContainerLevel = levelNum;
             }
 
-            // If commodity is required, show spinner dialog allowing them to select commodity, then continue procesing scan
-            if (CurrentTransaction.TripSegContainerCommodityCode == null && commodityRequired == Constants.Yes &&
-                _tripService.IsTripLegLoaded(currentSegment, true))
-            {
-                var commodities = await _customerService.FindCustomerCommodites(currentSegment.TripSegDestCustHostCode);
-
-                var commoditySelect =
-                    await
-                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectCommodity, "", "", null,
-                            commodities.Select(c => c.CustCommodityDesc).ToArray());
-
-                if (string.IsNullOrEmpty(commoditySelect)) return;
-
-                var commodity = commodities.First(c => c.CustCommodityDesc == commoditySelect);
-
-                CurrentTransaction.TripSegContainerCommodityCode = commodity.CustCommodityCode;
-                CurrentTransaction.TripSegContainerCommodityDesc = commodity.CustCommodityDesc;
-            }
-
             using ( var completeTripSegment = UserDialogs.Instance.Loading(AppResources.SavingContainer, maskType: MaskType.Black))
             {
                 if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
