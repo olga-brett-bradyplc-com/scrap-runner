@@ -15,7 +15,9 @@ using MvvmCross.Core.ViewModels;
 using Brady.ScrapRunner.Mobile.Resources;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
-{ 
+{
+    using MvvmCross.Platform;
+
     public class RouteDetailViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
@@ -25,6 +27,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IContainerService _containerService;
         private readonly ITerminalService _terminalService;
         private readonly ICodeTableService _codeTableService;
+        private readonly ILocationGeofenceService _locationGeofenceService;
 
         public RouteDetailViewModel(
             ITripService tripService, 
@@ -33,7 +36,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ICustomerService customerService,
             ICodeTableService codeTableService,
             IContainerService containerService,
-            ITerminalService terminalService)
+            ITerminalService terminalService, 
+            ILocationGeofenceService locationGeofenceService)
         {
             _tripService = tripService;
             _driverService = driverService;
@@ -41,6 +45,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _customerService = customerService;
             _containerService = containerService;
             _terminalService = terminalService;
+            _locationGeofenceService = locationGeofenceService;
             _codeTableService = codeTableService;
 
             EnRouteCommand = new MvxAsyncCommand(ExecuteEnRouteCommandAsync);
@@ -627,6 +632,64 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             Close(this);
             ShowViewModel<RouteSummaryViewModel>();
+        }
+
+        #endregion
+
+        #region GPS Auto Arrive/Auto Depart
+
+        private async Task SetAutoArriveAsync(TripSegmentModel tripSegment)
+        {
+            if (tripSegment.TripSegType == BasicTripTypeConstants.YardWork)
+            {
+                Mvx.TaggedWarning(Constants.ScrapRunner, "Auto arrive is not enabled for Yard Work trip types.");
+                return;
+            }
+            var customerMaster = await _customerService.FindCustomerMaster(tripSegment.TripSegDestCustHostCode);
+            if (customerMaster == null)
+            {
+                Mvx.TaggedError(Constants.ScrapRunner, $"RouteDetailViewModel.SetAutoArriveAsync failed to find CustomerMasterModel record for {tripSegment.TripSegDestCustHostCode}.");
+                return;
+            }
+            if (customerMaster.CustLatitude.HasValue && 
+                customerMaster.CustLongitude.HasValue)
+            {
+                var key = $"{tripSegment.TripNumber}-{tripSegment.TripSegNumber}";
+                var radius = customerMaster.CustRadius.GetValueOrDefault(10);
+                _locationGeofenceService.StartAutoArrive(key,
+                    customerMaster.CustLatitude.Value, 
+                    customerMaster.CustLatitude.Value,
+                    radius);
+                Mvx.TaggedTrace(Constants.ScrapRunner, "GPS Auto Arrive set for {0} ({1}) {2}, {3} {4}",
+                    key,
+                    customerMaster.CustName,
+                    customerMaster.CustLatitude.Value,
+                    customerMaster.CustLongitude.Value,
+                    radius);
+            }
+        }
+
+        private async Task SetAutoDepartAsync(TripSegmentModel tripSegment)
+        {
+            if (tripSegment.TripSegType == BasicTripTypeConstants.YardWork)
+            {
+                Mvx.TaggedWarning(Constants.ScrapRunner, "Auto depart is not enabled for Yard Work trip types.");
+                return;
+            }
+            var customerMaster = await _customerService.FindCustomerMaster(tripSegment.TripSegDestCustHostCode);
+            if (customerMaster == null)
+            {
+                Mvx.TaggedError(Constants.ScrapRunner, $"RouteDetailViewModel.SetAutoDepartAsync failed to find CustomerMasterModel record for {tripSegment.TripSegDestCustHostCode}.");
+                return;
+            }
+            if (customerMaster.CustRadius.HasValue)
+            {
+                var key = $"{tripSegment.TripNumber}-{tripSegment.TripSegNumber}";
+                var radius = customerMaster.CustRadius.GetValueOrDefault(10);
+                _locationGeofenceService.StartAutoDepart(key, radius);
+                Mvx.TaggedTrace(Constants.ScrapRunner, "GPS Auto Depart set for {0} ({1}) {2}",
+                    key, customerMaster.CustName, radius);
+            }
         }
 
         #endregion
