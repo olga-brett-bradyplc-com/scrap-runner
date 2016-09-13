@@ -168,8 +168,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentDriver.TripNumber == TripNumber &&
                 (CurrentDriver.Status == DriverStatusSRConstants.Arrive ||
                  CurrentDriver.Status == DriverStatusSRConstants.Enroute))
+            {
                 CurrentStatus = CurrentDriver.Status;
-
+            }
+            if (CurrentDriver.TripNumber == TripNumber)
+            {
+                if (CurrentStatus == DriverStatusSRConstants.Enroute)
+                {
+                    await SetAutoArriveAsync(firstSegment);
+                }
+                else if (CurrentStatus == DriverStatusSRConstants.Arrive)
+                {
+                    await SetAutoDepartAsync(firstSegment);
+                }
+            }
             base.Start();
         }
 
@@ -496,6 +508,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 await UserDialogs.Instance.AlertAsync(setDriverArrived.Failure.Summary,
                     AppResources.Error, AppResources.OK);
             }
+
+            await SetAutoDepartAsync(currentSegment);
         }
 
         private async Task ExecuteNextStageCommandAsync()
@@ -644,7 +658,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             if (tripSegment.TripSegType == BasicTripTypeConstants.YardWork)
             {
-                Mvx.TaggedWarning(Constants.ScrapRunner, "Auto arrive is not enabled for Yard Work trip types.");
+                Mvx.TaggedTrace(Constants.ScrapRunner, "Auto arrive is not enabled for Yard Work trip types.");
                 return;
             }
             var customerMaster = await _customerService.FindCustomerMaster(tripSegment.TripSegDestCustHostCode);
@@ -660,12 +674,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 var radius = customerMaster.CustRadius.GetValueOrDefault(10);
                 _locationGeofenceService.StartAutoArrive(key,
                     customerMaster.CustLatitude.Value, 
-                    customerMaster.CustLatitude.Value,
-                    radius);
-                Mvx.TaggedTrace(Constants.ScrapRunner, "GPS Auto Arrive set for {0} ({1}) {2}, {3} {4}",
-                    key,
-                    customerMaster.CustName,
-                    customerMaster.CustLatitude.Value,
                     customerMaster.CustLongitude.Value,
                     radius);
             }
@@ -688,8 +696,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var key = $"{tripSegment.TripNumber}-{tripSegment.TripSegNumber}";
             var radius = customerMaster.CustRadius.GetValueOrDefault(10);
             _locationGeofenceService.StartAutoDepart(key, radius);
-            Mvx.TaggedTrace(Constants.ScrapRunner, "GPS Auto Depart set for {0} ({1}) {2}",
-                key, customerMaster.CustName, radius);
         }
 
         #endregion
