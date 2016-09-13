@@ -48,7 +48,7 @@
             Mvx.TaggedTrace(Constants.ScrapRunner, "Geofence service stopped");
         }
 
-        public void StartAutoArrive(string key, int synergyLatitude, int synergyLongitude, short radius)
+        public void StartAutoArrive(string key, int synergyLatitude, int synergyLongitude, int radius)
         {
             if ((_geofenceContext.State == GeofenceState.EnRoute) &&
                 ((_geofenceContext.Latitude != synergyLatitude) || (_geofenceContext.Longitude != synergyLongitude)))
@@ -69,7 +69,7 @@
             _triggerFlag = 0;
         }
 
-        public void StartAutoDepart(string key, short radius)
+        public void StartAutoDepart(string key, int radius)
         {
             var synergyLatitude = Convert.ToInt32(_currentLocationModel?.Latitude * 600000.0);
             var synergyLongitude = Convert.ToInt32(_currentLocationModel?.Longitude * 600000.0);
