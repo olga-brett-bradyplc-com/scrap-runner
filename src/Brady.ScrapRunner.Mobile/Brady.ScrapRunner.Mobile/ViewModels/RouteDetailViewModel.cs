@@ -15,7 +15,9 @@ using MvvmCross.Core.ViewModels;
 using Brady.ScrapRunner.Mobile.Resources;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
-{ 
+{
+    using MvvmCross.Platform;
+
     public class RouteDetailViewModel : BaseViewModel
     {
         private readonly ITripService _tripService;
@@ -25,6 +27,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IContainerService _containerService;
         private readonly ITerminalService _terminalService;
         private readonly ICodeTableService _codeTableService;
+        private readonly ILocationGeofenceService _locationGeofenceService;
 
         public RouteDetailViewModel(
             ITripService tripService, 
@@ -33,7 +36,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ICustomerService customerService,
             ICodeTableService codeTableService,
             IContainerService containerService,
-            ITerminalService terminalService)
+            ITerminalService terminalService, 
+            ILocationGeofenceService locationGeofenceService)
         {
             _tripService = tripService;
             _driverService = driverService;
@@ -41,6 +45,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _customerService = customerService;
             _containerService = containerService;
             _terminalService = terminalService;
+            _locationGeofenceService = locationGeofenceService;
             _codeTableService = codeTableService;
 
             EnRouteCommand = new MvxAsyncCommand(ExecuteEnRouteCommandAsync);
@@ -163,8 +168,20 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentDriver.TripNumber == TripNumber &&
                 (CurrentDriver.Status == DriverStatusSRConstants.Arrive ||
                  CurrentDriver.Status == DriverStatusSRConstants.Enroute))
+            {
                 CurrentStatus = CurrentDriver.Status;
-
+            }
+            if (CurrentDriver.TripNumber == TripNumber)
+            {
+                if (CurrentStatus == DriverStatusSRConstants.Enroute)
+                {
+                    await SetAutoArriveAsync(firstSegment);
+                }
+                else if (CurrentStatus == DriverStatusSRConstants.Arrive)
+                {
+                    await SetAutoDepartAsync(firstSegment);
+                }
+            }
             base.Start();
         }
 
@@ -342,6 +359,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     CurrentDriver.Status = DriverStatusSRConstants.Enroute;
                     await _driverService.UpdateDriver(CurrentDriver);
 
+                    await SetAutoArriveAsync(firstSegment);
+
                     CurrentStatus = DriverStatusConstants.Enroute;
                 }
             }
@@ -489,6 +508,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 await UserDialogs.Instance.AlertAsync(setDriverArrived.Failure.Summary,
                     AppResources.Error, AppResources.OK);
             }
+
+            await SetAutoDepartAsync(currentSegment);
         }
 
         private async Task ExecuteNextStageCommandAsync()
@@ -627,6 +648,54 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             Close(this);
             ShowViewModel<RouteSummaryViewModel>();
+        }
+
+        #endregion
+
+        #region GPS Auto Arrive/Auto Depart
+
+        private async Task SetAutoArriveAsync(TripSegmentModel tripSegment)
+        {
+            if (tripSegment.TripSegType == BasicTripTypeConstants.YardWork)
+            {
+                Mvx.TaggedTrace(Constants.ScrapRunner, "Auto arrive is not enabled for Yard Work trip types.");
+                return;
+            }
+            var customerMaster = await _customerService.FindCustomerMaster(tripSegment.TripSegDestCustHostCode);
+            if (customerMaster == null)
+            {
+                Mvx.TaggedError(Constants.ScrapRunner, $"RouteDetailViewModel.SetAutoArriveAsync failed to find CustomerMasterModel record for {tripSegment.TripSegDestCustHostCode}.");
+                return;
+            }
+            if (customerMaster.CustLatitude.HasValue && 
+                customerMaster.CustLongitude.HasValue)
+            {
+                var key = $"{tripSegment.TripNumber}-{tripSegment.TripSegNumber}";
+                var radius = customerMaster.CustRadius.GetValueOrDefault(10);
+                _locationGeofenceService.StartAutoArrive(key,
+                    customerMaster.CustLatitude.Value, 
+                    customerMaster.CustLongitude.Value,
+                    radius);
+            }
+        }
+
+        private async Task SetAutoDepartAsync(TripSegmentModel tripSegment)
+        {
+            if (tripSegment.TripSegType == BasicTripTypeConstants.YardWork)
+            {
+                Mvx.TaggedWarning(Constants.ScrapRunner, "Auto depart is not enabled for Yard Work trip types.");
+                return;
+            }
+            var customerMaster = await _customerService.FindCustomerMaster(tripSegment.TripSegDestCustHostCode);
+            if (customerMaster == null)
+            {
+                Mvx.TaggedError(Constants.ScrapRunner, $"RouteDetailViewModel.SetAutoDepartAsync failed to find CustomerMasterModel record for {tripSegment.TripSegDestCustHostCode}.");
+                return;
+            }
+            
+            var key = $"{tripSegment.TripNumber}-{tripSegment.TripSegNumber}";
+            var radius = customerMaster.CustRadius.GetValueOrDefault(10);
+            _locationGeofenceService.StartAutoDepart(key, radius);
         }
 
         #endregion

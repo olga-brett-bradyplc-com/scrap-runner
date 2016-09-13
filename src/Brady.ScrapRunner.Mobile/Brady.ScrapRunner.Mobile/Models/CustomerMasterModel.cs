@@ -43,5 +43,7 @@ namespace Brady.ScrapRunner.Mobile.Models
         public int? CustLatitude { get; set; }
 
         public int? CustLongitude { get; set; }
+
+        public int? CustRadius { get; set; }
     }
 }
