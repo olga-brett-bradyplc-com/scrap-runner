@@ -347,6 +347,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     CurrentDriver.Status = DriverStatusSRConstants.Enroute;
                     await _driverService.UpdateDriver(CurrentDriver);
 
+                    await SetAutoArriveAsync(firstSegment);
+
                     CurrentStatus = DriverStatusConstants.Enroute;
                 }
             }
@@ -682,14 +684,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 Mvx.TaggedError(Constants.ScrapRunner, $"RouteDetailViewModel.SetAutoDepartAsync failed to find CustomerMasterModel record for {tripSegment.TripSegDestCustHostCode}.");
                 return;
             }
-            if (customerMaster.CustRadius.HasValue)
-            {
-                var key = $"{tripSegment.TripNumber}-{tripSegment.TripSegNumber}";
-                var radius = customerMaster.CustRadius.GetValueOrDefault(10);
-                _locationGeofenceService.StartAutoDepart(key, radius);
-                Mvx.TaggedTrace(Constants.ScrapRunner, "GPS Auto Depart set for {0} ({1}) {2}",
-                    key, customerMaster.CustName, radius);
-            }
+            
+            var key = $"{tripSegment.TripNumber}-{tripSegment.TripSegNumber}";
+            var radius = customerMaster.CustRadius.GetValueOrDefault(10);
+            _locationGeofenceService.StartAutoDepart(key, radius);
+            Mvx.TaggedTrace(Constants.ScrapRunner, "GPS Auto Depart set for {0} ({1}) {2}",
+                key, customerMaster.CustName, radius);
         }
 
         #endregion
