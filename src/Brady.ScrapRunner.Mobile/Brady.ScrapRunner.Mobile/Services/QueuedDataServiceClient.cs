@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using BWF.DataServices.Domain.Interfaces;
     using BWF.DataServices.Domain.Models;
     using BWF.DataServices.Metadata;
     using BWF.DataServices.Metadata.Interfaces;
@@ -234,7 +235,30 @@
 
         public string HostAddress => _dataServiceClient.HostAddress;
 
+        public IObservable<Exception> ConnectionError
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public Task<TypeMetadata[]> GetMetadataForTypeAsync(string type, string dataService = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IChangeSetResult> ProcessChangeSetAsync(IChangeSet changeSet, string dataService = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ChangeResultWithItem<BwfRecordLock>> LockAsync(long id, Type itemType, string context, string reason, string dataService = null, string itemTypeName = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ChangeResult> UnlockAsync(long id, Type itemType, string context, string dataService = null, string itemTypeName = null)
         {
             throw new NotImplementedException();
         }
