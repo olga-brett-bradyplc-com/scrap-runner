@@ -324,7 +324,6 @@
     <Compile Include="Fragments\LoadDropContainerFragment.cs" />
     <Compile Include="Fragments\MessagesFragment.cs" />
     <Compile Include="Fragments\NewMessageFragment.cs" />
-    <Compile Include="Views\FirstView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -1340,7 +1339,6 @@
   <ItemGroup>
     <AndroidResource Include="Resources\values\SplashStyle.xml" />
     <AndroidResource Include="Resources\drawable\splash.png" />
-    <Content Include="ToDo-MvvmCross\_ Droid UI.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
