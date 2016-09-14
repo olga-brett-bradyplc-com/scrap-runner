@@ -1,32 +1,27 @@
+using System.Net;
+using System.Reflection;
 using System.Collections.Generic;
 using Android.Views;
+using Android.Content;
 using MvvmCross.Binding.Parse.Binding.Lang;
-using MvvmCross.Droid.Shared.Presenter;
-using MvvmCross.Droid.Views;
 using MvvmCross.Localization;
 using MvvmCross.Platform;
 using MvvmCross.Platform.Converters;
 using MvvmCross.Platform.IoC;
-using System.Net;
-using System.Reflection;
-using Android.Content;
-using Android.Widget;
-using MvvmCross.Binding.Bindings.Target.Construction;
 using MvvmCross.Core.ViewModels;
-using MvvmCross.Droid.Platform;
 using MvvmCross.Droid.Support.V7.AppCompat;
+using Plugin.Settings.Abstractions;
+using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Droid.Services;
 
 namespace Brady.ScrapRunner.Mobile.Droid
 {
-    using Interfaces;
-    using Plugin.Settings.Abstractions;
-    using Services;
-
-    public class Setup : MvxAndroidSetup
+    public class Setup : MvxAppCompatSetup
     {
         public Setup(Context applicationContext) : base(applicationContext)
         {
         }
+
         protected override IMvxApplication CreateApp()
         {
             return new App();
@@ -34,10 +29,7 @@ namespace Brady.ScrapRunner.Mobile.Droid
 
         protected override IEnumerable<Assembly> AndroidViewAssemblies => new List<Assembly>(base.AndroidViewAssemblies)
         {
-            typeof(Android.Support.V7.Widget.Toolbar).Assembly,
             typeof(Android.Support.V7.Widget.RecyclerView).Assembly,
-            typeof(Android.Support.V4.Widget.DrawerLayout).Assembly,
-            typeof(Android.Support.V4.View.ViewPager).Assembly,
             typeof(Android.Support.Design.Widget.FloatingActionButton).Assembly,
             typeof(Android.Support.Design.Widget.NavigationView).Assembly
         };
@@ -52,13 +44,6 @@ namespace Brady.ScrapRunner.Mobile.Droid
             }
         }
 
-        protected override IMvxAndroidViewPresenter CreateViewPresenter()
-        {
-            var mvxFragmentsPresenter = new MvxFragmentsPresenter(AndroidViewAssemblies);
-            Mvx.RegisterSingleton<IMvxAndroidViewPresenter>(mvxFragmentsPresenter);
-            return mvxFragmentsPresenter;
-        }
-
         protected override void FillViewTypes(IMvxTypeCache<View> cache)
         {
             base.FillViewTypes(cache);
@@ -69,13 +54,6 @@ namespace Brady.ScrapRunner.Mobile.Droid
         {
             base.FillValueConverters(registry);
             registry.AddOrOverwrite("Language", new MvxLanguageConverter());
-        }
-
-        // Implemented to fix issues with SelectedItem binding not working with MvxSpinner
-        protected override void FillTargetFactories(IMvxTargetBindingFactoryRegistry registry)
-        {
-            MvxAppCompatSetupHelper.FillTargetFactories(registry);
-            base.FillTargetFactories(registry);
         }
 
         protected override void InitializeLastChance()
