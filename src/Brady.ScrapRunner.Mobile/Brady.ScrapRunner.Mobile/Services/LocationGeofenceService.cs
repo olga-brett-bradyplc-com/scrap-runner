@@ -48,7 +48,7 @@
             Mvx.TaggedTrace(Constants.ScrapRunner, "Geofence service stopped");
         }
 
-        public void StartAutoArrive(string key, int synergyLatitude, int synergyLongitude, short radius)
+        public void StartAutoArrive(string key, int synergyLatitude, int synergyLongitude, int radius)
         {
             if ((_geofenceContext.State == GeofenceState.EnRoute) &&
                 ((_geofenceContext.Latitude != synergyLatitude) || (_geofenceContext.Longitude != synergyLongitude)))
@@ -56,6 +56,14 @@
                 Mvx.TaggedTrace(Constants.ScrapRunner, string.Format("Geofence changed from {0} {1} {2} to {3} {4}.",
                     _geofenceContext.Latitude, _geofenceContext.Longitude, _geofenceContext.TriggerDistance, 
                     synergyLatitude, synergyLongitude));
+            }
+            if (key == _geofenceContext.Id &&
+                synergyLatitude == _geofenceContext.Latitude &&
+                synergyLongitude == _geofenceContext.Longitude &&
+                radius == _geofenceContext.Distance &&
+                _geofenceContext.State == GeofenceState.EnRoute)
+            {
+                return;
             }
             _geofenceContext = new GeofenceContext
             {
@@ -67,12 +75,22 @@
                 Distance = radius
             };
             _triggerFlag = 0;
+            Mvx.TaggedTrace(Constants.ScrapRunner, string.Format("Waiting for geofence arrival {0} {1} {2}.",
+                _geofenceContext.Latitude, 
+                _geofenceContext.Longitude, 
+                _geofenceContext.TriggerDistance));
         }
 
-        public void StartAutoDepart(string key, short radius)
+        public void StartAutoDepart(string key, int radius)
         {
             var synergyLatitude = Convert.ToInt32(_currentLocationModel?.Latitude * 600000.0);
             var synergyLongitude = Convert.ToInt32(_currentLocationModel?.Longitude * 600000.0);
+            if (key == _geofenceContext.Id &&
+                radius == _geofenceContext.Distance &&
+                _geofenceContext.State == GeofenceState.Arrive)
+            {
+                return;
+            }
             _geofenceContext = new GeofenceContext
             {
                 Id = key,
@@ -84,6 +102,7 @@
                 TriggerDistance = radius + TriggerDistance,
                 Distance = radius
             };
+            Mvx.TaggedTrace(Constants.ScrapRunner, $"Waiting for geofence departure {_geofenceContext.TriggerDistance}.");
         }
 
         private void OnLocationModelMessage(LocationModelMessage obj)

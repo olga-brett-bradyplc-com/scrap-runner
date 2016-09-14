@@ -167,6 +167,23 @@ namespace Brady.ScrapRunner.Host.Membership
         }
 
         /// <summary>
+        /// What Role(s) do all the users have. 
+        /// </summary>
+        /// <returns>An IDictionary of roles keyed by username</returns>
+        public Task<IDictionary<string, ICollection<string>>> GetRolesForUsersAsync()
+        {
+            Log.Debug("Enter GetRolesForUsersAsync()");
+            IDictionary<string, ICollection<string>> dictionary = new Dictionary<string, ICollection<string>>();
+            Task<IEnumerable<ExternalUser>> task = GetUsersAsync();
+            foreach (ExternalUser user in task.Result)
+            {
+                // TODO: UserRole details TBD.
+                dictionary.Add(user.Username, userRoles);
+            }
+            return Task.FromResult(dictionary);
+        }
+
+        /// <summary>
         /// Get the User's Key.  In our system this is the same as username.
         /// </summary>
         /// <param name="username"></param>
@@ -474,5 +491,6 @@ namespace Brady.ScrapRunner.Host.Membership
             }
             return usernameAndPassword;
         }
+
     }
 }

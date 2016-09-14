@@ -70,14 +70,7 @@
       <HintPath>..\..\..\packages\AndHUD.1.2.0\lib\MonoAndroid\AndHUD.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="BWF.DataServices.Metadata, Version=2016.2.43.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\packages\bwf.dataservices.metadata.2016.2.43-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.Metadata.dll</HintPath>
-    </Reference>
     <Reference Include="Java.Interop" />
-    <Reference Include="BWF.DataServices.Domain">
-      <HintPath>..\..\..\packages\bwf.dataservices.domain.2016.2.43-latest\lib\portable-net45+win+wpa81+wp80+MonoAndroid60+Xamarin.iOS10+MonoTouch10\BWF.DataServices.Domain.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Android" />
     <Reference Include="Mono.Android.Export" />
     <Reference Include="mscorlib" />
@@ -95,10 +88,6 @@
     </Reference>
     <Reference Include="MvvmCross.Droid, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\MvvmCross.Core.4.2.2\lib\MonoAndroid\MvvmCross.Droid.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MvvmCross.Droid.FullFragging, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\MvvmCross.Droid.FullFragging.4.2.2\lib\MonoAndroid\MvvmCross.Droid.FullFragging.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MvvmCross.Droid.Shared, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -307,6 +296,7 @@
     <Compile Include="Fragments\PhotosFragment.cs" />
     <Compile Include="Fragments\PublicScaleDetailFragment.cs" />
     <Compile Include="Fragments\PublicScaleSummaryFragment.cs" />
+    <Compile Include="Helpers\Settings.cs" />
     <Compile Include="LinkerPleaseInclude.cs" />
     <Compile Include="Messages\MenuStateMessage.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
@@ -539,7 +529,6 @@
     </AndroidResource>
     <AndroidResource Include="Resources\layout\fragment_modifyreturntoyard.axml" />
     <AndroidResource Include="Resources\layout\item_terminal.axml" />
-    <AndroidResource Include="Resources\layout\SplashScreen.axml" />
     <AndroidResource Include="Resources\layout\activity_trip_notification.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
@@ -552,6 +541,8 @@
     <AndroidResource Include="Resources\layout\activity_settings.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\SplashScreen.axml" />
+    <AndroidResource Include="Resources\layout\FirstView.axml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\icon.png" />
