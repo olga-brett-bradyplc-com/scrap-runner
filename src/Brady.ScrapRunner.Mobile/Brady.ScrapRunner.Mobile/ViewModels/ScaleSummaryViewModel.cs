@@ -217,7 +217,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                 {
                                     EmployeeId = CurrentDriver.EmployeeId,
                                     PowerId = CurrentDriver.PowerId,
-                                    ActionType = (container.TripSegmentContainer.TripSegContainerReviewFlag == Constants.Yes) ? ContainerActionTypeConstants.Review : ContainerActionTypeConstants.Done,
+                                    ActionType = (container.TripSegmentContainer.TripSegContainerReviewFlag == ContainerActionTypeConstants.Review) ? ContainerActionTypeConstants.Review : ContainerActionTypeConstants.Done,
                                     ActionDateTime = DateTime.Now,
                                     TripNumber = TripNumber,
                                     TripSegNumber = container.TripSegmentContainer.TripSegNumber,
@@ -226,6 +226,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                                     TareActionDateTime = container.TripSegmentContainer.WeightTareDateTime,
                                     Gross2ActionDateTime = container.TripSegmentContainer.WeightGross2ndDateTime,
                                     SetInYardFlag = container.ContainerMaster.ContainerToBeUnloaded,
+                                    ContainerContents = container.ContainerMaster.ContainerContents,
                                     MethodOfEntry = ContainerMethodOfEntry.Manual,
                                     ActionCode = container.TripSegmentContainer.TripSegContainerReviewReason,
                                     ActionDesc = container.TripSegmentContainer.TripSegContainerReivewReasonDesc,
@@ -246,6 +247,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     
                     var tripSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber, TripSegNumber);
 
+                    var reviewContainers = ContainersOnPowerId.SelectMany(grouping => grouping).Any(ts => ts.TripSegmentContainer.TripSegContainerReviewFlag == ContainerActionTypeConstants.Review);
+
                     var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
                     {
                         EmployeeId = CurrentDriver.EmployeeId,
@@ -261,7 +264,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     if (tripSegmentProcess.WasSuccessful)
                         await _tripService.CompleteTripSegmentAsync(tripSegment);
                     else
+                    {
                         UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
+                        return;
+                    }
 
                     await _tripService.CompleteTripAsync(TripNumber);
 

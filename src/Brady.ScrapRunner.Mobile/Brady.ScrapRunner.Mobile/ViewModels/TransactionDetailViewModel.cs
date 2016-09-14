@@ -135,6 +135,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionCompleteCommand()
         {
+            var container = await _containerService.FindContainerAsync(TripSegContainerNumber);
+
+            if (container == null)
+            {
+                UserDialogs.Instance.Alert(AppResources.ContainerNotFound, AppResources.Error);
+                return;
+            }
+
             string sCount = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFContainerValidationCount);
 
             if (sCount == null) sCount = "0";
@@ -182,13 +190,24 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 // Container.TripSegContainerNotes = not implemented server side
 
-                if (_tripService.IsTripLegLoaded(Segment))
-                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId,
-                        Container.TripSegContainerNumber);
+                if (_tripService.IsTripLegLoaded(Segment, true))
+                {
+                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, TripSegContainerNumber, Segment.TripSegDestCustHostCode);
+                    container.ContainerContents = ContainerContentsConstants.Loaded;
+                    await _containerService.UpdateContainerAsync(container);
+                }
+                else if (_tripService.IsTripLegLoaded(Segment)) // Pickup Empty
+                {
+                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, TripSegContainerNumber, Segment.TripSegDestCustHostCode);
+                    container.ContainerContents = ContainerContentsConstants.Empty;
+                    await _containerService.UpdateContainerAsync(container);
+                }
                 else if (_tripService.IsTripLegDropped(Segment))
-                    await
-                        _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId,
-                            Container.TripSegContainerNumber);
+                {
+                    await _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId, TripSegContainerNumber);
+                    container.ContainerContents = ContainerContentsConstants.Empty;
+                    await _containerService.UpdateContainerAsync(container);
+                }
 
                 await _tripService.CompleteTripSegmentContainerAsync(Container);
 

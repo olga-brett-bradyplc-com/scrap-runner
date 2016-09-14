@@ -121,7 +121,7 @@ namespace Brady.ScrapRunner.Mobile.Droid.Controls.GroupListView
                         case "D":
                             icon.SetImageResource(Resource.Drawable.check_circle_green_tint_icon);
                             break;
-                        case "E":
+                        case "R":
                             icon.SetImageResource(Resource.Drawable.cancelled_red_tint_icon);
                             break;
                         default:

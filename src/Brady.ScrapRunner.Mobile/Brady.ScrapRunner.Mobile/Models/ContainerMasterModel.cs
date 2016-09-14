@@ -55,6 +55,9 @@ namespace Brady.ScrapRunner.Mobile.Models
         [MaxLength(15)]
         public string ContainerBarCodeNo { get; set; }
 
+        [MaxLength(1)]
+        public string ContainerContents { get; set; }
+
         public int ContainerLevel { get; set; }
 
         // These fields are un-mapped to help else track unused contianers left on power id

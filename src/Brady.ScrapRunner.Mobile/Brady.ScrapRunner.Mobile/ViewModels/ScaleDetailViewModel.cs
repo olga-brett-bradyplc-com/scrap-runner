@@ -24,6 +24,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IContainerService _containerService;
         private readonly ICustomerService _customerService;
 
+        private static readonly string NoReasonCodeSelected = "NOREASONCODE";
+
         private static readonly int tarePressed = 2;
         private static readonly int secondGrossPressed = 1;
         private static readonly int grossPressed = 0;
@@ -245,19 +247,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         private int _grossWeight;
-
         public int GrossWeight
         {
             get { return _grossWeight;  }
             set { SetProperty(ref _grossWeight, value); }
         }
-        private int _secondGrossWeight;
 
+        private int _secondGrossWeight;
         public int SecondGrossWeight
         {
             get { return _secondGrossWeight; }
             set { SetProperty(ref _secondGrossWeight, value); }
         }
+
         private int _tareWeight;
         public int TareWeight
         {
@@ -322,33 +324,49 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 ? await
                     UserDialogs.Instance.ActionSheetAsync(AppResources.SelectReviewReason, AppResources.Cancel, "", null,
                         reasons.Select(ct => ct.CodeDisp1).ToArray())
-                : "NOREASONCODE";
+                : NoReasonCodeSelected;
 
             if (reasonDialogAsync == AppResources.Cancel || string.IsNullOrEmpty(reasonDialogAsync)) return;
 
             var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
 
-            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
+            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.SavingContainer, maskType: MaskType.Black))
             {
                 // Go through each container, updating both the local and remote db
                 foreach (var container in Containers.SelectMany(grouping => grouping))
                 {
+                    // Common properties regardless if the container belongs to the trip or not
+                    if (GrossTime.HasValue && TareTime.HasValue)
+                        container.ContainerMaster.ContainerContents = ContainerContentsConstants.Empty;
+                    else
+                        container.ContainerMaster.ContainerContents = ContainerContentsConstants.Loaded;
+
                     if (container.TripSegmentContainer == null)
                     {
                         container.ContainerMaster.ContainerReviewFlag = ContainerActionTypeConstants.Done;
                         container.ContainerMaster.ContainerComplete = Constants.Yes;
                         container.ContainerMaster.ContainerToBeUnloaded = (setDownInYard) ? Constants.Yes : Constants.No;
+                        container.ContainerMaster.ContainerContents = (setDownInYard)
+                            ? ContainerContentsConstants.Empty
+                            : ContainerContentsConstants.Loaded;
 
                         await _containerService.UpdateContainerAsync(container.ContainerMaster);
                     }
                     else
                     {
                         await _tripService.UpdateTripSegmentContainerWeightTimesAsync(container.TripSegmentContainer, GrossTime, SecondGrossTime, TareTime);
-                        await _tripService.CompleteTripSegmentContainerAsync(container.TripSegmentContainer);
+
+                        container.TripSegmentContainer.TripSegContainerReviewFlag = (string.IsNullOrEmpty(reason?.CodeDisp1)) ? ContainerActionTypeConstants.Done : ContainerActionTypeConstants.Review;
+                        container.TripSegmentContainer.TripSegContainerReviewReason = reason?.CodeValue;
+                        container.TripSegmentContainer.TripSegContainerReivewReasonDesc = reason?.CodeDisp1;
+                        container.TripSegmentContainer.TripSegContainerComplete = Constants.Yes;
+
+                        await _tripService.UpdateTripSegmentContainerAsync(container.TripSegmentContainer);
+
                         // @TODO : Implement once we have our location service working
                         //await _tripService.UpdateTripSegmentContainerLongLatAsync(TripSegmentContainerModel container , Latitude, Longitude);
-                            
-                        container.ContainerMaster.ContainerReviewFlag = (string.IsNullOrEmpty(reason?.CodeDisp1)) ? ContainerActionTypeConstants.Done : ContainerActionTypeConstants.Exception;
+
+                        container.ContainerMaster.ContainerReviewFlag = (string.IsNullOrEmpty(reason?.CodeDisp1)) ? ContainerActionTypeConstants.Done : ContainerActionTypeConstants.Review;
                         container.ContainerMaster.ContainerComplete = Constants.Yes;
                         container.ContainerMaster.ContainerToBeUnloaded = (setDownInYard) ? Constants.Yes : Constants.No;
 

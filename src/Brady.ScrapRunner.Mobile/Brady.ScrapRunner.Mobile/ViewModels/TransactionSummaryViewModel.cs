@@ -237,20 +237,32 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             using ( var completeTripSegment = UserDialogs.Instance.Loading(AppResources.SavingContainer, maskType: MaskType.Black))
             {
-                if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
-                    CurrentTransaction.TripSegContainerNumber = scannedNumber;
-
+                CurrentTransaction.TripSegContainerNumber = scannedNumber;
                 CurrentTransaction.TripSegContainerComplete = Constants.Yes;
                 CurrentTransaction.TripSegContainerReviewFlag = Constants.No;
                 CurrentTransaction.MethodOfEntry = TripMethodOfCompletionConstants.Scanned;
 
-                if (_tripService.IsTripLegLoaded(currentSegment))
-                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, CurrentTransaction.TripSegContainerNumber, currentSegment.TripSegDestCustHostCode, CurrentTransaction);
-                else if (_tripService.IsTripLegDropped(currentSegment))
-                    await _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId, CurrentTransaction.TripSegContainerNumber);
-
                 await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
                 await _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction);
+
+                if (_tripService.IsTripLegLoaded(currentSegment, true))
+                {
+                    container.ContainerContents = ContainerContentsConstants.Loaded;
+                    await _containerService.UpdateContainerAsync(container);
+                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, CurrentTransaction.TripSegContainerNumber, currentSegment.TripSegDestCustHostCode, CurrentTransaction);
+                }
+                else if (_tripService.IsTripLegLoaded(currentSegment)) // Pickup Empty
+                {
+                    container.ContainerContents = ContainerContentsConstants.Empty;
+                    await _containerService.UpdateContainerAsync(container);
+                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, CurrentTransaction.TripSegContainerNumber, currentSegment.TripSegDestCustHostCode, CurrentTransaction);
+                }
+                else if (_tripService.IsTripLegDropped(currentSegment))
+                {
+                    container.ContainerContents = ContainerContentsConstants.Empty;
+                    await _containerService.UpdateContainerAsync(container);
+                    await _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId, CurrentTransaction.TripSegContainerNumber);
+                }
 
                 SelectNextTransactionContainer();
                 ConfirmationSelectedCommand.RaiseCanExecuteChanged();
