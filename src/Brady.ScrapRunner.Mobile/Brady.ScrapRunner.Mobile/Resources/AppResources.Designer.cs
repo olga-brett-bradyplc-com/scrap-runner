@@ -152,6 +152,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Container numbers cannot be changed. Contact dispatch to update..
+        /// </summary>
+        public static string CantChangeContainerNumberError {
+            get {
+                return ResourceManager.GetString("CantChangeContainerNumberError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t Process.
         /// </summary>
         public static string CantProcess {
@@ -1063,6 +1072,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Container {0} does not match container {1}. Continue?.
+        /// </summary>
+        public static string NotMatchContainersAlert {
+            get {
+                return ResourceManager.GetString("NotMatchContainersAlert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No users found to message.
         /// </summary>
         public static string NoUsers {
@@ -1554,6 +1572,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string TareWeight {
             get {
                 return ResourceManager.GetString("TareWeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tare weight cannot be greater than gross weight..
+        /// </summary>
+        public static string TareWeightError {
+            get {
+                return ResourceManager.GetString("TareWeightError", resourceCulture);
             }
         }
         

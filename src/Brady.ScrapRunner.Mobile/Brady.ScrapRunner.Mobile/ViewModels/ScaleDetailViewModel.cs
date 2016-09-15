@@ -214,6 +214,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (!await CheckWeights(tarePressed))
                 return;
 
+            if (TareWeight > GrossWeight || TareWeight > SecondGrossWeight)
+            {
+                await
+                    UserDialogs.Instance.AlertAsync(AppResources.TareWeightError, AppResources.Error,
+                        AppResources.OK);
+                return;
+            }
+
             TareTime = DateTime.Now;
         }
         

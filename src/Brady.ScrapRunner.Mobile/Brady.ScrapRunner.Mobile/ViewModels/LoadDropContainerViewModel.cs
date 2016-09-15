@@ -25,6 +25,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _containerService = containerService;
             _driverService = driverService;
             _codeTableService = codeTableService;
+
             Title = AppResources.LoadDropContainer;
         }
 
@@ -134,6 +135,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 UserDialogs.Instance.Alert(string.Format(AppResources.ContainerLoaded, containerNumber), AppResources.Error);
                 return;
             }
+
+            container.ContainerNumber = containerNumber;
 
             // If new bin, redirect to NbScan view
             if (container.ContainerType == MobileConstants.NewContainerKey)

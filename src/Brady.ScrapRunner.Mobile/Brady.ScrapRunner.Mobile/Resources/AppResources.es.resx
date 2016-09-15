@@ -762,4 +762,13 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
     <value>Next</value>
     <comment>NEEDS TRANSLATION;</comment>
   </data>
+  <data name="CantChangeContainerNumberError" xml:space="preserve">
+    <value>Números de los contenedores no pueden ser cambiados . Contacto despachar a actualizar .</value>
+  </data>
+  <data name="NotMatchContainersAlert" xml:space="preserve">
+    <value>Contenedor {0} no coincide con {1} contenedor. ¿Continuar?</value>
+  </data>
+  <data name="TareWeightError" xml:space="preserve">
+    <value>Tara no puede ser mayor que el peso bruto.</value>
+  </data>
 </root>

@@ -129,7 +129,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             string sCount = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFContainerValidationCount);
 
-            if (sCount == null) sCount = "0";
+            if (sCount == null) sCount = "1";
 
             int iCount = int.Parse(sCount);
             if (iCount > 1)
