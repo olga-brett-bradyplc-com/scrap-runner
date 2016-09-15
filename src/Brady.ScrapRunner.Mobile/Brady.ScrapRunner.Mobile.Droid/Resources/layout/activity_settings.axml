@@ -8,7 +8,7 @@
       layout="@layout/toolbar" />
   <RelativeLayout
       android:layout_width="match_parent"
-      android:layout_height="45dp"
+      android:layout_height="55dp"
       android:orientation="vertical"
       local:MvxBind="Click ChangeLanguageCommand"
       android:background="#fff">
@@ -17,12 +17,12 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:layout_alignParentLeft="true"
         android:src="@drawable/ic_language_black_24dp" />
     <TextView
         android:id="@+id/LanguageSettingsLabel"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingLeft="20dp"
         android:textSize="15sp"
@@ -33,7 +33,7 @@
     <TextView
         android:layout_toRightOf="@id/LanguageSettingsImage"
         android:layout_below="@id/LanguageSettingsLabel"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:paddingLeft="20dp"
         android:layout_width="match_parent"
         android:textSize="10sp"
@@ -43,7 +43,7 @@
   </RelativeLayout>
   <RelativeLayout
       android:layout_width="match_parent"
-      android:layout_height="45dp"
+      android:layout_height="55dp"
       android:orientation="vertical"
       local:MvxBind="Click ChangeServerSettings"
       android:background="#fff">
@@ -52,12 +52,12 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:layout_alignParentLeft="true"
         android:src="@drawable/ic_settings_input_antenna_black_24dp" />
     <TextView
         android:id="@+id/ServerSettingsLabel"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingLeft="20dp"
         android:textSize="15sp"
@@ -68,7 +68,7 @@
     <TextView
         android:layout_toRightOf="@id/ServerSettingsImage"
         android:layout_below="@id/ServerSettingsLabel"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:paddingLeft="20dp"
         android:layout_width="match_parent"
         android:textSize="10sp"
