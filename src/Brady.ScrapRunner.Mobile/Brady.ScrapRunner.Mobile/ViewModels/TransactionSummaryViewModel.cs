@@ -198,6 +198,33 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 UserDialogs.Instance.Alert(AppResources.ContainerNotFound, AppResources.Error);
                 return;
             }
+            var containers = await _tripService.FindAllContainersForTripSegmentAsync(TripNumber, CurrentTransaction.TripSegNumber);
+
+            List<string> containerNumbers = new List<string>();
+            foreach (var cont in containers)
+                containerNumbers.Add(cont.TripSegContainerNumber);
+
+            if (!containerNumbers.Contains(scannedNumber))
+            {
+                if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFPrevChangContID) ==
+                    Constants.No)
+                {
+                    UserDialogs.Instance.Alert(AppResources.CantChangeContainerNumberError, AppResources.Error,
+                        AppResources.OK);
+                    return;
+                }
+                else
+                {
+                    var confirmChangeContDialog = await UserDialogs.Instance.ConfirmAsync(
+                        string.Format(AppResources.NotMatchContainersAlert, scannedNumber,
+                        CurrentTransaction.TripSegContainerNumber), AppResources.ConfirmLabel, AppResources.Yes,
+                        AppResources.No);
+
+                    if (!confirmChangeContDialog) return;
+                }
+            }
+
+            CurrentTransaction.TripSegContainerNumber = scannedNumber;
 
             var levelRequired = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel);
             var commodityRequired = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCommodSelection);

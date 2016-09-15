@@ -152,6 +152,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Container numbers cannot be changed. Contact dispatch to update..
+        /// </summary>
+        public static string CantChangeContainerNumberError {
+            get {
+                return ResourceManager.GetString("CantChangeContainerNumberError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t Process.
         /// </summary>
         public static string CantProcess {
@@ -1059,6 +1068,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         public static string NotificationTripResequenceTitle {
             get {
                 return ResourceManager.GetString("NotificationTripResequenceTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Container {0} does not match container {1}. Continue?.
+        /// </summary>
+        public static string NotMatchContainersAlert {
+            get {
+                return ResourceManager.GetString("NotMatchContainersAlert", resourceCulture);
             }
         }
         
