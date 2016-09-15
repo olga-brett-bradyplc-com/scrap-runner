@@ -802,4 +802,7 @@ You will now be sent back to the login.</value>
   <data name="NotMatchContainersAlert" xml:space="preserve">
     <value>Container {0} does not match container {1}. Continue?</value>
   </data>
+  <data name="TareWeightError" xml:space="preserve">
+    <value>Tare weight cannot be greater than gross weight.</value>
+  </data>
 </root>
