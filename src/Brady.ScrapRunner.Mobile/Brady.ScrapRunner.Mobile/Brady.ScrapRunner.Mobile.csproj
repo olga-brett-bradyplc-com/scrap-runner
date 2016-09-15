@@ -117,6 +117,7 @@
     <Compile Include="Services\LocationPathService.cs" />
     <Compile Include="Services\LocationService.cs" />
     <Compile Include="Services\MessagesService.cs" />
+    <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Services\PollingService.cs" />
     <Compile Include="Services\QueuedDataServiceClient.cs" />
     <Compile Include="Services\PreferenceService.cs" />

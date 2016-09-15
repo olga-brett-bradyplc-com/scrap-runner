@@ -520,15 +520,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             else if (_tripService.IsTripLegScale(firstSegment))
             {
                 var containersOnPowerId = await _containerService.FindPowerIdContainersAsync(CurrentDriver.PowerId);
-                if (_tripService.IsTripLegTypePublicScale(firstSegment))
+                if (_tripService.IsTripLegTypePublicScale(firstSegment) && containersOnPowerId.Count > 1)
                 {
                     Close(this);
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
                 }
-                else if (containersOnPowerId.Count >= 1)
+                else if (containersOnPowerId.Count > 1)
                 {
                     Close(this);
                     ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                }
+                else if (containersOnPowerId.Count == 1)
+                {
+                    Close(this);
+                    ShowViewModel<ScaleDetailViewModel>(
+                        new
+                        {
+                            tripNumber = TripNumber,
+                            containerNumber = containersOnPowerId.SingleOrDefault().ContainerNumber
+                        });
                 }
                 else
                 {

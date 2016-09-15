@@ -128,7 +128,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             return await _containerMasterRepository.UpdateAsync(container);
         }
 
-        public async Task<int> ResetContainer(ContainerMasterModel container)
+        public async Task<int> ResetContainer(ContainerMasterModel container, bool forceUnload = false)
         {
             container.ContainerPrevTripNumber = container.ContainerCurrentTripNumber;
             container.ContainerComplete = null;
@@ -137,7 +137,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             container.ContainerCurrentTripSegNumber = null;
             container.ContainerCurrentTripSegType = null;
 
-            if (container.ContainerToBeUnloaded == Constants.Yes)
+            if (container.ContainerToBeUnloaded == Constants.Yes || forceUnload)
             {
                 container.ContainerPowerId = null;
                 container.ContainerCustHostCode = null;

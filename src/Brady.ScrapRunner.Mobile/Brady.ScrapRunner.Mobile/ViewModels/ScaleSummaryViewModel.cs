@@ -60,12 +60,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
                 var containersOnPowerId = await _containerService.FindPowerIdContainersAsync(CurrentDriver.PowerId);
+                var containersToBeProcessed = containersOnPowerId.Where(c => c.ContainerComplete != Constants.Yes).ToList();
                 var powerlist = new ObservableCollection<Grouping<ContainerGroupKey, ContainerMasterWithTripContainer>>();
                 
                 var currentTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
                 TripSegNumber = currentTripSegment.FirstOrDefault().TripSegNumber;
 
-                foreach (var container in containersOnPowerId.Where(container => container.ContainerCurrentTripNumber != null && container.ContainerCustHostCode != null))
+                foreach (var container in containersToBeProcessed.Where(container => container.ContainerCurrentTripNumber != null && container.ContainerCustHostCode != null))
                 {
                     var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == container.ContainerType);
                     container.ContainerTypeDesc = contType != null
@@ -109,7 +110,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
 
                 // Append "Unused" container grouping to end of power list if any unused containers exist
-                foreach ( var container in containersOnPowerId.Where( container => container.ContainerCurrentTripNumber == null || container.ContainerCustHostCode == null))
+                foreach ( var container in containersToBeProcessed.Where( container => container.ContainerCurrentTripNumber == null || container.ContainerCustHostCode == null))
                 {
                     var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == container.ContainerType);
                     container.ContainerTypeDesc = contType != null
@@ -174,13 +175,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _containersOnPowerId; }
             set { SetProperty(ref _containersOnPowerId, value); }
         }
-
-        private IMvxAsyncCommand _finishSegmentCommand;
-        public IMvxAsyncCommand FinishSegmentCommand
-            =>
-                _finishSegmentCommand ??
-                (_finishSegmentCommand =
-                    new MvxAsyncCommand(ExecuteFinishSegmentCommand, CanExecuteFinishSegmentCommand));
 
         private async Task ExecuteFinishSegmentCommand()
         {
