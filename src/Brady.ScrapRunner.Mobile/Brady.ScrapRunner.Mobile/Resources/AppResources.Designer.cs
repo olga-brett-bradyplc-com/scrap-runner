@@ -1576,6 +1576,15 @@ namespace Brady.ScrapRunner.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tare weight cannot be greater than gross weight..
+        /// </summary>
+        public static string TareWeightError {
+            get {
+                return ResourceManager.GetString("TareWeightError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Transaction Detail.
         /// </summary>
         public static string TransactionDetail {

@@ -768,4 +768,7 @@ Ahora va a ser enviado de vuelta a la pantalla de inicio de sesión.</value>
   <data name="NotMatchContainersAlert" xml:space="preserve">
     <value>Contenedor {0} no coincide con {1} contenedor. ¿Continuar?</value>
   </data>
+  <data name="TareWeightError" xml:space="preserve">
+    <value>Tara no puede ser mayor que el peso bruto.</value>
+  </data>
 </root>
