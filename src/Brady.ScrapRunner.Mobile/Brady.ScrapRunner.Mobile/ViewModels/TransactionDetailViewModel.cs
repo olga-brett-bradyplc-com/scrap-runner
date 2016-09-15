@@ -129,9 +129,22 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionCompleteCommand()
         {
+           if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel) ==
+                Constants.Yes && SelectedLevel.CodeValue == null && _tripService.IsTripLegLoaded(Segment))
+            {
+                UserDialogs.Instance.Alert(AppResources.LevelRequired, AppResources.Error, AppResources.OK);
+                return;
+            }
+
+            if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCommodSelection) ==
+                Constants.Yes && SelectedCommodity.CustCommodityCode == null && _tripService.IsTripLegLoaded(Segment))
+            {
+                UserDialogs.Instance.Alert(AppResources.CommodityRequried, AppResources.Error, AppResources.OK);
+                return;
+            }
             string sCount = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFContainerValidationCount);
 
-            if (sCount == null) sCount = "0";
+            if (sCount == null) sCount = "1";
 
             int iCount = int.Parse(sCount);
             if (iCount > 1)
@@ -147,20 +160,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
             }
 
-            if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel) ==
-                Constants.Yes && SelectedLevel.CodeValue == null && _tripService.IsTripLegLoaded(Segment))
-            {
-                UserDialogs.Instance.Alert(AppResources.LevelRequired, AppResources.Error, AppResources.OK);
-                return;
-            }
-
-            if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCommodSelection) ==
-                Constants.Yes && SelectedCommodity.CustCommodityCode == null && _tripService.IsTripLegLoaded(Segment))
-            {
-                UserDialogs.Instance.Alert(AppResources.CommodityRequried, AppResources.Error, AppResources.OK);
-                return;
-            }
-
+ 
             using (var completeTripSegmentContainer = UserDialogs.Instance.Loading(AppResources.Loading,maskType: MaskType.Black))
             {
                 if (!string.IsNullOrEmpty(TripSegContainerNumber))
