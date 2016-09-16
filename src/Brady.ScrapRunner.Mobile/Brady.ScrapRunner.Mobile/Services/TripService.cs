@@ -21,7 +21,9 @@ namespace Brady.ScrapRunner.Mobile.Services
         private readonly IRepository<TripModel> _tripRepository;
         private readonly IRepository<TripSegmentModel> _tripSegmentRepository;
         private readonly IRepository<TripSegmentContainerModel> _tripSegmentContainerRepository;
-        private readonly IRepository<CodeTableModel> _codeTableRepository; 
+        private readonly IRepository<CodeTableModel> _codeTableRepository;
+
+        private readonly IContainerService _containerService;
 
         public TripService(
             IConnectionService connection,
@@ -29,7 +31,8 @@ namespace Brady.ScrapRunner.Mobile.Services
             IRepository<TripModel> tripRepository,
             IRepository<TripSegmentModel> tripSegmentRepository,
             IRepository<TripSegmentContainerModel> tripSegmentContainerRepository,
-            IRepository<CodeTableModel> codeTableRepository )
+            IRepository<CodeTableModel> codeTableRepository,
+            IContainerService containerService)
         {
             _connection = connection;
             _preferenceRepository = preferenceRepository;
@@ -37,6 +40,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             _tripSegmentRepository = tripSegmentRepository;
             _tripSegmentContainerRepository = tripSegmentContainerRepository;
             _codeTableRepository = codeTableRepository;
+            _containerService = containerService;
         }
 
         #region General purpose trip methods
@@ -652,6 +656,7 @@ namespace Brady.ScrapRunner.Mobile.Services
                         container.TripSegContainerSeqNumber = sameContainerNumber?.TripSegContainerSeqNumber ?? noContainerNumber.TripSegContainerSeqNumber;
 
                         await UpdateTripSegmentContainerAsync(container);
+                        
                     }
                     else // Create new trip segment container for RT or SC
                     {
@@ -662,6 +667,13 @@ namespace Brady.ScrapRunner.Mobile.Services
 
                         await CreateTripSegmentContainerAsync(container);
                     }
+
+                    // Update container master model
+                    var containerMaster = await _containerService.FindContainerAsync(container.TripSegContainerNumber);
+                    containerMaster.ContainerCurrentTripNumber = container.TripNumber;
+                    containerMaster.ContainerCurrentTripSegNumber = container.TripSegNumber;
+
+                    await _containerService.UpdateContainerAsync(containerMaster);
                 }
             }
         }
