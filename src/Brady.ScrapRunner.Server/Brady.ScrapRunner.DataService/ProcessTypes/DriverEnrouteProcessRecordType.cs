@@ -306,14 +306,19 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                     ////////////////////////////////////////////////
                     //Update Container Status for all containers on the power unit.
+                    //The power id field in the ContainerMaster determines what containers are on the power unit.
                     //Note that we may not have any container numbers at the arrive because the driver may not have
                     //loaded any containers (on the app) before he left the yard.
-                    //The power id field in the ContainerMaster determines what containers are on the power unit.
+                    //Containers on truck may consist of:
+                    //  Container loaded on the truck and on the app before driver leaves the yard.
+                    //  Container left on truck on yard/scale screen on previous trip.
+                    //  Container picked up on a previous trip (milk run).
+                    //The container may or may not be actually on the truck. We don't know at this point.
                     var containersOnPowerId = Common.GetContainersForPowerId(dataService, settings, userCulture, userRoleIds,
                                                   driverEnrouteProcess.PowerId, out fault);
                     if (null != containersOnPowerId && containersOnPowerId.Count() > 0)
                     {
-                        //For each container, update the ContainerMaster and the TripSegmentContainer table
+                        //For each container, update the ContainerMaster. Do not upate the TripSegmentContainer table.
                         foreach (var containerOnPowerId in containersOnPowerId)
                         {
                             var containerMaster = Common.GetContainer(dataService, settings, userCulture, userRoleIds,
@@ -336,18 +341,29 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                             if (currentTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard)
                             {
                                 containerMaster.ContainerStatus = ContainerStatusConstants.Inbound;
+                                //When the driver goes enroute on a RT segment, set the Inbound terminal to the serving
+                                //terminal of the destination customer. This will be removed when the driver arrives.
+                                containerMaster.ContainerInboundTerminalId = destCustomerMaster.ServingTerminalId;
                             }
                             else
                             {
                                 containerMaster.ContainerStatus = ContainerStatusConstants.Outbound;
-                                containerMaster.ContainerPrevCustHostCode = currentTripSegment.TripSegDestCustHostCode;
+                                //Per 09/14/2016 discussion, do not set the host code. These should have no values.
+                                //containerMaster.ContainerPrevCustHostCode = currentTripSegment.TripSegDestCustHostCode;                                
+                                containerMaster.ContainerPrevCustHostCode = null;
+                                containerMaster.ContainerCurrentTripNumber = null;
+                                containerMaster.ContainerCurrentTripSegNumber = null;
+                                containerMaster.ContainerCurrentTripSegType = null;
+                                containerMaster.ContainerCustHostCode = null;
+                                containerMaster.ContainerCustType = null;
                             }
 
-                            containerMaster.ContainerCurrentTripNumber = driverEnrouteProcess.TripNumber;
-                            containerMaster.ContainerCurrentTripSegNumber = driverEnrouteProcess.TripSegNumber;
-                            containerMaster.ContainerCurrentTripSegType = currentTripSegment.TripSegType;
-                            containerMaster.ContainerCustHostCode = currentTripSegment.TripSegDestCustHostCode;
-                            containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
+                            //Per 09/14/2016 discussion, do not set the host code or trip number.
+                            //containerMaster.ContainerCurrentTripNumber = driverEnrouteProcess.TripNumber;
+                            //containerMaster.ContainerCurrentTripSegNumber = driverEnrouteProcess.TripSegNumber;
+                            //containerMaster.ContainerCurrentTripSegType = currentTripSegment.TripSegType;
+                            //containerMaster.ContainerCustHostCode = currentTripSegment.TripSegDestCustHostCode;
+                            //containerMaster.ContainerCustType = currentTripSegment.TripSegDestCustType;
 
                             DateTime? prevLastActionDateTime = containerMaster.ContainerLastActionDateTime;
                             containerMaster.ContainerLastActionDateTime = driverEnrouteProcess.ActionDateTime;
@@ -359,13 +375,6 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
 
                             //Do not change on an enroute
                             //containerMaster.ContainerPendingMoveDateTime;
-
-                            //When the driver goes enroute on a RT segment, set the Inbound terminal to the serving
-                            //terminal of the destination customer. This will be removed when the driver arrives.
-                            if (currentTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard)
-                            {
-                                containerMaster.ContainerInboundTerminalId = destCustomerMaster.ServingTerminalId;
-                            }
 
                             //Do the update
                             changeSetResult = Common.UpdateContainerMaster(dataService, settings, containerMaster);
@@ -389,6 +398,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 break;
                             }
 
+                            ////////////////////////////////////////////////
+                            /*DO NOT Update TripSegmentContainer table.
                             ////////////////////////////////////////////////
                             //Update TripSegmentContainer table.
                             if (null != tripSegContainerList && tripSegContainerList.Count() > 0)
@@ -451,6 +462,8 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                                 changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                                 break;
                             }
+                            */
+                            ////////////////////////////////////////////////
                         }// end of foreach...
                     }//end of if (null != containersOnPowerId...
 

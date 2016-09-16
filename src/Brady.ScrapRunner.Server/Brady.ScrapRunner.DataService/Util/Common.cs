@@ -598,58 +598,59 @@ namespace Brady.ScrapRunner.DataService.Util
                 }
             }
 
-            var containerHistory = new ContainerHistory()
-            {
-                ContainerNumber = containerMaster.ContainerNumber,
-                ContainerSeqNumber = containerSeqNo,
-                ContainerType = containerMaster.ContainerType,
-                ContainerSize = containerMaster.ContainerSize,
-                ContainerUnits = containerMaster.ContainerUnits,
-                ContainerLength = containerMaster.ContainerLength,
-                ContainerCustType = containerMaster.ContainerCustType,
-                ContainerCustTypeDesc = containerCustTypeDesc,
-                ContainerTerminalId = containerMaster.ContainerTerminalId,
-                ContainerTerminalName = containerTerminalName,
-                ContainerRegionId = containerMaster.ContainerRegionId,
-                ContainerRegionName = containerRegionName,
-                ContainerLocation = containerMaster.ContainerLocation,
-                ContainerLastActionDateTime = containerMaster.ContainerLastActionDateTime,
-                ContainerDaysAtSite = daysAtSite,
-                ContainerPendingMoveDateTime = containerMaster.ContainerPendingMoveDateTime,
-                ContainerTripNumber = containerMaster.ContainerCurrentTripNumber,
-                ContainerTripSegNumber = containerMaster.ContainerCurrentTripSegNumber,
-                ContainerTripSegType = containerMaster.ContainerCurrentTripSegType,
-                ContainerTripSegTypeDesc = tripTypeBasicDesc,
-                ContainerStatus = containerMaster.ContainerStatus,
-                ContainerStatusDesc = containerStatusDesc,
-                ContainerContents = containerMaster.ContainerContents,
-                ContainerContentsDesc = containerContentsDesc,
-                ContainerCommodityCode = containerMaster.ContainerCommodityCode,
-                ContainerCommodityDesc = containerMaster.ContainerCommodityDesc,
-                ContainerComments = containerMaster.ContainerComments,
-                ContainerPowerId = containerMaster.ContainerPowerId,
-                ContainerShortTerm = containerMaster.ContainerShortTerm,
-                ContainerCustHostCode = containerMaster.ContainerCustHostCode,
-                ContainerCustName = destCustomerMaster?.CustName,
-                ContainerCustAddress1 = destCustomerMaster?.CustAddress1,
-                ContainerCustAddress2 = destCustomerMaster?.CustAddress2,
-                ContainerCustCity = destCustomerMaster?.CustCity,
-                ContainerCustState = destCustomerMaster?.CustState,
-                ContainerCustZip = destCustomerMaster?.CustZip,
-                ContainerCustCountry = destCustomerMaster?.CustCountry,
-                ContainerCustCounty = destCustomerMaster?.CustCounty,
-                ContainerCustTownship = destCustomerMaster?.CustTownship,
-                ContainerCustPhone1 = destCustomerMaster?.CustPhone1,
-                ContainerLevel = containerMaster.ContainerLevel,
-                ContainerLatitude = containerMaster.ContainerLatitude,
-                ContainerLongitude = containerMaster.ContainerLongitude,
-                ContainerNotes = containerMaster.ContainerNotes,
-                ContainerCurrentTerminalId = containerMaster.ContainerCurrentTerminalId,
-                ContainerCurrentTerminalName = containerCurrentTerminalName,
-                ContainerWidth = containerMaster.ContainerWidth,
-                ContainerHeight = containerMaster.ContainerHeight
+            var containerHistory = new ContainerHistory();
 
-            };
+            containerHistory.ContainerNumber = containerMaster.ContainerNumber;
+            containerHistory.ContainerSeqNumber = containerSeqNo;
+            containerHistory.ContainerType = containerMaster.ContainerType;
+            containerHistory.ContainerSize = containerMaster.ContainerSize;
+            containerHistory.ContainerUnits = containerMaster.ContainerUnits;
+            containerHistory.ContainerLength = containerMaster.ContainerLength;
+            containerHistory.ContainerCustType = containerMaster.ContainerCustType;
+            containerHistory.ContainerCustTypeDesc = containerCustTypeDesc;
+            containerHistory.ContainerTerminalId = containerMaster.ContainerTerminalId;
+            containerHistory.ContainerTerminalName = containerTerminalName;
+            containerHistory.ContainerRegionId = containerMaster.ContainerRegionId;
+            containerHistory.ContainerRegionName = containerRegionName;
+            containerHistory.ContainerLocation = containerMaster.ContainerLocation;
+            containerHistory.ContainerLastActionDateTime = containerMaster.ContainerLastActionDateTime;
+            containerHistory.ContainerDaysAtSite = daysAtSite;
+            containerHistory.ContainerPendingMoveDateTime = containerMaster.ContainerPendingMoveDateTime;
+            containerHistory.ContainerTripNumber = containerMaster.ContainerCurrentTripNumber;
+            containerHistory.ContainerTripSegNumber = containerMaster.ContainerCurrentTripSegNumber;
+            containerHistory.ContainerTripSegType = containerMaster.ContainerCurrentTripSegType;
+            containerHistory.ContainerTripSegTypeDesc = tripTypeBasicDesc;
+            containerHistory.ContainerStatus = containerMaster.ContainerStatus;
+            containerHistory.ContainerStatusDesc = containerStatusDesc;
+            containerHistory.ContainerContents = containerMaster.ContainerContents;
+            containerHistory.ContainerContentsDesc = containerContentsDesc;
+            containerHistory.ContainerCommodityCode = containerMaster.ContainerCommodityCode;
+            containerHistory.ContainerCommodityDesc = containerMaster.ContainerCommodityDesc;
+            containerHistory.ContainerComments = containerMaster.ContainerComments;
+            containerHistory.ContainerPowerId = containerMaster.ContainerPowerId;
+            containerHistory.ContainerShortTerm = containerMaster.ContainerShortTerm;
+            if (containerMaster.ContainerCustHostCode != null)
+            {
+                containerHistory.ContainerCustHostCode = containerMaster.ContainerCustHostCode;
+                containerHistory.ContainerCustName = destCustomerMaster?.CustName;
+                containerHistory.ContainerCustAddress1 = destCustomerMaster?.CustAddress1;
+                containerHistory.ContainerCustAddress2 = destCustomerMaster?.CustAddress2;
+                containerHistory.ContainerCustCity = destCustomerMaster?.CustCity;
+                containerHistory.ContainerCustState = destCustomerMaster?.CustState;
+                containerHistory.ContainerCustZip = destCustomerMaster?.CustZip;
+                containerHistory.ContainerCustCountry = destCustomerMaster?.CustCountry;
+                containerHistory.ContainerCustCounty = destCustomerMaster?.CustCounty;
+                containerHistory.ContainerCustTownship = destCustomerMaster?.CustTownship;
+                containerHistory.ContainerCustPhone1 = destCustomerMaster?.CustPhone1;
+            }
+            containerHistory.ContainerLevel = containerMaster.ContainerLevel;
+            containerHistory.ContainerLatitude = containerMaster.ContainerLatitude;
+            containerHistory.ContainerLongitude = containerMaster.ContainerLongitude;
+            containerHistory.ContainerNotes = containerMaster.ContainerNotes;
+            containerHistory.ContainerCurrentTerminalId = containerMaster.ContainerCurrentTerminalId;
+            containerHistory.ContainerCurrentTerminalName = containerCurrentTerminalName;
+            containerHistory.ContainerWidth = containerMaster.ContainerWidth;
+            containerHistory.ContainerHeight = containerMaster.ContainerHeight;
 
             // Insert ContainerHistory 
             var recordType = (ContainerHistoryRecordType)dataService.RecordTypes.Single(x => x.TypeName == "ContainerHistory");

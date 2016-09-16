@@ -1098,34 +1098,34 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             //If so, set TripSegStartDateTime for next segment.
             //Set TripSegActualDriveStartDateTime, TripSegActualDriveEndDateTime,TripSegActualStopStartDateTime for next segment.
             string hostcode = null;
-            foreach (var nextTripSegment in tripSegList)
+            foreach (var tripSegment in tripSegList)
             {
-                if (nextTripSegment.TripSegNumber == driverSegmentDoneProcess.TripSegNumber)
+                if (tripSegment.TripSegNumber == driverSegmentDoneProcess.TripSegNumber)
                 {
                     //This is our current destination customer.
-                    hostcode = nextTripSegment.TripSegDestCustHostCode;
+                    hostcode = tripSegment.TripSegDestCustHostCode;
                 }
                 //Look for subsequent segments with the same destination customer.
                 //The first string follows the second string in the sort order.
-                else if (1 == nextTripSegment.TripSegNumber.CompareTo(driverSegmentDoneProcess.TripSegNumber))
+                else if (1 == tripSegment.TripSegNumber.CompareTo(driverSegmentDoneProcess.TripSegNumber))
                 {
-                    if (hostcode == nextTripSegment.TripSegDestCustHostCode)
+                    if (hostcode == tripSegment.TripSegDestCustHostCode)
                     {
                         //Since destination of the next segment is the same as the current segment, set the times.
-                        nextTripSegment.TripSegStartDateTime = driverSegmentDoneProcess.ActionDateTime;
-                        nextTripSegment.TripSegActualDriveStartDateTime = driverSegmentDoneProcess.ActionDateTime;
-                        nextTripSegment.TripSegActualDriveEndDateTime = driverSegmentDoneProcess.ActionDateTime;
-                        nextTripSegment.TripSegActualStopStartDateTime = driverSegmentDoneProcess.ActionDateTime;
-                        nextTripSegment.TripSegActualDriveMinutes = 0;
+                        tripSegment.TripSegStartDateTime = driverSegmentDoneProcess.ActionDateTime;
+                        tripSegment.TripSegActualDriveStartDateTime = driverSegmentDoneProcess.ActionDateTime;
+                        tripSegment.TripSegActualDriveEndDateTime = driverSegmentDoneProcess.ActionDateTime;
+                        tripSegment.TripSegActualStopStartDateTime = driverSegmentDoneProcess.ActionDateTime;
+                        tripSegment.TripSegActualDriveMinutes = 0;
 
                         //Do the update
-                        changeSetResult = Common.UpdateTripSegment(dataService, settings, nextTripSegment);
+                        changeSetResult = Common.UpdateTripSegment(dataService, settings, tripSegment);
                         log.DebugFormat("SRTEST:Saving next TripSegment Record for Trip:{0}-{1} - Segment Done.",
-                                        nextTripSegment.TripNumber, nextTripSegment.TripSegNumber);
-                        if (Common.LogChangeSetFailure(changeSetResult, nextTripSegment, log))
+                                        tripSegment.TripNumber, tripSegment.TripSegNumber);
+                        if (Common.LogChangeSetFailure(changeSetResult, tripSegment, log))
                         {
                             var s = string.Format("Segment Done:Could not update next TripSegment for Trip:{0}-{1}.",
-                                nextTripSegment.TripNumber, nextTripSegment.TripSegNumber);
+                                tripSegment.TripNumber, tripSegment.TripSegNumber);
                             changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
                             break;
                         }
@@ -1138,11 +1138,117 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     }
                 }
             }//end foreach ...
-             ////////////////////////////////////////////////
-             //Update Trip Record.  Update Primary Container Information if this is the first TripSegment.
-             //Container number in the TripSegmentContainer record should not be null but check anyway.
+
+             ///////////////////////////////////////////////////////////////////
+             //If the current trip segment is a LD (Load), UL(Unload), PF(Pickup Full), or PE(Pickup Empty)
+             //and the next trip segment is a RT, delete all containers from the next segment
+             //and add containers from the current segment to the next segment
+             if (currentTripSegment.TripSegType == BasicTripTypeConstants.Load ||
+                 currentTripSegment.TripSegType == BasicTripTypeConstants.Unload ||
+                 currentTripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
+                 currentTripSegment.TripSegType == BasicTripTypeConstants.PickupEmpty)
+            {
+                 // Get the next TripSegment record
+                int intNo = Int32.Parse(driverSegmentDoneProcess.TripSegNumber);
+                intNo++;
+                string segNo = intNo.ToString("D2");
+                var nextTripSegment = (from item in tripSegList
+                                       where item.TripSegNumber == segNo
+                                       select item).FirstOrDefault();
+                if (null != nextTripSegment)
+                {
+                    //If the next segment type is a RT (Return to Yard)
+                    if (nextTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard)
+                    {
+                        //Delete any existing trip segment container records for this segment
+                        var oldTripSegmentContainerList = Common.GetTripSegmentContainers(dataService, settings, userCulture, userRoleIds,
+                                        currentTrip.TripNumber, segNo, out fault);
+                        foreach (var oldSegmentContainer in oldTripSegmentContainerList)
+                        {
+                            //Do the delete. Deleting records with composite keys is now fixed.
+                            changeSetResult = Common.DeleteTripSegmentContainer(dataService, settings, oldSegmentContainer);
+                            log.DebugFormat("SRTEST:DriverSegmentDoneProcess:Deleting TripSegmentContainer Record for Trip:{0}-{1} Seq:{2}- Done.",
+                                            oldSegmentContainer.TripNumber, oldSegmentContainer.TripSegNumber,
+                                            oldSegmentContainer.TripSegContainerSeqNumber);
+                            if (Common.LogChangeSetFailure(changeSetResult, oldSegmentContainer, log))
+                            {
+                                var s = string.Format("DriverSegmentDoneProcess:Could not delete TripSegmentContainer for Trip:{0}-{1} Seq:{2}.",
+                                        oldSegmentContainer.TripNumber, oldSegmentContainer.TripSegNumber,
+                                        oldSegmentContainer.TripSegContainerSeqNumber);
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                break;
+                            }
+                        }//foreach (var oldSegmentContainer in oldTripSegmentContainerList)
+
+                        //Add containers from the current segment to the next segment.
+                        var firstTripSegmentContainer = new TripSegmentContainer();
+                        int idx = 0;
+                        foreach (var tripSegContainer in tripSegContainerList)
+                        {
+                            var newSegmentContainer = new TripSegmentContainer();
+
+                            newSegmentContainer.TripNumber = tripSegContainer.TripNumber;
+                            newSegmentContainer.TripSegNumber = segNo;
+                            newSegmentContainer.TripSegContainerSeqNumber = tripSegContainer.TripSegContainerSeqNumber;
+                            newSegmentContainer.TripSegContainerNumber = tripSegContainer.TripSegContainerNumber;
+                            newSegmentContainer.TripSegContainerType = tripSegContainer.TripSegContainerType;
+                            newSegmentContainer.TripSegContainerSize = tripSegContainer.TripSegContainerSize;
+                            newSegmentContainer.TripSegContainerCommodityCode = tripSegContainer.TripSegContainerCommodityCode;
+                            newSegmentContainer.TripSegContainerCommodityDesc = tripSegContainer.TripSegContainerCommodityDesc;
+                            newSegmentContainer.TripSegContainerLevel = tripSegContainer.TripSegContainerLevel;
+                            newSegmentContainer.TripSegContainerActionDateTime = tripSegContainer.TripSegContainerActionDateTime;
+                            if (idx == 0)
+                            {
+                                firstTripSegmentContainer = newSegmentContainer;
+                            }
+                            idx++;
+
+                            //Do the update for the new trip segment container records
+                            changeSetResult = Common.UpdateTripSegmentContainer(dataService, settings, newSegmentContainer);
+                            log.DebugFormat("SRTEST:Saving TripSegmentContainer Record for Trip:{0}-{1} Seq:{2}- Done.",
+                                            newSegmentContainer.TripNumber, newSegmentContainer.TripSegNumber,
+                                            newSegmentContainer.TripSegContainerSeqNumber);
+                            if (Common.LogChangeSetFailure(changeSetResult, powerMaster, log))
+                            {
+                                var s = string.Format("Segment Done:Could not update TripSegmentContainer Record for Trip:{0}-{1} Seq:{2}.",
+                                            newSegmentContainer.TripNumber, newSegmentContainer.TripSegNumber,
+                                            newSegmentContainer.TripSegContainerSeqNumber);
+                                changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                                return false;
+                            }
+                        }
+
+                        //Now set the primary trip segment information for the next segment
+                        nextTripSegment.TripSegPrimaryContainerNumber = firstTripSegmentContainer.TripSegContainerNumber;
+                        nextTripSegment.TripSegPrimaryContainerType = firstTripSegmentContainer.TripSegContainerType;
+                        nextTripSegment.TripSegPrimaryContainerSize = firstTripSegmentContainer.TripSegContainerSize;
+                        nextTripSegment.TripSegPrimaryContainerCommodityCode = firstTripSegmentContainer.TripSegContainerCommodityCode;
+                        nextTripSegment.TripSegPrimaryContainerCommodityDesc = firstTripSegmentContainer.TripSegContainerCommodityDesc;
+                        nextTripSegment.TripSegPrimaryContainerLocation = firstTripSegmentContainer.TripSegContainerLocation;
+
+                        ////////////////////////////////////////////////
+                        //Do the TripSegment table update for the next trip segment
+                        changeSetResult = Common.UpdateTripSegment(dataService, settings, nextTripSegment);
+                        log.DebugFormat("SRTEST:Saving TripSegment Record for Trip:{0}-{1} - Segment Add.",
+                                        nextTripSegment.TripNumber, nextTripSegment.TripSegNumber);
+                        if (Common.LogChangeSetFailure(changeSetResult, nextTripSegment, log))
+                        {
+                            var s = string.Format("Segment Add:Could not update TripSegment for Trip:{0}-{1}.",
+                                nextTripSegment.TripNumber, nextTripSegment.TripSegNumber);
+                            changeSetResult.FailedUpdates.Add(msgKey, new MessageSet(s));
+                            return false;
+                        }
+                    }//end of if (nextTripSegment.TripSegType == BasicTripTypeConstants.ReturnYard)
+                }
+
+            }
+
+            ///////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////
+            //Update Trip Record.  Update Primary Container Information if this is the first TripSegment.
+            //Container number in the TripSegmentContainer record should not be null but check anyway.
             if (currentTripSegment.TripSegNumber == Constants.FirstSegment &&
-                null != currentTripSegment.TripSegPrimaryContainerNumber)
+            null != currentTripSegment.TripSegPrimaryContainerNumber)
             {
                 currentTrip.TripPrimaryContainerNumber = currentTripSegment.TripSegPrimaryContainerNumber;
                 currentTrip.TripPrimaryContainerType = currentTripSegment.TripSegPrimaryContainerType;
