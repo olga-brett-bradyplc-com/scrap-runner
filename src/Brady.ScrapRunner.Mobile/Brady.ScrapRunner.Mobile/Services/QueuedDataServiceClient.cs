@@ -235,32 +235,26 @@
 
         public string HostAddress => _dataServiceClient.HostAddress;
 
-        public IObservable<Exception> ConnectionError
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public IObservable<Exception> ConnectionError => _dataServiceClient.ConnectionError;
 
         public Task<TypeMetadata[]> GetMetadataForTypeAsync(string type, string dataService = null)
         {
-            throw new NotImplementedException();
+            return _dataServiceClient.GetMetadataForTypeAsync(type, dataService);
         }
 
         public Task<IChangeSetResult> ProcessChangeSetAsync(IChangeSet changeSet, string dataService = null)
         {
-            throw new NotImplementedException();
+            return _dataServiceClient.ProcessChangeSetAsync(changeSet, dataService);
         }
 
         public Task<ChangeResultWithItem<BwfRecordLock>> LockAsync(long id, Type itemType, string context, string reason, string dataService = null, string itemTypeName = null)
         {
-            throw new NotImplementedException();
+            return _dataServiceClient.LockAsync(id, itemType, context, reason, dataService);
         }
 
         public Task<ChangeResult> UnlockAsync(long id, Type itemType, string context, string dataService = null, string itemTypeName = null)
         {
-            throw new NotImplementedException();
+            return _dataServiceClient.UnlockAsync(id, itemType, context, dataService, itemTypeName);
         }
     }
 }
