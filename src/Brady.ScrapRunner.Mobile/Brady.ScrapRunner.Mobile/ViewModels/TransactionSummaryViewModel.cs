@@ -262,41 +262,34 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CurrentTransaction.TripSegContainerLevel = levelNum;
             }
 
-            // If commodity is required, show spinner dialog allowing them to select commodity, then continue procesing scan
-            if (CurrentTransaction.TripSegContainerCommodityCode == null && commodityRequired == Constants.Yes &&
-                _tripService.IsTripLegLoaded(currentSegment, true))
-            {
-                var commodities = await _customerService.FindCustomerCommodites(currentSegment.TripSegDestCustHostCode);
-
-                var commoditySelect =
-                    await
-                        UserDialogs.Instance.ActionSheetAsync(AppResources.SelectCommodity, "", "", null,
-                            commodities.Select(c => c.CustCommodityDesc).ToArray());
-
-                if (string.IsNullOrEmpty(commoditySelect)) return;
-
-                var commodity = commodities.First(c => c.CustCommodityDesc == commoditySelect);
-
-                CurrentTransaction.TripSegContainerCommodityCode = commodity.CustCommodityCode;
-                CurrentTransaction.TripSegContainerCommodityDesc = commodity.CustCommodityDesc;
-            }
-
             using ( var completeTripSegment = UserDialogs.Instance.Loading(AppResources.SavingContainer, maskType: MaskType.Black))
             {
-                if (string.IsNullOrEmpty(CurrentTransaction.TripSegContainerNumber))
-                    CurrentTransaction.TripSegContainerNumber = scannedNumber;
-
+                CurrentTransaction.TripSegContainerNumber = scannedNumber;
                 CurrentTransaction.TripSegContainerComplete = Constants.Yes;
                 CurrentTransaction.TripSegContainerReviewFlag = Constants.No;
                 CurrentTransaction.MethodOfEntry = TripMethodOfCompletionConstants.Scanned;
 
-                if (_tripService.IsTripLegLoaded(currentSegment))
-                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, CurrentTransaction.TripSegContainerNumber, currentSegment.TripSegDestCustHostCode, CurrentTransaction);
-                else if (_tripService.IsTripLegDropped(currentSegment))
-                    await _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId, CurrentTransaction.TripSegContainerNumber);
-
                 await _tripService.UpdateTripSegmentContainerAsync(CurrentTransaction);
                 await _tripService.CompleteTripSegmentContainerAsync(CurrentTransaction);
+
+                if (_tripService.IsTripLegLoaded(currentSegment, true))
+                {
+                    container.ContainerContents = ContainerContentsConstants.Loaded;
+                    await _containerService.UpdateContainerAsync(container);
+                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, CurrentTransaction.TripSegContainerNumber, currentSegment.TripSegDestCustHostCode, CurrentTransaction);
+                }
+                else if (_tripService.IsTripLegLoaded(currentSegment)) // Pickup Empty
+                {
+                    container.ContainerContents = ContainerContentsConstants.Empty;
+                    await _containerService.UpdateContainerAsync(container);
+                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, CurrentTransaction.TripSegContainerNumber, currentSegment.TripSegDestCustHostCode, CurrentTransaction);
+                }
+                else if (_tripService.IsTripLegDropped(currentSegment))
+                {
+                    container.ContainerContents = ContainerContentsConstants.Empty;
+                    await _containerService.UpdateContainerAsync(container);
+                    await _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId, CurrentTransaction.TripSegContainerNumber);
+                }
 
                 SelectNextTransactionContainer();
                 ConfirmationSelectedCommand.RaiseCanExecuteChanged();

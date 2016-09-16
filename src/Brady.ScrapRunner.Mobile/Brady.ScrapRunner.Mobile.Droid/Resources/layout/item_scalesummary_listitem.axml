@@ -10,7 +10,7 @@
     <TextView
         android:id="@+id/tripContainerInfo"
         android:layout_width="match_parent"
-        android:layout_height="15dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:textColor="@color/material_gray_900"
         tools:text="LU"
@@ -18,7 +18,7 @@
     <TextView
         android:id="@+id/tripContainerLocation"
         android:layout_width="match_parent"
-        android:layout_height="15dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/tripContainerInfo"
         android:textColor="@color/material_gray_900"
         tools:text="Trash Can"
@@ -26,7 +26,7 @@
     <TextView
         android:id="@+id/tripCommodityDesc"
         android:layout_width="match_parent"
-        android:layout_height="15dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/tripContainerLocation"
         android:textColor="@color/material_gray_900"
         tools:text="#2 Tin"

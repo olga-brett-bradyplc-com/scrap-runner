@@ -28,7 +28,7 @@ namespace Brady.ScrapRunner.Mobile.Interfaces
 
         Task<int> UnloadContainerFromPowerIdAsync(string powerId, string containerNumber);
 
-        Task<int> ResetContainer(ContainerMasterModel container);
+        Task<int> ResetContainer(ContainerMasterModel container, bool forceUnload = false);
 
         Task<int> LoadContainerOnPowerIdAsync(string powerId, string containerNumber, string custHostCode = null, TripSegmentContainerModel tripContainer = null);
 

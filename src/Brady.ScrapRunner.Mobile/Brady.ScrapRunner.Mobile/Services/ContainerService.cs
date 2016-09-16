@@ -102,7 +102,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             container.ContainerCurrentTripSegNumber = null;
             return await _containerMasterRepository.UpdateAsync(container);
         }
-
+        
         /// <summary>
         /// Load container onto power id.
         /// Typically, I'd rather pass an object reference instead of multiple parameters
@@ -110,6 +110,7 @@ namespace Brady.ScrapRunner.Mobile.Services
         /// </summary>
         /// <param name="powerId"></param>
         /// <param name="containerNumber"></param>
+        /// <param name="custHostCode"></param>
         /// <param name="tripContainer"></param>
         /// <returns></returns>
         public async Task<int> LoadContainerOnPowerIdAsync(string powerId, string containerNumber, string custHostCode = null, TripSegmentContainerModel tripContainer = null)
@@ -127,7 +128,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             return await _containerMasterRepository.UpdateAsync(container);
         }
 
-        public async Task<int> ResetContainer(ContainerMasterModel container)
+        public async Task<int> ResetContainer(ContainerMasterModel container, bool forceUnload = false)
         {
             container.ContainerPrevTripNumber = container.ContainerCurrentTripNumber;
             container.ContainerComplete = null;
@@ -136,7 +137,7 @@ namespace Brady.ScrapRunner.Mobile.Services
             container.ContainerCurrentTripSegNumber = null;
             container.ContainerCurrentTripSegType = null;
 
-            if (container.ContainerToBeUnloaded == Constants.Yes)
+            if (container.ContainerToBeUnloaded == Constants.Yes || forceUnload)
             {
                 container.ContainerPowerId = null;
                 container.ContainerCustHostCode = null;

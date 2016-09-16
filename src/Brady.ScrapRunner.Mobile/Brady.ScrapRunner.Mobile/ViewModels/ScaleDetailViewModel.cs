@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Process;
@@ -23,6 +24,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IPreferenceService _preferenceService;
         private readonly IContainerService _containerService;
         private readonly ICustomerService _customerService;
+
+        private static readonly string NoReasonCodeSelected = "NOREASONCODE";
 
         private static readonly int tarePressed = 2;
         private static readonly int secondGrossPressed = 1;
@@ -60,12 +63,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripSegContainerSeqNumber = tripSegContainerSeqNumber;
             TripSegContainerNumber = tripSegContainerNumber;
         }
-        private List<CodeTableModel> _contTypeList;
-        public List<CodeTableModel> ContTypesList
-        {
-            get { return _contTypeList; }
-            set { SetProperty(ref _contTypeList, value); }
-        }
  
         public override async void Start()
         {
@@ -90,7 +87,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 TripNumber = container.ContainerCurrentTripNumber,
                 CustHostCode = container.ContainerCustHostCode,
-                Name = tempCustomerName.CustName
+                Name = tempCustomerName?.CustName ?? "Unused"
             };
 
             var cont = ContTypesList.FirstOrDefault(ct => ct.CodeDisp1 == container.ContainerType);
@@ -101,7 +98,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 new ContainerMasterWithTripContainer
                 {
                     ContainerMaster = container,
-                    TripSegmentContainer = tripContainers.FirstOrDefault(ts => ts.TripSegNumber == container.ContainerCurrentTripSegNumber)
+                    TripSegmentContainer = tripContainers.Count > 0 ? tripContainers.FirstOrDefault(ts => ts.TripSegNumber == container.ContainerCurrentTripSegNumber) : null
                 }
             };
 
@@ -182,6 +179,13 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _tareTime, value); }
         }
 
+        private List<CodeTableModel> _contTypeList;
+        public List<CodeTableModel> ContTypesList
+        {
+            get { return _contTypeList; }
+            set { SetProperty(ref _contTypeList, value); }
+        }
+
         private DriverStatusModel CurrentDriver { get; set; }
 
         // Command bindings
@@ -194,8 +198,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         
         private async void ExecuteGrossWeightSetCommand()
         {
-            await CheckWeights(grossPressed);
-            if (GrossWeight <= 0)
+            if (!await CheckWeights(grossPressed))
                 return;
             GrossTime = DateTime.Now;
             TareWeightSetCommand.RaiseCanExecuteChanged();
@@ -208,8 +211,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         
         private async void ExecuteTareWeightSetCommand()
         {
-            await CheckWeights(tarePressed);
-            if (TareWeight <= 0)
+            if (!await CheckWeights(tarePressed))
                 return;
 
             if (TareWeight > GrossWeight || TareWeight > SecondGrossWeight)
@@ -236,9 +238,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         
         private async void ExecuteSecondGrossWeightSetCommand()
         {
-            await CheckWeights(secondGrossPressed);
-            if (SecondGrossWeight <= 0)
+            if (!await CheckWeights(secondGrossPressed))
                 return;
+
             SecondGrossTime = DateTime.Now;
         }
 
@@ -253,19 +255,19 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         private int _grossWeight;
-
         public int GrossWeight
         {
             get { return _grossWeight;  }
             set { SetProperty(ref _grossWeight, value); }
         }
-        private int _secondGrossWeight;
 
+        private int _secondGrossWeight;
         public int SecondGrossWeight
         {
             get { return _secondGrossWeight; }
             set { SetProperty(ref _secondGrossWeight, value); }
         }
+
         private int _tareWeight;
         public int TareWeight
         {
@@ -273,12 +275,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _tareWeight, value); }
         }
 
-        private async Task CheckWeights(int weightSelected)
+        private async Task<bool> CheckWeights(int weightSelected)
         {
             var reqDrvrEnterWeights = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFDriverWeights);
 
             if (reqDrvrEnterWeights != Constants.Yes)
-                return;
+                return true;
 
             string title;
 
@@ -294,7 +296,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 title = AppResources.TareWeight;
                     break;
                 default:
-                    return;
+                    return false;
             }
 
             var weightPrompt = await UserDialogs.Instance.PromptAsync(title, AppResources.WeightHint,
@@ -308,64 +310,243 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     {
                         case 0:
                             GrossWeight = int.Parse(weightPrompt.Text);
-                            break;
+                            return GrossWeight > 0;
                         case 1:
                             SecondGrossWeight = int.Parse(weightPrompt.Text);
-                            break;
+                            return SecondGrossWeight > 0;
                         case 2:
                             TareWeight = int.Parse(weightPrompt.Text);
-                            break;
+                            return TareWeight > 0;
                         default:
-                            break;
+                            return false;
                     }
                 }
             }
+
+            return false;
         }
 
         private async Task ProcessContainers(bool setDownInYard, string confirmationMessage)
         {
+            var powerContainersOnId = await _containerService.FindPowerIdContainersAsync(CurrentDriver.PowerId);
+            var nextSegments = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             // Show review exception dialog if gross time isn't set.
             var reasons = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ReasonCodes);
             var reasonDialogAsync = (!GrossTime.HasValue || !TareTime.HasValue)
                 ? await
                     UserDialogs.Instance.ActionSheetAsync(AppResources.SelectReviewReason, AppResources.Cancel, "", null,
                         reasons.Select(ct => ct.CodeDisp1).ToArray())
-                : "NOREASONCODE";
+                : NoReasonCodeSelected;
 
             if (reasonDialogAsync == AppResources.Cancel || string.IsNullOrEmpty(reasonDialogAsync)) return;
 
             var reason = reasons.FirstOrDefault(ct => ct.CodeDisp1 == reasonDialogAsync);
 
-            using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.CompletingTripSegment, maskType: MaskType.Black))
+            var anyContainersLeft = powerContainersOnId.Any(c => c.ContainerComplete != Constants.Yes && c.ContainerNumber != ContainerNumber);
+            var anySegmentsLeft = nextSegments.Any(ts => ts.TripSegNumber != TripSegNumber);
+
+            var completeMessage = (anyContainersLeft || anySegmentsLeft)
+                ? confirmationMessage
+                : confirmationMessage + "\n\n" + AppResources.CompleteTrip;
+
+            var result = await UserDialogs.Instance.ConfirmAsync(completeMessage, AppResources.ConfirmLabel);
+
+            if (result)
             {
-                // Go through each container, updating both the local and remote db
-                foreach (var container in Containers.SelectMany(grouping => grouping))
+                using (var completeTripSegment = UserDialogs.Instance.Loading(AppResources.SavingContainer, maskType: MaskType.Black))
                 {
-                    if (container.TripSegmentContainer == null)
+                    // Go through each container, updating both the local and remote db
+                    foreach (var container in Containers.SelectMany(grouping => grouping))
                     {
-                        container.ContainerMaster.ContainerReviewFlag = ContainerActionTypeConstants.Done;
-                        container.ContainerMaster.ContainerComplete = Constants.Yes;
-                        container.ContainerMaster.ContainerToBeUnloaded = (setDownInYard) ? Constants.Yes : Constants.No;
+                        // Common properties regardless if the container belongs to the trip or not
+                        if (GrossTime.HasValue && TareTime.HasValue)
+                            container.ContainerMaster.ContainerContents = ContainerContentsConstants.Empty;
+                        else
+                            container.ContainerMaster.ContainerContents = ContainerContentsConstants.Loaded;
 
-                        await _containerService.UpdateContainerAsync(container.ContainerMaster);
-                    }
-                    else
-                    {
-                        await _tripService.UpdateTripSegmentContainerWeightTimesAsync(container.TripSegmentContainer, GrossTime, SecondGrossTime, TareTime);
-                        await _tripService.CompleteTripSegmentContainerAsync(container.TripSegmentContainer);
-                        // @TODO : Implement once we have our location service working
-                        //await _tripService.UpdateTripSegmentContainerLongLatAsync(TripSegmentContainerModel container , Latitude, Longitude);
+                        if (container.TripSegmentContainer == null)
+                        {
+                            container.ContainerMaster.ContainerReviewFlag = ContainerActionTypeConstants.Done;
+                            container.ContainerMaster.ContainerComplete = Constants.Yes;
+                            container.ContainerMaster.ContainerToBeUnloaded = (setDownInYard) ? Constants.Yes : Constants.No;
+                            container.ContainerMaster.ContainerContents = (setDownInYard)
+                                ? ContainerContentsConstants.Empty
+                                : ContainerContentsConstants.Loaded;
+
+                            await _containerService.UpdateContainerAsync(container.ContainerMaster);
+
+                            var unusedContainerAction =
+                                await _tripService.ProcessContainerActionAsync(new DriverContainerActionProcess
+                                {
+                                    EmployeeId = CurrentDriver.EmployeeId,
+                                    PowerId = CurrentDriver.PowerId,
+                                    ActionType = ContainerActionTypeConstants.Dropped,
+                                    ActionDateTime = DateTime.Now,
+                                    ContainerNumber = container.ContainerMaster.ContainerNumber
+                                });
+
+                            if (unusedContainerAction.WasSuccessful)
+                            {
+                                if (setDownInYard)
+                                {
+                                    await _containerService.ResetContainer(container.ContainerMaster, true);
+                                }
+                                else
+                                {
+                                    await _containerService.ResetContainer(container.ContainerMaster);
+
+                                    // Make sure this container doesn't show up if they have to go back to scale summary screen
+                                    container.ContainerMaster.ContainerComplete = Constants.Yes;
+                                    await _containerService.UpdateContainerAsync(container.ContainerMaster);
+                                }
+
+                                continue;
+                            }
+
+                            UserDialogs.Instance.Alert(unusedContainerAction.Failure.Summary, AppResources.Error);
+                            return;
+                        }
+                        else
+                        {
+                            var driverProcessObj = new DriverContainerActionProcess
+                            {
+                                EmployeeId = CurrentDriver.EmployeeId,
+                                PowerId = CurrentDriver.PowerId,
+                                ActionType =
+                                    (string.IsNullOrEmpty(reason?.CodeDisp1))
+                                        ? ContainerActionTypeConstants.Done
+                                        : ContainerActionTypeConstants.Review,
+                                ActionDateTime = DateTime.Now,
+                                TripNumber = TripNumber,
+                                TripSegNumber = container.TripSegmentContainer.TripSegNumber,
+                                ContainerNumber = container.TripSegmentContainer.TripSegContainerNumber,
+                                Gross1ActionDateTime = GrossTime,
+                                TareActionDateTime = TareTime,
+                                Gross2ActionDateTime = SecondGrossTime,
+                                SetInYardFlag = (setDownInYard) ? Constants.Yes : Constants.No,
+                                ContainerContents =
+                                    (GrossTime.HasValue && TareTime.HasValue)
+                                        ? ContainerContentsConstants.Empty
+                                        : ContainerContentsConstants.Loaded,
+                                MethodOfEntry = ContainerMethodOfEntry.Manual,
+                                ActionCode = reason?.CodeValue,
+                                ActionDesc = reason?.CodeDisp1,
+                                Gross1Weight = GrossWeight,
+                                Gross2Weight = SecondGrossWeight,
+                                TareWeight = TareWeight
+                            };
+
+                            var containerAction = await _tripService.ProcessContainerActionAsync(driverProcessObj);
+
+                            if (containerAction.WasSuccessful)
+                            {
+                                await _tripService.UpdateTripSegmentContainerWeightTimesAsync(container.TripSegmentContainer, GrossTime, SecondGrossTime, TareTime);
                             
-                        container.ContainerMaster.ContainerReviewFlag = (string.IsNullOrEmpty(reason?.CodeDisp1)) ? ContainerActionTypeConstants.Done : ContainerActionTypeConstants.Exception;
-                        container.ContainerMaster.ContainerComplete = Constants.Yes;
-                        container.ContainerMaster.ContainerToBeUnloaded = (setDownInYard) ? Constants.Yes : Constants.No;
+                                container.TripSegmentContainer.TripSegContainerReviewReason = reason?.CodeValue;
+                                container.TripSegmentContainer.TripSegContainerReivewReasonDesc = reason?.CodeDisp1;
+                                container.TripSegmentContainer.TripSegContainerComplete = Constants.Yes;
 
-                        await _containerService.UpdateContainerAsync(container.ContainerMaster);
+                                await _tripService.UpdateTripSegmentContainerAsync(container.TripSegmentContainer);
+
+                                // @TODO : Implement once we have our location service working
+                                //await _tripService.UpdateTripSegmentContainerLongLatAsync(TripSegmentContainerModel container , Latitude, Longitude);
+
+                                if (setDownInYard)
+                                {
+                                    await _containerService.ResetContainer(container.ContainerMaster, true);
+                                }
+                                else
+                                {
+                                    await _containerService.ResetContainer(container.ContainerMaster);
+
+                                    // Make sure this container doesn't show up if they have to go back to scale summary screen
+                                    container.ContainerMaster.ContainerComplete = Constants.Yes;
+                                    await _containerService.UpdateContainerAsync(container.ContainerMaster);
+                                }
+
+                                continue;
+                            }
+
+                            UserDialogs.Instance.Alert(containerAction.Failure.Summary, AppResources.Error);
+                            return;
+                        }
                     }
+
+                    await ExecuteNextStage();
                 }
-                    
+            }
+        }
+
+        private async Task ExecuteNextStage()
+        {
+            var powerContainersOnId = await _containerService.FindPowerIdContainersAsync(CurrentDriver.PowerId);
+            var finishedContainers = powerContainersOnId.Any(c => c.ContainerComplete != Constants.Yes);
+
+            if (finishedContainers)
+            {
                 Close(this);
-                ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                ShowViewModel<ScaleSummaryViewModel>(new {tripNumber = TripNumber});
+            }
+            else
+            {
+                var tripSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber, TripSegNumber);
+                var tripSegmentProcess = await _tripService.ProcessTripSegmentDoneAsync(new DriverSegmentDoneProcess
+                {
+                    EmployeeId = CurrentDriver.EmployeeId,
+                    TripNumber = TripNumber,
+                    TripSegNumber = TripSegNumber,
+                    ActionDateTime = DateTime.Now,
+                    PowerId = CurrentDriver.PowerId,
+                    ActionType = TripSegStatusConstants.Done,
+                    Latitude = tripSegment.TripSegEndLatitude,
+                    Longitude = tripSegment.TripSegEndLongitude
+                });
+
+                if (tripSegmentProcess.WasSuccessful)
+                    await _tripService.CompleteTripSegmentAsync(tripSegment);
+                else
+                {
+                    UserDialogs.Instance.Alert(tripSegmentProcess.Failure.Summary, AppResources.Error);
+                    return;
+                }
+
+                var nextTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
+                var firstTripSegment = nextTripSegment.FirstOrDefault();
+
+                if (nextTripSegment.Count == 0)
+                {
+                    await _tripService.CompleteTripAsync(TripNumber);
+
+                    var nextTrip = await _tripService.FindNextTripAsync();
+                    var seg = await _tripService.FindNextTripSegmentsAsync(nextTrip?.TripNumber);
+
+                    CurrentDriver.Status = nextTrip == null ? DriverStatusSRConstants.NoWork : DriverStatusSRConstants.Available;
+                    CurrentDriver.TripNumber = nextTrip == null ? "" : nextTrip.TripNumber;
+                    CurrentDriver.TripSegNumber = seg.Count < 1 ? "" : seg.FirstOrDefault().TripSegNumber;
+
+                    await _driverService.UpdateDriver(CurrentDriver);
+
+                    Close(this);
+                    ShowViewModel<RouteSummaryViewModel>();
+                }
+                else if (nextTripSegment.FirstOrDefault().TripSegDestCustHostCode != tripSegment.TripSegDestCustHostCode)
+                {
+                    CurrentDriver.TripSegNumber = nextTripSegment.FirstOrDefault().TripSegNumber;
+                    await _driverService.UpdateDriver(CurrentDriver);
+
+                    Close(this);
+                    ShowViewModel<RouteDetailViewModel>(new {tripNumber = TripNumber});
+                }
+                else if (_tripService.IsTripLegTransaction(firstTripSegment))
+                {
+                    Close(this);
+                    ShowViewModel<TransactionSummaryViewModel>(new {tripNumber = TripNumber});
+                }
+                else if (_tripService.IsTripLegTypePublicScale(firstTripSegment))
+                {
+                    Close(this);
+                    ShowViewModel<PublicScaleSummaryViewModel>(new {tripNumber = TripNumber});
+                }
             }
         }
     }

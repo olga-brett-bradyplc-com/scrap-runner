@@ -47,7 +47,6 @@
     <Compile Include="Helpers\ContainerMasterWithTripContainer.cs" />
     <Compile Include="Helpers\Grouping.cs" />
     <Compile Include="Helpers\PhoneSettings.cs" />
-    <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Interfaces\ICodeTableService.cs" />
     <Compile Include="Interfaces\IContainerService.cs" />
     <Compile Include="Interfaces\ICustomerService.cs" />
@@ -110,7 +109,6 @@
     <Compile Include="Services\CodeTableService.cs" />
     <Compile Include="Services\ContainerService.cs" />
     <Compile Include="Services\CustomerService.cs" />
-    <Compile Include="Services\DemoDataGenerator.cs" />
     <Compile Include="Services\ConnectionService.cs" />
     <Compile Include="Services\DriverService.cs" />
     <Compile Include="Services\LocationGeofenceService.cs" />
@@ -118,6 +116,7 @@
     <Compile Include="Services\LocationPathService.cs" />
     <Compile Include="Services\LocationService.cs" />
     <Compile Include="Services\MessagesService.cs" />
+    <Compile Include="Services\NavigationService.cs" />
     <Compile Include="Services\PollingService.cs" />
     <Compile Include="Services\QueuedDataServiceClient.cs" />
     <Compile Include="Services\PreferenceService.cs" />

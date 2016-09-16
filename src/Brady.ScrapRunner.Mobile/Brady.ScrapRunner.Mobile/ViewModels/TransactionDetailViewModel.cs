@@ -107,6 +107,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 CustCommodityDesc = CustomerCommodityList.Count > 0 ? AppResources.NoCommoditySelected : AppResources.NoCommoditiesAval
             });
 
+            var allowCommoditySelection =
+                await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCommodSelection);
+
+            if ( allowCommoditySelection == Constants.Yes )
+                CommoditySelectionEnabled = true;
+
             if (!string.IsNullOrEmpty(Container?.TripSegContainerCommodityCode))
                 SelectedCommodity =
                     CustomerCommodityList.FirstOrDefault(
@@ -129,19 +135,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionCompleteCommand()
         {
-           if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel) ==
-                Constants.Yes && SelectedLevel.CodeValue == null && _tripService.IsTripLegLoaded(Segment))
+            var container = await _containerService.FindContainerAsync(TripSegContainerNumber);
+
+            if (container == null)
             {
-                UserDialogs.Instance.Alert(AppResources.LevelRequired, AppResources.Error, AppResources.OK);
+                UserDialogs.Instance.Alert(AppResources.ContainerNotFound, AppResources.Error);
                 return;
             }
 
-            if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCommodSelection) ==
-                Constants.Yes && SelectedCommodity.CustCommodityCode == null && _tripService.IsTripLegLoaded(Segment))
-            {
-                UserDialogs.Instance.Alert(AppResources.CommodityRequried, AppResources.Error, AppResources.OK);
-                return;
-            }
             string sCount = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFContainerValidationCount);
 
             if (sCount == null) sCount = "1";
@@ -160,26 +161,53 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
             }
 
- 
+            var useContainerLevel =
+                await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel);
+
+            if ( useContainerLevel == Constants.Yes && SelectedLevel.CodeValue == null && _tripService.IsTripLegLoaded(Segment))
+            {
+                UserDialogs.Instance.Alert(AppResources.LevelRequired, AppResources.Error, AppResources.OK);
+                return;
+            }
+
             using (var completeTripSegmentContainer = UserDialogs.Instance.Loading(AppResources.Loading,maskType: MaskType.Black))
             {
                 if (!string.IsNullOrEmpty(TripSegContainerNumber))
                     Container.TripSegContainerNumber = TripSegContainerNumber;
 
                 Container.TripSegContainerLevel = string.IsNullOrEmpty(SelectedLevel?.CodeValue) ? (short?)null : short.Parse(SelectedLevel?.CodeValue);
-                Container.TripSegContainerCommodityCode = string.IsNullOrEmpty(SelectedCommodity?.CustHostCode) ? null : SelectedCommodity.CustCommodityCode;
-                Container.TripSegContainerCommodityDesc = string.IsNullOrEmpty(SelectedCommodity?.CustHostCode) ? null : SelectedCommodity.CustCommodityDesc;
-                Container.TripSegContainerLocation = string.IsNullOrEmpty(SelectedLocation?.CustHostCode) ? null : SelectedLocation.CustLocation;
+
+                if (SelectedCommodity?.CustHostCode != null)
+                {
+                    Container.TripSegContainerCommodityCode = SelectedCommodity.CustCommodityCode;
+                    Container.TripSegContainerCommodityDesc = SelectedCommodity.CustCommodityDesc;
+                }
+                
+                if( SelectedLocation?.CustHostCode != null )
+                    Container.TripSegContainerLocation = SelectedLocation.CustLocation;
+                
                 Container.MethodOfEntry = TripMethodOfCompletionConstants.Manual;
+
                 // Container.TripSegContainerNotes = not implemented server side
 
-                if (_tripService.IsTripLegLoaded(Segment))
-                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId,
-                        Container.TripSegContainerNumber);
+                if (_tripService.IsTripLegLoaded(Segment, true))
+                {
+                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, TripSegContainerNumber, Segment.TripSegDestCustHostCode);
+                    container.ContainerContents = ContainerContentsConstants.Loaded;
+                    await _containerService.UpdateContainerAsync(container);
+                }
+                else if (_tripService.IsTripLegLoaded(Segment)) // Pickup Empty
+                {
+                    await _containerService.LoadContainerOnPowerIdAsync(CurrentDriver.PowerId, TripSegContainerNumber, Segment.TripSegDestCustHostCode);
+                    container.ContainerContents = ContainerContentsConstants.Empty;
+                    await _containerService.UpdateContainerAsync(container);
+                }
                 else if (_tripService.IsTripLegDropped(Segment))
-                    await
-                        _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId,
-                            Container.TripSegContainerNumber);
+                {
+                    await _containerService.UnloadContainerFromPowerIdAsync(CurrentDriver.PowerId, TripSegContainerNumber);
+                    container.ContainerContents = ContainerContentsConstants.Empty;
+                    await _containerService.UpdateContainerAsync(container);
+                }
 
                 await _tripService.CompleteTripSegmentContainerAsync(Container);
 
@@ -288,6 +316,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _commodity; }
             set { SetProperty(ref _commodity, value); }
         }
+
+        private bool _commoditySelectionEnabled;
+        public bool CommoditySelectionEnabled
+        {
+            get { return _commoditySelectionEnabled; }
+            set { SetProperty(ref _commoditySelectionEnabled, value); }
+        }
+
 
         private CodeTableModel _selectedLevel;
         public CodeTableModel SelectedLevel

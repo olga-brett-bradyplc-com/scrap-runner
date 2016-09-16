@@ -381,15 +381,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             {
                 using (var loading = UserDialogs.Instance.Loading(AppResources.Loading, maskType: MaskType.Black))
                 {
-                    // Used for RouteSummary view to know what "state" it's in
-                    // TODO: Replace with messaging similiar to the menu state?
-                    CurrentStatus = DriverStatusSRConstants.Arrive;
-
                     CurrentDriver.Status = CurrentStatus;
                     await _driverService.UpdateDriver(CurrentDriver);
 
-                    //GPS Capture dialog appears here if the current system doesn't have lat/lon set for a yard after arrival
-                    //commented out temporarely for the demo by OIB 8/9/16
                     var currentSegment = await _tripService.FindTripSegmentInfoAsync(TripNumber,
                         TripLegs.FirstOrDefault().TripSegments.FirstOrDefault().Key.TripSegNumber);
 
@@ -509,7 +503,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     AppResources.Error, AppResources.OK);
             }
 
+            CurrentStatus = DriverStatusSRConstants.Arrive;
+
             await SetAutoDepartAsync(currentSegment);
+            await ExecuteNextStageCommandAsync();
         }
 
         private async Task ExecuteNextStageCommandAsync()
@@ -523,15 +520,25 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             else if (_tripService.IsTripLegScale(firstSegment))
             {
                 var containersOnPowerId = await _containerService.FindPowerIdContainersAsync(CurrentDriver.PowerId);
-                if (_tripService.IsTripLegTypePublicScale(firstSegment))
+                if (_tripService.IsTripLegTypePublicScale(firstSegment) && containersOnPowerId.Count > 1)
                 {
                     Close(this);
                     ShowViewModel<PublicScaleSummaryViewModel>(new { tripNumber = TripNumber });
                 }
-                else if (containersOnPowerId.Count >= 1)
+                else if (containersOnPowerId.Count > 1)
                 {
                     Close(this);
                     ShowViewModel<ScaleSummaryViewModel>(new { tripNumber = TripNumber });
+                }
+                else if (containersOnPowerId.Count == 1)
+                {
+                    Close(this);
+                    ShowViewModel<ScaleDetailViewModel>(
+                        new
+                        {
+                            tripNumber = TripNumber,
+                            containerNumber = containersOnPowerId.SingleOrDefault().ContainerNumber
+                        });
                 }
                 else
                 {

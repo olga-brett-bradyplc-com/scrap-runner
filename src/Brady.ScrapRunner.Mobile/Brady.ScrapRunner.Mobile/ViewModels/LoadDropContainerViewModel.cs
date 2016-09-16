@@ -212,8 +212,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     ConfirmContainersCommand.RaiseCanExecuteChanged();
 
                     var containerMaster = await _containerService.FindContainerAsync(containerNumber);
-                    containerMaster.ContainerPowerId = null;
-                    await _containerService.UpdateContainerAsync(containerMaster);
+                    await _containerService.ResetContainer(containerMaster, true);
                 }
                 else
                 {
