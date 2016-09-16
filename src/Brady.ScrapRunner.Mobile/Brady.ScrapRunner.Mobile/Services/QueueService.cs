@@ -5,8 +5,8 @@
     using System.Linq;
     using System.Threading.Tasks;
     using BWF.DataServices.Domain.Interfaces;
+    using BWF.DataServices.Domain.Models;
     using BWF.DataServices.Metadata.Models;
-    using Helpers;
     using Interfaces;
     using Models;
     using MvvmCross.Platform;
@@ -59,7 +59,7 @@
 
                     var objectType = Type.GetType(queueItem.RecordType);
                     var idType = Type.GetType(queueItem.IdType);
-                    var changeSet = ChangeSetExtensions.MakeChangeSetForType(idType, objectType);
+                    var changeSet = MakeChangeSetForType(idType, objectType);
                     var noRoleIds = Enumerable.Empty<long>().ToList();
                     var createReference = 0L;
                     var updateReferences = new List<object>();
@@ -101,6 +101,16 @@
         {
                 return await _repository.AsQueryable().CountAsync() > 0;
         }
+
+        private IChangeSet MakeChangeSetForType(Type idType, Type itemType)
+        {
+            var genericChangeSetType = typeof(ChangeSet<,>);
+            Type[] typeArgs = { idType, itemType };
+            var typedChangeSetType = genericChangeSetType.MakeGenericType(typeArgs);
+            var changeSet = Activator.CreateInstance(typedChangeSetType);
+            return (IChangeSet)changeSet;
+        }
+
 
         private bool WasChangeSetSuccessful(IChangeSetResult changeSetResult, long createReference, IEnumerable<object> updateIds)
         {
