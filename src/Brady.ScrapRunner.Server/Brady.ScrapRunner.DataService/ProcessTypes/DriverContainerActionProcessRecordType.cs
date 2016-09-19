@@ -460,28 +460,47 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
             }
 
             //No special processing is needed for the Containers with the QtyInID Flag set to Y.
-            
+
             //Do not alter these values
             //ContainerType,ContainerSize,ContainerTerminalId,ContainerRegionId
 
             //Based on the action type, container may or may not be on the PowerId.
+            //Currently in the Windows CE app when the driver goes to the Load/Drop screen and drops 
+            //a container, a message pops up that says “Is container full”? 
+            //Depending on the response, this sets the ContainerContents field to E(Empty) or L(Loaded).
+            //Per discussion 09/16/2016, we are not going to do the prompt. We are just going to leave the 
+            //contents alone, assuming it is still whatever it was previously.
             if (driverContainerActionProcess.ActionType == ContainerActionTypeConstants.Load)
             {
                 containerMaster.ContainerPowerId = driverContainerActionProcess.PowerId;
+                //The container contents should remain the same on a load
+                //containerMaster.ContainerContents = driverContainerActionProcess.ContainerContents;
             }
+            //ActionType is (S) Dropped
             else
             {
                 containerMaster.ContainerPowerId = null;
+                //For now 09/16/2016, the container contents should remain the same on a drop.
+                //But if we decide to prompt the driver with the "Is container full" question, then...
+                ////Default to E(Empty)
+                //containerMaster.ContainerContents = ContainerContentsConstants.Empty;
+                //if (driverContainerActionProcess.ContainerContents != null)
+                //{
+                //    //Only change for E (Empty) is one was provided.
+                //    containerMaster.ContainerContents = driverContainerActionProcess.ContainerContents;
+                //}
             }
 
             DateTime? prevLastActionDateTime = containerMaster.ContainerLastActionDateTime;
             containerMaster.ContainerLastActionDateTime = driverContainerActionProcess.ActionDateTime;
-            containerMaster.ContainerContents = driverContainerActionProcess.ContainerContents;
+
 
             //The container status should remain the same. Still at yard.
             //containerMaster.ContainerStatus = ContainerStatusConstants.Yard;
+
             //The previous trip number should remain the same.
-            // containerMaster.ContainerPrevTripNumber;
+            //containerMaster.ContainerPrevTripNumber;
+
             //The customer info remains the same.
             //containerMaster.ContainerCustHostCode;
             //containerMaster.ContainerCustType;
@@ -786,7 +805,23 @@ namespace Brady.ScrapRunner.DataService.ProcessTypes
                     containerMaster.ContainerLocation = driverContainerActionProcess.ContainerLocation;
                 }
 
-                containerMaster.ContainerContents = driverContainerActionProcess.ContainerContents;
+                //As a precaution, if we get a null value
+                if (driverContainerActionProcess.ContainerContents == null)
+                {
+                    //Initialize to E (Empty)
+                    containerMaster.ContainerContents = ContainerContentsConstants.Empty;
+                    //If the driver has picked up a full container or a loaded container, we assume it is full
+                    //Exception trips will not hit this logic.
+                    if (currentTripSegment.TripSegType == BasicTripTypeConstants.PickupFull ||
+                        currentTripSegment.TripSegType == BasicTripTypeConstants.Load)
+                    {
+                        containerMaster.ContainerContents = ContainerContentsConstants.Loaded;
+                    }
+                }
+                else
+                {
+                    containerMaster.ContainerContents = driverContainerActionProcess.ContainerContents;
+                }
                 containerMaster.ContainerLevel = driverContainerActionProcess.ContainerLevel;
                 containerMaster.ContainerLatitude = driverContainerActionProcess.Latitude;
                 containerMaster.ContainerLongitude = driverContainerActionProcess.Longitude;
