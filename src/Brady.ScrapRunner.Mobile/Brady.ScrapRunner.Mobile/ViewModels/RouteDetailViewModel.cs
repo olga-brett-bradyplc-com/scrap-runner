@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 using Acr.UserDialogs;
 using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Messages;
 using Brady.ScrapRunner.Mobile.Models;
 using MvvmCross.Core.ViewModels;
 using Brady.ScrapRunner.Mobile.Resources;
+using MvvmCross.Plugins.Messenger;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -28,6 +30,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ITerminalService _terminalService;
         private readonly ICodeTableService _codeTableService;
         private readonly ILocationGeofenceService _locationGeofenceService;
+        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private readonly IMvxMessenger _mvxMessenger;
 
         public RouteDetailViewModel(
             ITripService tripService, 
@@ -37,7 +41,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ICodeTableService codeTableService,
             IContainerService containerService,
             ITerminalService terminalService, 
-            ILocationGeofenceService locationGeofenceService)
+            ILocationGeofenceService locationGeofenceService,
+            IMvxMessenger mvxMessenger)
         {
             _tripService = tripService;
             _driverService = driverService;
@@ -47,10 +52,39 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _terminalService = terminalService;
             _locationGeofenceService = locationGeofenceService;
             _codeTableService = codeTableService;
+            _mvxMessenger = mvxMessenger;
+            _mvxSubscriptionToken = mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
 
             EnRouteCommand = new MvxAsyncCommand(ExecuteEnRouteCommandAsync);
             ArriveCommand = new MvxAsyncCommand(ExecuteArriveCommandAsync);
             NextStageCommand = new MvxAsyncCommand(ExecuteNextStageCommandAsync);
+        }
+        private void OnTripNotification(TripNotificationMessage msg)
+        {
+            switch (msg.Context)
+            {
+                case TripNotificationContext.Canceled:
+                case TripNotificationContext.Reassigned:
+                case TripNotificationContext.MarkedDone:
+                    if (msg.Trip.TripNumber == TripNumber)
+                        ShowViewModel<RouteSummaryViewModel>();
+                    break;
+                case TripNotificationContext.New:
+                    break;
+                case TripNotificationContext.Modified:
+                    LoadData();
+                    break;
+                case TripNotificationContext.OnHold:
+                    break;
+                case TripNotificationContext.Future:
+                    break;
+                case TripNotificationContext.Unassigned:
+                    break;
+                case TripNotificationContext.Resequenced:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public void Init(string tripNumber)
@@ -69,8 +103,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripNumber = tripNumber;
             CurrentStatus = status;
         }
- 
-        public override async void Start()
+
+        private async void LoadData()
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
             ContTypesList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerType);
@@ -78,7 +112,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             // We grab all the trips to validate driver is on correct trip if DEFEnforceSeqProcess = Y
             var trips = await _tripService.FindTripsAsync();
             var trip = trips.FirstOrDefault(ts => ts.TripNumber == TripNumber);
-            
+
             Title = trip.TripTypeDesc;
             SubTitle = $"{AppResources.Trip} {trip.TripNumber}";
             TripDriverInstructions = trip.TripDriverInstructions;
@@ -91,7 +125,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var customerDirections =
                 await _customerService.FindCustomerDirections(fullTripSegments.FirstOrDefault().TripSegDestCustHostCode);
 
-            if(customerDirections.Count > 0)
+            if (customerDirections.Count > 0)
                 CustomerDirections = new CustomerDirectionsWrapper
                 {
                     TripCustHostCode = fullTripSegments.FirstOrDefault().TripSegDestCustHostCode,
@@ -123,7 +157,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                         TripCustAddress = segment.TripSegDestCustAddress1,
                         TripCustCityStateZip = segment.DestCustCityStateZip,
                         Notes = trip.TripDriverInstructions,
-                        TripSegments = new List<Grouping<TripSegmentModel, TripSegmentContainerModel>>{ grouping }
+                        TripSegments = new List<Grouping<TripSegmentModel, TripSegmentContainerModel>> { grouping }
                     });
                 }
             }
@@ -148,9 +182,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             // If the user is already on a trip, or DEFEnforceSeqProcess = Y and they're not on their first avaliable trip, mark the trip as read-only
             var seqEnforced = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFEnforceSeqProcess);
-            if (!string.IsNullOrEmpty(CurrentDriver.TripNumber) && 
-                CurrentDriver.Status != DriverStatusSRConstants.LoggedIn && 
-                CurrentDriver.Status != DriverStatusSRConstants.Available && 
+            if (!string.IsNullOrEmpty(CurrentDriver.TripNumber) &&
+                CurrentDriver.Status != DriverStatusSRConstants.LoggedIn &&
+                CurrentDriver.Status != DriverStatusSRConstants.Available &&
                 TripNumber != CurrentDriver.TripNumber)
             {
                 ReadOnlyTrip = true;
@@ -182,6 +216,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     await SetAutoDepartAsync(firstSegment);
                 }
             }
+
+        }
+        public override void Start()
+        {
+            LoadData();
             base.Start();
         }
 

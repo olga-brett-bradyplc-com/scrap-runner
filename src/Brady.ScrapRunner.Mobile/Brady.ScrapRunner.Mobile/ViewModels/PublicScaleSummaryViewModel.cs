@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
@@ -6,7 +7,9 @@ using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Messages;
 using Brady.ScrapRunner.Mobile.Resources;
+using MvvmCross.Plugins.Messenger;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -18,14 +21,46 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
     {
         private readonly ITripService _tripService;
         private readonly ICodeTableService _codeTableService;
+        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private readonly IMvxMessenger _mvxMessenger;
 
-        public PublicScaleSummaryViewModel(ITripService tripService, ICodeTableService codeTableService)
+        public PublicScaleSummaryViewModel(ITripService tripService, ICodeTableService codeTableService, IMvxMessenger mvxMessenger)
         {
             _tripService = tripService;
             _codeTableService = codeTableService;
+            _mvxMessenger = mvxMessenger;
+            _mvxSubscriptionToken = mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
 
             Title = AppResources.PublicScaleSummary;
             ContainerSelectedCommand = new MvxCommand<TripSegmentContainerModel>(ExecuteContainerSelectedCommand);
+        }
+        private void OnTripNotification(TripNotificationMessage msg)
+        {
+            switch (msg.Context)
+            {
+                case TripNotificationContext.Canceled:
+                case TripNotificationContext.Reassigned:
+                case TripNotificationContext.MarkedDone:
+                    if (msg.Trip.TripNumber == TripNumber)
+                        ShowViewModel<RouteSummaryViewModel>();
+                    break;
+                case TripNotificationContext.New:
+                    break;
+                case TripNotificationContext.Modified:
+                    LoadData();
+                    break;
+                case TripNotificationContext.OnHold:
+                    break;
+                case TripNotificationContext.Future:
+                    break;
+                case TripNotificationContext.Unassigned:
+                    break;
+                case TripNotificationContext.Resequenced:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
         }
         public void Init(string tripNumber, string methodOfEntry)
         {
@@ -46,9 +81,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _contTypeList; }
             set { SetProperty(ref _contTypeList, value); }
         }
-        public override async void Start()
-        {
 
+        private async void LoadData()
+        {
             using (var tripDataLoad = UserDialogs.Instance.Loading(AppResources.LoadingTripData, maskType: MaskType.Clear))
             {
                 var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
@@ -71,6 +106,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 if (list.Any())
                     Containers = list;
             }
+            
+        }
+        public override void Start()
+        {
+            LoadData();
 
             base.Start();
         }

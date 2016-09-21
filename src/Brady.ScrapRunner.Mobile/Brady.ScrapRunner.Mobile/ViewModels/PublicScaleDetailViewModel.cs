@@ -6,6 +6,9 @@ using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Messages;
+using MvvmCross.Platform;
+using MvvmCross.Plugins.Messenger;
 
 /* TODO: Add process of time out for public scale - after certain period of time delay screen pops up*/
 namespace Brady.ScrapRunner.Mobile.ViewModels
@@ -21,13 +24,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ITripService _tripService;
         private readonly IDriverService _driverService;
         private readonly ICodeTableService _codeTableService;
+        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private readonly IMvxMessenger _mvxMessenger;
 
         public PublicScaleDetailViewModel(ITripService tripService, IDriverService driverService,
-            ICodeTableService codeTableService)
+            ICodeTableService codeTableService, IMvxMessenger mvxMessenger)
         {
             _tripService = tripService;
             _driverService = driverService;
             _codeTableService = codeTableService;
+            _mvxMessenger = mvxMessenger;
+            _mvxSubscriptionToken = mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
 
             Title = AppResources.PublicScaleDetail;
 
@@ -40,6 +47,33 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ContinueCommand = new MvxAsyncCommand(ExecuteContinueCommandAsync);
         }
 
+        private void OnTripNotification(TripNotificationMessage msg)
+        {
+            switch (msg.Context)
+            {
+                case TripNotificationContext.Canceled:
+                case TripNotificationContext.Reassigned:
+                case TripNotificationContext.MarkedDone:
+                    if (msg.Trip.TripNumber == TripNumber)
+                        ShowViewModel<RouteSummaryViewModel>();
+                    break;
+                case TripNotificationContext.New:
+                    break;
+                case TripNotificationContext.Modified:
+                    LoadData();
+                    break;
+                case TripNotificationContext.OnHold:
+                    break;
+                case TripNotificationContext.Future:
+                    break;
+                case TripNotificationContext.Unassigned:
+                    break;
+                case TripNotificationContext.Resequenced:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
         private IMvxAsyncCommand _noProcessCommandAsync;
 
         public IMvxAsyncCommand NoProcessCommandAsync
@@ -71,7 +105,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private DriverStatusModel CurrentDriver { get; set; }
 
-        public override async void Start()
+        public async void LoadData()
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
@@ -86,7 +120,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 foreach (var cont in containers)
                 {
                     var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == cont.TripSegContainerType?.TrimEnd());
-                    cont.TripSegContainerTypeDesc = contType != null ? contType.CodeDisp1?.TrimEnd() : cont.TripSegContainerType ;
+                    cont.TripSegContainerTypeDesc = contType != null ? contType.CodeDisp1?.TrimEnd() : cont.TripSegContainerType;
                 }
                 var grouping = new Grouping<TripSegmentModel, TripSegmentContainerModel>(tsm, containers);
                 list.Add(grouping);
@@ -98,8 +132,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 Containers = list;
             }
 
+        }
+        public override void Start()
+        {
+            LoadData();
+
             base.Start();
         }
+
 
         // Listview bindings
         private ObservableCollection<Grouping<TripSegmentModel, TripSegmentContainerModel>> _containers;
@@ -164,10 +204,11 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         public DateTime? SecondGrossTime
         {
             get { return _secondGrossTime; }
-            set { SetProperty(ref _secondGrossTime, value); }
+            set{ SetProperty(ref _secondGrossTime, value);}
         }
 
         private DateTime? _tareTime;
+
         public DateTime? TareTime
         {
             get { return _tareTime; }
@@ -175,6 +216,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         }
 
         private string _selectedReason;
+
         public string SelectedReason
         {
             get { return _selectedReason; }
