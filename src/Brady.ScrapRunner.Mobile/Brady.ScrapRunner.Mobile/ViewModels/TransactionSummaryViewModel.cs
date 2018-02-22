@@ -9,8 +9,10 @@ using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Enums;
+using Brady.ScrapRunner.Mobile.Messages;
 using BWF.DataServices.Metadata.Models;
 using MvvmCross.Binding.ExtensionMethods;
+using MvvmCross.Plugins.Messenger;
 using Splat;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
@@ -32,13 +34,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
         private readonly IContainerService _containerService;
         private readonly ICodeTableService _codeTableService;
+        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private readonly IMvxMessenger _mvxMessenger;
 
         public TransactionSummaryViewModel(ITripService tripService, 
             IPreferenceService preferenceService, 
             ICustomerService customerService, 
             IDriverService driverService, 
             ICodeTableService codeTableService,
-            IContainerService containerService)
+            IContainerService containerService,
+            IMvxMessenger mvxMessenger)
         {
             _tripService = tripService;
             _preferenceService = preferenceService;
@@ -46,6 +51,35 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _driverService = driverService;
             _codeTableService = codeTableService;
             _containerService = containerService;
+            _mvxMessenger = mvxMessenger;
+            _mvxSubscriptionToken = mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
+        }
+        private void OnTripNotification(TripNotificationMessage msg)
+        {
+            switch (msg.Context)
+            {
+                case TripNotificationContext.Canceled:
+                case TripNotificationContext.Reassigned:
+                case TripNotificationContext.MarkedDone:
+                    if (msg.Trip.TripNumber == TripNumber)
+                        ShowViewModel<RouteSummaryViewModel>();
+                    break;
+                case TripNotificationContext.New:
+                    break;
+                case TripNotificationContext.Modified:
+                    LoadData();
+                    break;
+                case TripNotificationContext.OnHold:
+                    break;
+                case TripNotificationContext.Future:
+                    break;
+                case TripNotificationContext.Unassigned:
+                    break;
+                case TripNotificationContext.Resequenced:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public void Init(string tripNumber)
@@ -59,12 +93,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _contTypeList, value); }
         }
 
-        public override async void Start()
+        private async void LoadData()
         {
-            Title = AppResources.Transactions;
-            SubTitle = $"{AppResources.Trip} {TripNumber}";
-
-            FinishLabel = AppResources.FinishLabel;
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
 
             var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
@@ -105,6 +135,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var defAllowAddRt = await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFAllowAddRT);
 
             AllowRtnAdd = doesRtnSegExistAtEnd && Constants.Yes.Equals(defAllowAddRt);
+
+        }
+        public override void Start()
+        {
+            Title = AppResources.Transactions;
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
+
+            FinishLabel = AppResources.FinishLabel;
+
+            LoadData();
 
             base.Start();
         }
@@ -204,7 +244,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             foreach (var cont in containers)
                 containerNumbers.Add(cont.TripSegContainerNumber);
 
-            if (!containerNumbers.Contains(scannedNumber))
+            if (CurrentTransaction.DefaultTripSegContainerNumber != "<NO NUMBER>" && !containerNumbers.Contains(scannedNumber))
             {
                 if (await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFPrevChangContID) ==
                     Constants.No)

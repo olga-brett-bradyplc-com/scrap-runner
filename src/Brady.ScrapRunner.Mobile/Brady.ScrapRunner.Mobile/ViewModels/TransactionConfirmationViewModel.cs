@@ -8,9 +8,11 @@ using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Messages;
 using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
+using MvvmCross.Plugins.Messenger;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -19,15 +21,47 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly ITripService _tripService;
         private readonly IDriverService _driverService;
         private readonly ICodeTableService _codeTableService;
+        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private readonly IMvxMessenger _mvxMessenger;
 
-        public TransactionConfirmationViewModel(ITripService tripService, IDriverService driverService, ICodeTableService codeTableService)
+        public TransactionConfirmationViewModel(ITripService tripService, IDriverService driverService, ICodeTableService codeTableService,
+            IMvxMessenger mvxMessenger)
         {
             _tripService = tripService;
             _driverService = driverService;
             _codeTableService = codeTableService;
             Title = AppResources.SignatureReceipt;
+            _mvxMessenger = mvxMessenger;
+            _mvxSubscriptionToken = mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
         }
 
+        private void OnTripNotification(TripNotificationMessage msg)
+        {
+            switch (msg.Context)
+            {
+                case TripNotificationContext.Canceled:
+                case TripNotificationContext.Reassigned:
+                case TripNotificationContext.MarkedDone:
+                    if (msg.Trip.TripNumber == TripNumber)
+                        ShowViewModel<RouteSummaryViewModel>();
+                    break;
+                case TripNotificationContext.New:
+                    break;
+                case TripNotificationContext.Modified:
+                    LoadData();
+                    break;
+                case TripNotificationContext.OnHold:
+                    break;
+                case TripNotificationContext.Future:
+                    break;
+                case TripNotificationContext.Unassigned:
+                    break;
+                case TripNotificationContext.Resequenced:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
         public void Init(string tripNumber)
         {
             TripNumber = tripNumber;
@@ -40,7 +74,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             set { SetProperty(ref _contTypeList, value); }
         }
 
-        public override async void Start()
+        private async void LoadData()
         {
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
             var segments = await _tripService.FindNextTripLegSegmentsAsync(TripNumber);
@@ -62,6 +96,12 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             if (list.Any())
                 Containers = list;
+
+
+        }
+        public override void Start()
+        {
+            LoadData();
 
             base.Start();
         }

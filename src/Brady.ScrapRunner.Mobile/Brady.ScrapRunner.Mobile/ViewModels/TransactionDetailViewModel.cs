@@ -8,9 +8,11 @@ using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Enums;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Messages;
 using Brady.ScrapRunner.Mobile.Models;
 using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Core.ViewModels;
+using MvvmCross.Plugins.Messenger;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -22,13 +24,16 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
         private readonly IPreferenceService _preferenceService;
         private readonly IContainerService _containerService;
+        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private readonly IMvxMessenger _mvxMessenger;
 
         public TransactionDetailViewModel(ITripService tripService, 
             ICodeTableService codeTableService, 
             ICustomerService customerService,
             IPreferenceService preferenceService,
             IContainerService containerService,
-            IDriverService driverService)
+            IDriverService driverService,
+            IMvxMessenger mvxMessenger)
         {
             _tripService = tripService;
             _codeTableService = codeTableService;
@@ -36,6 +41,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             _preferenceService = preferenceService;
             _containerService = containerService;
             _driverService = driverService;
+            _mvxMessenger = mvxMessenger;
+            _mvxSubscriptionToken = mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
         }
 
         // Initialize parameters passed from transaction summary screen
@@ -51,11 +58,36 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             get { return _contTypeList; }
             set { SetProperty(ref _contTypeList, value); }
         }
-
-        public override async void Start()
+        private void OnTripNotification(TripNotificationMessage msg)
         {
-            Title = AppResources.TransactionDetail;
-            SubTitle = $"{AppResources.Trip} {TripNumber}";
+            switch (msg.Context)
+            {
+                case TripNotificationContext.Canceled:
+                case TripNotificationContext.Reassigned:
+                case TripNotificationContext.MarkedDone:
+                    if (msg.Trip.TripNumber == TripNumber)
+                        ShowViewModel<RouteSummaryViewModel>();
+                    break;
+                case TripNotificationContext.New:
+                    break;
+                case TripNotificationContext.Modified:
+                    LoadData();
+                    break;
+                case TripNotificationContext.OnHold:
+                    break;
+                case TripNotificationContext.Future:
+                    break;
+                case TripNotificationContext.Unassigned:
+                    break;
+                case TripNotificationContext.Resequenced:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private async void LoadData()
+        {
             ContTypesList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerType);
 
             CurrentDriver = await _driverService.GetCurrentDriverStatusAsync();
@@ -91,7 +123,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var customLocation = customerLocations.Any(l => l.CustLocation == Container?.TripSegContainerLocation);
 
             // Was a custom location entered in dispatch
-            if(!customLocation && Container?.TripSegContainerLocation != null )
+            if (!customLocation && Container?.TripSegContainerLocation != null)
                 CustomerLocationList.Insert(1, new CustomerLocationModel()
                 {
                     CustHostCode = Segment.TripSegDestCustHostCode,
@@ -110,7 +142,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             var allowCommoditySelection =
                 await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFCommodSelection);
 
-            if ( allowCommoditySelection == Constants.Yes )
+            if (allowCommoditySelection == Constants.Yes)
                 CommoditySelectionEnabled = true;
 
             if (!string.IsNullOrEmpty(Container?.TripSegContainerCommodityCode))
@@ -124,6 +156,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (!string.IsNullOrEmpty(Container?.TripSegContainerLocation))
                 SelectedLocation =
                     CustomerLocationList.FirstOrDefault(l => string.Equals(l.CustLocation, Container.TripSegContainerLocation, StringComparison.CurrentCultureIgnoreCase));
+
+        }
+        public override void Start()
+        {
+            Title = AppResources.TransactionDetail;
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
+
+            LoadData();
             
             base.Start();
         }
@@ -135,7 +175,17 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
         private async Task ExecuteTransactionCompleteCommand()
         {
+
             var container = await _containerService.FindContainerAsync(TripSegContainerNumber);
+
+            var useContainerLevel =
+                await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel);
+
+            if ( useContainerLevel == Constants.Yes && SelectedLevel.CodeValue == null && _tripService.IsTripLegLoaded(Segment))
+            {
+                UserDialogs.Instance.Alert(AppResources.LevelRequired, AppResources.Error, AppResources.OK);
+                return;
+            }
 
             if (container == null)
             {
@@ -159,15 +209,6 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     else
                         TripSegContainerNumber = contPrompt.Text;
                 }
-            }
-
-            var useContainerLevel =
-                await _preferenceService.FindPreferenceValueAsync(PrefDriverConstants.DEFUseContainerLevel);
-
-            if ( useContainerLevel == Constants.Yes && SelectedLevel.CodeValue == null && _tripService.IsTripLegLoaded(Segment))
-            {
-                UserDialogs.Instance.Alert(AppResources.LevelRequired, AppResources.Error, AppResources.OK);
-                return;
             }
 
             using (var completeTripSegmentContainer = UserDialogs.Instance.Loading(AppResources.Loading,maskType: MaskType.Black))

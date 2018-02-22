@@ -8,8 +8,10 @@ using Brady.ScrapRunner.Domain.Models;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Messages;
 using Brady.ScrapRunner.Mobile.Resources;
 using MvvmCross.Binding.Combiners;
+using MvvmCross.Plugins.Messenger;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -24,18 +26,23 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IDriverService _driverService;
         private readonly ICustomerService _customerService;
         private readonly ICodeTableService _codeTableService;
+        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private readonly IMvxMessenger _mvxMessenger;
 
         public ScaleSummaryViewModel(ITripService tripService, 
             IContainerService containerService, 
             IDriverService driverService, 
             ICustomerService customerService,
-            ICodeTableService codeTableService)
+            ICodeTableService codeTableService,
+            IMvxMessenger mvxMessenger)
         {
             _tripService = tripService;
             _containerService = containerService;
             _driverService = driverService;
             _customerService = customerService;
             _codeTableService = codeTableService;
+            _mvxMessenger = mvxMessenger;
+            _mvxSubscriptionToken = mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
 
             ContainerSelectedCommand = new MvxCommand<ContainerMasterWithTripContainer>(ExecuteContainerSelectedCommand);
         }
@@ -49,11 +56,36 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         {
             TripNumber = tripNumber;
         }
-
-        public override async void Start()
+        private void OnTripNotification(TripNotificationMessage msg)
         {
-            Title = AppResources.YardScaleSummary;
-            SubTitle = AppResources.Trip + $" {TripNumber}";
+            switch (msg.Context)
+            {
+                case TripNotificationContext.Canceled:
+                case TripNotificationContext.Reassigned:
+                case TripNotificationContext.MarkedDone:
+                    if (msg.Trip.TripNumber == TripNumber)
+                        ShowViewModel<RouteSummaryViewModel>();
+                    break;
+                case TripNotificationContext.New:
+                    break;
+                case TripNotificationContext.Modified:
+                    LoadData();
+                    break;
+                case TripNotificationContext.OnHold:
+                    break;
+                case TripNotificationContext.Future:
+                    break;
+                case TripNotificationContext.Unassigned:
+                    break;
+                case TripNotificationContext.Resequenced:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private async void LoadData()
+        {
             ContTypesList = await _codeTableService.FindCodeTableList(CodeTableNameConstants.ContainerType);
 
             using (var tripDataLoad = UserDialogs.Instance.Loading(AppResources.LoadingTripData, maskType: MaskType.Clear))
@@ -62,7 +94,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 var containersOnPowerId = await _containerService.FindPowerIdContainersAsync(CurrentDriver.PowerId);
                 var containersToBeProcessed = containersOnPowerId.Where(c => c.ContainerComplete != Constants.Yes).ToList();
                 var powerlist = new ObservableCollection<Grouping<ContainerGroupKey, ContainerMasterWithTripContainer>>();
-                
+
                 var currentTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
                 TripSegNumber = currentTripSegment.FirstOrDefault().TripSegNumber;
 
@@ -76,7 +108,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                     var tripSegments = await _tripService.FindAllContainersForTripSegmentAsync(container.ContainerCurrentTripNumber, container.ContainerCurrentTripSegNumber);
 
                     // Existing container grouping
-                    if ( powerlist.Any(grp => grp.Key.Id == $"{container.ContainerCustHostCode};{container.ContainerCurrentTripNumber}"))
+                    if (powerlist.Any(grp => grp.Key.Id == $"{container.ContainerCustHostCode};{container.ContainerCurrentTripNumber}"))
                     {
                         powerlist.SingleOrDefault(grp => grp.Key.Id == $"{container.ContainerCustHostCode};{container.ContainerCurrentTripNumber}").Add(new ContainerMasterWithTripContainer
                         {
@@ -110,7 +142,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
                 }
 
                 // Append "Unused" container grouping to end of power list if any unused containers exist
-                foreach ( var container in containersToBeProcessed.Where( container => container.ContainerCurrentTripNumber == null || container.ContainerCustHostCode == null))
+                foreach (var container in containersToBeProcessed.Where(container => container.ContainerCurrentTripNumber == null || container.ContainerCustHostCode == null))
                 {
                     var contType = ContTypesList.FirstOrDefault(ct => ct.CodeValue == container.ContainerType);
                     container.ContainerTypeDesc = contType != null
@@ -150,6 +182,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
                 ContainersOnPowerId = powerlist;
             }
+
+        }
+        public override void Start()
+        {
+            Title = AppResources.YardScaleSummary;
+            SubTitle = AppResources.Trip + $" {TripNumber}";
+
+            LoadData();
 
             base.Start();
         }

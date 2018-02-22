@@ -7,6 +7,8 @@ using Brady.ScrapRunner.Domain;
 using Brady.ScrapRunner.Domain.Process;
 using Brady.ScrapRunner.Mobile.Helpers;
 using Brady.ScrapRunner.Mobile.Interfaces;
+using Brady.ScrapRunner.Mobile.Messages;
+using MvvmCross.Plugins.Messenger;
 
 namespace Brady.ScrapRunner.Mobile.ViewModels
 {
@@ -24,6 +26,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
         private readonly IPreferenceService _preferenceService;
         private readonly IContainerService _containerService;
         private readonly ICustomerService _customerService;
+        private MvxSubscriptionToken _mvxSubscriptionToken;
+        private readonly IMvxMessenger _mvxMessenger;
 
         private static readonly string NoReasonCodeSelected = "NOREASONCODE";
 
@@ -37,7 +41,8 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             ICodeTableService codeTableService,
             IPreferenceService preferenceService,
             IContainerService containerService,
-            ICustomerService customerService)
+            ICustomerService customerService,
+            IMvxMessenger mvxMessenger)
         {
             _tripService = tripService;
             _driverService = driverService;
@@ -48,6 +53,35 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             ContainerSetDownCommand = new MvxAsyncCommand(ExecuteContainerSetDownCommandAsync);
             ContainerLeftOnTruckCommand = new MvxAsyncCommand(ExecuteContainerLeftOnTruckCommandAsync);
+            _mvxMessenger = mvxMessenger;
+            _mvxSubscriptionToken = mvxMessenger.SubscribeOnMainThread<TripNotificationMessage>(OnTripNotification);
+        }
+        private void OnTripNotification(TripNotificationMessage msg)
+        {
+            switch (msg.Context)
+            {
+                case TripNotificationContext.Canceled:
+                case TripNotificationContext.Reassigned:
+                case TripNotificationContext.MarkedDone:
+                    if (msg.Trip.TripNumber == TripNumber)
+                        ShowViewModel<RouteSummaryViewModel>();
+                    break;
+                case TripNotificationContext.New:
+                    break;
+                case TripNotificationContext.Modified:
+                    LoadData();
+                    break;
+                case TripNotificationContext.OnHold:
+                    break;
+                case TripNotificationContext.Future:
+                    break;
+                case TripNotificationContext.Unassigned:
+                    break;
+                case TripNotificationContext.Resequenced:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public void Init(string tripNumber, string containerNumber)
@@ -63,12 +97,9 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             TripSegContainerSeqNumber = tripSegContainerSeqNumber;
             TripSegContainerNumber = tripSegContainerNumber;
         }
- 
-        public override async void Start()
-        {
-            Title = AppResources.YardScaleDetail;
-            SubTitle = $"{AppResources.Trip} {TripNumber}";
 
+        private async void LoadData()
+        {
             var currentTripSegment = await _tripService.FindNextTripSegmentsAsync(TripNumber);
             TripSegNumber = currentTripSegment.FirstOrDefault().TripSegNumber;
 
@@ -82,7 +113,7 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
 
             var list = new ObservableCollection<Grouping<ContainerGroupKey, ContainerMasterWithTripContainer>>();
             var tempCustomerName = await _customerService.FindCustomerMaster(container.ContainerCustHostCode);
-            
+
             var tempContainerKey = new ContainerGroupKey
             {
                 TripNumber = container.ContainerCurrentTripNumber,
@@ -105,6 +136,14 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             list.Add(new Grouping<ContainerGroupKey, ContainerMasterWithTripContainer>(tempContainerKey, tempContainerMasterTripSeg));
 
             Containers = list;
+
+        }
+        public override void Start()
+        {
+            Title = AppResources.YardScaleDetail;
+            SubTitle = $"{AppResources.Trip} {TripNumber}";
+
+            LoadData();
 
             base.Start();
         }
@@ -214,7 +253,10 @@ namespace Brady.ScrapRunner.Mobile.ViewModels
             if (!await CheckWeights(tarePressed))
                 return;
 
-            if (TareWeight > GrossWeight || TareWeight > SecondGrossWeight)
+            if (TareWeight <= 0)
+                return;
+
+            if (TareWeight > GrossWeight)
             {
                 await
                     UserDialogs.Instance.AlertAsync(AppResources.TareWeightError, AppResources.Error,
